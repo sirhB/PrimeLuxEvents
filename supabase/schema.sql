@@ -7,7 +7,7 @@ create table products (
   name text not null,
   description text,
   price decimal(10, 2) not null,
-  category_id uuid,
+  category_id uuid references categories(id) on delete set null,
   image_url text,
   stock integer default 0,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,

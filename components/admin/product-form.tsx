@@ -41,7 +41,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             description: formData.get('description') as string,
             price: parseFloat(formData.get('price') as string),
             stock: parseInt(formData.get('stock') as string),
-            category_id: formData.get('category_id') as string,
+            category_id: (formData.get('category_id') as string) || null,
             image_url: formData.get('image_url') as string,
         }
 

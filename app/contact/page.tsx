@@ -3,8 +3,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { MapPin, Phone, Mail } from "lucide-react"
+import { getSiteContent } from "@/lib/content"
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const content = await getSiteContent()
+
   return (
     <section className="py-20 md:py-32 bg-background">
       <div className="container px-4 md:px-6">
@@ -12,10 +15,9 @@ export default function ContactPage() {
           {/* Contact Info */}
           <div className="space-y-12">
             <div className="space-y-6">
-              <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-tight">Get in Touch</h1>
+              <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-tight">{content['contact.hero.title']}</h1>
               <p className="text-lg text-muted-foreground max-w-md">
-                We'd love to hear about your upcoming event. Fill out the form or contact us directly to start the
-                conversation.
+                {content['contact.hero.description']}
               </p>
             </div>
 
@@ -25,11 +27,9 @@ export default function ContactPage() {
                   <MapPin className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">Visit Our Showroom</h3>
-                  <p className="text-muted-foreground">
-                    123 Luxury Lane, Suite 100
-                    <br />
-                    Beverly Hills, CA 90210
+                  <h3 className="font-medium mb-1">{content['contact.info.address.title']}</h3>
+                  <p className="text-muted-foreground whitespace-pre-line">
+                    {content['contact.info.address.value']}
                   </p>
                 </div>
               </div>
@@ -39,9 +39,9 @@ export default function ContactPage() {
                   <Phone className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">Call Us</h3>
-                  <p className="text-muted-foreground">(310) 555-0123</p>
-                  <p className="text-sm text-muted-foreground mt-1">Mon-Fri: 9am - 6pm</p>
+                  <h3 className="font-medium mb-1">{content['contact.info.phone.title']}</h3>
+                  <p className="text-muted-foreground">{content['contact.info.phone.value']}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{content['contact.info.phone.hours']}</p>
                 </div>
               </div>
 
@@ -50,8 +50,8 @@ export default function ContactPage() {
                   <Mail className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">Email Us</h3>
-                  <p className="text-muted-foreground">hello@primeluxevents.com</p>
+                  <h3 className="font-medium mb-1">{content['contact.info.email.title']}</h3>
+                  <p className="text-muted-foreground">{content['contact.info.email.value']}</p>
                 </div>
               </div>
             </div>
@@ -66,7 +66,7 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="bg-muted/30 p-8 md:p-12 rounded-lg border border-border/50">
-            <h2 className="text-2xl font-serif mb-6">Send us a Message</h2>
+            <h2 className="text-2xl font-serif mb-6">{content['contact.form.title']}</h2>
             <form className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">

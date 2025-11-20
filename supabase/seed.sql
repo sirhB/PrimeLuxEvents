@@ -112,5 +112,43 @@ INSERT INTO content (key, value, type) VALUES
     "role": "Corporate Gala Organizer",
     "image": "/diverse-executive-team.png"
   }
-]', 'json')
+]', 'json'),
+
+('catalog.header.title', 'The Collection', 'text'),
+('catalog.header.subtitle', 'Browse our curated inventory of luxury event rentals.', 'text'),
+
+('contact.header.title', 'Get in Touch', 'text'),
+('contact.header.subtitle', 'We''d love to hear about your upcoming event. Fill out the form or contact us directly to start the conversation.', 'text'),
+('contact.info.address', '123 Luxury Lane, Suite 100\nBeverly Hills, CA 90210', 'text'),
+('contact.info.phone', '(310) 555-0123', 'text'),
+('contact.info.email', 'hello@primeluxevents.com', 'text'),
+
+('about.hero.title', 'Curating Extraordinary Moments', 'text'),
+('about.hero.subtitle', 'PrimeLux Events is the premier destination for luxury event rentals, bringing your vision to life with our curated collection of exquisite furniture and decor.', 'text'),
+('about.story.title', 'Our Story', 'text'),
+('about.story.content', '[
+  "Founded in 2010, PrimeLux Events began with a simple mission: to elevate the standard of event rentals. We noticed a gap in the market for truly high-end, well-maintained furniture that could transform a space rather than just fill it.",
+  "Over the past decade, we have grown from a small boutique collection to a comprehensive design house, partnering with the world''s top event planners and designers to execute weddings, galas, and corporate gatherings of distinction.",
+  "Our commitment goes beyond inventory. We believe in the art of hospitality, ensuring that every interaction, from the first quote to the final pickup, is seamless and professional."
+]', 'json'),
+('about.values.title', 'The PrimeLux Standard', 'text'),
+('about.values.description', 'We hold ourselves to the highest standards of quality and service, ensuring your event is nothing short of perfection.', 'text'),
+('about.values.items', '[
+  {
+    "title": "Curated Excellence",
+    "description": "Every piece in our collection is hand-selected for its design, craftsmanship, and ability to make a statement."
+  },
+  {
+    "title": "Impeccable Maintenance",
+    "description": "Our inventory is meticulously inspected and maintained after every event to ensure it arrives in pristine condition."
+  },
+  {
+    "title": "Seamless Logistics",
+    "description": "Our experienced logistics team handles the complexities of delivery and setup, so you can focus on your guests."
+  }
+]', 'json'),
+('about.cta.title', 'Ready to elevate your event?', 'text'),
+('about.cta.subtitle', 'Browse our collection and build your quote online instantly.', 'text'),
+('about.cta.primary', 'Start Your Quote', 'text'),
+('about.cta.secondary', 'Contact Support', 'text')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;

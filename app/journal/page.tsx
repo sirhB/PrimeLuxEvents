@@ -1,23 +1,26 @@
 import Image from "next/image"
 import Link from "next/link"
-import { journalPosts } from "@/lib/data"
 import { ArrowRight } from "lucide-react"
+import { getSiteContent } from "@/lib/content"
 
-export default function JournalPage() {
+export default async function JournalPage() {
+  const content = await getSiteContent()
+  const posts = JSON.parse(content['journal.posts'] || '[]')
+
   return (
     <div className="py-12 md:py-20">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 animate-fade-in-up">
           <div>
-            <h1 className="text-4xl md:text-6xl font-serif mb-4">The Edit</h1>
+            <h1 className="text-4xl md:text-6xl font-serif mb-4">{content['journal.hero.title']}</h1>
             <p className="text-lg text-muted-foreground max-w-xl">
-              Trends, inspiration, and expert advice from the world of luxury events.
+              {content['journal.hero.description']}
             </p>
           </div>
         </div>
 
         <div className="grid gap-12 md:gap-16">
-          {journalPosts.map((post, index) => (
+          {posts.map((post: any, index: number) => (
             <article
               key={post.id}
               className="group grid md:grid-cols-2 gap-8 items-center animate-fade-in-up"
