@@ -255,5 +255,15 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
 -- Catalog Page Content
 INSERT INTO content (key, value, type) VALUES
-('catalog.hero.title', 'The Collection', 'text')
+('catalog.hero.title', 'The Collection', 'text'),
+('catalog.hero.subtitle', 'Premium event rentals for unforgettable celebrations', 'text'),
+('catalog.rental.policy.title', 'Rental Information', 'text'),
+('catalog.rental.policy.description', 'All rentals include a 24-hour period with delivery and pickup. Extended rental periods and setup services available.', 'text'),
+('catalog.delivery.zones', '["Beverly Hills", "Los Angeles", "Santa Monica", "Malibu", "Pasadena", "Orange County"]', 'json'),
+('catalog.pricing.tiers', '{
+  "daily": "Base daily rate for 1-day rentals",
+  "weekend": "Special rate for 2-3 day weekend events",
+  "weekly": "Discounted rate for 7+ day rentals"
+}', 'json')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
+

@@ -9,8 +9,21 @@ create table products (
   price decimal(10, 2) not null,
   category_id uuid references categories(id) on delete set null,
   image_url text,
+  images jsonb default '[]'::jsonb,
   stock integer default 0,
   modifiers jsonb default '[]'::jsonb,
+  -- Rental-specific fields
+  rental_price_daily decimal(10, 2),
+  rental_price_weekend decimal(10, 2),
+  rental_price_weekly decimal(10, 2),
+  quantity_available integer default 1,
+  quantity_reserved integer default 0,
+  minimum_rental_days integer default 1,
+  setup_fee decimal(10, 2) default 0,
+  sku text,
+  weight decimal(10, 2),
+  features jsonb default '[]'::jsonb,
+  care_instructions text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -53,6 +66,38 @@ create table content (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Rental Reservations Table (for availability tracking)
+create table rental_reservations (
+  id uuid default uuid_generate_v4() primary key,
+  product_id uuid references products(id) on delete cascade,
+  order_id uuid references orders(id) on delete cascade,
+  start_date date not null,
+  end_date date not null,
+  quantity integer not null default 1,
+  status text default 'pending',
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Quotes Table (for saved customer quotes)
+create table quotes (
+  id uuid default uuid_generate_v4() primary key,
+  customer_name text,
+  customer_email text,
+  customer_phone text,
+  event_date date,
+  event_type text,
+  venue_address text,
+  cart_data jsonb not null,
+  subtotal decimal(10, 2) not null,
+  delivery_fee decimal(10, 2) default 0,
+  setup_fee decimal(10, 2) default 0,
+  total_amount decimal(10, 2) not null,
+  status text default 'draft',
+  expires_at timestamp with time zone,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- RLS Policies
 
 -- Enable RLS
@@ -61,6 +106,8 @@ alter table categories enable row level security;
 alter table orders enable row level security;
 alter table order_items enable row level security;
 alter table content enable row level security;
+alter table rental_reservations enable row level security;
+alter table quotes enable row level security;
 
 -- Products: Public read, Admin write
 create policy "Public products are viewable by everyone."
@@ -119,3 +166,30 @@ create policy "Admins can update content."
 create policy "Admins can insert content."
   on content for insert
   with check ( auth.role() = 'authenticated' );
+
+-- Rental Reservations: Public read (for availability checking), Admin write
+create policy "Public can view reservations for availability."
+  on rental_reservations for select
+  using ( true );
+
+create policy "Admins can insert reservations."
+  on rental_reservations for insert
+  with check ( auth.role() = 'authenticated' );
+
+create policy "Admins can update reservations."
+  on rental_reservations for update
+  using ( auth.role() = 'authenticated' );
+
+-- Quotes: Public insert (customers can create), Admin read/update
+create policy "Anyone can create quotes."
+  on quotes for insert
+  with check ( true );
+
+create policy "Admins can view all quotes."
+  on quotes for select
+  using ( auth.role() = 'authenticated' );
+
+create policy "Admins can update quotes."
+  on quotes for update
+  using ( auth.role() = 'authenticated' );
+

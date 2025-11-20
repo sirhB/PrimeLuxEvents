@@ -1,15 +1,26 @@
 "use client"
 
 import { use, useState, useEffect } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, Check, Plus, Ruler, Box, Tag } from "lucide-react"
+import { ArrowLeft, Check, Plus, Minus, Package, Truck, Calendar as CalendarIcon, Info } from "lucide-react"
+import { DateRange } from "react-day-picker"
+import { differenceInDays } from "date-fns"
 import { useCart } from "@/components/providers/cart-provider"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { ProductGallery } from "@/components/product-gallery"
+import { RentalDatePicker } from "@/components/rental-date-picker"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 interface ModifierOption {
   id: string
@@ -28,14 +39,21 @@ interface Product {
   name: string
   description: string
   price: number
+  rental_price_daily?: number
+  rental_price_weekend?: number
+  rental_price_weekly?: number
   image_url: string
+  images?: string[]
   category_id: string
   stock: number
+  quantity_available?: number
+  minimum_rental_days?: number
+  setup_fee?: number
   modifiers: Modifier[]
-  // properties from mock data that might be missing in DB schema yet, handling gracefully
-  dimensions?: string
-  material?: string
+  features?: string[]
+  care_instructions?: string
   sku?: string
+  weight?: number
 }
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
@@ -43,6 +61,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedModifiers, setSelectedModifiers] = useState<Record<string, ModifierOption>>({})
+  const [quantity, setQuantity] = useState(1)
+  const [rentalDates, setRentalDates] = useState<DateRange | undefined>()
+  const [rentalDays, setRentalDays] = useState(0)
 
   const { items, addItem, removeItem } = useCart()
   const [isLoaded, setIsLoaded] = useState(false)
@@ -71,7 +92,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   }, [id])
 
   if (loading) {
-    return <div className="container mx-auto px-4 py-20 text-center">Loading...</div>
+    return (
+      <div className="container mx-auto px-4 py-20 text-center">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-secondary rounded w-1/4 mx-auto"></div>
+          <div className="h-4 bg-secondary rounded w-1/2 mx-auto"></div>
+        </div>
+      </div>
+    )
   }
 
   if (!product) {
@@ -79,16 +107,33 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   }
 
   const isInCart = items.some((item) => item.productId === product.id)
+  const maxQuantity = product.quantity_available || product.stock || 10
 
-  // Calculate total price
+  // Calculate pricing based on rental duration
+  const calculateRentalPrice = () => {
+    if (!rentalDays) return product.rental_price_daily || product.price
+
+    if (rentalDays >= 7 && product.rental_price_weekly) {
+      const weeks = Math.floor(rentalDays / 7)
+      const remainingDays = rentalDays % 7
+      return (weeks * product.rental_price_weekly) + (remainingDays * (product.rental_price_daily || product.price))
+    } else if (rentalDays >= 2 && product.rental_price_weekend) {
+      return product.rental_price_weekend
+    } else {
+      return (product.rental_price_daily || product.price) * rentalDays
+    }
+  }
+
+  const basePrice = rentalDays > 0 ? calculateRentalPrice() : (product.rental_price_daily || product.price)
   const modifiersPrice = Object.values(selectedModifiers).reduce((acc, curr) => acc + curr.priceAdjustment, 0)
-  const totalPrice = product.price + modifiersPrice
+  const setupFee = product.setup_fee || 0
+  const subtotal = (basePrice + modifiersPrice) * quantity
+  const totalPrice = subtotal + setupFee
 
   const toggleCart = () => {
     if (isInCart) {
       removeItem(product.id)
     } else {
-      // Note: Cart provider might need update to store selected modifiers
       addItem(product.id)
     }
   }
@@ -104,114 +149,194 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     }
   }
 
+  const handleDateChange = (dateRange: DateRange | undefined, days: number) => {
+    setRentalDates(dateRange)
+    setRentalDays(days)
+  }
+
+  const incrementQuantity = () => {
+    if (quantity < maxQuantity) {
+      setQuantity(q => q + 1)
+    }
+  }
+
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(q => q - 1)
+    }
+  }
+
+  const galleryImages = product.images && product.images.length > 0
+    ? product.images
+    : [product.image_url]
+
+  const canAddToCart = rentalDays >= (product.minimum_rental_days || 1)
+
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10">
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 md:px-6 py-6">
         <Link
           href="/catalog"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors group"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
           Back to Collection
         </Link>
       </div>
 
       <div className="container mx-auto px-4 md:px-6 pb-20">
-        <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-start">
-          {/* Image Section */}
-          <div
-            className={`relative aspect-[3/4] bg-secondary overflow-hidden rounded-sm ${isLoaded ? "animate-fade-in-up" : "opacity-0"}`}
-          >
-            <Image
-              src={product.image_url || "/placeholder.svg"}
-              alt={product.name}
-              fill
-              className="object-cover"
-              priority
-            />
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+          {/* Image Gallery */}
+          <div className={`${isLoaded ? "animate-fade-in-up" : "opacity-0"}`}>
+            <ProductGallery images={galleryImages} productName={product.name} />
           </div>
 
           {/* Details Section */}
-          <div className={`flex flex-col gap-8 ${isLoaded ? "animate-fade-in-up delay-200" : "opacity-0"}`}>
+          <div className={`flex flex-col gap-6 ${isLoaded ? "animate-fade-in-up delay-200" : "opacity-0"}`}>
+            {/* Header */}
             <div>
-              {/* Category fetching omitted for brevity, could fetch if needed */}
-              <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-2">
-                Product
-              </p>
-              <h1 className="text-4xl md:text-5xl font-serif mb-4">{product.name}</h1>
-              <p className="text-2xl font-medium">
-                ${totalPrice.toFixed(2)} <span className="text-sm text-muted-foreground font-normal">/ day</span>
-              </p>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="outline" className="text-xs uppercase">
+                  {product.sku || 'Product'}
+                </Badge>
+                {(product.quantity_available || 0) > 0 ? (
+                  <Badge variant="secondary" className="text-xs">
+                    {product.quantity_available} Available
+                  </Badge>
+                ) : (
+                  <Badge variant="destructive" className="text-xs">
+                    Out of Stock
+                  </Badge>
+                )}
+              </div>
+              <h1 className="text-4xl md:text-5xl font-serif mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                {product.name}
+              </h1>
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-semibold">
+                  ${totalPrice.toFixed(2)}
+                </span>
+                {rentalDays > 0 ? (
+                  <span className="text-sm text-muted-foreground">
+                    for {rentalDays} {rentalDays === 1 ? 'day' : 'days'}
+                  </span>
+                ) : (
+                  <span className="text-sm text-muted-foreground">/ day</span>
+                )}
+              </div>
+              {rentalDays > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  ${basePrice.toFixed(2)} base + ${(modifiersPrice * quantity).toFixed(2)} options + ${setupFee.toFixed(2)} setup
+                </p>
+              )}
             </div>
 
+            <Separator />
+
+            {/* Description */}
             <div className="prose prose-stone max-w-none">
-              <p className="text-lg leading-relaxed text-muted-foreground">{product.description}</p>
+              <p className="text-base leading-relaxed text-muted-foreground">
+                {product.description}
+              </p>
             </div>
 
-            {/* Modifiers Section */}
-            {product.modifiers && product.modifiers.length > 0 && (
-              <div className="space-y-6 py-6 border-y border-border">
-                {product.modifiers.map((modifier) => (
-                  <div key={modifier.id} className="space-y-3">
-                    <Label className="text-base font-medium">{modifier.name}</Label>
-                    <RadioGroup
-                      onValueChange={(value: string) => handleModifierChange(modifier.id, value)}
-                      value={selectedModifiers[modifier.id]?.id}
-                    >
-                      <div className="flex flex-wrap gap-3">
-                        {modifier.options.map((option) => (
-                          <div key={option.id} className="flex items-center space-x-2">
-                            <RadioGroupItem value={option.id} id={option.id} />
-                            <Label htmlFor={option.id} className="cursor-pointer">
-                              {option.label}
-                              {option.priceAdjustment > 0 && ` (+$${option.priceAdjustment.toFixed(2)})`}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </RadioGroup>
-                  </div>
+            {/* Features */}
+            {product.features && product.features.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {product.features.map((feature, idx) => (
+                  <Badge key={idx} variant="secondary">
+                    {feature}
+                  </Badge>
                 ))}
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 py-6 border-b border-border">
-              {product.dimensions && (
-                <div className="flex items-start gap-3">
-                  <Ruler className="h-5 w-5 text-muted-foreground mt-0.5" />
-                  <div>
-                    <h3 className="font-medium text-sm uppercase tracking-wide">Dimensions</h3>
-                    <p className="text-muted-foreground">{product.dimensions}</p>
-                  </div>
-                </div>
-              )}
-              {product.material && (
-                <div className="flex items-start gap-3">
-                  <Box className="h-5 w-5 text-muted-foreground mt-0.5" />
-                  <div>
-                    <h3 className="font-medium text-sm uppercase tracking-wide">Material</h3>
-                    <p className="text-muted-foreground">{product.material}</p>
-                  </div>
-                </div>
-              )}
-              {product.sku && (
-                <div className="flex items-start gap-3">
-                  <Tag className="h-5 w-5 text-muted-foreground mt-0.5" />
-                  <div>
-                    <h3 className="font-medium text-sm uppercase tracking-wide">SKU</h3>
-                    <p className="text-muted-foreground">{product.sku}</p>
-                  </div>
-                </div>
-              )}
+            <Separator />
+
+            {/* Rental Date Picker */}
+            <RentalDatePicker
+              onDateChange={handleDateChange}
+              minDays={product.minimum_rental_days || 1}
+            />
+
+            {/* Quantity Selector */}
+            <div className="space-y-3">
+              <Label className="text-base font-medium">Quantity</Label>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={decrementQuantity}
+                  disabled={quantity <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="text-lg font-medium w-12 text-center">{quantity}</span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={incrementQuantity}
+                  disabled={quantity >= maxQuantity}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  {maxQuantity} available
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-4">
+            {/* Modifiers Section */}
+            {product.modifiers && product.modifiers.length > 0 && (
+              <>
+                <Separator />
+                <div className="space-y-4">
+                  <Label className="text-base font-medium">Customize Your Rental</Label>
+                  {product.modifiers.map((modifier) => (
+                    <div key={modifier.id} className="space-y-3">
+                      <Label className="text-sm font-medium text-muted-foreground">
+                        {modifier.name}
+                      </Label>
+                      <RadioGroup
+                        onValueChange={(value: string) => handleModifierChange(modifier.id, value)}
+                        value={selectedModifiers[modifier.id]?.id}
+                      >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {modifier.options.map((option) => (
+                            <div
+                              key={option.id}
+                              className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-secondary/50 transition-colors"
+                            >
+                              <RadioGroupItem value={option.id} id={option.id} />
+                              <Label htmlFor={option.id} className="cursor-pointer flex-1">
+                                <span className="font-medium">{option.label}</span>
+                                {option.priceAdjustment > 0 && (
+                                  <span className="text-muted-foreground ml-2">
+                                    +${option.priceAdjustment.toFixed(2)}
+                                  </span>
+                                )}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <Separator />
+
+            {/* Add to Cart */}
+            <div className="space-y-4">
               <Button
                 size="lg"
-                className="w-full md:w-auto text-lg h-14 px-8"
+                className="w-full text-lg h-14 shadow-lg hover:shadow-xl transition-all"
                 onClick={toggleCart}
                 variant={isInCart ? "outline" : "default"}
+                disabled={!canAddToCart || (product.quantity_available || 0) === 0}
               >
                 {isInCart ? (
                   <>
@@ -223,13 +348,78 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   </>
                 )}
               </Button>
-              <p className="text-xs text-muted-foreground text-center md:text-left">
-                *Delivery and setup fees calculated at checkout based on location and logistics.
-              </p>
+
+              {!canAddToCart && rentalDays > 0 && (
+                <p className="text-sm text-destructive text-center">
+                  Minimum rental period is {product.minimum_rental_days} {product.minimum_rental_days === 1 ? 'day' : 'days'}
+                </p>
+              )}
+
+              <div className="flex items-start gap-2 text-xs text-muted-foreground bg-secondary/50 p-3 rounded-lg">
+                <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <p>
+                  Delivery and setup fees calculated at checkout based on location and logistics requirements.
+                </p>
+              </div>
             </div>
+
+            <Separator />
+
+            {/* Additional Information */}
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="details">
+                <AccordionTrigger className="text-base font-medium">
+                  Product Details
+                </AccordionTrigger>
+                <AccordionContent className="space-y-2 text-sm text-muted-foreground">
+                  {product.sku && (
+                    <div className="flex justify-between">
+                      <span>SKU:</span>
+                      <span className="font-medium">{product.sku}</span>
+                    </div>
+                  )}
+                  {product.weight && (
+                    <div className="flex justify-between">
+                      <span>Weight:</span>
+                      <span className="font-medium">{product.weight} lbs</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span>Minimum Rental:</span>
+                    <span className="font-medium">
+                      {product.minimum_rental_days || 1} {(product.minimum_rental_days || 1) === 1 ? 'day' : 'days'}
+                    </span>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {product.care_instructions && (
+                <AccordionItem value="care">
+                  <AccordionTrigger className="text-base font-medium">
+                    Care Instructions
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground">
+                    {product.care_instructions}
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+
+              <AccordionItem value="rental">
+                <AccordionTrigger className="text-base font-medium">
+                  Rental Information
+                </AccordionTrigger>
+                <AccordionContent className="space-y-2 text-sm text-muted-foreground">
+                  <p>• Standard rental period includes 24-hour use</p>
+                  <p>• Delivery typically occurs the day before your event</p>
+                  <p>• Pickup scheduled for the day after your event</p>
+                  <p>• Setup and installation available for additional fee</p>
+                  <p>• Damage waiver included with all rentals</p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
