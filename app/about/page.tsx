@@ -5,7 +5,7 @@ import { getSiteContent } from "@/lib/content"
 
 export default async function AboutPage() {
   const content = await getSiteContent()
-  const values = JSON.parse(content['about.values.items'] || '[]')
+  const values = content['about.values.items'] || []
 
   return (
     <>

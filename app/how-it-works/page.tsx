@@ -7,8 +7,8 @@ import { getSiteContent } from "@/lib/content"
 export default async function HowItWorksPage() {
   const content = await getSiteContent()
 
-  const steps = JSON.parse(content['howitworks.steps.list'] || '[]')
-  const faqs = JSON.parse(content['howitworks.faq.list'] || '[]')
+  const steps = content['howitworks.steps.list'] || []
+  const faqs = content['howitworks.faq.list'] || []
 
   return (
     <div className="flex flex-col min-h-screen">

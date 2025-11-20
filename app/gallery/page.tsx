@@ -3,7 +3,7 @@ import GalleryGrid from "./gallery-grid"
 
 export default async function GalleryPage() {
   const content = await getSiteContent()
-  const images = JSON.parse(content['gallery.images'] || '[]')
+  const images = content['gallery.images'] || []
 
   return (
     <div className="py-12 md:py-20">

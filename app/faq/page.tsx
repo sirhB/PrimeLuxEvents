@@ -3,7 +3,7 @@ import { getSiteContent } from "@/lib/content"
 
 export default async function FAQPage() {
   const content = await getSiteContent()
-  const faqs = JSON.parse(content['faq.list'] || '[]')
+  const faqs = content['faq.list'] || []
 
   return (
     <>

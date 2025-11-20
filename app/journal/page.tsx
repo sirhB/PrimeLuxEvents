@@ -5,7 +5,7 @@ import { getSiteContent } from "@/lib/content"
 
 export default async function JournalPage() {
   const content = await getSiteContent()
-  const posts = JSON.parse(content['journal.posts'] || '[]')
+  const posts = content['journal.posts'] || []
 
   return (
     <div className="py-12 md:py-20">
