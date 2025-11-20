@@ -7,9 +7,9 @@ import { getSiteContent } from "@/lib/content"
 export default async function ServicesPage() {
   const content = await getSiteContent()
 
-  const planningFeatures = content['services.planning.features'] || []
-  const stylingFeatures = content['services.styling.features'] || []
-  const rentalFeatures = content['services.rental.features'] || []
+  const designFeatures = content['services.design.features'] || []
+  const deliveryFeatures = content['services.delivery.features'] || []
+  const setupFeatures = content['services.setup.features'] || []
 
   return (
     <div className="flex flex-col min-h-screen">

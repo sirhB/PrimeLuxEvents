@@ -1,0 +1,13 @@
+# Node.js
+node_modules/
+.env
+npm-debug.log
+yarn-debug.log
+.DS_Store
+build/
+dist/
+coverage/
+*.log
+*.tgz
+.vscode/
+.next/
