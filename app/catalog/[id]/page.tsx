@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { ProductGallery } from "@/components/product-gallery"
 import { RentalDatePicker } from "@/components/rental-date-picker"
+import { RelatedProducts } from "@/components/related-products"
 import {
   Accordion,
   AccordionContent,
@@ -59,6 +60,7 @@ interface Product {
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const [product, setProduct] = useState<Product | null>(null)
+  const [allProducts, setAllProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedModifiers, setSelectedModifiers] = useState<Record<string, ModifierOption>>({})
   const [quantity, setQuantity] = useState(1)
@@ -84,6 +86,17 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       }
 
       setProduct(data)
+
+      // Fetch all products for related products
+      const { data: allProductsData } = await supabase
+        .from('products')
+        .select('*, categories(name)')
+        .order('created_at', { ascending: false })
+
+      if (allProductsData) {
+        setAllProducts(allProductsData)
+      }
+
       setLoading(false)
       setIsLoaded(true)
     }
@@ -107,6 +120,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   }
 
   const isInCart = items.some((item) => item.productId === product.id)
+  const isInCartFn = (productId: string) => items.some((item) => item.productId === productId)
   const maxQuantity = product.quantity_available || product.stock || 10
 
   // Calculate pricing based on rental duration
@@ -420,6 +434,20 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           </div>
         </div>
       </div>
+
+      {/* Related Products Section */}
+      {product && allProducts.length > 0 && (
+        <div className="container mx-auto px-4 md:px-6 pb-20">
+          <Separator className="mb-12" />
+          <RelatedProducts
+            currentProduct={product}
+            allProducts={allProducts}
+            onAddToCart={toggleCart}
+            isInCart={isInCartFn}
+            maxItems={4}
+          />
+        </div>
+      )}
     </div>
   )
 }

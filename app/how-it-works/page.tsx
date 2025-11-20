@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { CheckCircle2, ArrowRight } from "lucide-react"
@@ -25,30 +26,30 @@ export default async function HowItWorksPage() {
       {/* Steps Section */}
       <section className="py-20 bg-background">
         <div className="container px-4 md:px-6">
-          <div className="grid gap-12 lg:gap-24 relative">
-            {/* Connecting Line (Desktop) */}
-            <div className="hidden lg:block absolute left-[50%] top-0 bottom-0 w-px bg-border -translate-x-1/2 z-0" />
-
+          <div className="grid gap-12 lg:gap-24">
             {steps.map((step: any, index: number) => (
-              <div key={index} className="relative z-10 grid lg:grid-cols-2 gap-8 lg:gap-24 items-center">
-                <div className={`lg:text-right ${index % 2 === 1 ? "lg:order-2 lg:text-left" : ""}`}>
-                  <div
-                    className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary text-primary-foreground text-2xl font-serif mb-6 lg:hidden`}
-                  >
+              <div key={index} className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+                {/* Image - alternates left/right on desktop */}
+                <div className={`relative aspect-video lg:aspect-[4/3] bg-muted rounded-lg overflow-hidden ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                  {step.image && (
+                    <Image
+                      src={step.image}
+                      alt={step.title}
+                      fill
+                      className="object-cover"
+                    />
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className={`space-y-6 ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary text-primary-foreground text-2xl font-serif">
                     {index + 1}
                   </div>
-                  <h2 className="text-3xl font-serif mb-4">{step.title}</h2>
+                  <h2 className="text-3xl font-serif">{step.title}</h2>
                   <p className="text-muted-foreground text-lg leading-relaxed">{step.description}</p>
-                </div>
 
-                <div className={`hidden lg:flex items-center justify-center ${index % 2 === 1 ? "lg:order-1" : ""}`}>
-                  <div className="w-24 h-24 rounded-full bg-background border-4 border-primary flex items-center justify-center text-3xl font-serif text-primary shadow-xl">
-                    {index + 1}
-                  </div>
-                </div>
-
-                <div className={`${index % 2 === 1 ? "lg:order-1" : ""}`}>
-                  <div className="bg-muted p-8 rounded-lg border border-border/50">
+                  <div className="bg-muted p-6 rounded-lg border border-border/50">
                     <h3 className="font-medium mb-4 flex items-center gap-2">
                       <CheckCircle2 className="h-5 w-5 text-primary" />
                       Key Details

@@ -3,10 +3,11 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Check, Plus, Grid3x3, List, ArrowUpDown, Calendar, Package } from "lucide-react"
+import { Check, Plus, Grid3x3, List, ArrowUpDown, Calendar, Package, Eye } from "lucide-react"
 import { useCart } from "@/components/providers/cart-provider"
 import { CatalogSearch } from "@/components/catalog-search"
 import { CatalogFilters } from "@/components/catalog-filters"
+import { ProductQuickView } from "@/components/product-quick-view"
 import { Button } from "@/components/ui/button"
 import {
     Select,
@@ -60,6 +61,8 @@ export default function CatalogClient({ heroTitle, products, categories }: Catal
         features: [],
         availability: false
     })
+    const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
+    const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
 
     const { items, addItem, removeItem } = useCart()
 
@@ -242,6 +245,19 @@ export default function CatalogClient({ heroTitle, products, categories }: Catal
                                             {getAvailabilityBadge(product.quantity_available)}
                                         </div>
 
+                                        {/* Quick View Button */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                setQuickViewProduct(product)
+                                                setIsQuickViewOpen(true)
+                                            }}
+                                            className="absolute bottom-4 left-4 h-12 w-12 rounded-full bg-background/95 backdrop-blur flex items-center justify-center shadow-lg hover:bg-background transition-all duration-300 hover:scale-110 opacity-0 group-hover:opacity-100 z-10"
+                                        >
+                                            <Eye className="h-5 w-5" />
+                                            <span className="sr-only">Quick view</span>
+                                        </button>
+
                                         {/* Add to Cart Button */}
                                         <button
                                             onClick={(e) => {
@@ -386,6 +402,15 @@ export default function CatalogClient({ heroTitle, products, categories }: Catal
                     )}
                 </div>
             </div>
+
+            {/* Quick View Modal */}
+            <ProductQuickView
+                product={quickViewProduct}
+                open={isQuickViewOpen}
+                onOpenChange={setIsQuickViewOpen}
+                onAddToCart={toggleCart}
+                isInCart={quickViewProduct ? isInCart(quickViewProduct.id) : false}
+            />
         </div>
     )
 }
