@@ -5,18 +5,31 @@ import Link from "next/link"
 import Image from "next/image"
 import { Check, Plus } from "lucide-react"
 import { useCart } from "@/components/providers/cart-provider"
-import { products, categories } from "@/lib/data"
+
+interface Product {
+    id: string
+    name: string
+    description: string
+    price: number
+    image_url: string
+    category_id: string
+    categories?: { name: string }
+}
 
 interface CatalogClientProps {
     heroTitle: string
+    products: Product[]
+    categories: string[]
 }
 
-export default function CatalogClient({ heroTitle }: CatalogClientProps) {
+export default function CatalogClient({ heroTitle, products, categories }: CatalogClientProps) {
     const [selectedCategory, setSelectedCategory] = useState("All")
     const { items, addItem, removeItem } = useCart()
 
     const filteredProducts =
-        selectedCategory === "All" ? products : products.filter((p) => p.category === selectedCategory)
+        selectedCategory === "All"
+            ? products
+            : products.filter((p) => p.categories?.name === selectedCategory)
 
     const isInCart = (id: string) => items.some((item) => item.productId === id)
 
@@ -63,7 +76,7 @@ export default function CatalogClient({ heroTitle }: CatalogClientProps) {
                             <div className="relative aspect-[3/4] overflow-hidden bg-secondary mb-4">
                                 <Link href={`/catalog/${product.id}`}>
                                     <Image
-                                        src={product.image || "/placeholder.svg"}
+                                        src={product.image_url || "/placeholder.svg"}
                                         alt={product.name}
                                         fill
                                         className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -87,7 +100,7 @@ export default function CatalogClient({ heroTitle }: CatalogClientProps) {
                                             {product.name}
                                         </h3>
                                     </Link>
-                                    <p className="text-sm text-muted-foreground">{product.category}</p>
+                                    <p className="text-sm text-muted-foreground">{product.categories?.name || 'Uncategorized'}</p>
                                 </div>
                                 <span className="font-medium">${product.price.toFixed(2)}</span>
                             </div>
