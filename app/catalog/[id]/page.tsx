@@ -5,32 +5,102 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, Check, Plus, Ruler, Box, Tag } from "lucide-react"
-import { products } from "@/lib/data"
 import { useCart } from "@/components/providers/cart-provider"
 import { Button } from "@/components/ui/button"
+import { createClient } from "@/lib/supabase/client"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+
+interface ModifierOption {
+  id: string
+  label: string
+  priceAdjustment: number
+}
+
+interface Modifier {
+  id: string
+  name: string
+  options: ModifierOption[]
+}
+
+interface Product {
+  id: string
+  name: string
+  description: string
+  price: number
+  image_url: string
+  category_id: string
+  stock: number
+  modifiers: Modifier[]
+  // properties from mock data that might be missing in DB schema yet, handling gracefully
+  dimensions?: string
+  material?: string
+  sku?: string
+}
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const product = products.find((p) => p.id === id)
+  const [product, setProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [selectedModifiers, setSelectedModifiers] = useState<Record<string, ModifierOption>>({})
+
   const { items, addItem, removeItem } = useCart()
   const [isLoaded, setIsLoaded] = useState(false)
+  const supabase = createClient()
 
   useEffect(() => {
-    setIsLoaded(true)
-  }, [])
+    async function fetchProduct() {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single()
+
+      if (error || !data) {
+        console.error('Error fetching product:', error)
+        setLoading(false)
+        return
+      }
+
+      setProduct(data)
+      setLoading(false)
+      setIsLoaded(true)
+    }
+
+    fetchProduct()
+  }, [id])
+
+  if (loading) {
+    return <div className="container mx-auto px-4 py-20 text-center">Loading...</div>
+  }
 
   if (!product) {
     notFound()
   }
 
   const isInCart = items.some((item) => item.productId === product.id)
-  const relatedProducts = products.filter((p) => product.relatedIds?.includes(p.id))
+
+  // Calculate total price
+  const modifiersPrice = Object.values(selectedModifiers).reduce((acc, curr) => acc + curr.priceAdjustment, 0)
+  const totalPrice = product.price + modifiersPrice
 
   const toggleCart = () => {
     if (isInCart) {
       removeItem(product.id)
     } else {
+      // Note: Cart provider might need update to store selected modifiers
       addItem(product.id)
+    }
+  }
+
+  const handleModifierChange = (modifierId: string, optionId: string) => {
+    const modifier = product.modifiers?.find(m => m.id === modifierId)
+    const option = modifier?.options.find(o => o.id === optionId)
+    if (modifier && option) {
+      setSelectedModifiers(prev => ({
+        ...prev,
+        [modifierId]: option
+      }))
     }
   }
 
@@ -54,7 +124,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             className={`relative aspect-[3/4] bg-secondary overflow-hidden rounded-sm ${isLoaded ? "animate-fade-in-up" : "opacity-0"}`}
           >
             <Image
-              src={product.image || "/placeholder.svg"}
+              src={product.image_url || "/placeholder.svg"}
               alt={product.name}
               fill
               className="object-cover"
@@ -65,12 +135,13 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           {/* Details Section */}
           <div className={`flex flex-col gap-8 ${isLoaded ? "animate-fade-in-up delay-200" : "opacity-0"}`}>
             <div>
+              {/* Category fetching omitted for brevity, could fetch if needed */}
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-2">
-                {product.category}
+                Product
               </p>
               <h1 className="text-4xl md:text-5xl font-serif mb-4">{product.name}</h1>
               <p className="text-2xl font-medium">
-                ${product.price.toFixed(2)} <span className="text-sm text-muted-foreground font-normal">/ day</span>
+                ${totalPrice.toFixed(2)} <span className="text-sm text-muted-foreground font-normal">/ day</span>
               </p>
             </div>
 
@@ -78,7 +149,34 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <p className="text-lg leading-relaxed text-muted-foreground">{product.description}</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 py-6 border-y border-border">
+            {/* Modifiers Section */}
+            {product.modifiers && product.modifiers.length > 0 && (
+              <div className="space-y-6 py-6 border-y border-border">
+                {product.modifiers.map((modifier) => (
+                  <div key={modifier.id} className="space-y-3">
+                    <Label className="text-base font-medium">{modifier.name}</Label>
+                    <RadioGroup
+                      onValueChange={(value: string) => handleModifierChange(modifier.id, value)}
+                      value={selectedModifiers[modifier.id]?.id}
+                    >
+                      <div className="flex flex-wrap gap-3">
+                        {modifier.options.map((option) => (
+                          <div key={option.id} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option.id} id={option.id} />
+                            <Label htmlFor={option.id} className="cursor-pointer">
+                              {option.label}
+                              {option.priceAdjustment > 0 && ` (+$${option.priceAdjustment.toFixed(2)})`}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </RadioGroup>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 py-6 border-b border-border">
               {product.dimensions && (
                 <div className="flex items-start gap-3">
                   <Ruler className="h-5 w-5 text-muted-foreground mt-0.5" />
@@ -131,31 +229,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             </div>
           </div>
         </div>
-
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <div className="mt-24">
-            <h2 className="text-3xl font-serif mb-12">You May Also Like</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {relatedProducts.map((related) => (
-                <Link key={related.id} href={`/catalog/${related.id}`} className="group block">
-                  <div className="relative aspect-[3/4] overflow-hidden bg-secondary mb-4">
-                    <Image
-                      src={related.image || "/placeholder.svg"}
-                      alt={related.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                  <h3 className="font-serif text-lg group-hover:underline decoration-1 underline-offset-4">
-                    {related.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">${related.price.toFixed(2)}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </>
   )

@@ -28,9 +28,14 @@ export default async function ProductsPage() {
     }
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold tracking-tight">Products</h1>
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Products</h1>
+                    <p className="text-muted-foreground mt-1">
+                        Manage your product catalog and inventory
+                    </p>
+                </div>
                 <Button asChild>
                     <Link href="/admin/products/new">
                         <Plus className="mr-2 h-4 w-4" />

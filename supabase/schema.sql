@@ -10,6 +10,7 @@ create table products (
   category_id uuid references categories(id) on delete set null,
   image_url text,
   stock integer default 0,
+  modifiers jsonb default '[]'::jsonb,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );

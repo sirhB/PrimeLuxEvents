@@ -3,8 +3,13 @@ import { Package, ShoppingCart, Users, DollarSign } from 'lucide-react'
 
 export default function AdminDashboardPage() {
     return (
-        <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+        <div className="flex flex-col gap-6">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+                <p className="text-muted-foreground mt-1">
+                    Overview of your business metrics and performance
+                </p>
+            </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
