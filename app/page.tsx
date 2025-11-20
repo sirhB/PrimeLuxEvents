@@ -56,6 +56,6 @@ export default async function Home() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   )
 }
