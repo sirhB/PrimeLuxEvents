@@ -25,19 +25,34 @@ const testimonials = [
   },
 ]
 
-export function TestimonialsSection() {
+interface TestimonialsSectionProps {
+  title?: string
+  description?: string
+  items?: Array<{
+    quote: string
+    author: string
+    role: string
+    image?: string
+  }>
+}
+
+export function TestimonialsSection({
+  title = "Client Stories",
+  description = "Hear from those who have experienced the PrimeLux difference.",
+  items = testimonials,
+}: TestimonialsSectionProps) {
   return (
     <section className="py-20 md:py-32 bg-secondary/20">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-5xl font-serif mb-6">Client Stories</h2>
+          <h2 className="text-3xl md:text-5xl font-serif mb-6">{title}</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Hear from those who have experienced the PrimeLux difference.
+            {description}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
+          {items.map((testimonial, index) => (
             <div key={index} className="bg-background p-8 md:p-10 rounded-sm border border-border/40 shadow-sm">
               <div className="flex gap-1 mb-6">
                 {[...Array(5)].map((_, i) => (

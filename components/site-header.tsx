@@ -9,13 +9,14 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart-sheet"
 import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
@@ -28,6 +29,10 @@ export function SiteHeader() {
     // In a real app, this would redirect to search results
     setIsSearchOpen(false)
     router.push("/catalog")
+  }
+
+  if (pathname?.startsWith('/admin')) {
+    return null
   }
 
   return (

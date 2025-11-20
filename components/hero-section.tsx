@@ -2,7 +2,19 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import Image from "next/image" // Added Image import
 
-export function HeroSection() {
+interface HeroSectionProps {
+  title?: string
+  subtitle?: string
+  ctaPrimary?: string
+  ctaSecondary?: string
+}
+
+export function HeroSection({
+  title = "Curating Unforgettable Moments of Luxury",
+  subtitle = "Premier event rentals and styling for weddings, galas, and corporate gatherings. Browse our collection and book directly online.",
+  ctaPrimary = "Rent Online",
+  ctaSecondary = "How It Works",
+}: HeroSectionProps) {
   return (
     <section className="relative h-[90vh] w-full overflow-hidden bg-black">
       <Image
@@ -17,16 +29,14 @@ export function HeroSection() {
       <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6">
         <div className="max-w-4xl space-y-8">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white tracking-tight animate-fade-in-up">
-            Curating Unforgettable <br />
-            <span className="italic text-primary-foreground/90">Moments of Luxury</span>
+            {title}
           </h1>
           <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed animate-fade-in-up delay-200">
-            Premier event rentals and styling for weddings, galas, and corporate gatherings. Browse our collection and
-            book directly online.
+            {subtitle}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up delay-300">
             <Button asChild size="lg" className="bg-white text-black hover:bg-gray-200 text-base h-12 px-8">
-              <Link href="/catalog">Rent Online</Link>
+              <Link href="/catalog">{ctaPrimary}</Link>
             </Button>
             <Button
               asChild
@@ -34,7 +44,7 @@ export function HeroSection() {
               size="lg"
               className="text-white border-white hover:bg-white/10 text-base h-12 px-8 bg-transparent"
             >
-              <Link href="/how-it-works">How It Works</Link>
+              <Link href="/how-it-works">{ctaSecondary}</Link>
             </Button>
           </div>
         </div>
