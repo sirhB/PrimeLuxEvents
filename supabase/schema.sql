@@ -43,12 +43,20 @@ create table orders (
   id uuid default uuid_generate_v4() primary key,
   customer_name text not null,
   customer_email text not null,
+  customer_phone text,
   total_amount decimal(10, 2) not null,
+  subtotal decimal(10, 2),
+  tax_rate decimal(5, 4),
+  tax_amount decimal(10, 2),
+  delivery_fee decimal(10, 2) default 0,
+  setup_fee decimal(10, 2) default 0,
+  discount_amount decimal(10, 2) default 0,
   status text default 'pending',
   delivery_address text,
   delivery_time text,
   delivery_date date,
   delivery_notes text,
+  notes text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

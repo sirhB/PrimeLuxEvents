@@ -22,12 +22,18 @@ BEGIN
   SELECT id INTO sofa_id FROM products WHERE name = 'Velvet Lounge Sofa' LIMIT 1;
 
   -- Create Order 1: Wedding
-  INSERT INTO orders (id, customer_name, customer_email, total_amount, status, delivery_address, delivery_time, delivery_date, delivery_notes)
+  INSERT INTO orders (id, customer_name, customer_email, customer_phone, total_amount, subtotal, tax_rate, tax_amount, delivery_fee, setup_fee, status, delivery_address, delivery_time, delivery_date, delivery_notes)
   VALUES (
     order1_id,
     'Isabella Martinez',
     'isabella.m@example.com',
+    '(555) 123-4567',
     1250.00,
+    1100.00,  -- subtotal (100 chairs @ $12.50 + 10 tables @ $85)
+    0.08875,  -- tax rate (8.875% - will be fetched from settings in production)
+    97.63,    -- tax amount
+    50.00,    -- delivery fee
+    2.37,     -- setup fee (to make total = 1250.00)
     'confirmed',
     'The Plaza Hotel, 768 5th Ave, New York, NY 10019',
     '10:00 AM',
@@ -36,12 +42,19 @@ BEGIN
   );
 
   -- Create Order 2: Corporate Event
-  INSERT INTO orders (id, customer_name, customer_email, total_amount, status, delivery_address, delivery_time, delivery_date, delivery_notes)
+  INSERT INTO orders (id, customer_name, customer_email, customer_phone, total_amount, subtotal, tax_rate, tax_amount, delivery_fee, setup_fee, discount_amount, status, delivery_address, delivery_time, delivery_date, delivery_notes)
   VALUES (
     order2_id,
     'TechCorp Inc.',
     'events@techcorp.com',
+    '(555) 987-6543',
     3500.00,
+    600.00,   -- subtotal (4 sofas @ $150)
+    0.08875,  -- tax rate
+    53.25,    -- tax amount
+    75.00,    -- delivery fee
+    200.00,   -- setup fee
+    0.00,     -- no discount
     'confirmed',
     'Javits Center, 429 11th Ave, New York, NY 10001',
     '08:00 AM',
