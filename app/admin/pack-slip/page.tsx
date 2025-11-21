@@ -136,8 +136,19 @@ export default function PackSlipPage() {
 
                     // Add assembly to order pack
                     if (product.assembly_items && Array.isArray(product.assembly_items)) {
-                        product.assembly_items.forEach((part: string) => {
-                            orderPack.assemblySummary[part] = (orderPack.assemblySummary[part] || 0) + res.quantity
+                        product.assembly_items.forEach((part: string | AssemblyItem) => {
+                            let partName = ''
+                            let partQty = 0
+
+                            if (typeof part === 'string') {
+                                partName = part
+                                partQty = res.quantity
+                            } else {
+                                partName = part.name
+                                partQty = part.quantity * res.quantity
+                            }
+
+                            orderPack.assemblySummary[partName] = (orderPack.assemblySummary[partName] || 0) + partQty
                         })
                     }
 
@@ -314,12 +325,29 @@ function PackListSection({ title, icon, items, compact }: { title: string, icon?
                                         <div className="mt-2 text-xs text-muted-foreground print:text-gray-600 pl-3 border-l-2 border-muted print:border-gray-300">
                                             <div className="font-semibold mb-1">Assembly Parts:</div>
                                             <ul className="space-y-1">
-                                                {item.assemblyItems.map((part, idx) => (
-                                                    <li key={idx} className="flex justify-between max-w-[200px]">
-                                                        <span>{part}</span>
-                                                        <span className="font-mono">x {item.quantity}</span>
-                                                    </li>
-                                                ))}
+                                                {item.assemblyItems.map((part, idx) => {
+                                                    let name = ''
+                                                    let qtyPerItem = 1
+
+                                                    if (typeof part === 'string') {
+                                                        name = part
+                                                    } else {
+                                                        name = part.name
+                                                        qtyPerItem = part.quantity
+                                                    }
+
+                                                    const totalQty = qtyPerItem * item.quantity
+
+                                                    return (
+                                                        <li key={idx} className="flex justify-between max-w-[200px]">
+                                                            <span>{name}</span>
+                                                            <span className="font-mono">
+                                                                {qtyPerItem > 1 && <span className="text-muted-foreground mr-1">({qtyPerItem} ea)</span>}
+                                                                x {totalQty}
+                                                            </span>
+                                                        </li>
+                                                    )
+                                                })}
                                             </ul>
                                         </div>
                                     )}

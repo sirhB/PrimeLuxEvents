@@ -3,7 +3,7 @@ import { Facebook, Instagram, Twitter } from "lucide-react" // Added icons
 
 export function SiteFooter() {
   return (
-    <footer className="bg-secondary pt-16 pb-8 border-t border-border">
+    <footer className="bg-secondary pt-16 pb-8 border-t border-border print:hidden">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="space-y-4">

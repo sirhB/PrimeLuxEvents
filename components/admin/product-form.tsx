@@ -45,19 +45,35 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     const router = useRouter()
     const supabase = createClient()
     const [loading, setLoading] = useState(false)
-    const [assemblyItems, setAssemblyItems] = useState<string[]>(product?.assembly_items || [])
+    interface AssemblyItem {
+        name: string
+        quantity: number
+    }
+
+    // Helper to parse existing items which might be strings or objects
+    const parseAssemblyItems = (items: any[]): AssemblyItem[] => {
+        if (!items) return []
+        return items.map(item => {
+            if (typeof item === 'string') {
+                return { name: item, quantity: 1 }
+            }
+            return item as AssemblyItem
+        })
+    }
+
+    const [assemblyItems, setAssemblyItems] = useState<AssemblyItem[]>(parseAssemblyItems(product?.assembly_items))
 
     const addAssemblyItem = () => {
-        setAssemblyItems([...assemblyItems, ''])
+        setAssemblyItems([...assemblyItems, { name: '', quantity: 1 }])
     }
 
     const removeAssemblyItem = (index: number) => {
         setAssemblyItems(assemblyItems.filter((_, i) => i !== index))
     }
 
-    const updateAssemblyItem = (index: number, value: string) => {
+    const updateAssemblyItem = (index: number, field: keyof AssemblyItem, value: any) => {
         const newItems = [...assemblyItems]
-        newItems[index] = value
+        newItems[index] = { ...newItems[index], [field]: value }
         setAssemblyItems(newItems)
     }
 
@@ -149,7 +165,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             category_id: (formData.get('category_id') as string) || null,
             image_url: formData.get('image_url') as string,
             modifiers: modifiers,
-            assembly_items: assemblyItems.filter(item => item.trim() !== ''),
+            assembly_items: assemblyItems.filter(item => item.name.trim() !== ''),
         }
 
         try {
@@ -257,10 +273,21 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                     {assemblyItems.map((item, index) => (
                         <div key={index} className="flex items-center gap-2">
                             <Input
-                                value={item}
-                                onChange={(e) => updateAssemblyItem(index, e.target.value)}
-                                placeholder="e.g. Legs, Screws, etc."
+                                value={item.name}
+                                onChange={(e) => updateAssemblyItem(index, 'name', e.target.value)}
+                                placeholder="Part Name (e.g. Legs)"
+                                className="flex-1"
                             />
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground">Qty</span>
+                                <Input
+                                    type="number"
+                                    value={item.quantity}
+                                    onChange={(e) => updateAssemblyItem(index, 'quantity', parseInt(e.target.value) || 1)}
+                                    className="w-20"
+                                    min={1}
+                                />
+                            </div>
                             <Button
                                 type="button"
                                 variant="ghost"
