@@ -6,8 +6,9 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Printer, Calendar as CalendarIcon, Package, Truck, Wrench } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Printer, Calendar as CalendarIcon, Package, Truck, Wrench, MapPin, Clock, FileText } from "lucide-react"
 import { format } from "date-fns"
 
 interface PackItem {
@@ -17,13 +18,25 @@ interface PackItem {
     assemblyItems: string[]
 }
 
+interface OrderPack {
+    id: string
+    customerName: string
+    deliveryAddress: string | null
+    deliveryTime: string | null
+    deliveryNotes: string | null
+    items: PackItem[]
+    assemblySummary: Record<string, number>
+}
+
 export default function PackSlipPage() {
     const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0])
     const [loading, setLoading] = useState(false)
     const [items, setItems] = useState<PackItem[]>([])
     const [assemblySummary, setAssemblySummary] = useState<Record<string, number>>({})
+    const [orders, setOrders] = useState<OrderPack[]>([])
     const [orderCount, setOrderCount] = useState(0)
     const [hasSearched, setHasSearched] = useState(false)
+    const [viewMode, setViewMode] = useState<"aggregate" | "by-order">("aggregate")
 
     const supabase = createClient()
 
@@ -31,21 +44,20 @@ export default function PackSlipPage() {
         setLoading(true)
         setHasSearched(true)
 
-        // In a real app, we would query rental_reservations or orders based on delivery date
-        // For now, let's simulate by fetching all orders and pretending they are for this date
-        // or just fetching all products to show the structure.
-
-        // Let's try to fetch orders created recently as a proxy for "active" orders
-        // Since we don't have a real delivery_date column in orders table in the schema provided earlier
-        // (it was in rental_reservations, but let's assume we look at rental_reservations)
-
         try {
             // 1. Get reservations for this date
-            // Note: In the schema, rental_reservations has start_date. Let's use that.
             const { data: reservations, error: resError } = await supabase
                 .from('rental_reservations')
                 .select(`
                     quantity,
+                    order_id,
+                    order:orders (
+                        id,
+                        customer_name,
+                        delivery_address,
+                        delivery_time,
+                        delivery_notes
+                    ),
                     product:products (
                         id,
                         name,
@@ -56,54 +68,89 @@ export default function PackSlipPage() {
 
             if (resError) throw resError
 
-            // Aggregate items
-            const itemMap = new Map<string, PackItem>()
-            const assemblyMap: Record<string, number> = {}
-            let ordersFound = 0 // This is hard to count from reservations alone without grouping by order_id, but let's just count reservations for now or distinct orders if we had order_id
-
-            // If no reservations found, let's just show a message
             if (!reservations || reservations.length === 0) {
                 setItems([])
                 setAssemblySummary({})
+                setOrders([])
                 setOrderCount(0)
                 setLoading(false)
                 return
             }
 
-            // Count distinct orders
-            // @ts-ignore
-            const orderIds = new Set(reservations.map(r => r.order_id))
-            setOrderCount(orderIds.size)
+            // --- Aggregate View Logic ---
+            const itemMap = new Map<string, PackItem>()
+            const assemblyMap: Record<string, number> = {}
+
+            // --- By Order View Logic ---
+            const orderMap = new Map<string, OrderPack>()
 
             reservations.forEach((res: any) => {
                 const product = res.product
+                const order = res.order
                 if (!product) return
 
+                // Aggregate Items
                 const current = itemMap.get(product.id) || {
                     id: product.id,
                     name: product.name,
                     quantity: 0,
                     assemblyItems: product.assembly_items || []
                 }
-
                 current.quantity += res.quantity
                 itemMap.set(product.id, current)
 
-                // Aggregate assembly items
+                // Aggregate Assembly
                 if (product.assembly_items && Array.isArray(product.assembly_items)) {
                     product.assembly_items.forEach((part: string) => {
                         assemblyMap[part] = (assemblyMap[part] || 0) + res.quantity
                     })
                 }
+
+                // By Order Logic
+                if (order) {
+                    const orderPack = orderMap.get(order.id) || {
+                        id: order.id,
+                        customerName: order.customer_name,
+                        deliveryAddress: order.delivery_address,
+                        deliveryTime: order.delivery_time,
+                        deliveryNotes: order.delivery_notes,
+                        items: [] as PackItem[],
+                        assemblySummary: {} as Record<string, number>
+                    }
+
+                    // Add item to order pack
+                    const existingItemIndex = orderPack.items.findIndex((i) => i.id === product.id)
+                    if (existingItemIndex >= 0) {
+                        orderPack.items[existingItemIndex].quantity += res.quantity
+                    } else {
+                        orderPack.items.push({
+                            id: product.id,
+                            name: product.name,
+                            quantity: res.quantity,
+                            assemblyItems: product.assembly_items || []
+                        })
+                    }
+
+                    // Add assembly to order pack
+                    if (product.assembly_items && Array.isArray(product.assembly_items)) {
+                        product.assembly_items.forEach((part: string) => {
+                            orderPack.assemblySummary[part] = (orderPack.assemblySummary[part] || 0) + res.quantity
+                        })
+                    }
+
+                    orderMap.set(order.id, orderPack)
+                }
             })
 
             setItems(Array.from(itemMap.values()))
             setAssemblySummary(assemblyMap)
+            setOrders(Array.from(orderMap.values()))
+            setOrderCount(orderMap.size)
 
         } catch (error) {
             console.error('Error generating pack slip:', error)
-            // Fallback for demo if no data exists
             setItems([])
+            setOrders([])
         } finally {
             setLoading(false)
         }
@@ -148,93 +195,80 @@ export default function PackSlipPage() {
             </Card>
 
             {hasSearched && (
-                <div className="space-y-8 print:space-y-4">
-                    <div className="flex items-center justify-between border-b pb-4">
+                <div className="space-y-8">
+                    <div className="flex items-center justify-between border-b pb-4 print:pb-2">
                         <div>
                             <h2 className="text-2xl font-bold">Delivery Manifest</h2>
                             <p className="text-muted-foreground">
                                 Date: {format(new Date(date), 'MMMM d, yyyy')}
                             </p>
                         </div>
-                        <div className="text-right">
-                            <div className="text-sm text-muted-foreground">Total Orders</div>
-                            <div className="text-2xl font-bold">{orderCount}</div>
+                        <div className="flex items-center gap-4">
+                            <div className="text-right hidden sm:block">
+                                <div className="text-sm text-muted-foreground">Total Orders</div>
+                                <div className="text-2xl font-bold">{orderCount}</div>
+                            </div>
+                            <Button variant="outline" size="icon" onClick={handlePrint} className="print:hidden">
+                                <Printer className="h-4 w-4" />
+                            </Button>
                         </div>
-                        <Button variant="outline" size="icon" onClick={handlePrint} className="print:hidden">
-                            <Printer className="h-4 w-4" />
-                        </Button>
                     </div>
+
+                    <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "aggregate" | "by-order")} className="print:hidden">
+                        <TabsList>
+                            <TabsTrigger value="aggregate">Aggregate List</TabsTrigger>
+                            <TabsTrigger value="by-order">By Order</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
 
                     {items.length === 0 ? (
                         <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
                             No reservations found for this date.
                         </div>
                     ) : (
-                        <div className="grid gap-8 md:grid-cols-2 print:grid-cols-2">
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2 text-lg font-semibold text-primary">
-                                    <Package className="h-5 w-5" />
-                                    <h3>Products to Pack</h3>
-                                </div>
-                                <div className="border rounded-md overflow-hidden">
-                                    <table className="w-full text-sm">
-                                        <thead className="bg-muted">
-                                            <tr>
-                                                <th className="px-4 py-3 text-left font-medium">Item Name</th>
-                                                <th className="px-4 py-3 text-right font-medium w-24">Qty</th>
-                                                <th className="px-4 py-3 text-center font-medium w-12">Check</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y">
-                                            {items.map((item) => (
-                                                <tr key={item.id}>
-                                                    <td className="px-4 py-3">{item.name}</td>
-                                                    <td className="px-4 py-3 text-right font-mono">{item.quantity}</td>
-                                                    <td className="px-4 py-3 text-center">
-                                                        <div className="w-4 h-4 border rounded mx-auto" />
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                        <>
+                            {/* Aggregate View */}
+                            <div className={viewMode === 'aggregate' ? 'block' : 'hidden print:hidden'}>
+                                <div className="grid gap-8 md:grid-cols-2 print:grid-cols-2">
+                                    <PackListSection title="Total Products to Pack" icon={<Package className="h-5 w-5" />} items={items} />
+                                    <AssemblyListSection title="Total Assembly Parts" icon={<Wrench className="h-5 w-5" />} summary={assemblySummary} />
                                 </div>
                             </div>
 
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-2 text-lg font-semibold text-primary">
-                                    <Wrench className="h-5 w-5" />
-                                    <h3>Assembly Parts Required</h3>
+                            {/* By Order View */}
+                            <div className={viewMode === 'by-order' ? 'block' : 'hidden print:block'}>
+                                <div className="space-y-12 print:space-y-8">
+                                    {orders.map((order) => (
+                                        <div key={order.id} className="break-inside-avoid border rounded-lg p-6 print:border-black print:p-0 print:border-0">
+                                            <div className="mb-6 border-b pb-4 print:border-black">
+                                                <h3 className="text-xl font-bold">{order.customerName}</h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 text-sm">
+                                                    <div className="flex gap-2">
+                                                        <MapPin className="h-4 w-4 text-muted-foreground print:text-black" />
+                                                        <span>{order.deliveryAddress || 'No address provided'}</span>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <Clock className="h-4 w-4 text-muted-foreground print:text-black" />
+                                                        <span>{order.deliveryTime || 'No time specified'}</span>
+                                                    </div>
+                                                    {order.deliveryNotes && (
+                                                        <div className="flex gap-2 col-span-full">
+                                                            <FileText className="h-4 w-4 text-muted-foreground print:text-black" />
+                                                            <span className="italic">{order.deliveryNotes}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="grid gap-8 md:grid-cols-2 print:grid-cols-2">
+                                                <PackListSection title="Products" items={order.items} compact />
+                                                <AssemblyListSection title="Assembly Parts" summary={order.assemblySummary} compact />
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                                {Object.keys(assemblySummary).length === 0 ? (
-                                    <div className="p-4 border rounded-md bg-muted/20 text-muted-foreground text-sm italic">
-                                        No assembly parts required for these items.
-                                    </div>
-                                ) : (
-                                    <div className="border rounded-md overflow-hidden">
-                                        <table className="w-full text-sm">
-                                            <thead className="bg-muted">
-                                                <tr>
-                                                    <th className="px-4 py-3 text-left font-medium">Part Name</th>
-                                                    <th className="px-4 py-3 text-right font-medium w-24">Total Qty</th>
-                                                    <th className="px-4 py-3 text-center font-medium w-12">Check</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y">
-                                                {Object.entries(assemblySummary).map(([part, qty]) => (
-                                                    <tr key={part}>
-                                                        <td className="px-4 py-3">{part}</td>
-                                                        <td className="px-4 py-3 text-right font-mono">{qty}</td>
-                                                        <td className="px-4 py-3 text-center">
-                                                            <div className="w-4 h-4 border rounded mx-auto" />
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
                             </div>
-                        </div>
+                        </>
                     )}
 
                     <div className="hidden print:block mt-12 pt-8 border-t text-sm text-muted-foreground text-center">
@@ -243,6 +277,86 @@ export default function PackSlipPage() {
                     </div>
                 </div>
             )}
+        </div>
+    )
+}
+
+function PackListSection({ title, icon, items, compact }: { title: string, icon?: React.ReactNode, items: PackItem[], compact?: boolean }) {
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center gap-2 text-lg font-semibold text-primary print:text-black">
+                {icon}
+                <h3>{title}</h3>
+            </div>
+            <div className="border rounded-md overflow-hidden print:border-black">
+                <table className="w-full text-sm">
+                    <thead className="bg-muted print:bg-gray-100">
+                        <tr>
+                            <th className="px-4 py-3 text-left font-medium">Item Name</th>
+                            <th className="px-4 py-3 text-right font-medium w-24">Qty</th>
+                            <th className="px-4 py-3 text-center font-medium w-12">Check</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y print:divide-black">
+                        {items.map((item) => (
+                            <tr key={item.id}>
+                                <td className="px-4 py-3">{item.name}</td>
+                                <td className="px-4 py-3 text-right font-mono">{item.quantity}</td>
+                                <td className="px-4 py-3 text-center">
+                                    <div className="w-4 h-4 border rounded mx-auto print:border-black" />
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    )
+}
+
+function AssemblyListSection({ title, icon, summary, compact }: { title: string, icon?: React.ReactNode, summary: Record<string, number>, compact?: boolean }) {
+    if (Object.keys(summary).length === 0) {
+        return (
+            <div className="space-y-4">
+                <div className="flex items-center gap-2 text-lg font-semibold text-primary print:text-black">
+                    {icon}
+                    <h3>{title}</h3>
+                </div>
+                <div className="p-4 border rounded-md bg-muted/20 text-muted-foreground text-sm italic print:border-black print:text-black">
+                    No assembly parts required.
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center gap-2 text-lg font-semibold text-primary print:text-black">
+                {icon}
+                <h3>{title}</h3>
+            </div>
+            <div className="border rounded-md overflow-hidden print:border-black">
+                <table className="w-full text-sm">
+                    <thead className="bg-muted print:bg-gray-100">
+                        <tr>
+                            <th className="px-4 py-3 text-left font-medium">Part Name</th>
+                            <th className="px-4 py-3 text-right font-medium w-24">Qty</th>
+                            <th className="px-4 py-3 text-center font-medium w-12">Check</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y print:divide-black">
+                        {Object.entries(summary).map(([part, qty]) => (
+                            <tr key={part}>
+                                <td className="px-4 py-3">{part}</td>
+                                <td className="px-4 py-3 text-right font-mono">{qty}</td>
+                                <td className="px-4 py-3 text-center">
+                                    <div className="w-4 h-4 border rounded mx-auto print:border-black" />
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     )
 }
