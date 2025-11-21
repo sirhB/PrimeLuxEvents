@@ -356,9 +356,9 @@ function PackListSection({ title, icon, items, compact }: { title: string, icon?
 
                                                     return (
                                                         <li key={idx} className="flex justify-between max-w-[200px]">
-                                                            <span><b>{name}:</b> </span>
+                                                            <span><b>{name}:</b></span>
                                                             <span className="font-mono">
-                                                                {qtyPerItem > 1 && <span className="text-muted-foreground mr-1">({qtyPerItem} each)</span>}
+                                                                &nbsp; {qtyPerItem > 1 && <span className="text-muted-foreground mr-1">{qtyPerItem} each</span>}
                                                                 ({totalQty} total)
                                                             </span>
                                                         </li>
