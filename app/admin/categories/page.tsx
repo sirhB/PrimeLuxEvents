@@ -43,7 +43,7 @@ export default async function CategoriesPage() {
                     </Link>
                 </Button>
             </div>
-            <div className="rounded-md border">
+            <div className="rounded-md border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <Table>
                     <TableHeader>
                         <TableRow>
