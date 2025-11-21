@@ -7,6 +7,7 @@ import { CartProvider } from "@/components/providers/cart-provider"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { ThreeBackground } from "@/components/three-background"
+import { Toaster } from "sonner"
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -52,6 +53,7 @@ export default function RootLayout({
           </div>
         </CartProvider>
         <Analytics />
+        <Toaster />
       </body>
     </html>
   )

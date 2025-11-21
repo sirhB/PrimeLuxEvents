@@ -27,6 +27,7 @@ import { revalidatePath } from 'next/cache'
 import { ArrowLeft, Printer, Calendar, MapPin, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { PrintButton } from '@/components/admin/print-button'
+import { OrderStatusForm } from '@/components/admin/order-status-form'
 
 export default async function OrderDetailsPage({
     params,
@@ -111,22 +112,11 @@ export default async function OrderDetailsPage({
                         <CardDescription>Update the status of this order</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form action={updateStatus} className="flex gap-4">
-                            <Select name="status" defaultValue={order.status}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="pending">Pending</SelectItem>
-                                    <SelectItem value="confirmed">Confirmed</SelectItem>
-                                    <SelectItem value="processing">Processing</SelectItem>
-                                    <SelectItem value="delivered">Delivered</SelectItem>
-                                    <SelectItem value="completed">Completed</SelectItem>
-                                    <SelectItem value="cancelled">Cancelled</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Button type="submit">Update Status</Button>
-                        </form>
+                        <OrderStatusForm
+                            orderId={order.id}
+                            currentStatus={order.status}
+                            updateStatusAction={updateStatus}
+                        />
                     </CardContent>
                 </Card>
             </div>

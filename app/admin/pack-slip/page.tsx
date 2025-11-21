@@ -1,8 +1,8 @@
-
 "use client"
 
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -150,10 +150,13 @@ export default function PackSlipPage() {
             setOrders(Array.from(orderMap.values()))
             setOrderCount(orderMap.size)
 
+            toast.success(`Pack slip generated for ${orderMap.size} orders`)
+
         } catch (error) {
             console.error('Error generating pack slip:', error)
             setItems([])
             setOrders([])
+            toast.error("Failed to generate pack slip")
         } finally {
             setLoading(false)
         }
@@ -266,9 +269,8 @@ export default function PackSlipPage() {
                                                 </div>
                                             </div>
 
-                                            <div className="grid gap-8 md:grid-cols-2 print:grid-cols-2">
-                                                <PackListSection title="Products" items={order.items} compact />
-                                                <AssemblyListSection title="Assembly Parts" summary={order.assemblySummary} compact />
+                                            <div className="grid gap-8 md:grid-cols-1 print:grid-cols-1">
+                                                <PackListSection title="Products & Assembly" items={order.items} compact />
                                             </div>
                                         </div>
                                     ))}
@@ -306,9 +308,24 @@ function PackListSection({ title, icon, items, compact }: { title: string, icon?
                     <tbody className="divide-y print:divide-black">
                         {items.map((item) => (
                             <tr key={item.id}>
-                                <td className="px-4 py-3">{item.name}</td>
-                                <td className="px-4 py-3 text-right font-mono">{item.quantity}</td>
-                                <td className="px-4 py-3 text-center">
+                                <td className="px-4 py-3">
+                                    <div className="font-medium">{item.name}</div>
+                                    {item.assemblyItems && item.assemblyItems.length > 0 && (
+                                        <div className="mt-2 text-xs text-muted-foreground print:text-gray-600 pl-3 border-l-2 border-muted print:border-gray-300">
+                                            <div className="font-semibold mb-1">Assembly Parts:</div>
+                                            <ul className="space-y-1">
+                                                {item.assemblyItems.map((part, idx) => (
+                                                    <li key={idx} className="flex justify-between max-w-[200px]">
+                                                        <span>{part}</span>
+                                                        <span className="font-mono">x {item.quantity}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </td>
+                                <td className="px-4 py-3 text-right font-mono align-top">{item.quantity}</td>
+                                <td className="px-4 py-3 text-center align-top">
                                     <div className="w-4 h-4 border rounded mx-auto print:border-black" />
                                 </td>
                             </tr>
