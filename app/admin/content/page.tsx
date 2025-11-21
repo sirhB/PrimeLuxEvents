@@ -173,48 +173,25 @@ export default function ContentPage() {
                         setIsDialogOpen(open)
                         if (!open) setEditingItem(null)
                     }}>
-                        <DialogTrigger asChild>
-                            <Button>
-                                <Plus className="mr-2 h-4 w-4" /> Add Content
-                            </Button>
-                        </DialogTrigger>
+                        {/* Add Content button removed as per requirements */}
                         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
-                                <DialogTitle>{editingItem ? 'Edit Content' : 'Add New Content'}</DialogTitle>
+                                <DialogTitle>Edit Content</DialogTitle>
                             </DialogHeader>
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="key">Key</Label>
-                                        <Input
-                                            id="key"
-                                            value={formKey}
-                                            onChange={(e) => setFormKey(e.target.value)}
-                                            required
-                                            placeholder="e.g., home.hero.title"
-                                            // Make read-only for existing items to prevent accidental breakage
-                                            // unless user really wants to change it (maybe add an unlock button later)
-                                            // For now, let's keep it editable but maybe visually de-emphasized
-                                            className={cn(editingItem ? "bg-muted text-muted-foreground" : "")}
-                                        />
-                                        {editingItem && (
-                                            <p className="text-xs text-muted-foreground">
-                                                Changing the key may break the site if the code expects the old key.
-                                            </p>
-                                        )}
+                                        <div className="p-2 bg-muted rounded-md text-sm font-mono text-muted-foreground border">
+                                            {formKey}
+                                        </div>
+                                        {/* Hidden input to ensure key is still submitted if needed, though we use state */}
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="type">Type</Label>
-                                        <select
-                                            id="type"
-                                            value={formType}
-                                            onChange={(e) => setFormType(e.target.value as any)}
-                                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                        >
-                                            <option value="text">Text</option>
-                                            <option value="json">JSON (List/Object)</option>
-                                            <option value="image">Image URL</option>
-                                        </select>
+                                        <div className="p-2 bg-muted rounded-md text-sm font-medium text-muted-foreground border capitalize">
+                                            {formType}
+                                        </div>
                                     </div>
                                 </div>
 

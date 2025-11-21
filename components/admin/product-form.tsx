@@ -45,82 +45,20 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     const router = useRouter()
     const supabase = createClient()
     const [loading, setLoading] = useState(false)
-    const [modifiers, setModifiers] = useState<Modifier[]>(product?.modifiers || [])
+    const [assemblyItems, setAssemblyItems] = useState<string[]>(product?.assembly_items || [])
 
-    const addModifier = () => {
-        setModifiers([
-            ...modifiers,
-            {
-                id: crypto.randomUUID(),
-                name: '',
-                options: [],
-            },
-        ])
+    const addAssemblyItem = () => {
+        setAssemblyItems([...assemblyItems, ''])
     }
 
-    const removeModifier = (id: string) => {
-        setModifiers(modifiers.filter((m) => m.id !== id))
+    const removeAssemblyItem = (index: number) => {
+        setAssemblyItems(assemblyItems.filter((_, i) => i !== index))
     }
 
-    const updateModifier = (id: string, field: keyof Modifier, value: any) => {
-        setModifiers(
-            modifiers.map((m) =>
-                m.id === id ? { ...m, [field]: value } : m
-            )
-        )
-    }
-
-    const addOption = (modifierId: string) => {
-        setModifiers(
-            modifiers.map((m) =>
-                m.id === modifierId
-                    ? {
-                        ...m,
-                        options: [
-                            ...m.options,
-                            {
-                                id: crypto.randomUUID(),
-                                label: '',
-                                priceAdjustment: 0,
-                            },
-                        ],
-                    }
-                    : m
-            )
-        )
-    }
-
-    const removeOption = (modifierId: string, optionId: string) => {
-        setModifiers(
-            modifiers.map((m) =>
-                m.id === modifierId
-                    ? {
-                        ...m,
-                        options: m.options.filter((o) => o.id !== optionId),
-                    }
-                    : m
-            )
-        )
-    }
-
-    const updateOption = (
-        modifierId: string,
-        optionId: string,
-        field: keyof ModifierOption,
-        value: any
-    ) => {
-        setModifiers(
-            modifiers.map((m) =>
-                m.id === modifierId
-                    ? {
-                        ...m,
-                        options: m.options.map((o) =>
-                            o.id === optionId ? { ...o, [field]: value } : o
-                        ),
-                    }
-                    : m
-            )
-        )
+    const updateAssemblyItem = (index: number, value: string) => {
+        const newItems = [...assemblyItems]
+        newItems[index] = value
+        setAssemblyItems(newItems)
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -136,6 +74,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             category_id: (formData.get('category_id') as string) || null,
             image_url: formData.get('image_url') as string,
             modifiers: modifiers,
+            assembly_items: assemblyItems.filter(item => item.trim() !== ''),
         }
 
         try {
@@ -229,6 +168,38 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                     defaultValue={product?.image_url}
                     placeholder="https://..."
                 />
+            </div>
+
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <Label className="text-base">Assembly Items</Label>
+                    <Button type="button" variant="outline" size="sm" onClick={addAssemblyItem}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Item
+                    </Button>
+                </div>
+                <div className="space-y-2">
+                    {assemblyItems.map((item, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <Input
+                                value={item}
+                                onChange={(e) => updateAssemblyItem(index, e.target.value)}
+                                placeholder="e.g. Legs, Screws, etc."
+                            />
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeAssemblyItem(index)}
+                            >
+                                <Trash className="h-4 w-4 text-destructive" />
+                            </Button>
+                        </div>
+                    ))}
+                    {assemblyItems.length === 0 && (
+                        <p className="text-sm text-muted-foreground italic">No assembly items added.</p>
+                    )}
+                </div>
             </div>
 
             <div className="space-y-4">

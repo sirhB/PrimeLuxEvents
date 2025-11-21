@@ -12,6 +12,7 @@ create table products (
   images jsonb default '[]'::jsonb,
   stock integer default 0,
   modifiers jsonb default '[]'::jsonb,
+  assembly_items jsonb default '[]'::jsonb,
   -- Rental-specific fields
   rental_price_daily decimal(10, 2),
   rental_price_weekend decimal(10, 2),
