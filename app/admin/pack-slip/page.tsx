@@ -11,11 +11,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Printer, Calendar as CalendarIcon, Package, Truck, Wrench, MapPin, Clock, FileText } from "lucide-react"
 import { format } from "date-fns"
 
+interface AssemblyItem {
+    name: string
+    quantity: number
+}
+
 interface PackItem {
     id: string
     name: string
     quantity: number
-    assemblyItems: string[]
+    assemblyItems: (string | AssemblyItem)[]
 }
 
 interface OrderPack {
@@ -103,8 +108,19 @@ export default function PackSlipPage() {
 
                 // Aggregate Assembly
                 if (product.assembly_items && Array.isArray(product.assembly_items)) {
-                    product.assembly_items.forEach((part: string) => {
-                        assemblyMap[part] = (assemblyMap[part] || 0) + res.quantity
+                    product.assembly_items.forEach((part: string | AssemblyItem) => {
+                        let partName = ''
+                        let partQty = 0
+
+                        if (typeof part === 'string') {
+                            partName = part
+                            partQty = res.quantity
+                        } else {
+                            partName = part.name
+                            partQty = part.quantity * res.quantity
+                        }
+
+                        assemblyMap[partName] = (assemblyMap[partName] || 0) + partQty
                     })
                 }
 
@@ -340,10 +356,10 @@ function PackListSection({ title, icon, items, compact }: { title: string, icon?
 
                                                     return (
                                                         <li key={idx} className="flex justify-between max-w-[200px]">
-                                                            <span>{name}</span>
+                                                            <span><b>{name}:</b> </span>
                                                             <span className="font-mono">
-                                                                {qtyPerItem > 1 && <span className="text-muted-foreground mr-1">({qtyPerItem} ea)</span>}
-                                                                x {totalQty}
+                                                                {qtyPerItem > 1 && <span className="text-muted-foreground mr-1">({qtyPerItem} each)</span>}
+                                                                ({totalQty} total)
                                                             </span>
                                                         </li>
                                                     )
