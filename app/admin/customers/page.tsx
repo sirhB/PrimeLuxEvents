@@ -8,6 +8,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { Users } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 
 interface Customer {
     email: string
@@ -91,50 +92,52 @@ export default async function CustomersPage() {
                     View customer information and order history
                 </p>
             </div>
-            <div className="rounded-md border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead>Orders</TableHead>
-                            <TableHead>Quotes</TableHead>
-                            <TableHead>Total Spent</TableHead>
-                            <TableHead>Last Order</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {customers.map((customer) => (
-                            <TableRow key={customer.email}>
-                                <TableCell className="font-medium">{customer.name}</TableCell>
-                                <TableCell>{customer.email}</TableCell>
-                                <TableCell>{customer.phone || 'N/A'}</TableCell>
-                                <TableCell>{customer.orderCount}</TableCell>
-                                <TableCell>{customer.quoteCount}</TableCell>
-                                <TableCell className="font-medium">
-                                    ${customer.totalSpent.toFixed(2)}
-                                </TableCell>
-                                <TableCell>
-                                    {customer.lastOrderDate
-                                        ? new Date(customer.lastOrderDate).toLocaleDateString()
-                                        : 'N/A'}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                        {customers.length === 0 && (
+            <Card>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center h-24">
-                                    <div className="flex flex-col items-center gap-2">
-                                        <Users className="h-8 w-8 text-muted-foreground" />
-                                        <p className="text-muted-foreground">No customers found.</p>
-                                    </div>
-                                </TableCell>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Email</TableHead>
+                                <TableHead>Phone</TableHead>
+                                <TableHead>Orders</TableHead>
+                                <TableHead>Quotes</TableHead>
+                                <TableHead>Total Spent</TableHead>
+                                <TableHead>Last Order</TableHead>
                             </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                        </TableHeader>
+                        <TableBody>
+                            {customers.map((customer) => (
+                                <TableRow key={customer.email}>
+                                    <TableCell className="font-medium">{customer.name}</TableCell>
+                                    <TableCell>{customer.email}</TableCell>
+                                    <TableCell>{customer.phone || 'N/A'}</TableCell>
+                                    <TableCell>{customer.orderCount}</TableCell>
+                                    <TableCell>{customer.quoteCount}</TableCell>
+                                    <TableCell className="font-medium">
+                                        ${customer.totalSpent.toFixed(2)}
+                                    </TableCell>
+                                    <TableCell>
+                                        {customer.lastOrderDate
+                                            ? new Date(customer.lastOrderDate).toLocaleDateString()
+                                            : 'N/A'}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            {customers.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="text-center h-24">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <Users className="h-8 w-8 text-muted-foreground" />
+                                            <p className="text-muted-foreground">No customers found.</p>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </div>
     )
 }

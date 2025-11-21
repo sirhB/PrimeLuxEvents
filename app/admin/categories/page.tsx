@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
+import { Card, CardContent } from '@/components/ui/card'
 
 export default async function CategoriesPage() {
     const supabase = await createClient()
@@ -43,51 +44,53 @@ export default async function CategoriesPage() {
                     </Link>
                 </Button>
             </div>
-            <div className="rounded-md border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Slug</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {categories?.map((category) => (
-                            <TableRow key={category.id}>
-                                <TableCell className="font-medium">{category.name}</TableCell>
-                                <TableCell>{category.slug}</TableCell>
-                                <TableCell>{category.description}</TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <Button variant="ghost" size="icon" asChild>
-                                            <Link href={`/admin/categories/${category.id}`}>
-                                                <Pencil className="h-4 w-4" />
-                                                <span className="sr-only">Edit</span>
-                                            </Link>
-                                        </Button>
-                                        <form action={deleteCategory}>
-                                            <input type="hidden" name="id" value={category.id} />
-                                            <Button variant="ghost" size="icon" type="submit">
-                                                <Trash2 className="h-4 w-4 text-red-500" />
-                                                <span className="sr-only">Delete</span>
-                                            </Button>
-                                        </form>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                        {categories?.length === 0 && (
+            <Card>
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
                             <TableRow>
-                                <TableCell colSpan={4} className="text-center">
-                                    No categories found.
-                                </TableCell>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Slug</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                        </TableHeader>
+                        <TableBody>
+                            {categories?.map((category) => (
+                                <TableRow key={category.id}>
+                                    <TableCell className="font-medium">{category.name}</TableCell>
+                                    <TableCell>{category.slug}</TableCell>
+                                    <TableCell>{category.description}</TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <Button variant="ghost" size="icon" asChild>
+                                                <Link href={`/admin/categories/${category.id}`}>
+                                                    <Pencil className="h-4 w-4" />
+                                                    <span className="sr-only">Edit</span>
+                                                </Link>
+                                            </Button>
+                                            <form action={deleteCategory}>
+                                                <input type="hidden" name="id" value={category.id} />
+                                                <Button variant="ghost" size="icon" type="submit">
+                                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                                    <span className="sr-only">Delete</span>
+                                                </Button>
+                                            </form>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            {categories?.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="text-center">
+                                        No categories found.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </div>
     )
 }

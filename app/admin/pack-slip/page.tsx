@@ -323,60 +323,63 @@ function PackListSection({ title, icon, items, compact }: { title: string, icon?
                 {icon}
                 <h3>{title}</h3>
             </div>
-            <div className="border rounded-md overflow-hidden print:border-black">
-                <table className="w-full text-sm">
-                    <thead className="bg-muted print:bg-gray-100">
-                        <tr>
-                            <th className="px-4 py-3 text-left font-medium">Item Name</th>
-                            <th className="px-4 py-3 text-right font-medium w-24">Qty</th>
-                            <th className="px-4 py-3 text-center font-medium w-12">Check</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y print:divide-black">
-                        {items.map((item) => (
-                            <tr key={item.id}>
-                                <td className="px-4 py-3">
-                                    <div className="font-medium">{item.name}</div>
-                                    {item.assemblyItems && item.assemblyItems.length > 0 && (
-                                        <div className="mt-2 text-xs text-muted-foreground print:text-gray-600 pl-3 border-l-2 border-muted print:border-gray-300">
-                                            <div className="font-semibold mb-1">Assembly Parts:</div>
-                                            <ul className="space-y-1">
-                                                {item.assemblyItems.map((part, idx) => {
-                                                    let name = ''
-                                                    let qtyPerItem = 1
-
-                                                    if (typeof part === 'string') {
-                                                        name = part
-                                                    } else {
-                                                        name = part.name
-                                                        qtyPerItem = part.quantity
-                                                    }
-
-                                                    const totalQty = qtyPerItem * item.quantity
-
-                                                    return (
-                                                        <li key={idx} className="flex justify-between max-w-[200px]">
-                                                            <span><b>{name}:</b></span>
-                                                            <span className="font-mono">
-                                                                &nbsp; {qtyPerItem > 1 && <span className="text-muted-foreground mr-1">{qtyPerItem} each</span>}
-                                                                ({totalQty} total)
-                                                            </span>
-                                                        </li>
-                                                    )
-                                                })}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </td>
-                                <td className="px-4 py-3 text-right font-mono align-top">{item.quantity}</td>
-                                <td className="px-4 py-3 text-center align-top">
-                                    <div className="w-4 h-4 border rounded mx-auto print:border-black" />
-                                </td>
+            <Card className="print:border-black print:shadow-none">
+                <CardContent className="p-0">
+                    <table className="w-full text-sm">
+                        <thead className="bg-muted print:bg-gray-100">
+                            <tr>
+                                <th className="px-4 py-3 text-left font-medium">Item Name</th>
+                                <th className="px-4 py-3 text-right font-medium w-24">Qty</th>
+                                <th className="px-4 py-3 text-center font-medium w-12">Check</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody className="divide-y print:divide-black">
+                            {items.map((item) => (
+                                <tr key={item.id}>
+                                    <td className="px-4 py-3">
+                                        <div className="font-medium">{item.name}</div>
+                                        {item.assemblyItems && item.assemblyItems.length > 0 && (
+                                            <div className="mt-2 text-xs text-muted-foreground print:text-black">
+                                                <span className="font-semibold">Assembly Parts:</span>
+                                                <ul className="mt-1 space-y-1 pl-2">
+                                                    {item.assemblyItems.map((part, idx) => {
+                                                        let name = ''
+                                                        let qtyPerItem = 0
+
+                                                        if (typeof part === 'string') {
+                                                            name = part
+                                                            qtyPerItem = 1
+                                                        } else {
+                                                            name = part.name
+                                                            qtyPerItem = part.quantity
+                                                        }
+
+                                                        const totalQty = qtyPerItem * item.quantity
+
+                                                        return (
+                                                            <li key={idx} className="flex justify-between max-w-[200px]">
+                                                                <span><b>{name}:</b></span>
+                                                                <span className="font-mono">
+                                                                    &nbsp; {qtyPerItem > 1 && <span className="text-muted-foreground mr-1">{qtyPerItem} each</span>}
+                                                                    ({totalQty} total)
+                                                                </span>
+                                                            </li>
+                                                        )
+                                                    })}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3 text-right font-mono align-top">{item.quantity}</td>
+                                    <td className="px-4 py-3 text-center align-top">
+                                        <div className="h-4 w-4 border rounded mx-auto print:border-black" />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </CardContent>
+            </Card>
         </div>
     )
 }
