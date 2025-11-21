@@ -23,6 +23,7 @@ interface OrderPack {
     customerName: string
     deliveryAddress: string | null
     deliveryTime: string | null
+    deliveryDate: string | null
     deliveryNotes: string | null
     items: PackItem[]
     assemblySummary: Record<string, number>
@@ -56,6 +57,7 @@ export default function PackSlipPage() {
                         customer_name,
                         delivery_address,
                         delivery_time,
+                        delivery_date,
                         delivery_notes
                     ),
                     product:products (
@@ -113,6 +115,7 @@ export default function PackSlipPage() {
                         customerName: order.customer_name,
                         deliveryAddress: order.delivery_address,
                         deliveryTime: order.delivery_time,
+                        deliveryDate: order.delivery_date,
                         deliveryNotes: order.delivery_notes,
                         items: [] as PackItem[],
                         assemblySummary: {} as Record<string, number>
@@ -214,7 +217,7 @@ export default function PackSlipPage() {
                         </div>
                     </div>
 
-                    <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "aggregate" | "by-order")} className="print:hidden">
+                    <Tabs value={viewMode} onValueChange={(v: string) => setViewMode(v as "aggregate" | "by-order")} className="print:hidden">
                         <TabsList>
                             <TabsTrigger value="aggregate">Aggregate List</TabsTrigger>
                             <TabsTrigger value="by-order">By Order</TabsTrigger>
@@ -249,7 +252,10 @@ export default function PackSlipPage() {
                                                     </div>
                                                     <div className="flex gap-2">
                                                         <Clock className="h-4 w-4 text-muted-foreground print:text-black" />
-                                                        <span>{order.deliveryTime || 'No time specified'}</span>
+                                                        <span>
+                                                            {order.deliveryDate && format(new Date(order.deliveryDate), 'MMM d')}
+                                                            {order.deliveryTime ? ` @ ${order.deliveryTime}` : ''}
+                                                        </span>
                                                     </div>
                                                     {order.deliveryNotes && (
                                                         <div className="flex gap-2 col-span-full">

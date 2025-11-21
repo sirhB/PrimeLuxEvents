@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button'
 import { revalidatePath } from 'next/cache'
 import { ArrowLeft, Printer, Calendar, MapPin, Wrench } from 'lucide-react'
 import Link from 'next/link'
+import { PrintButton } from '@/components/admin/print-button'
 
 export default async function OrderDetailsPage({
     params,
@@ -74,10 +75,7 @@ export default async function OrderDetailsPage({
                         Order ID: {order.id.slice(0, 8)}...
                     </p>
                 </div>
-                <Button variant="outline" onClick={() => window.print()}>
-                    <Printer className="h-4 w-4 mr-2" />
-                    Print Invoice
-                </Button>
+                <PrintButton />
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">

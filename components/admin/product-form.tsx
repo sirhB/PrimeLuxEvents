@@ -61,6 +61,81 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         setAssemblyItems(newItems)
     }
 
+    // Modifier State & Handlers
+    const [modifiers, setModifiers] = useState<Modifier[]>(product?.modifiers || [])
+
+    const addModifier = () => {
+        setModifiers([
+            ...modifiers,
+            {
+                id: crypto.randomUUID(),
+                name: '',
+                options: []
+            }
+        ])
+    }
+
+    const removeModifier = (id: string) => {
+        setModifiers(modifiers.filter(m => m.id !== id))
+    }
+
+    const updateModifier = (id: string, field: keyof Modifier, value: any) => {
+        setModifiers(modifiers.map(m => {
+            if (m.id === id) {
+                return { ...m, [field]: value }
+            }
+            return m
+        }))
+    }
+
+    const addOption = (modifierId: string) => {
+        setModifiers(modifiers.map(m => {
+            if (m.id === modifierId) {
+                return {
+                    ...m,
+                    options: [
+                        ...m.options,
+                        {
+                            id: crypto.randomUUID(),
+                            label: '',
+                            priceAdjustment: 0
+                        }
+                    ]
+                }
+            }
+            return m
+        }))
+    }
+
+    const removeOption = (modifierId: string, optionId: string) => {
+        setModifiers(modifiers.map(m => {
+            if (m.id === modifierId) {
+                return {
+                    ...m,
+                    options: m.options.filter(o => o.id !== optionId)
+                }
+            }
+            return m
+        }))
+    }
+
+    const updateOption = (modifierId: string, optionId: string, field: keyof ModifierOption, value: any) => {
+        setModifiers(modifiers.map(m => {
+            if (m.id === modifierId) {
+                return {
+                    ...m,
+                    options: m.options.map(o => {
+                        if (o.id === optionId) {
+                            return { ...o, [field]: value }
+                        }
+                        return o
+                    })
+                }
+            }
+            return m
+        }))
+    }
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setLoading(true)

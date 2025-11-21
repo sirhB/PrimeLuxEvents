@@ -47,6 +47,7 @@ create table orders (
   status text default 'pending',
   delivery_address text,
   delivery_time text,
+  delivery_date date,
   delivery_notes text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );

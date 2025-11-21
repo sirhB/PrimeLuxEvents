@@ -22,7 +22,7 @@ BEGIN
   SELECT id INTO sofa_id FROM products WHERE name = 'Velvet Lounge Sofa' LIMIT 1;
 
   -- Create Order 1: Wedding
-  INSERT INTO orders (id, customer_name, customer_email, total_amount, status, delivery_address, delivery_time, delivery_notes)
+  INSERT INTO orders (id, customer_name, customer_email, total_amount, status, delivery_address, delivery_time, delivery_date, delivery_notes)
   VALUES (
     order1_id,
     'Isabella Martinez',
@@ -31,11 +31,12 @@ BEGIN
     'confirmed',
     'The Plaza Hotel, 768 5th Ave, New York, NY 10019',
     '10:00 AM',
+    today,
     'Deliver to the Grand Ballroom via loading dock B. Contact event coordinator upon arrival.'
   );
 
   -- Create Order 2: Corporate Event
-  INSERT INTO orders (id, customer_name, customer_email, total_amount, status, delivery_address, delivery_time, delivery_notes)
+  INSERT INTO orders (id, customer_name, customer_email, total_amount, status, delivery_address, delivery_time, delivery_date, delivery_notes)
   VALUES (
     order2_id,
     'TechCorp Inc.',
@@ -44,6 +45,7 @@ BEGIN
     'confirmed',
     'Javits Center, 429 11th Ave, New York, NY 10001',
     '08:00 AM',
+    today,
     'Booth 405 setup. strict security check required.'
   );
 
