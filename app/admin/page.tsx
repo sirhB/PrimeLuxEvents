@@ -1,7 +1,46 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, ShoppingCart, Users, DollarSign } from 'lucide-react'
+import { Package, ShoppingCart, FileText, DollarSign, AlertTriangle, Calendar } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+    const supabase = await createClient()
+
+    // Fetch real data
+    const { data: orders } = await supabase
+        .from('orders')
+        .select('total_amount, created_at')
+        .order('created_at', { ascending: false })
+
+    const { data: quotes } = await supabase
+        .from('quotes')
+        .select('status')
+
+    const { data: products } = await supabase
+        .from('products')
+        .select('quantity_available, quantity_reserved')
+
+    const { data: recentOrders } = await supabase
+        .from('orders')
+        .select('id, customer_name, customer_email, total_amount, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5)
+
+    const { data: upcomingReservations } = await supabase
+        .from('rental_reservations')
+        .select('*, products(name)')
+        .gte('start_date', new Date().toISOString().split('T')[0])
+        .order('start_date', { ascending: true })
+        .limit(5)
+
+    // Calculate metrics
+    const totalRevenue = orders?.reduce((sum, order) => sum + parseFloat(order.total_amount), 0) || 0
+    const orderCount = orders?.length || 0
+    const pendingQuotes = quotes?.filter((q) => q.status === 'draft' || q.status === 'sent').length || 0
+    const lowStockProducts =
+        products?.filter((p) => p.quantity_available - p.quantity_reserved <= 2).length || 0
+
     return (
         <div className="flex flex-col gap-6">
             <div>
@@ -10,6 +49,8 @@ export default function AdminDashboardPage() {
                     Overview of your business metrics and performance
                 </p>
             </div>
+
+            {/* Metrics Cards */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -17,78 +58,131 @@ export default function AdminDashboardPage() {
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">$45,231.89</div>
-                        <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+                        <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+                        <p className="text-xs text-muted-foreground">All time</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Orders</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
                         <ShoppingCart className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">+2350</div>
-                        <p className="text-xs text-muted-foreground">+180.1% from last month</p>
+                        <div className="text-2xl font-bold">{orderCount}</div>
+                        <p className="text-xs text-muted-foreground">All time</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Products</CardTitle>
-                        <Package className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-sm font-medium">Pending Quotes</CardTitle>
+                        <FileText className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">+12,234</div>
-                        <p className="text-xs text-muted-foreground">+19% from last month</p>
+                        <div className="text-2xl font-bold">{pendingQuotes}</div>
+                        <p className="text-xs text-muted-foreground">Awaiting response</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-sm font-medium">Low Stock Alerts</CardTitle>
+                        <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">+573</div>
-                        <p className="text-xs text-muted-foreground">+201 since last hour</p>
+                        <div className="text-2xl font-bold">{lowStockProducts}</div>
+                        <p className="text-xs text-muted-foreground">Products need attention</p>
                     </CardContent>
                 </Card>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4">
-                    <CardHeader>
-                        <CardTitle>Overview</CardTitle>
+
+            {/* Recent Orders and Upcoming Reservations */}
+            <div className="grid gap-4 md:grid-cols-2">
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle>Recent Orders</CardTitle>
+                        <Button variant="ghost" size="sm" asChild>
+                            <Link href="/admin/orders">View All</Link>
+                        </Button>
                     </CardHeader>
-                    <CardContent className="pl-2">
-                        {/* Placeholder for a chart */}
-                        <div className="h-[200px] flex items-center justify-center text-muted-foreground">
-                            Chart Placeholder
+                    <CardContent>
+                        <div className="space-y-4">
+                            {recentOrders?.map((order) => (
+                                <div key={order.id} className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium">{order.customer_name}</p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {new Date(order.created_at).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                    <div className="font-medium">${order.total_amount}</div>
+                                </div>
+                            ))}
+                            {recentOrders?.length === 0 && (
+                                <p className="text-sm text-muted-foreground text-center py-4">
+                                    No orders yet
+                                </p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
-                <Card className="col-span-3">
-                    <CardHeader>
-                        <CardTitle>Recent Sales</CardTitle>
+
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle>Upcoming Reservations</CardTitle>
+                        <Button variant="ghost" size="sm" asChild>
+                            <Link href="/admin/inventory">View All</Link>
+                        </Button>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-8">
-                            {/* Placeholder for recent sales list */}
-                            <div className="flex items-center">
-                                <div className="ml-4 space-y-1">
-                                    <p className="text-sm font-medium leading-none">Olivia Martin</p>
-                                    <p className="text-sm text-muted-foreground">olivia.martin@email.com</p>
+                        <div className="space-y-4">
+                            {upcomingReservations?.map((reservation) => (
+                                <div key={reservation.id} className="flex items-center gap-3">
+                                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                                    <div className="flex-1">
+                                        <p className="text-sm font-medium">
+                                            {reservation.products?.name || 'Unknown Product'}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {new Date(reservation.start_date).toLocaleDateString()} -{' '}
+                                            {new Date(reservation.end_date).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                        Qty: {reservation.quantity}
+                                    </div>
                                 </div>
-                                <div className="ml-auto font-medium">+$1,999.00</div>
-                            </div>
-                            <div className="flex items-center">
-                                <div className="ml-4 space-y-1">
-                                    <p className="text-sm font-medium leading-none">Jackson Lee</p>
-                                    <p className="text-sm text-muted-foreground">jackson.lee@email.com</p>
-                                </div>
-                                <div className="ml-auto font-medium">+$39.00</div>
-                            </div>
+                            ))}
+                            {upcomingReservations?.length === 0 && (
+                                <p className="text-sm text-muted-foreground text-center py-4">
+                                    No upcoming reservations
+                                </p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Quick Actions */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                        <Button asChild>
+                            <Link href="/admin/products/new">Add Product</Link>
+                        </Button>
+                        <Button variant="outline" asChild>
+                            <Link href="/admin/orders">View Orders</Link>
+                        </Button>
+                        <Button variant="outline" asChild>
+                            <Link href="/admin/quotes">View Quotes</Link>
+                        </Button>
+                        <Button variant="outline" asChild>
+                            <Link href="/admin/inventory">Check Inventory</Link>
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }

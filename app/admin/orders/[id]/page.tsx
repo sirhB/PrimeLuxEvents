@@ -24,7 +24,8 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { revalidatePath } from 'next/cache'
-import { toast } from 'sonner'
+import { ArrowLeft, Printer, Calendar, MapPin, Wrench } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function OrderDetailsPage({
     params,
@@ -40,6 +41,12 @@ export default async function OrderDetailsPage({
         .eq('id', id)
         .single()
 
+    // Get rental reservations for this order
+    const { data: reservations } = await supabase
+        .from('rental_reservations')
+        .select('*, products(name)')
+        .eq('order_id', id)
+
     if (error || !order) {
         notFound()
     }
@@ -54,30 +61,52 @@ export default async function OrderDetailsPage({
     }
 
     return (
-        <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-bold tracking-tight">Order Details</h1>
+        <div className="flex flex-col gap-6">
+            <div className="flex items-center gap-4">
+                <Button variant="ghost" size="icon" asChild>
+                    <Link href="/admin/orders">
+                        <ArrowLeft className="h-4 w-4" />
+                    </Link>
+                </Button>
+                <div className="flex-1">
+                    <h1 className="text-3xl font-bold tracking-tight">Order Details</h1>
+                    <p className="text-muted-foreground mt-1">
+                        Order ID: {order.id.slice(0, 8)}...
+                    </p>
+                </div>
+                <Button variant="outline" onClick={() => window.print()}>
+                    <Printer className="h-4 w-4 mr-2" />
+                    Print Invoice
+                </Button>
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2">
+                {/* Customer Information */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Customer Information</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid gap-2">
-                            <div className="flex justify-between">
-                                <span className="font-medium">Name:</span>
-                                <span>{order.customer_name}</span>
+                        <div className="space-y-2">
+                            <div>
+                                <p className="text-sm font-medium text-muted-foreground">Name</p>
+                                <p>{order.customer_name}</p>
                             </div>
-                            <div className="flex justify-between">
-                                <span className="font-medium">Email:</span>
-                                <span>{order.customer_email}</span>
+                            <div>
+                                <p className="text-sm font-medium text-muted-foreground">Email</p>
+                                <p>{order.customer_email}</p>
                             </div>
-                            <div className="flex justify-between">
-                                <span className="font-medium">Date:</span>
-                                <span>{new Date(order.created_at).toLocaleString()}</span>
+                            <div>
+                                <p className="text-sm font-medium text-muted-foreground">
+                                    Order Date
+                                </p>
+                                <p>{new Date(order.created_at).toLocaleString()}</p>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* Order Status */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Order Status</CardTitle>
@@ -91,18 +120,61 @@ export default async function OrderDetailsPage({
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="confirmed">Confirmed</SelectItem>
                                     <SelectItem value="processing">Processing</SelectItem>
-                                    <SelectItem value="shipped">Shipped</SelectItem>
                                     <SelectItem value="delivered">Delivered</SelectItem>
+                                    <SelectItem value="completed">Completed</SelectItem>
                                     <SelectItem value="cancelled">Cancelled</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Button type="submit">Update</Button>
+                            <Button type="submit">Update Status</Button>
                         </form>
                     </CardContent>
                 </Card>
             </div>
 
+            {/* Rental Reservations */}
+            {reservations && reservations.length > 0 && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Calendar className="h-5 w-5" />
+                            Rental Reservations
+                        </CardTitle>
+                        <CardDescription>Scheduled rental dates for this order</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {reservations.map((reservation) => (
+                                <div
+                                    key={reservation.id}
+                                    className="flex items-center justify-between border-b pb-4 last:border-0"
+                                >
+                                    <div>
+                                        <p className="font-medium">
+                                            {reservation.products?.name || 'Unknown Product'}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">
+                                            Quantity: {reservation.quantity}
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-medium">
+                                            {new Date(reservation.start_date).toLocaleDateString()} -{' '}
+                                            {new Date(reservation.end_date).toLocaleDateString()}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground capitalize">
+                                            Status: {reservation.status}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Order Items */}
             <Card>
                 <CardHeader>
                     <CardTitle>Order Items</CardTitle>
@@ -138,6 +210,36 @@ export default async function OrderDetailsPage({
                             </TableRow>
                         </TableBody>
                     </Table>
+                </CardContent>
+            </Card>
+
+            {/* Order Timeline */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Order Timeline</CardTitle>
+                    <CardDescription>Track the progress of this order</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        <div className="flex items-start gap-4">
+                            <div className="h-2 w-2 rounded-full bg-primary mt-2" />
+                            <div>
+                                <p className="font-medium">Order Created</p>
+                                <p className="text-sm text-muted-foreground">
+                                    {new Date(order.created_at).toLocaleString()}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex items-start gap-4">
+                            <div className="h-2 w-2 rounded-full bg-muted mt-2" />
+                            <div>
+                                <p className="font-medium">Current Status</p>
+                                <p className="text-sm text-muted-foreground capitalize">
+                                    {order.status}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </CardContent>
             </Card>
         </div>

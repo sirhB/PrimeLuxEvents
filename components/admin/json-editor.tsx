@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Plus, Trash2, GripVertical } from "lucide-react"
+import { Plus, Trash2, GripVertical, ArrowUp, ArrowDown } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface JsonEditorProps {
     value: string
@@ -49,6 +50,18 @@ export function JsonEditor({ value, onChange }: JsonEditorProps) {
         }
     }
 
+    const moveItem = (index: number, direction: 'up' | 'down') => {
+        if (!Array.isArray(parsedValue)) return
+
+        const newArray = [...parsedValue]
+        if (direction === 'up' && index > 0) {
+            [newArray[index], newArray[index - 1]] = [newArray[index - 1], newArray[index]]
+        } else if (direction === 'down' && index < newArray.length - 1) {
+            [newArray[index], newArray[index + 1]] = [newArray[index + 1], newArray[index]]
+        }
+        handleUpdate(newArray)
+    }
+
     const updateItem = (index: number, key: string | null, val: string) => {
         if (Array.isArray(parsedValue)) {
             const newArray = [...parsedValue]
@@ -80,47 +93,75 @@ export function JsonEditor({ value, onChange }: JsonEditorProps) {
         return (
             <div className="space-y-4">
                 {parsedValue.map((item, index) => (
-                    <div key={index} className="flex gap-4 items-start p-4 border rounded-md bg-card">
-                        <div className="mt-2 text-muted-foreground">
-                            <GripVertical className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1 space-y-4">
-                            {typeof item === 'object' ? (
-                                Object.entries(item).map(([key, val]) => (
-                                    <div key={key} className="space-y-1">
-                                        <Label className="text-xs uppercase text-muted-foreground">{key}</Label>
-                                        {key === 'description' || key === 'quote' || key.length > 50 ? (
-                                            <Textarea
-                                                value={val as string}
-                                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateItem(index, key, e.target.value)}
-                                                className="min-h-[60px]"
-                                            />
-                                        ) : (
-                                            <Input
-                                                value={val as string}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateItem(index, key, e.target.value)}
-                                            />
-                                        )}
-                                    </div>
-                                ))
-                            ) : (
-                                <Input
-                                    value={item as string}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateItem(index, null, e.target.value)}
-                                />
-                            )}
-                        </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeItem(index)}
-                            className="text-destructive hover:text-destructive/90"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
-                    </div>
+                    <Card key={index} className="relative group">
+                        <CardContent className="p-4 flex gap-4 items-start">
+                            <div className="flex flex-col gap-1 mt-2 text-muted-foreground">
+                                <div className="p-1 rounded hover:bg-muted cursor-grab active:cursor-grabbing">
+                                    <GripVertical className="h-4 w-4" />
+                                </div>
+                                <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-6 w-6"
+                                        onClick={() => moveItem(index, 'up')}
+                                        disabled={index === 0}
+                                    >
+                                        <ArrowUp className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-6 w-6"
+                                        onClick={() => moveItem(index, 'down')}
+                                        disabled={index === parsedValue.length - 1}
+                                    >
+                                        <ArrowDown className="h-3 w-3" />
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <div className="flex-1 space-y-4">
+                                {typeof item === 'object' ? (
+                                    Object.entries(item).map(([key, val]) => (
+                                        <div key={key} className="space-y-1">
+                                            <Label className="text-xs uppercase text-muted-foreground font-semibold tracking-wider">
+                                                {key.replace(/_/g, ' ')}
+                                            </Label>
+                                            {key === 'description' || key === 'quote' || key === 'answer' || (typeof val === 'string' && val.length > 50) ? (
+                                                <Textarea
+                                                    value={val as string}
+                                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateItem(index, key, e.target.value)}
+                                                    className="min-h-[60px]"
+                                                />
+                                            ) : (
+                                                <Input
+                                                    value={val as string}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateItem(index, key, e.target.value)}
+                                                />
+                                            )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <Input
+                                        value={item as string}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateItem(index, null, e.target.value)}
+                                    />
+                                )}
+                            </div>
+
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeItem(index)}
+                                className="text-destructive hover:text-destructive/90 hover:bg-destructive/10 -mt-2 -mr-2"
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </CardContent>
+                    </Card>
                 ))}
-                <Button type="button" variant="outline" onClick={addItem} className="w-full">
+                <Button type="button" variant="outline" onClick={addItem} className="w-full border-dashed">
                     <Plus className="mr-2 h-4 w-4" /> Add Item
                 </Button>
             </div>

@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { products } from "@/lib/data"
 import { ArrowRight } from "lucide-react"
+import { ThreeCardEffect } from "@/components/three-card-effect"
 
 export function FeaturedCollection() {
   const featuredProducts = products.filter((p) => p.featured).slice(0, 4)
@@ -25,25 +26,26 @@ export function FeaturedCollection() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {featuredProducts.map((product, index) => (
-            <Link
-              key={product.id}
-              href={`/catalog/${product.id}`}
-              className="group block animate-fade-in-up"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="relative aspect-[3/4] overflow-hidden bg-secondary mb-4">
-                <Image
-                  src={product.image || "/placeholder.svg"}
-                  alt={product.name}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-              <h3 className="font-serif text-lg group-hover:underline decoration-1 underline-offset-4">
-                {product.name}
-              </h3>
-              <p className="text-sm text-muted-foreground">${product.price.toFixed(2)}</p>
-            </Link>
+            <ThreeCardEffect key={product.id} intensity={10}>
+              <Link
+                href={`/catalog/${product.id}`}
+                className="group block animate-fade-in-up"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="relative aspect-[3/4] overflow-hidden bg-secondary mb-4">
+                  <Image
+                    src={product.image || "/placeholder.svg"}
+                    alt={product.name}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                </div>
+                <h3 className="font-serif text-lg group-hover:underline decoration-1 underline-offset-4">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-muted-foreground">${product.price.toFixed(2)}</p>
+              </Link>
+            </ThreeCardEffect>
           ))}
         </div>
       </div>

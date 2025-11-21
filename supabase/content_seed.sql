@@ -30,6 +30,76 @@ INSERT INTO content (key, value, type) VALUES
 ('about.cta.secondary', 'Contact Support', 'text')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
+-- Home Page Content
+INSERT INTO content (key, value, type) VALUES
+('home.hero.title', 'Curating Unforgettable Moments of Luxury', 'text'),
+('home.hero.subtitle', 'Premier event rentals and styling for weddings, galas, and corporate gatherings. Browse our collection and book directly online.', 'text'),
+('home.hero.cta_primary', 'Rent Online', 'text'),
+('home.hero.cta_secondary', 'How It Works', 'text'),
+('home.values.title', 'The PrimeLux Standard', 'text'),
+('home.values.description', 'We don''t just rent furniture; we curate experiences. Our commitment to excellence sets the foundation for unforgettable events.', 'text'),
+('home.values.items', '[
+  {
+    "title": "Curated Excellence",
+    "description": "Every piece in our collection is hand-selected for its craftsmanship, aesthetic appeal, and ability to transform a space."
+  },
+  {
+    "title": "Uncompromising Quality",
+    "description": "We maintain our inventory to the highest standards. Each item is inspected, cleaned, and perfected before it arrives at your event."
+  },
+  {
+    "title": "Seamless Logistics",
+    "description": "Our white-glove delivery team handles every detail of transport and setup, ensuring a stress-free experience from start to finish."
+  },
+  {
+    "title": "Personalized Service",
+    "description": "We believe in building relationships. Our dedicated design consultants work closely with you to bring your unique vision to life."
+  }
+]', 'json'),
+('home.services.title', 'Our Services', 'text'),
+('home.services.description', 'Beyond rentals, we provide comprehensive styling and logistical support to ensure your event is flawless.', 'text'),
+('home.services.items', '[
+  {
+    "title": "Event Design & Styling",
+    "description": "Our expert designers work with you to create a cohesive look for your event, from color palettes to floor plans."
+  },
+  {
+    "title": "Delivery & Setup",
+    "description": "White-glove delivery service including full setup and breakdown of all rental items."
+  },
+  {
+    "title": "Custom Fabrication",
+    "description": "Need something unique? Our workshop can build custom backdrops, bars, and decor pieces."
+  },
+  {
+    "title": "Venue Consultation",
+    "description": "We''ll visit your venue to recommend the best layout and rental items to maximize the space."
+  }
+]', 'json'),
+('home.testimonials.title', 'Client Stories', 'text'),
+('home.testimonials.description', 'Hear from those who have experienced the PrimeLux difference.', 'text'),
+('home.testimonials.items', '[
+  {
+    "quote": "PrimeLux transformed our wedding venue into a dream. The velvet lounge furniture was the talk of the night, and the service was impeccable.",
+    "author": "Isabella & Marcus",
+    "role": "Wedding at The Plaza",
+    "image": "/elegant-bride.png"
+  },
+  {
+    "quote": "As an event planner, I need partners I can rely on. PrimeLux delivers consistency, quality, and style every single time. They are my go-to.",
+    "author": "Sarah Jenkins",
+    "role": "Senior Planner, Elite Events",
+    "image": "/open-planner.png"
+  },
+  {
+    "quote": "The attention to detail is unmatched. From the initial consultation to the final pickup, the team was professional, punctual, and a joy to work with.",
+    "author": "David Chen",
+    "role": "Corporate Gala Organizer",
+    "image": "/diverse-executive-team.png"
+  }
+]', 'json')
+ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
+
 -- Contact Page Content
 INSERT INTO content (key, value, type) VALUES
 ('contact.hero.title', 'Get in Touch', 'text'),

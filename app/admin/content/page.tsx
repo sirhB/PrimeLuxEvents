@@ -4,15 +4,6 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 import {
     Dialog,
     DialogContent,
@@ -21,24 +12,20 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Plus, Pencil, Trash2, LayoutDashboard, FileText, Image as ImageIcon, HelpCircle, BookOpen, ShoppingBag, Phone, Info, Settings } from "lucide-react"
+import { Plus, Pencil, Trash2, LayoutDashboard, FileText, Image as ImageIcon, HelpCircle, BookOpen, ShoppingBag, Phone, Info, Settings, ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { JsonEditor } from "@/components/admin/json-editor"
+import { ContentEditor } from "@/components/admin/content-editor"
 import { cn } from "@/lib/utils"
-
-interface ContentItem {
-    id: number
-    key: string
-    value: string
-    type: 'text' | 'json' | 'image'
-}
+import { getLabelFromKey, groupContentBySection, ContentItem, GroupedContent } from "@/lib/cms-utils"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 const PAGE_GROUPS = [
     { id: 'all', label: 'All Content', icon: LayoutDashboard },
     { id: 'home', label: 'Home', icon: FileText },
     { id: 'about', label: 'About', icon: Info },
     { id: 'services', label: 'Services', icon: Settings },
-    { id: 'how_it_works', label: 'How It Works', icon: HelpCircle },
+    { id: 'howitworks', label: 'How It Works', icon: HelpCircle },
     { id: 'faq', label: 'FAQ', icon: HelpCircle },
     { id: 'gallery', label: 'Gallery', icon: ImageIcon },
     { id: 'journal', label: 'Journal', icon: BookOpen },
@@ -52,12 +39,41 @@ export default function ContentPage() {
     const [selectedGroup, setSelectedGroup] = useState('all')
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [editingItem, setEditingItem] = useState<ContentItem | null>(null)
+    const [groupedContent, setGroupedContent] = useState<GroupedContent[]>([])
+
+    // Form state
+    const [formKey, setFormKey] = useState('')
+    const [formValue, setFormValue] = useState('')
+    const [formType, setFormType] = useState<'text' | 'json' | 'image'>('text')
+
     const supabase = createClient()
     const router = useRouter()
 
     useEffect(() => {
         fetchContent()
     }, [])
+
+    useEffect(() => {
+        if (editingItem) {
+            setFormKey(editingItem.key)
+            setFormValue(editingItem.value)
+            setFormType(editingItem.type)
+        } else {
+            // Reset form for new item
+            // If we are in a specific page group, pre-fill the key prefix
+            setFormKey(selectedGroup !== 'all' ? `${selectedGroup}.` : '')
+            setFormValue('')
+            setFormType('text')
+        }
+    }, [editingItem, selectedGroup, isDialogOpen])
+
+    useEffect(() => {
+        const filtered = selectedGroup === 'all'
+            ? content
+            : content.filter(item => item.key.startsWith(selectedGroup + '.'))
+
+        setGroupedContent(groupContentBySection(filtered))
+    }, [content, selectedGroup])
 
     async function fetchContent() {
         const { data, error } = await supabase
@@ -73,28 +89,20 @@ export default function ContentPage() {
         setLoading(false)
     }
 
-    const filteredContent = selectedGroup === 'all'
-        ? content
-        : content.filter(item => item.key.startsWith(selectedGroup + '.'))
-
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
-        const formData = new FormData(e.currentTarget)
-        const key = formData.get('key') as string
-        const value = formData.get('value') as string
-        const type = formData.get('type') as 'text' | 'json' | 'image'
 
         if (editingItem) {
             const { error } = await supabase
                 .from('content')
-                .update({ key, value, type })
+                .update({ key: formKey, value: formValue, type: formType })
                 .eq('id', editingItem.id)
 
             if (error) console.error('Error updating content:', error)
         } else {
             const { error } = await supabase
                 .from('content')
-                .insert([{ key, value, type }])
+                .insert([{ key: formKey, value: formValue, type: formType }])
 
             if (error) console.error('Error creating content:', error)
         }
@@ -129,7 +137,7 @@ export default function ContentPage() {
     return (
         <div className="flex h-[calc(100vh-4rem)] gap-6">
             {/* Sidebar */}
-            <div className="w-64 shrink-0 border-r pr-6 py-4">
+            <div className="w-64 shrink-0 border-r pr-6 py-4 overflow-y-auto">
                 <div className="space-y-1">
                     {PAGE_GROUPS.map((group) => {
                         const Icon = group.icon
@@ -153,7 +161,7 @@ export default function ContentPage() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 py-4 space-y-6 overflow-auto">
+            <div className="flex-1 py-4 space-y-6 overflow-auto pr-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-serif">Content Management</h1>
@@ -180,51 +188,43 @@ export default function ContentPage() {
                                         <Label htmlFor="key">Key</Label>
                                         <Input
                                             id="key"
-                                            name="key"
-                                            defaultValue={editingItem?.key}
+                                            value={formKey}
+                                            onChange={(e) => setFormKey(e.target.value)}
                                             required
                                             placeholder="e.g., home.hero.title"
+                                            // Make read-only for existing items to prevent accidental breakage
+                                            // unless user really wants to change it (maybe add an unlock button later)
+                                            // For now, let's keep it editable but maybe visually de-emphasized
+                                            className={cn(editingItem ? "bg-muted text-muted-foreground" : "")}
                                         />
+                                        {editingItem && (
+                                            <p className="text-xs text-muted-foreground">
+                                                Changing the key may break the site if the code expects the old key.
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="type">Type</Label>
                                         <select
                                             id="type"
-                                            name="type"
+                                            value={formType}
+                                            onChange={(e) => setFormType(e.target.value as any)}
                                             className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                            defaultValue={editingItem?.type || 'text'}
                                         >
                                             <option value="text">Text</option>
-                                            <option value="json">JSON</option>
+                                            <option value="json">JSON (List/Object)</option>
                                             <option value="image">Image URL</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="value">Value</Label>
-                                    {editingItem?.type === 'json' ? (
-                                        <div className="border rounded-md p-4 bg-muted/10">
-                                            <input type="hidden" name="value" id="value" defaultValue={editingItem?.value} />
-                                            <JsonEditor
-                                                value={editingItem?.value}
-                                                onChange={(val) => {
-                                                    const input = document.getElementById('value') as HTMLInputElement
-                                                    if (input) input.value = val
-                                                    setEditingItem(prev => prev ? { ...prev, value: val } : null)
-                                                }}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <Textarea
-                                            id="value"
-                                            name="value"
-                                            defaultValue={editingItem?.value}
-                                            required
-                                            className="min-h-[200px] font-mono text-sm"
-                                            placeholder="Content value..."
-                                        />
-                                    )}
-                                </div>
+
+                                <ContentEditor
+                                    type={formType}
+                                    value={formValue}
+                                    onChange={setFormValue}
+                                    label={editingItem ? getLabelFromKey(editingItem.key) : "Value"}
+                                />
+
                                 <div className="flex justify-end gap-2">
                                     <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
                                     <Button type="submit">Save</Button>
@@ -234,58 +234,62 @@ export default function ContentPage() {
                     </Dialog>
                 </div>
 
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[300px]">Key</TableHead>
-                                <TableHead className="w-[100px]">Type</TableHead>
-                                <TableHead>Value</TableHead>
-                                <TableHead className="text-right w-[100px]">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
-                                <TableRow>
-                                    <TableCell colSpan={4} className="text-center h-24">Loading...</TableCell>
-                                </TableRow>
-                            ) : filteredContent.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={4} className="text-center h-24">No content found for this section.</TableCell>
-                                </TableRow>
-                            ) : (
-                                filteredContent.map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell className="font-medium font-mono text-xs">{item.key}</TableCell>
-                                        <TableCell>
-                                            <span className={cn(
-                                                "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent",
-                                                item.type === 'json' ? "bg-blue-100 text-blue-800" :
-                                                    item.type === 'image' ? "bg-purple-100 text-purple-800" :
-                                                        "bg-secondary text-secondary-foreground"
-                                            )}>
-                                                {item.type}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="font-mono text-xs truncate max-w-[400px]">
-                                            {item.value}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <Button variant="ghost" size="icon" onClick={() => openEditDialog(item)}>
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
-                                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
+                {loading ? (
+                    <div className="text-center py-12 text-muted-foreground">Loading content...</div>
+                ) : groupedContent.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">No content found for this section.</div>
+                ) : (
+                    <div className="space-y-8">
+                        {groupedContent.map((group) => (
+                            <div key={group.section} className="space-y-4">
+                                <h2 className="text-xl font-semibold flex items-center gap-2 text-primary/80 border-b pb-2">
+                                    {group.section}
+                                    <Badge variant="secondary" className="text-xs font-normal">{group.items.length} items</Badge>
+                                </h2>
+                                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                                    {group.items.map((item) => (
+                                        <Card key={item.id} className="overflow-hidden hover:shadow-md transition-shadow group">
+                                            <CardHeader className="pb-2 space-y-0">
+                                                <div className="flex justify-between items-start gap-2">
+                                                    <CardTitle className="text-base font-medium leading-tight">
+                                                        {getLabelFromKey(item.key)}
+                                                    </CardTitle>
+                                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditDialog(item)}>
+                                                            <Pencil className="h-3.5 w-3.5" />
+                                                        </Button>
+                                                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => handleDelete(item.id)}>
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                <div className="text-xs text-muted-foreground font-mono truncate" title={item.key}>
+                                                    {item.key}
+                                                </div>
+                                            </CardHeader>
+                                            <CardContent>
+                                                {item.type === 'image' ? (
+                                                    <div className="aspect-video rounded-md bg-muted overflow-hidden relative">
+                                                        <img src={item.value} alt={item.key} className="w-full h-full object-cover" />
+                                                    </div>
+                                                ) : item.type === 'json' ? (
+                                                    <div className="bg-muted/30 rounded p-2 text-xs font-mono h-24 overflow-hidden relative">
+                                                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-muted/10 pointer-events-none" />
+                                                        {item.value}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-sm text-muted-foreground line-clamp-3 min-h-[3rem]">
+                                                        {item.value}
+                                                    </p>
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     )
