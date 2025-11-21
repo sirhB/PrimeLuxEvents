@@ -194,7 +194,7 @@ export default function PackSlipPage() {
     }
 
     return (
-        <div className="space-y-6 p-6 max-w-5xl mx-auto">
+        <div className="space-y-6">
             <div className="flex items-center justify-between print:hidden">
                 <div>
                     <h1 className="text-3xl font-serif">Pack Slip Generator</h1>
@@ -228,89 +228,93 @@ export default function PackSlipPage() {
             </Card>
 
             {hasSearched && (
-                <div className="space-y-8">
-                    <div className="flex items-center justify-between border-b pb-4 print:pb-2">
-                        <div>
-                            <h2 className="text-2xl font-bold">Delivery Manifest</h2>
-                            <p className="text-muted-foreground">
-                                Date: {format(new Date(date), 'MMMM d, yyyy')}
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="text-right hidden sm:block">
-                                <div className="text-sm text-muted-foreground">Total Orders</div>
-                                <div className="text-2xl font-bold">{orderCount}</div>
-                            </div>
-                            <Button variant="outline" size="icon" onClick={handlePrint} className="print:hidden">
-                                <Printer className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
-
-                    <Tabs value={viewMode} onValueChange={(v: string) => setViewMode(v as "aggregate" | "by-order")} className="print:hidden">
-                        <TabsList>
-                            <TabsTrigger value="aggregate">Aggregate List</TabsTrigger>
-                            <TabsTrigger value="by-order">By Order</TabsTrigger>
-                        </TabsList>
-                    </Tabs>
-
-                    {items.length === 0 ? (
-                        <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
-                            No reservations found for this date.
-                        </div>
-                    ) : (
-                        <>
-                            {/* Aggregate View */}
-                            <div className={viewMode === 'aggregate' ? 'block' : 'hidden print:hidden'}>
-                                <div className="grid gap-8 md:grid-cols-2 print:grid-cols-2">
-                                    <PackListSection title="Total Products to Pack" icon={<Package className="h-5 w-5" />} items={items} />
-                                    <AssemblyListSection title="Total Assembly Parts" icon={<Wrench className="h-5 w-5" />} summary={assemblySummary} />
+                <Card className="print:shadow-none">
+                    <CardContent className="p-6">
+                        <div className="space-y-8">
+                            <div className="flex items-center justify-between border-b pb-4 print:pb-2">
+                                <div>
+                                    <h2 className="text-2xl font-bold">Delivery Manifest</h2>
+                                    <p className="text-muted-foreground">
+                                        Date: {format(new Date(date), 'MMMM d, yyyy')}
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <div className="text-right hidden sm:block">
+                                        <div className="text-sm text-muted-foreground">Total Orders</div>
+                                        <div className="text-2xl font-bold">{orderCount}</div>
+                                    </div>
+                                    <Button variant="outline" size="icon" onClick={handlePrint} className="print:hidden">
+                                        <Printer className="h-4 w-4" />
+                                    </Button>
                                 </div>
                             </div>
 
-                            {/* By Order View */}
-                            <div className={viewMode === 'by-order' ? 'block' : 'hidden print:block'}>
-                                <div className="space-y-12 print:space-y-8">
-                                    {orders.map((order) => (
-                                        <div key={order.id} className="break-inside-avoid border rounded-lg p-6 print:border-black print:p-0 print:border-0">
-                                            <div className="mb-6 border-b pb-4 print:border-black">
-                                                <h3 className="text-xl font-bold">{order.customerName}</h3>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 text-sm">
-                                                    <div className="flex gap-2">
-                                                        <MapPin className="h-4 w-4 text-muted-foreground print:text-black" />
-                                                        <span>{order.deliveryAddress || 'No address provided'}</span>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <Clock className="h-4 w-4 text-muted-foreground print:text-black" />
-                                                        <span>
-                                                            {order.deliveryDate && format(new Date(order.deliveryDate), 'MMM d')}
-                                                            {order.deliveryTime ? ` @ ${order.deliveryTime}` : ''}
-                                                        </span>
-                                                    </div>
-                                                    {order.deliveryNotes && (
-                                                        <div className="flex gap-2 col-span-full">
-                                                            <FileText className="h-4 w-4 text-muted-foreground print:text-black" />
-                                                            <span className="italic">{order.deliveryNotes}</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
+                            <Tabs value={viewMode} onValueChange={(v: string) => setViewMode(v as "aggregate" | "by-order")} className="print:hidden">
+                                <TabsList>
+                                    <TabsTrigger value="aggregate">Aggregate List</TabsTrigger>
+                                    <TabsTrigger value="by-order">By Order</TabsTrigger>
+                                </TabsList>
+                            </Tabs>
 
-                                            <div className="grid gap-8 md:grid-cols-1 print:grid-cols-1">
-                                                <PackListSection title="Products & Assembly" items={order.items} compact />
-                                            </div>
+                            {items.length === 0 ? (
+                                <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
+                                    No reservations found for this date.
+                                </div>
+                            ) : (
+                                <>
+                                    {/* Aggregate View */}
+                                    <div className={viewMode === 'aggregate' ? 'block' : 'hidden print:hidden'}>
+                                        <div className="grid gap-8 md:grid-cols-2 print:grid-cols-2">
+                                            <PackListSection title="Total Products to Pack" icon={<Package className="h-5 w-5" />} items={items} />
+                                            <AssemblyListSection title="Total Assembly Parts" icon={<Wrench className="h-5 w-5" />} summary={assemblySummary} />
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </>
-                    )}
+                                    </div>
 
-                    <div className="hidden print:block mt-12 pt-8 border-t text-sm text-muted-foreground text-center">
-                        <p>Generated on {new Date().toLocaleString()}</p>
-                        <p>PrimeLux Events - Internal Use Only</p>
-                    </div>
-                </div>
+                                    {/* By Order View */}
+                                    <div className={viewMode === 'by-order' ? 'block' : 'hidden print:block'}>
+                                        <div className="space-y-12 print:space-y-8">
+                                            {orders.map((order) => (
+                                                <div key={order.id} className="break-inside-avoid border rounded-lg p-6 print:border-black print:p-0 print:border-0">
+                                                    <div className="mb-6 border-b pb-4 print:border-black">
+                                                        <h3 className="text-xl font-bold">{order.customerName}</h3>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 text-sm">
+                                                            <div className="flex gap-2">
+                                                                <MapPin className="h-4 w-4 text-muted-foreground print:text-black" />
+                                                                <span>{order.deliveryAddress || 'No address provided'}</span>
+                                                            </div>
+                                                            <div className="flex gap-2">
+                                                                <Clock className="h-4 w-4 text-muted-foreground print:text-black" />
+                                                                <span>
+                                                                    {order.deliveryDate && format(new Date(order.deliveryDate), 'MMM d')}
+                                                                    {order.deliveryTime ? ` @ ${order.deliveryTime}` : ''}
+                                                                </span>
+                                                            </div>
+                                                            {order.deliveryNotes && (
+                                                                <div className="flex gap-2 col-span-full">
+                                                                    <FileText className="h-4 w-4 text-muted-foreground print:text-black" />
+                                                                    <span className="italic">{order.deliveryNotes}</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="grid gap-8 md:grid-cols-1 print:grid-cols-1">
+                                                        <PackListSection title="Products & Assembly" items={order.items} compact />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            <div className="hidden print:block mt-12 pt-8 border-t text-sm text-muted-foreground text-center">
+                                <p>Generated on {new Date().toLocaleString()}</p>
+                                <p>PrimeLux Events - Internal Use Only</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             )}
         </div>
     )

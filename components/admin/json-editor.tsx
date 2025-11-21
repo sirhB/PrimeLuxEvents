@@ -101,6 +101,7 @@ export function JsonEditor({ value, onChange }: JsonEditorProps) {
                                 </div>
                                 <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <Button
+                                        type="button"
                                         variant="ghost"
                                         size="icon"
                                         className="h-6 w-6"
@@ -110,6 +111,7 @@ export function JsonEditor({ value, onChange }: JsonEditorProps) {
                                         <ArrowUp className="h-3 w-3" />
                                     </Button>
                                     <Button
+                                        type="button"
                                         variant="ghost"
                                         size="icon"
                                         className="h-6 w-6"
