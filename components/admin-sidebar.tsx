@@ -73,35 +73,38 @@ export function AdminSidebar() {
     }
 
     return (
-        <div className="flex h-screen w-64 flex-col border-r bg-gray-100/40 dark:bg-gray-800/40">
-            <div className="flex h-14 items-center border-b px-6">
-                <Link className="flex items-center gap-2 font-semibold" href="/admin">
+        <div className="flex h-screen w-64 flex-col border-r bg-sidebar text-sidebar-foreground">
+            <div className="flex h-14 items-center border-b border-sidebar-border px-6">
+                <Link className="flex items-center gap-2 font-serif font-semibold tracking-wide text-lg" href="/admin">
                     <span className="">PrimeLux Admin</span>
                 </Link>
             </div>
-            <div className="flex-1 overflow-auto py-2">
-                <nav className="grid items-start px-4 text-sm font-medium">
-                    {sidebarItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={cn(
-                                'flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-gray-900 dark:hover:text-gray-50',
-                                pathname === item.href
-                                    ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50'
-                                    : 'text-gray-500 dark:text-gray-400'
-                            )}
-                        >
-                            <item.icon className="h-4 w-4" />
-                            {item.title}
-                        </Link>
-                    ))}
+            <div className="flex-1 overflow-auto py-4">
+                <nav className="grid items-start px-4 text-sm font-medium gap-1">
+                    {sidebarItems.map((item) => {
+                        const isActive = pathname === item.href
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                    'flex items-center gap-3 rounded-md px-3 py-2.5 transition-all duration-200',
+                                    isActive
+                                        ? 'bg-sidebar-accent text-sidebar-accent-foreground shadow-sm font-semibold translate-x-1'
+                                        : 'text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/50 hover:translate-x-1'
+                                )}
+                            >
+                                <item.icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground")} />
+                                {item.title}
+                            </Link>
+                        )
+                    })}
                 </nav>
             </div>
-            <div className="mt-auto p-4">
+            <div className="mt-auto p-4 border-t border-sidebar-border">
                 <Button
-                    variant="outline"
-                    className="w-full justify-start gap-2"
+                    variant="ghost"
+                    className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                     onClick={handleLogout}
                 >
                     <LogOut className="h-4 w-4" />
