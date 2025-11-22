@@ -1,80 +1,9 @@
 'use client'
 
 import { Canvas, useFrame } from '@react-three/fiber'
-import { useRef, useMemo } from 'react'
+import { useRef } from 'react'
 import * as THREE from 'three'
-
-function AnimatedParticles() {
-    const pointsRef = useRef<THREE.Points>(null)
-    const mouseRef = useRef({ x: 0, y: 0 })
-
-    // Create particle positions
-    const particleCount = 1000
-    const positions = useMemo(() => {
-        const pos = new Float32Array(particleCount * 3)
-        for (let i = 0; i < particleCount; i++) {
-            pos[i * 3] = (Math.random() - 0.5) * 50
-            pos[i * 3 + 1] = (Math.random() - 0.5) * 50
-            pos[i * 3 + 2] = (Math.random() - 0.5) * 50
-        }
-        return pos
-    }, [])
-
-    // Mouse move handler
-    useMemo(() => {
-        const handleMouseMove = (event: MouseEvent) => {
-            mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1
-            mouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1
-        }
-        window.addEventListener('mousemove', handleMouseMove)
-        return () => window.removeEventListener('mousemove', handleMouseMove)
-    }, [])
-
-    // Animation loop
-    useFrame((state) => {
-        if (!pointsRef.current) return
-
-        const time = state.clock.getElapsedTime()
-
-        // Rotate the entire particle system slowly
-        pointsRef.current.rotation.y = time * 0.05
-        pointsRef.current.rotation.x = Math.sin(time * 0.1) * 0.1
-
-        // Subtle mouse interaction
-        pointsRef.current.rotation.y += mouseRef.current.x * 0.01
-        pointsRef.current.rotation.x += mouseRef.current.y * 0.01
-
-        // Animate individual particles
-        const positions = pointsRef.current.geometry.attributes.position.array as Float32Array
-        for (let i = 0; i < particleCount; i++) {
-            const i3 = i * 3
-            positions[i3 + 1] += Math.sin(time + i * 0.1) * 0.002
-        }
-        pointsRef.current.geometry.attributes.position.needsUpdate = true
-    })
-
-    return (
-        <points ref={pointsRef}>
-            <bufferGeometry>
-                <bufferAttribute
-                    attach="attributes-position"
-                    count={particleCount}
-                    array={positions}
-                    itemSize={3}
-                    args={[positions, 3]}
-                />
-            </bufferGeometry>
-            <pointsMaterial
-                size={0.05}
-                color="#d4af37"
-                transparent
-                opacity={0.6}
-                sizeAttenuation
-                blending={THREE.AdditiveBlending}
-            />
-        </points>
-    )
-}
+import { Text } from '@react-three/drei'
 
 function WaveGrid() {
     const meshRef = useRef<THREE.Mesh>(null)
@@ -100,12 +29,43 @@ function WaveGrid() {
         <mesh ref={meshRef} rotation={[-Math.PI / 3, 0, 0]} position={[0, -10, -20]}>
             <planeGeometry args={[40, 40, 50, 50]} />
             <meshStandardMaterial
-                color="#1a1a2e"
+                color="#c9a961"
                 wireframe
                 transparent
-                opacity={0.15}
+                opacity={0.12}
             />
         </mesh>
+    )
+}
+
+function BrandText() {
+    const textRef = useRef<THREE.Mesh>(null)
+
+    useFrame((state) => {
+        if (!textRef.current) return
+        const time = state.clock.getElapsedTime()
+        // Subtle floating animation
+        textRef.current.position.y = Math.sin(time * 0.3) * 0.3 - 8
+    })
+
+    return (
+        <Text
+            ref={textRef}
+            position={[0, -8, -15]}
+            fontSize={1.2}
+            color="#c9a961"
+            anchorX="center"
+            anchorY="middle"
+        >
+            PRIME LUX EVENTS
+            <meshStandardMaterial
+                color="#c9a961"
+                transparent
+                opacity={0.15}
+                emissive="#c9a961"
+                emissiveIntensity={0.2}
+            />
+        </Text>
     )
 }
 
@@ -118,8 +78,8 @@ export function ThreeBackground() {
             >
                 <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} intensity={1} />
-                <AnimatedParticles />
                 <WaveGrid />
+                <BrandText />
             </Canvas>
         </div>
     )

@@ -6,8 +6,10 @@
 
 :root {
   /* Warm, luxury cream palette inspired by the reference images */
-  --background: oklch(0.98 0.01 90); /* Warm Cream */
-  --foreground: oklch(0.15 0.02 85); /* Dark Warm Grey */
+  --background: oklch(0.98 0.01 90);
+  /* Warm Cream */
+  --foreground: oklch(0.15 0.02 85);
+  /* Dark Warm Grey */
 
   --card: oklch(0.99 0.005 90);
   --card-foreground: oklch(0.15 0.02 85);
@@ -15,26 +17,31 @@
   --popover: oklch(0.99 0.005 90);
   --popover-foreground: oklch(0.15 0.02 85);
 
-  --primary: oklch(0.15 0.02 85); /* Dark text color for primary actions */
+  --primary: oklch(0.7344 0.15 85);
+  /* Rich gold for luxury accent */
   --primary-foreground: oklch(0.98 0.01 90);
 
-  --secondary: oklch(0.94 0.02 90); /* Slightly darker cream for secondary */
+  --secondary: oklch(0.94 0.02 90);
+  /* Slightly darker cream for secondary */
   --secondary-foreground: oklch(0.15 0.02 85);
 
   --muted: oklch(0.94 0.02 90);
   --muted-foreground: oklch(0.45 0.02 85);
 
-  --accent: oklch(0.92 0.02 90);
-  --accent-foreground: oklch(0.15 0.02 85);
+  --accent: oklch(0.7344 0.15 85);
+  /* Gold accent matching primary */
+  --accent-foreground: oklch(0.98 0.01 90);
 
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.98 0.01 90);
 
-  --border: oklch(0.88 0.02 90); /* Subtle warm border */
+  --border: oklch(0.88 0.02 90);
+  /* Subtle warm border */
   --input: oklch(0.88 0.02 90);
   --ring: oklch(0.15 0.02 85);
 
-  --radius: 0rem; /* Sharp corners for luxury feel */
+  --radius: 0rem;
+  /* Sharp corners for luxury feel */
 
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -63,7 +70,8 @@
   --popover: oklch(0.14 0.02 85);
   --popover-foreground: oklch(0.95 0.01 90);
 
-  --primary: oklch(0.95 0.01 90);
+  --primary: oklch(0.80 0.15 85);
+  /* Bright gold for dark mode */
   --primary-foreground: oklch(0.12 0.02 85);
 
   --secondary: oklch(0.18 0.02 85);
@@ -72,8 +80,9 @@
   --muted: oklch(0.18 0.02 85);
   --muted-foreground: oklch(0.65 0.01 90);
 
-  --accent: oklch(0.18 0.02 85);
-  --accent-foreground: oklch(0.95 0.01 90);
+  --accent: oklch(0.80 0.15 85);
+  /* Bright gold accent for dark mode */
+  --accent-foreground: oklch(0.12 0.02 85);
 
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.95 0.01 90);
@@ -101,7 +110,8 @@
 @theme inline {
   --font-sans: "Geist", "Geist Fallback";
   --font-mono: "Geist Mono", "Geist Mono Fallback";
-  --font-serif: "Playfair Display", "Times New Roman", serif; /* Added serif for luxury feel */
+  --font-serif: "Playfair Display", "Times New Roman", serif;
+  /* Added serif for luxury feel */
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -158,12 +168,15 @@
   .delay-100 {
     animation-delay: 100ms;
   }
+
   .delay-200 {
     animation-delay: 200ms;
   }
+
   .delay-300 {
     animation-delay: 300ms;
   }
+
   .delay-500 {
     animation-delay: 500ms;
   }
@@ -190,6 +203,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -200,6 +214,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -211,6 +226,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -221,9 +237,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   h1,
   h2,
   h3,

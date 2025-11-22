@@ -38,6 +38,15 @@ create table products (
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Settings Table (for global configuration)
+create table settings (
+  id uuid default uuid_generate_v4() primary key,
+  key text not null unique,
+  value text not null,
+  description text,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- Orders Table
 create table orders (
   id uuid default uuid_generate_v4() primary key,
@@ -52,6 +61,10 @@ create table orders (
   setup_fee integer default 0, -- stored in cents
   discount_amount integer default 0, -- stored in cents
   status text default 'pending',
+  payment_status text default 'pending', -- pending, processing, succeeded, failed, refunded
+  payment_intent_id text, -- Stripe payment intent ID
+  payment_method text, -- card, bank_transfer, etc.
+  stripe_customer_id text, -- For future recurring customers
   delivery_address text,
   delivery_time text,
   delivery_date date,
@@ -116,6 +129,7 @@ create table quotes (
 -- Enable RLS
 alter table products enable row level security;
 alter table categories enable row level security;
+alter table settings enable row level security;
 alter table orders enable row level security;
 alter table order_items enable row level security;
 alter table content enable row level security;
@@ -152,8 +166,24 @@ create policy "Admins can update categories."
   on categories for update
   using ( auth.role() = 'authenticated' );
 
--- Orders: Admin read/write (and potentially user own orders if we had user auth for customers)
--- For now, assuming only admins manage orders
+-- Settings: Public read, Admin write
+create policy "Public settings are viewable by everyone."
+  on settings for select
+  using ( true );
+
+create policy "Admins can update settings."
+  on settings for update
+  using ( auth.role() = 'authenticated' );
+
+create policy "Admins can insert settings."
+  on settings for insert
+  with check ( auth.role() = 'authenticated' );
+
+-- Orders: Public can create (checkout), Admin can read/update
+create policy "Anyone can create orders."
+  on orders for insert
+  with check ( true );
+
 create policy "Admins can view all orders."
   on orders for select
   using ( auth.role() = 'authenticated' );

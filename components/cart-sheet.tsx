@@ -36,8 +36,8 @@ export function CartSheet() {
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg flex flex-col h-full bg-background border-l border-border">
         <SheetHeader className="space-y-2.5 pr-6 border-b border-border pb-4">
-          <SheetTitle className="font-serif text-2xl">Your Quote</SheetTitle>
-          <SheetDescription>Review your items and request a custom quote for your event.</SheetDescription>
+          <SheetTitle className="font-serif text-2xl">Your Cart</SheetTitle>
+          <SheetDescription>Review your items and proceed to checkout.</SheetDescription>
         </SheetHeader>
 
         {isSuccess ? (
@@ -158,16 +158,19 @@ export function CartSheet() {
                     <span className="text-muted-foreground">Items</span>
                     <span>{cartCount}</span>
                   </div>
-                  <div className="flex justify-between font-medium text-lg">
-                    <span>Total Estimate</span>
-                    <span>Request Quote</span>
-                  </div>
                   <p className="text-xs text-muted-foreground">
-                    Final pricing including delivery and setup will be provided in your official quote.
+                    Tax and delivery fees will be calculated at checkout based on your delivery address.
                   </p>
                 </div>
-                <Button className="w-full h-12 text-base" size="lg" onClick={handleSubmit}>
-                  Submit Quote Request
+                <Button
+                  className="w-full h-12 text-base"
+                  size="lg"
+                  onClick={() => {
+                    setIsOpen(false)
+                    window.location.href = '/checkout'
+                  }}
+                >
+                  Proceed to Checkout
                 </Button>
               </div>
             )}
