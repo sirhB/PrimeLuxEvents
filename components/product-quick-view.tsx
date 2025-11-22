@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+import { cn, formatCurrency } from "@/lib/utils"
 
 interface Product {
     id: string
@@ -126,7 +126,7 @@ export function ProductQuickView({
                         <div className="space-y-2">
                             <div className="flex items-baseline gap-3">
                                 <span className="text-2xl font-semibold">
-                                    ${rentalPrice.toFixed(2)}
+                                    {formatCurrency(rentalPrice)}
                                 </span>
                                 <span className="text-sm text-muted-foreground">/ day</span>
                             </div>
@@ -134,10 +134,10 @@ export function ProductQuickView({
                             {(hasWeekendRate || hasWeeklyRate) && (
                                 <div className="text-sm text-muted-foreground space-y-1">
                                     {hasWeekendRate && (
-                                        <p>Weekend (2-3 days): ${product.rental_price_weekend?.toFixed(2)}</p>
+                                        <p>Weekend (2-3 days): {formatCurrency(product.rental_price_weekend || 0)}</p>
                                     )}
                                     {hasWeeklyRate && (
-                                        <p>Weekly (7+ days): ${product.rental_price_weekly?.toFixed(2)}</p>
+                                        <p>Weekly (7+ days): {formatCurrency(product.rental_price_weekly || 0)}</p>
                                     )}
                                 </div>
                             )}

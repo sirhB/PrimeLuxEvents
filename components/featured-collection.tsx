@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { products } from "@/lib/data"
 import { ArrowRight } from "lucide-react"
+import { formatCurrency } from "@/lib/utils"
 
 export function FeaturedCollection() {
   const featuredProducts = products.filter((p) => p.featured).slice(0, 4)
@@ -42,7 +43,7 @@ export function FeaturedCollection() {
               <h3 className="font-serif text-lg group-hover:underline decoration-1 underline-offset-4">
                 {product.name}
               </h3>
-              <p className="text-sm text-muted-foreground">${product.price.toFixed(2)}</p>
+              <p className="text-sm text-muted-foreground">{formatCurrency(product.price)}</p>
             </Link>
           ))}
         </div>

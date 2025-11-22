@@ -32,14 +32,14 @@ BEGIN
   SELECT id INTO decor_id FROM categories WHERE slug = 'decor';
 
   INSERT INTO products (name, description, price, image_url, category_id, stock) VALUES
-  ('Gilded Chiavari Chair', 'Classic elegance for any formal occasion. Features a gold finish and ivory cushion.', 12.50, '/gold-chiavari-chair.jpg', seating_id, 100),
-  ('Velvet Lounge Sofa', 'Mid-century modern velvet sofa in emerald green. Perfect for lounge areas.', 150.00, '/emerald-green-velvet-sofa.jpg', furniture_id, 10),
-  ('Crystal Chandelier', 'Statement lighting piece with genuine crystals. Adds immediate luxury.', 250.00, '/crystal-chandelier.png', lighting_id, 5),
-  ('Farmhouse Dining Table', 'Solid oak farmhouse table. Seats 8-10 guests comfortably.', 85.00, '/rustic-wooden-dining-table.jpg', tables_id, 20),
-  ('Gold Rim Charger Plate', 'Glass charger plate with delicate gold rim detailing.', 4.50, '/gold-rim-charger-plate.jpg', tableware_id, 200),
-  ('Ghost Chair', 'Modern transparent acrylic chair. Adds a contemporary touch.', 15.00, '/clear-ghost-chair.jpg', seating_id, 150),
-  ('Vintage Brass Candlesticks', 'Set of 3 assorted vintage brass candlesticks.', 18.00, '/vintage-brass-candlesticks.jpg', decor_id, 50),
-  ('Marble Bar Counter', 'Luxurious white marble bar counter with gold trim.', 350.00, '/marble-bar-counter.jpg', furniture_id, 3);
+  ('Gilded Chiavari Chair', 'Classic elegance for any formal occasion. Features a gold finish and ivory cushion.', 1250, '/gold-chiavari-chair.jpg', seating_id, 100),
+  ('Velvet Lounge Sofa', 'Mid-century modern velvet sofa in emerald green. Perfect for lounge areas.', 15000, '/emerald-green-velvet-sofa.jpg', furniture_id, 10),
+  ('Crystal Chandelier', 'Statement lighting piece with genuine crystals. Adds immediate luxury.', 25000, '/crystal-chandelier.png', lighting_id, 5),
+  ('Farmhouse Dining Table', 'Solid oak farmhouse table. Seats 8-10 guests comfortably.', 8500, '/rustic-wooden-dining-table.jpg', tables_id, 20),
+  ('Gold Rim Charger Plate', 'Glass charger plate with delicate gold rim detailing.', 450, '/gold-rim-charger-plate.jpg', tableware_id, 200),
+  ('Ghost Chair', 'Modern transparent acrylic chair. Adds a contemporary touch.', 1500, '/clear-ghost-chair.jpg', seating_id, 150),
+  ('Vintage Brass Candlesticks', 'Set of 3 assorted vintage brass candlesticks.', 1800, '/vintage-brass-candlesticks.jpg', decor_id, 50),
+  ('Marble Bar Counter', 'Luxurious white marble bar counter with gold trim.', 35000, '/marble-bar-counter.jpg', furniture_id, 3);
 END $$;
 
 -- Seed Content

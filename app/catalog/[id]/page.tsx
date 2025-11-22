@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator"
 import { ProductGallery } from "@/components/product-gallery"
 import { RentalDatePicker } from "@/components/rental-date-picker"
 import { RelatedProducts } from "@/components/related-products"
+import { formatCurrency } from "@/lib/utils"
 import {
   Accordion,
   AccordionContent,
@@ -203,7 +204,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               </h1>
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-semibold">
-                  ${basePrice.toFixed(2)}
+                  {formatCurrency(basePrice)}
                 </span>
                 <span className="text-sm text-muted-foreground">/ day</span>
               </div>
@@ -300,7 +301,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 <span className="font-medium">{option.label}</span>
                                 {option.priceAdjustment > 0 && (
                                   <span className="text-muted-foreground ml-2">
-                                    +${option.priceAdjustment.toFixed(2)}
+                                    +{formatCurrency(option.priceAdjustment)}
                                   </span>
                                 )}
                               </Label>

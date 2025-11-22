@@ -6,7 +6,7 @@ import Image from "next/image"
 import { ArrowRight, Plus, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { cn, formatCurrency } from "@/lib/utils"
 
 interface Product {
     id: string
@@ -146,7 +146,7 @@ export function RelatedProducts({
                             </p>
                             <div className="flex items-baseline gap-2 mt-1">
                                 <span className="font-semibold">
-                                    ${(product.rental_price_daily || product.price).toFixed(2)}
+                                    {formatCurrency(product.rental_price_daily || product.price)}
                                 </span>
                                 <span className="text-xs text-muted-foreground">/ day</span>
                             </div>
