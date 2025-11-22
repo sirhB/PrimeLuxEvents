@@ -429,23 +429,23 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           </Accordion>
         </div>
       </div>
-    </div >
 
-    {/* Related Products Section */ }
-  {
-    product && allProducts.length > 0 && (
-      <div className="container mx-auto px-4 md:px-6 pb-20">
-        <Separator className="mb-12" />
-        <RelatedProducts
-          currentProduct={product}
-          allProducts={allProducts}
-          onAddToCart={toggleCart}
-          isInCart={isInCartFn}
-          maxItems={4}
-        />
-      </div>
-    )
-  }
+
+      {/* Related Products Section */}
+      {
+        product && allProducts.length > 0 && (
+          <div className="container mx-auto px-4 md:px-6 pb-20">
+            <Separator className="mb-12" />
+            <RelatedProducts
+              currentProduct={product}
+              allProducts={allProducts}
+              onAddToCart={toggleCart}
+              isInCart={isInCartFn}
+              maxItems={4}
+            />
+          </div>
+        )
+      }
     </div >
   )
 }
