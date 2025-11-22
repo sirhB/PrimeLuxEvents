@@ -64,7 +64,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [loading, setLoading] = useState(true)
   const [selectedModifiers, setSelectedModifiers] = useState<Record<string, ModifierOption>>({})
   const [quantity, setQuantity] = useState(1)
-  const [quantity, setQuantity] = useState(1)
+
 
   const { items, addItem, removeItem } = useCart()
   const [isLoaded, setIsLoaded] = useState(false)
@@ -204,7 +204,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   ${totalPrice.toFixed(2)}
                 </span>
                 <span className="text-sm text-muted-foreground">/ day</span>
-                )}
+
               </div>
             </div>
 
