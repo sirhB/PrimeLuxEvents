@@ -67,7 +67,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [quantity, setQuantity] = useState(1)
 
 
-  const { items, addItem, removeItem } = useCart()
+  const { items, addItem, removeItem, updateQuantity: updateCartQuantity } = useCart()
   const [isLoaded, setIsLoaded] = useState(false)
   const supabase = createClient()
 
@@ -119,7 +119,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     notFound()
   }
 
-  const isInCart = items.some((item) => item.productId === product.id)
+  const cartItem = items.find((item) => item.productId === product.id)
+  const isInCart = !!cartItem
   const isInCartFn = (productId: string) => items.some((item) => item.productId === productId)
   const maxQuantity = 100
 
@@ -198,225 +199,250 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 </Badge>
               </div>
               <h1 className="text-4xl md:text-5xl font-serif mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-                {product.name}
-              </h1>
-              <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-semibold">
-                  ${totalPrice.toFixed(2)}
+                  ${basePrice.toFixed(2)}
                 </span>
-                <span className="text-sm text-muted-foreground">/ day</span>
+                <span className="text-sm text-muted-foreground">/ day for {product.name}</span>
 
-              </div>
             </div>
+          </div>
 
-            <Separator />
+          <Separator />
 
-            {/* Description */}
-            <div className="prose prose-stone max-w-none">
-              <p className="text-base leading-relaxed text-muted-foreground">
-                {product.description}
-              </p>
+          {/* Description */}
+          <div className="prose prose-stone max-w-none">
+            <p className="text-base leading-relaxed text-muted-foreground">
+              {product.description}
+            </p>
+          </div>
+
+          {/* Features */}
+          {product.features && product.features.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {product.features.map((feature, idx) => (
+                <Badge key={idx} variant="secondary">
+                  {feature}
+                </Badge>
+              ))}
             </div>
+          )}
 
-            {/* Features */}
-            {product.features && product.features.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {product.features.map((feature, idx) => (
-                  <Badge key={idx} variant="secondary">
-                    {feature}
-                  </Badge>
+          <Separator />
+
+
+
+          {/* Quantity Selector */}
+          <div className="space-y-3">
+            <Label className="text-base font-medium">Quantity</Label>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={decrementQuantity}
+                disabled={quantity <= 1}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <Input
+                type="number"
+                min={1}
+                max={maxQuantity}
+                value={quantity}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value)
+                  if (!isNaN(val) && val >= 1 && val <= maxQuantity) {
+                    setQuantity(val)
+                  } else if (e.target.value === '') {
+                    // Allow empty string for typing, but handle blur or submit to default to 1
+                    // For now, let's just not update if invalid, or maybe handle it better.
+                    // A simple approach is to only update if valid number.
+                  }
+                }}
+                className="w-20 text-center"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={incrementQuantity}
+                disabled={quantity >= maxQuantity}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+
+            </div>
+          </div>
+
+          {/* Modifiers Section */}
+          {product.modifiers && product.modifiers.length > 0 && (
+            <>
+              <Separator />
+              <div className="space-y-4">
+                <Label className="text-base font-medium">Customize Your Rental</Label>
+                {product.modifiers.map((modifier) => (
+                  <div key={modifier.id} className="space-y-3">
+                    <Label className="text-sm font-medium text-muted-foreground">
+                      {modifier.name}
+                    </Label>
+                    <RadioGroup
+                      onValueChange={(value: string) => handleModifierChange(modifier.id, value)}
+                      value={selectedModifiers[modifier.id]?.id}
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {modifier.options.map((option) => (
+                          <div
+                            key={option.id}
+                            className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-secondary/50 transition-colors"
+                          >
+                            <RadioGroupItem value={option.id} id={option.id} />
+                            <Label htmlFor={option.id} className="cursor-pointer flex-1">
+                              <span className="font-medium">{option.label}</span>
+                              {option.priceAdjustment > 0 && (
+                                <span className="text-muted-foreground ml-2">
+                                  +${option.priceAdjustment.toFixed(2)}
+                                </span>
+                              )}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </RadioGroup>
+                  </div>
                 ))}
               </div>
-            )}
+            </>
+          )}
 
-            <Separator />
+          <Separator />
 
-
-
-            {/* Quantity Selector */}
-            <div className="space-y-3">
-              <Label className="text-base font-medium">Quantity</Label>
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={decrementQuantity}
-                  disabled={quantity <= 1}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <Input
-                  type="number"
-                  min={1}
-                  max={maxQuantity}
-                  value={quantity}
-                  onChange={(e) => {
-                    const val = parseInt(e.target.value)
-                    if (!isNaN(val) && val >= 1 && val <= maxQuantity) {
-                      setQuantity(val)
-                    } else if (e.target.value === '') {
-                      // Allow empty string for typing, but handle blur or submit to default to 1
-                      // For now, let's just not update if invalid, or maybe handle it better.
-                      // A simple approach is to only update if valid number.
-                    }
-                  }}
-                  className="w-20 text-center"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={incrementQuantity}
-                  disabled={quantity >= maxQuantity}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-
-              </div>
-            </div>
-
-            {/* Modifiers Section */}
-            {product.modifiers && product.modifiers.length > 0 && (
-              <>
-                <Separator />
-                <div className="space-y-4">
-                  <Label className="text-base font-medium">Customize Your Rental</Label>
-                  {product.modifiers.map((modifier) => (
-                    <div key={modifier.id} className="space-y-3">
-                      <Label className="text-sm font-medium text-muted-foreground">
-                        {modifier.name}
-                      </Label>
-                      <RadioGroup
-                        onValueChange={(value: string) => handleModifierChange(modifier.id, value)}
-                        value={selectedModifiers[modifier.id]?.id}
-                      >
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {modifier.options.map((option) => (
-                            <div
-                              key={option.id}
-                              className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-secondary/50 transition-colors"
-                            >
-                              <RadioGroupItem value={option.id} id={option.id} />
-                              <Label htmlFor={option.id} className="cursor-pointer flex-1">
-                                <span className="font-medium">{option.label}</span>
-                                {option.priceAdjustment > 0 && (
-                                  <span className="text-muted-foreground ml-2">
-                                    +${option.priceAdjustment.toFixed(2)}
-                                  </span>
-                                )}
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
-                      </RadioGroup>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-
-            <Separator />
-
-            {/* Add to Cart */}
-            <div className="space-y-4">
-              <Button
-                size="lg"
-                className="w-full text-lg h-14 shadow-lg hover:shadow-xl transition-all"
-                onClick={toggleCart}
-                variant={isInCart ? "outline" : "default"}
-                disabled={!canAddToCart}
-              >
-                {isInCart ? (
+          {/* Add to Cart */}
+          <div className="space-y-4">
+            <Button
+              size="lg"
+              className="w-full text-lg h-14 shadow-lg hover:shadow-xl transition-all"
+              onClick={() => {
+                if (isInCart) {
+                  if (cartItem?.quantity !== quantity) {
+                    updateCartQuantity(product.id, quantity)
+                  } else {
+                    // Maybe remove if they click "Added to Quote"? Or do nothing?
+                    // User said "update the button to be able to save cart changes"
+                    // If it's already saved, maybe just do nothing or show a toast?
+                    // Let's assume clicking "Added to Quote" does nothing or toggles off if they really want to remove.
+                    // But standard UX is usually "Remove" button or toggle.
+                    // Given the previous code was toggle, let's keep toggle functionality if quantity matches?
+                    // Or maybe better: if quantity matches, it says "Added to Quote" and is disabled or acts as remove?
+                    // Let's make it:
+                    // If quantity changed: "Update Quote"
+                    // If quantity same: "Added to Quote" (click to remove?)
+                    removeItem(product.id)
+                  }
+                } else {
+                  addItem(product.id, quantity)
+                }
+              }}
+              variant={isInCart && cartItem?.quantity === quantity ? "outline" : "default"}
+              disabled={!canAddToCart}
+            >
+              {isInCart ? (
+                cartItem?.quantity !== quantity ? (
                   <>
-                    <Check className="mr-2 h-5 w-5" /> Added to Quote
+                    <Package className="mr-2 h-5 w-5" /> Update Quote
                   </>
                 ) : (
                   <>
-                    <Plus className="mr-2 h-5 w-5" /> Add to Quote
+                    <Check className="mr-2 h-5 w-5" /> Added to Quote
                   </>
-                )}
-              </Button>
-
-
-
-              <div className="flex items-start gap-2 text-xs text-muted-foreground bg-secondary/50 p-3 rounded-lg">
-                <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <p>
-                  Delivery and setup fees calculated at checkout based on location and logistics requirements.
-                </p>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Additional Information */}
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="details">
-                <AccordionTrigger className="text-base font-medium">
-                  Product Details
-                </AccordionTrigger>
-                <AccordionContent className="space-y-2 text-sm text-muted-foreground">
-                  {product.sku && (
-                    <div className="flex justify-between">
-                      <span>SKU:</span>
-                      <span className="font-medium">{product.sku}</span>
-                    </div>
-                  )}
-                  {product.weight && (
-                    <div className="flex justify-between">
-                      <span>Weight:</span>
-                      <span className="font-medium">{product.weight} lbs</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span>Minimum Rental:</span>
-                    <span className="font-medium">
-                      {product.minimum_rental_days || 1} {(product.minimum_rental_days || 1) === 1 ? 'day' : 'days'}
-                    </span>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-
-              {product.care_instructions && (
-                <AccordionItem value="care">
-                  <AccordionTrigger className="text-base font-medium">
-                    Care Instructions
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground">
-                    {product.care_instructions}
-                  </AccordionContent>
-                </AccordionItem>
+                )
+              ) : (
+                <>
+                  <Plus className="mr-2 h-5 w-5" /> Add to Quote
+                </>
               )}
+            </Button>
 
-              <AccordionItem value="rental">
+
+
+            <div className="flex items-start gap-2 text-xs text-muted-foreground bg-secondary/50 p-3 rounded-lg">
+              <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <p>
+                Delivery and setup fees calculated at checkout based on location and logistics requirements.
+              </p>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Additional Information */}
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="details">
+              <AccordionTrigger className="text-base font-medium">
+                Product Details
+              </AccordionTrigger>
+              <AccordionContent className="space-y-2 text-sm text-muted-foreground">
+                {product.sku && (
+                  <div className="flex justify-between">
+                    <span>SKU:</span>
+                    <span className="font-medium">{product.sku}</span>
+                  </div>
+                )}
+                {product.weight && (
+                  <div className="flex justify-between">
+                    <span>Weight:</span>
+                    <span className="font-medium">{product.weight} lbs</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span>Minimum Rental:</span>
+                  <span className="font-medium">
+                    {product.minimum_rental_days || 1} {(product.minimum_rental_days || 1) === 1 ? 'day' : 'days'}
+                  </span>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {product.care_instructions && (
+              <AccordionItem value="care">
                 <AccordionTrigger className="text-base font-medium">
-                  Rental Information
+                  Care Instructions
                 </AccordionTrigger>
-                <AccordionContent className="space-y-2 text-sm text-muted-foreground">
-                  <p>• Standard rental period includes 24-hour use</p>
-                  <p>• Delivery typically occurs the day before your event</p>
-                  <p>• Pickup scheduled for the day after your event</p>
-                  <p>• Setup and installation available for additional fee</p>
-                  <p>• Damage waiver included with all rentals</p>
+                <AccordionContent className="text-sm text-muted-foreground">
+                  {product.care_instructions}
                 </AccordionContent>
               </AccordionItem>
-            </Accordion>
-          </div>
+            )}
+
+            <AccordionItem value="rental">
+              <AccordionTrigger className="text-base font-medium">
+                Rental Information
+              </AccordionTrigger>
+              <AccordionContent className="space-y-2 text-sm text-muted-foreground">
+                <p>• Standard rental period includes 24-hour use</p>
+                <p>• Delivery typically occurs the day before your event</p>
+                <p>• Pickup scheduled for the day after your event</p>
+                <p>• Setup and installation available for additional fee</p>
+                <p>• Damage waiver included with all rentals</p>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </div>
-
-      {/* Related Products Section */}
-      {product && allProducts.length > 0 && (
-        <div className="container mx-auto px-4 md:px-6 pb-20">
-          <Separator className="mb-12" />
-          <RelatedProducts
-            currentProduct={product}
-            allProducts={allProducts}
-            onAddToCart={toggleCart}
-            isInCart={isInCartFn}
-            maxItems={4}
-          />
-        </div>
-      )}
     </div>
+
+      {/* Related Products Section */ }
+  {
+    product && allProducts.length > 0 && (
+      <div className="container mx-auto px-4 md:px-6 pb-20">
+        <Separator className="mb-12" />
+        <RelatedProducts
+          currentProduct={product}
+          allProducts={allProducts}
+          onAddToCart={toggleCart}
+          isInCart={isInCartFn}
+          maxItems={4}
+        />
+      </div>
+    )
+  }
+    </div >
   )
 }
