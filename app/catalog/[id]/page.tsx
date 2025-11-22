@@ -64,8 +64,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [loading, setLoading] = useState(true)
   const [selectedModifiers, setSelectedModifiers] = useState<Record<string, ModifierOption>>({})
   const [quantity, setQuantity] = useState(1)
-  const [rentalDates, setRentalDates] = useState<DateRange | undefined>()
-  const [rentalDays, setRentalDays] = useState(0)
+  const [quantity, setQuantity] = useState(1)
 
   const { items, addItem, removeItem } = useCart()
   const [isLoaded, setIsLoaded] = useState(false)
@@ -123,22 +122,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const isInCartFn = (productId: string) => items.some((item) => item.productId === productId)
   const maxQuantity = 100
 
-  // Calculate pricing based on rental duration
-  const calculateRentalPrice = () => {
-    if (!rentalDays) return product.rental_price_daily || product.price
-
-    if (rentalDays >= 7 && product.rental_price_weekly) {
-      const weeks = Math.floor(rentalDays / 7)
-      const remainingDays = rentalDays % 7
-      return (weeks * product.rental_price_weekly) + (remainingDays * (product.rental_price_daily || product.price))
-    } else if (rentalDays >= 2 && product.rental_price_weekend) {
-      return product.rental_price_weekend
-    } else {
-      return (product.rental_price_daily || product.price) * rentalDays
-    }
-  }
-
-  const basePrice = rentalDays > 0 ? calculateRentalPrice() : (product.rental_price_daily || product.price)
+  const basePrice = product.rental_price_daily || product.price
   const modifiersPrice = Object.values(selectedModifiers).reduce((acc, curr) => acc + curr.priceAdjustment, 0)
   const setupFee = product.setup_fee || 0
   const subtotal = (basePrice + modifiersPrice) * quantity
@@ -163,10 +147,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     }
   }
 
-  const handleDateChange = (dateRange: DateRange | undefined, days: number) => {
-    setRentalDates(dateRange)
-    setRentalDays(days)
-  }
+
 
   const incrementQuantity = () => {
     if (quantity < maxQuantity) {
@@ -184,7 +165,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     ? product.images
     : [product.image_url]
 
-  const canAddToCart = rentalDays >= (product.minimum_rental_days || 1)
+  const canAddToCart = true
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10">
@@ -222,19 +203,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <span className="text-3xl font-semibold">
                   ${totalPrice.toFixed(2)}
                 </span>
-                {rentalDays > 0 ? (
-                  <span className="text-sm text-muted-foreground">
-                    for {rentalDays} {rentalDays === 1 ? 'day' : 'days'}
-                  </span>
-                ) : (
-                  <span className="text-sm text-muted-foreground">/ day</span>
+                <span className="text-sm text-muted-foreground">/ day</span>
                 )}
               </div>
-              {rentalDays > 0 && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  ${basePrice.toFixed(2)} base + ${(modifiersPrice * quantity).toFixed(2)} options + ${setupFee.toFixed(2)} setup
-                </p>
-              )}
             </div>
 
             <Separator />
@@ -259,11 +230,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
             <Separator />
 
-            {/* Rental Date Picker */}
-            <RentalDatePicker
-              onDateChange={handleDateChange}
-              minDays={product.minimum_rental_days || 1}
-            />
+
 
             {/* Quantity Selector */}
             <div className="space-y-3">
@@ -352,11 +319,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 )}
               </Button>
 
-              {!canAddToCart && rentalDays > 0 && (
-                <p className="text-sm text-destructive text-center">
-                  Minimum rental period is {product.minimum_rental_days} {product.minimum_rental_days === 1 ? 'day' : 'days'}
-                </p>
-              )}
+
 
               <div className="flex items-start gap-2 text-xs text-muted-foreground bg-secondary/50 p-3 rounded-lg">
                 <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
