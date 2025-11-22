@@ -15,7 +15,7 @@ import { createClient } from '@/lib/supabase/client'
 
 export default function CheckoutPage() {
     const router = useRouter()
-    const { items, eventDetails, clearCart } = useCart()
+    const { items, eventDetails, clearCart, isLoaded } = useCart()
     const [isLoading, setIsLoading] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -38,10 +38,10 @@ export default function CheckoutPage() {
 
     // Redirect if cart is empty
     useEffect(() => {
-        if (items.length === 0) {
+        if (isLoaded && items.length === 0) {
             router.push('/catalog')
         }
-    }, [items, router])
+    }, [items, isLoaded, router])
 
     // Fetch products and calculate totals
     useEffect(() => {

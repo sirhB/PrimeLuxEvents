@@ -1,17 +1,39 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { ShoppingBag, Trash2, Plus, Minus, Calendar, MapPin, Check } from "lucide-react"
 import { useCart } from "@/components/providers/cart-provider"
-import { products } from "@/lib/data"
 import { format } from "date-fns"
+import { createClient } from "@/lib/supabase/client"
 
 export function CartSheet() {
   const { items, removeItem, updateQuantity, cartCount, clearCart, eventDetails, openEventDetails } = useCart()
   const [isOpen, setIsOpen] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [products, setProducts] = useState<any[]>([])
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (items.length === 0) {
+        setProducts([])
+        return
+      }
+
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('products')
+        .select('*')
+        .in('id', items.map(item => item.productId))
+
+      if (data) {
+        setProducts(data)
+      }
+    }
+
+    fetchProducts()
+  }, [items])
 
   const handleSubmit = () => {
     // Mock API call
@@ -104,7 +126,7 @@ export function CartSheet() {
                       <div key={item.productId} className="flex gap-4">
                         <div className="h-20 w-20 rounded-md border bg-muted overflow-hidden flex-shrink-0">
                           <img
-                            src={product.image || "/placeholder.svg"}
+                            src={product.image_url || "/placeholder.svg"}
                             alt={product.name}
                             className="h-full w-full object-cover"
                           />

@@ -18,6 +18,7 @@ type CartContextType = {
   eventDetails: EventDetails | null
   setEventDetails: (details: EventDetails) => void
   openEventDetails: () => void
+  isLoaded: boolean
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -129,6 +130,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         eventDetails,
         setEventDetails: setEventDetailsState,
         openEventDetails: () => setIsEventDialogOpen(true),
+        isLoaded,
       }}
     >
       {children}
