@@ -114,18 +114,7 @@ export function RelatedProducts({
                                 />
                             </Link>
 
-                            {/* Availability Badge */}
-                            <div className="absolute top-2 left-2">
-                                {(product.quantity_available || 0) > 0 ? (
-                                    <Badge variant="secondary" className="text-xs">
-                                        Available
-                                    </Badge>
-                                ) : (
-                                    <Badge variant="destructive" className="text-xs">
-                                        Out of Stock
-                                    </Badge>
-                                )}
-                            </div>
+
 
                             {/* Quick Add Button */}
                             {onAddToCart && (

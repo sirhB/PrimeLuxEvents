@@ -21,7 +21,6 @@ interface FilterOptions {
     categories: string[]
     priceRange: [number, number]
     features: string[]
-    availability: boolean
 }
 
 interface CatalogFiltersProps {
@@ -34,7 +33,6 @@ export function CatalogFilters({ categories, onFilterChange, maxPrice = 1000 }: 
     const [selectedCategories, setSelectedCategories] = useState<string[]>([])
     const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice])
     const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
-    const [availableOnly, setAvailableOnly] = useState(false)
     const [open, setOpen] = useState(false)
 
     const featureOptions = [
@@ -53,8 +51,7 @@ export function CatalogFilters({ categories, onFilterChange, maxPrice = 1000 }: 
         onFilterChange({
             categories: selectedCategories,
             priceRange,
-            features: selectedFeatures,
-            availability: availableOnly
+            features: selectedFeatures
         })
     }
 
@@ -62,12 +59,10 @@ export function CatalogFilters({ categories, onFilterChange, maxPrice = 1000 }: 
         setSelectedCategories([])
         setPriceRange([0, maxPrice])
         setSelectedFeatures([])
-        setAvailableOnly(false)
         onFilterChange({
             categories: [],
             priceRange: [0, maxPrice],
-            features: [],
-            availability: false
+            features: []
         })
     }
 
@@ -89,7 +84,6 @@ export function CatalogFilters({ categories, onFilterChange, maxPrice = 1000 }: 
 
     const hasActiveFilters = selectedCategories.length > 0 ||
         selectedFeatures.length > 0 ||
-        availableOnly ||
         priceRange[0] !== 0 ||
         priceRange[1] !== maxPrice
 
@@ -101,7 +95,7 @@ export function CatalogFilters({ categories, onFilterChange, maxPrice = 1000 }: 
                     Filters
                     {hasActiveFilters && (
                         <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
-                            {selectedCategories.length + selectedFeatures.length + (availableOnly ? 1 : 0)}
+                            {selectedCategories.length + selectedFeatures.length}
                         </span>
                     )}
                 </Button>
@@ -181,20 +175,6 @@ export function CatalogFilters({ categories, onFilterChange, maxPrice = 1000 }: 
                                     </div>
                                 ))}
                             </div>
-                        </div>
-
-                        <Separator />
-
-                        {/* Availability */}
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="available-only"
-                                checked={availableOnly}
-                                onCheckedChange={(checked) => setAvailableOnly(checked as boolean)}
-                            />
-                            <Label htmlFor="available-only" className="text-sm cursor-pointer">
-                                Show available items only
-                            </Label>
                         </div>
                     </div>
                 </ScrollArea>

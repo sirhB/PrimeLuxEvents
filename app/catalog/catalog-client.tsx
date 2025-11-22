@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Check, Plus, Grid3x3, List, ArrowUpDown, Calendar, Package, Eye } from "lucide-react"
+import { Check, Plus, Grid3x3, List, ArrowUpDown, Calendar, Package, Eye, Minus } from "lucide-react"
 import { useCart } from "@/components/providers/cart-provider"
 import { CatalogSearch } from "@/components/catalog-search"
 import { CatalogFilters } from "@/components/catalog-filters"
@@ -48,7 +48,6 @@ interface FilterOptions {
     categories: string[]
     priceRange: [number, number]
     features: string[]
-    availability: boolean
 }
 
 export default function CatalogClient({ heroTitle, products, categories }: CatalogClientProps) {
@@ -58,13 +57,23 @@ export default function CatalogClient({ heroTitle, products, categories }: Catal
     const [filters, setFilters] = useState<FilterOptions>({
         categories: [],
         priceRange: [0, 1000],
-        features: [],
-        availability: false
+        features: []
     })
     const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
+    const [quantities, setQuantities] = useState<Record<string, number>>({})
 
     const { items, addItem, removeItem } = useCart()
+
+    const updateQuantity = (productId: string, delta: number) => {
+        setQuantities(prev => {
+            const current = prev[productId] || 1
+            const newQuantity = Math.max(1, current + delta)
+            return { ...prev, [productId]: newQuantity }
+        })
+    }
+
+    const getQuantity = (productId: string) => quantities[productId] || 1
 
     // Calculate max price for filter
     const maxPrice = useMemo(() => {
@@ -107,11 +116,6 @@ export default function CatalogClient({ heroTitle, products, categories }: Catal
             )
         }
 
-        // Availability filter
-        if (filters.availability) {
-            result = result.filter(p => (p.quantity_available || 0) > 0)
-        }
-
         // Sort
         switch (sortBy) {
             case "price-low":
@@ -138,18 +142,8 @@ export default function CatalogClient({ heroTitle, products, categories }: Catal
         if (isInCart(id)) {
             removeItem(id)
         } else {
-            addItem(id)
+            addItem(id, getQuantity(id))
         }
-    }
-
-    const getAvailabilityBadge = (quantity?: number) => {
-        if (!quantity || quantity === 0) {
-            return <Badge variant="destructive" className="text-xs">Out of Stock</Badge>
-        }
-        if (quantity <= 5) {
-            return <Badge variant="secondary" className="text-xs">Low Stock</Badge>
-        }
-        return <Badge variant="outline" className="text-xs">Available</Badge>
     }
 
     return (
@@ -240,10 +234,7 @@ export default function CatalogClient({ heroTitle, products, categories }: Catal
                                             />
                                         </Link>
 
-                                        {/* Availability Badge */}
-                                        <div className="absolute top-4 left-4">
-                                            {getAvailabilityBadge(product.quantity_available)}
-                                        </div>
+
 
                                         {/* Quick View Button */}
                                         <button
@@ -257,6 +248,31 @@ export default function CatalogClient({ heroTitle, products, categories }: Catal
                                             <Eye className="h-5 w-5" />
                                             <span className="sr-only">Quick view</span>
                                         </button>
+
+                                        {/* Quantity Selector */}
+                                        <div className={`absolute bottom-4 right-16 h-12 rounded-full bg-background/95 backdrop-blur flex items-center shadow-lg transition-all duration-300 ${isInCart(product.id) ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100 z-10'}`}>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    updateQuantity(product.id, -1)
+                                                }}
+                                                className="h-12 w-10 flex items-center justify-center hover:bg-muted/50 rounded-l-full transition-colors"
+                                            >
+                                                <Minus className="h-3 w-3" />
+                                            </button>
+                                            <span className="w-8 text-center font-medium text-sm">
+                                                {getQuantity(product.id)}
+                                            </span>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    updateQuantity(product.id, 1)
+                                                }}
+                                                className="h-12 w-10 flex items-center justify-center hover:bg-muted/50 rounded-r-full transition-colors"
+                                            >
+                                                <Plus className="h-3 w-3" />
+                                            </button>
+                                        </div>
 
                                         {/* Add to Cart Button */}
                                         <button
@@ -331,9 +347,7 @@ export default function CatalogClient({ heroTitle, products, categories }: Catal
                                                 className="object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
                                         </Link>
-                                        <div className="absolute top-2 left-2">
-                                            {getAvailabilityBadge(product.quantity_available)}
-                                        </div>
+
                                     </div>
 
                                     <div className="flex-1 flex flex-col justify-between">
@@ -374,6 +388,29 @@ export default function CatalogClient({ heroTitle, products, categories }: Catal
                                         </div>
 
                                         <div className="flex gap-2">
+                                            {!isInCart(product.id) && (
+                                                <div className="flex items-center border rounded-md h-10">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-full w-8 rounded-none rounded-l-md"
+                                                        onClick={() => updateQuantity(product.id, -1)}
+                                                    >
+                                                        <Minus className="h-3 w-3" />
+                                                    </Button>
+                                                    <span className="w-8 text-center text-sm font-medium">
+                                                        {getQuantity(product.id)}
+                                                    </span>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-full w-8 rounded-none rounded-r-md"
+                                                        onClick={() => updateQuantity(product.id, 1)}
+                                                    >
+                                                        <Plus className="h-3 w-3" />
+                                                    </Button>
+                                                </div>
+                                            )}
                                             <Button
                                                 variant={isInCart(product.id) ? "outline" : "default"}
                                                 onClick={() => toggleCart(product.id)}

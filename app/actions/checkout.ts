@@ -151,6 +151,36 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[])
             paymentIntent = await createMockPaymentIntent(totals.totalAmount)
         }
 
+        // Check for stock availability
+        let isOverbooked = false
+        const eventDate = formData.eventDate || formData.deliveryDate
+
+        // We'll assume a standard 1-day rental for now, or 3-day window (day before, day of, day after)
+        // For strict checking, let's just check the event date
+        const startDate = eventDate
+        const endDate = eventDate
+
+        for (const item of items) {
+            const product = totals.products.find(p => p.id === item.productId)
+            if (!product) continue
+
+            // Get total reserved quantity for this product on this date
+            const { data: reservations } = await supabase
+                .from('rental_reservations')
+                .select('quantity')
+                .eq('product_id', item.productId)
+                .lte('start_date', endDate)
+                .gte('end_date', startDate)
+
+            const totalReserved = reservations?.reduce((sum, r) => sum + r.quantity, 0) || 0
+            const available = product.quantity_available || 0 // Default to 0 if not set, or maybe 1? Schema says default 1.
+
+            if (totalReserved + item.quantity > available) {
+                isOverbooked = true
+                console.log(`Overbooking detected for product ${product.name}: Requested ${item.quantity}, Reserved ${totalReserved}, Available ${available}`)
+            }
+        }
+
         // Create order
         const { data: order, error: orderError } = await supabase
             .from('orders')
@@ -171,6 +201,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[])
                 payment_intent_id: paymentIntent.id,
                 payment_status: 'pending',
                 status: 'pending',
+                is_overbooked: isOverbooked,
             })
             .select()
             .single()
@@ -193,6 +224,24 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[])
         if (itemsError) {
             console.error('Error creating order items:', itemsError)
             throw new Error('Failed to create order items')
+        }
+
+        // Create rental reservations to block stock for this order
+        const reservations = items.map((item) => ({
+            product_id: item.productId,
+            order_id: order.id,
+            start_date: startDate,
+            end_date: endDate,
+            quantity: item.quantity,
+            status: 'confirmed', // or pending
+        }))
+
+        const { error: reservationError } = await supabase.from('rental_reservations').insert(reservations)
+
+        if (reservationError) {
+            console.error('Error creating reservations:', reservationError)
+            // We don't fail the order here, but we should log it. 
+            // In a real system we might want to rollback or alert admin.
         }
 
         return {

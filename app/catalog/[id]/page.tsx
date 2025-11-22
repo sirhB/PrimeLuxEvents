@@ -121,7 +121,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   const isInCart = items.some((item) => item.productId === product.id)
   const isInCartFn = (productId: string) => items.some((item) => item.productId === productId)
-  const maxQuantity = product.quantity_available || product.stock || 10
+  const maxQuantity = 100
 
   // Calculate pricing based on rental duration
   const calculateRentalPrice = () => {
@@ -214,15 +214,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <Badge variant="outline" className="text-xs uppercase">
                   {product.sku || 'Product'}
                 </Badge>
-                {(product.quantity_available || 0) > 0 ? (
-                  <Badge variant="secondary" className="text-xs">
-                    {product.quantity_available} Available
-                  </Badge>
-                ) : (
-                  <Badge variant="destructive" className="text-xs">
-                    Out of Stock
-                  </Badge>
-                )}
               </div>
               <h1 className="text-4xl md:text-5xl font-serif mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
                 {product.name}
@@ -295,9 +286,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
-                <span className="text-sm text-muted-foreground">
-                  {maxQuantity} available
-                </span>
+
               </div>
             </div>
 
@@ -350,7 +339,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 className="w-full text-lg h-14 shadow-lg hover:shadow-xl transition-all"
                 onClick={toggleCart}
                 variant={isInCart ? "outline" : "default"}
-                disabled={!canAddToCart || (product.quantity_available || 0) === 0}
+                disabled={!canAddToCart}
               >
                 {isInCart ? (
                   <>

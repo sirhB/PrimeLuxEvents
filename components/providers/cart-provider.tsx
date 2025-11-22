@@ -10,7 +10,7 @@ type CartItem = {
 
 type CartContextType = {
   items: CartItem[]
-  addItem: (productId: string) => void
+  addItem: (productId: string, quantity?: number) => void
   removeItem: (productId: string) => void
   updateQuantity: (productId: string, quantity: number) => void
   clearCart: () => void
@@ -70,13 +70,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [eventDetails, isLoaded])
 
-  const addItem = (productId: string) => {
+  const addItem = (productId: string, quantity: number = 1) => {
     setItems((prev) => {
       const existing = prev.find((item) => item.productId === productId)
       if (existing) {
-        return prev.map((item) => (item.productId === productId ? { ...item, quantity: item.quantity + 1 } : item))
+        return prev.map((item) => (item.productId === productId ? { ...item, quantity: item.quantity + quantity } : item))
       }
-      return [...prev, { productId, quantity: 1 }]
+      return [...prev, { productId, quantity }]
     })
   }
 

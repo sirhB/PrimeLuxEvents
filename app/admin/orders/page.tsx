@@ -38,6 +38,7 @@ export default async function OrdersPage() {
                                 <TableHead>Total</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead>Date</TableHead>
+                                <TableHead>Alerts</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -59,6 +60,13 @@ export default async function OrdersPage() {
                                     </TableCell>
                                     <TableCell>
                                         {new Date(order.created_at).toLocaleDateString()}
+                                    </TableCell>
+                                    <TableCell>
+                                        {order.is_overbooked && (
+                                            <span className="inline-flex items-center rounded-full border border-red-500 px-2.5 py-0.5 text-xs font-semibold text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                                Overbooked
+                                            </span>
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <Button variant="ghost" size="icon" asChild>

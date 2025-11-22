@@ -55,15 +55,7 @@ export function ProductQuickView({
     const hasWeekendRate = product.rental_price_weekend && product.rental_price_weekend !== rentalPrice
     const hasWeeklyRate = product.rental_price_weekly && product.rental_price_weekly !== rentalPrice
 
-    const getAvailabilityBadge = (quantity?: number) => {
-        if (!quantity || quantity === 0) {
-            return <Badge variant="destructive" className="text-xs">Out of Stock</Badge>
-        }
-        if (quantity <= 5) {
-            return <Badge variant="secondary" className="text-xs">Low Stock</Badge>
-        }
-        return <Badge variant="outline" className="text-xs">Available</Badge>
-    }
+
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -82,7 +74,6 @@ export function ProductQuickView({
                                 fill
                                 className="object-cover"
                             />
-                            {getAvailabilityBadge(product.quantity_available)}
                         </div>
 
                         {/* Thumbnail Navigation */}
@@ -121,7 +112,7 @@ export function ProductQuickView({
                                         {product.sku}
                                     </Badge>
                                 )}
-                                {getAvailabilityBadge(product.quantity_available)}
+
                             </div>
                             <h2 className="text-3xl font-serif mb-2">{product.name}</h2>
                             <p className="text-sm text-muted-foreground">
@@ -181,12 +172,7 @@ export function ProductQuickView({
 
                         {/* Quick Stats */}
                         <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="flex items-center gap-2">
-                                <Package className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-muted-foreground">
-                                    {product.quantity_available || 0} available
-                                </span>
-                            </div>
+
                             <div className="flex items-center gap-2">
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-muted-foreground">
@@ -203,7 +189,7 @@ export function ProductQuickView({
                                 className="flex-1"
                                 onClick={() => onAddToCart?.(product.id)}
                                 variant={isInCart ? "outline" : "default"}
-                                disabled={(product.quantity_available || 0) === 0}
+
                             >
                                 {isInCart ? (
                                     <>

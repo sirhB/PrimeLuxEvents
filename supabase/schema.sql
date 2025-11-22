@@ -70,6 +70,7 @@ create table orders (
   delivery_date date,
   delivery_notes text,
   notes text,
+  is_overbooked boolean default false,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
