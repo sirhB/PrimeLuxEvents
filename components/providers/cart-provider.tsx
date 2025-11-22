@@ -27,7 +27,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [eventDetails, setEventDetailsState] = useState<EventDetails | null>(null)
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
-  const [pendingItem, setPendingItem] = useState<string | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
 
   // Load cart from local storage on mount
@@ -72,13 +71,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [eventDetails, isLoaded])
 
   const addItem = (productId: string) => {
-    // If it's the first item and we don't have event details, ask for them
-    if (items.length === 0 && !eventDetails) {
-      setPendingItem(productId)
-      setIsEventDialogOpen(true)
-      return
-    }
-
     setItems((prev) => {
       const existing = prev.find((item) => item.productId === productId)
       if (existing) {
@@ -86,16 +78,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { productId, quantity: 1 }]
     })
-  }
-
-  const handleEventDetailsSubmit = (details: EventDetails) => {
-    setEventDetailsState(details)
-    setIsEventDialogOpen(false)
-
-    if (pendingItem) {
-      setItems((prev) => [...prev, { productId: pendingItem, quantity: 1 }])
-      setPendingItem(null)
-    }
   }
 
   const removeItem = (productId: string) => {
@@ -110,10 +92,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => prev.map((item) => (item.productId === productId ? { ...item, quantity } : item)))
   }
 
+  const handleEventDetailsSubmit = (details: EventDetails) => {
+    setEventDetailsState(details)
+    setIsEventDialogOpen(false)
+  }
+
   const clearCart = () => {
     setItems([])
-    // Optional: Clear event details on cart clear?
-    // Usually better to keep them in case they start a new order immediately.
   }
 
   const cartCount = items.reduce((acc, item) => acc + item.quantity, 0)
