@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/client'
 import { formatCurrency } from '@/lib/stripe'
 import { format } from 'date-fns'
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationContent() {
     const searchParams = useSearchParams()
     const orderId = searchParams.get('orderId')
     const [order, setOrder] = useState<any>(null)
@@ -234,5 +234,19 @@ export default function OrderConfirmationPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function OrderConfirmationPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen flex items-center justify-center bg-background">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+            }
+        >
+            <OrderConfirmationContent />
+        </Suspense>
     )
 }
