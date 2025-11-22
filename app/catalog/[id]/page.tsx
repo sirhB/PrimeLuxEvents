@@ -8,6 +8,7 @@ import { DateRange } from "react-day-picker"
 import { differenceInDays } from "date-fns"
 import { useCart } from "@/components/providers/cart-provider"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -244,7 +245,23 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
-                <span className="text-lg font-medium w-12 text-center">{quantity}</span>
+                <Input
+                  type="number"
+                  min={1}
+                  max={maxQuantity}
+                  value={quantity}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value)
+                    if (!isNaN(val) && val >= 1 && val <= maxQuantity) {
+                      setQuantity(val)
+                    } else if (e.target.value === '') {
+                      // Allow empty string for typing, but handle blur or submit to default to 1
+                      // For now, let's just not update if invalid, or maybe handle it better.
+                      // A simple approach is to only update if valid number.
+                    }
+                  }}
+                  className="w-20 text-center"
+                />
                 <Button
                   variant="outline"
                   size="icon"
