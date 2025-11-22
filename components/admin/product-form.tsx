@@ -17,6 +17,7 @@ import {
 import { toast } from 'sonner'
 import { Plus, Trash, X } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 
 
 interface Category {
@@ -164,6 +165,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             stock: parseInt(formData.get('stock') as string),
             category_id: (formData.get('category_id') as string) || null,
             image_url: formData.get('image_url') as string,
+            is_featured: formData.get('is_featured') === 'on',
             modifiers: modifiers,
             assembly_items: assemblyItems.filter(item => item.name.trim() !== ''),
         }
@@ -259,6 +261,11 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                     defaultValue={product?.image_url}
                     placeholder="https://..."
                 />
+            </div>
+
+            <div className="flex items-center space-x-2">
+                <Checkbox id="is_featured" name="is_featured" defaultChecked={product?.is_featured} />
+                <Label htmlFor="is_featured">Featured Product</Label>
             </div>
 
             <div className="space-y-4">

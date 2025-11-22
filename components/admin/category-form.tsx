@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 
 interface CategoryFormProps {
@@ -27,6 +28,8 @@ export function CategoryForm({ category }: CategoryFormProps) {
             name: formData.get('name') as string,
             slug: formData.get('slug') as string,
             description: formData.get('description') as string,
+            image_url: formData.get('image_url') as string,
+            is_featured: formData.get('is_featured') === 'on',
         }
 
         try {
@@ -80,6 +83,21 @@ export function CategoryForm({ category }: CategoryFormProps) {
                     name="description"
                     defaultValue={category?.description}
                 />
+            </div>
+
+            <div className="space-y-2">
+                <Label htmlFor="image_url">Image URL</Label>
+                <Input
+                    id="image_url"
+                    name="image_url"
+                    defaultValue={category?.image_url}
+                    placeholder="https://..."
+                />
+            </div>
+
+            <div className="flex items-center space-x-2">
+                <Checkbox id="is_featured" name="is_featured" defaultChecked={category?.is_featured} />
+                <Label htmlFor="is_featured">Featured Category</Label>
             </div>
 
             <div className="flex gap-4">

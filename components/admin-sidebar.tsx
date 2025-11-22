@@ -26,6 +26,11 @@ const sidebarItems = [
         icon: FolderTree,
     },
     {
+        title: 'Packages',
+        href: '/admin/packages',
+        icon: Package,
+    },
+    {
         title: 'Orders',
         href: '/admin/orders',
         icon: ShoppingCart,

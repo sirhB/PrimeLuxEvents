@@ -93,9 +93,9 @@ export default function CatalogClient({ heroTitle, products, categories, package
     return (
         <div className="min-h-screen bg-background pb-20">
             {/* Hero Section */}
-            <section className="relative py-20 px-4 text-center bg-gradient-to-b from-background to-background/50 border-b border-border/50">
+            <section className="relative py-20 px-4 text-center bg-background border-b border-border/50">
                 <div className="max-w-4xl mx-auto">
-                    <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gold to-white animate-gradient-x">
+                    <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 text-gold animate-fade-in">
                         {selectedCategory ? selectedCategory : (heroTitle || "Rental Catalog")}
                     </h1>
                     <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
