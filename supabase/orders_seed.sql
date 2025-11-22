@@ -18,7 +18,7 @@ DECLARE
 BEGIN
   -- Look up some products
   SELECT id INTO chair_id FROM products WHERE name = 'Gilded Chiavari Chair' LIMIT 1;
-  SELECT id INTO table_id FROM products WHERE name = 'Farmhouse Dining Table' LIMIT 1;
+  SELECT id INTO table_id FROM products WHERE name = 'Gold Table' LIMIT 1;
   SELECT id INTO sofa_id FROM products WHERE name = 'Velvet Lounge Sofa' LIMIT 1;
 
   -- Create Order 1: Wedding
@@ -28,12 +28,12 @@ BEGIN
     'Isabella Martinez',
     'isabella.m@example.com',
     '(555) 123-4567',
-    1250.00,
-    1100.00,  -- subtotal (100 chairs @ $12.50 + 10 tables @ $85)
-    0.08875,  -- tax rate (8.875% - will be fetched from settings in production)
-    97.63,    -- tax amount
-    50.00,    -- delivery fee
-    2.37,     -- setup fee (to make total = 1250.00)
+    125000,   -- $1,250.00 in cents
+    110000,   -- $1,100.00 subtotal in cents
+    0.08875,  -- tax rate (8.875%)
+    9763,     -- $97.63 tax amount in cents
+    5000,     -- $50.00 delivery fee in cents
+    237,      -- $2.37 setup fee in cents
     'confirmed',
     'The Plaza Hotel, 768 5th Ave, New York, NY 10019',
     '10:00 AM',
@@ -48,13 +48,13 @@ BEGIN
     'TechCorp Inc.',
     'events@techcorp.com',
     '(555) 987-6543',
-    3500.00,
-    600.00,   -- subtotal (4 sofas @ $150)
+    350000,   -- $3,500.00 in cents
+    60000,    -- $600.00 subtotal in cents
     0.08875,  -- tax rate
-    53.25,    -- tax amount
-    75.00,    -- delivery fee
-    200.00,   -- setup fee
-    0.00,     -- no discount
+    5325,     -- $53.25 tax amount in cents
+    7500,     -- $75.00 delivery fee in cents
+    20000,    -- $200.00 setup fee in cents
+    0,        -- no discount
     'confirmed',
     'Javits Center, 429 11th Ave, New York, NY 10001',
     '08:00 AM',
@@ -65,7 +65,7 @@ BEGIN
   -- Create Order Items for Order 1
   IF chair_id IS NOT NULL THEN
     INSERT INTO order_items (order_id, product_id, quantity, price_at_time)
-    VALUES (order1_id, chair_id, 100, 12.50);
+    VALUES (order1_id, chair_id, 100, 1250); -- $12.50 in cents
     
     INSERT INTO rental_reservations (product_id, order_id, start_date, end_date, quantity, status)
     VALUES (chair_id, order1_id, today, today + 2, 100, 'confirmed');
@@ -73,7 +73,7 @@ BEGIN
 
   IF table_id IS NOT NULL THEN
     INSERT INTO order_items (order_id, product_id, quantity, price_at_time)
-    VALUES (order1_id, table_id, 10, 85.00);
+    VALUES (order1_id, table_id, 10, 8500); -- $85.00 in cents
 
     INSERT INTO rental_reservations (product_id, order_id, start_date, end_date, quantity, status)
     VALUES (table_id, order1_id, today, today + 2, 10, 'confirmed');
@@ -82,7 +82,7 @@ BEGIN
   -- Create Order Items for Order 2
   IF sofa_id IS NOT NULL THEN
     INSERT INTO order_items (order_id, product_id, quantity, price_at_time)
-    VALUES (order2_id, sofa_id, 4, 150.00);
+    VALUES (order2_id, sofa_id, 4, 15000); -- $150.00 in cents
 
     INSERT INTO rental_reservations (product_id, order_id, start_date, end_date, quantity, status)
     VALUES (sofa_id, order2_id, today, today + 3, 4, 'confirmed');

@@ -29,6 +29,7 @@ import Link from 'next/link'
 import { PrintButton } from '@/components/admin/print-button'
 import { OrderStatusForm } from '@/components/admin/order-status-form'
 import { OrderInvoice } from '@/components/admin/order-invoice'
+import { formatCents } from '@/lib/format-money'
 
 export default async function OrderDetailsPage({
     params,
@@ -188,9 +189,9 @@ export default async function OrderDetailsPage({
                                     <TableRow key={item.id}>
                                         <TableCell>{item.products?.name || 'Unknown Product'}</TableCell>
                                         <TableCell>{item.quantity}</TableCell>
-                                        <TableCell>${item.price_at_time}</TableCell>
+                                        <TableCell>{formatCents(item.price_at_time)}</TableCell>
                                         <TableCell className="text-right">
-                                            ${(item.quantity * item.price_at_time).toFixed(2)}
+                                            {formatCents(item.quantity * item.price_at_time)}
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -199,7 +200,7 @@ export default async function OrderDetailsPage({
                                         Total Amount
                                     </TableCell>
                                     <TableCell className="font-bold text-right">
-                                        ${order.total_amount}
+                                        {formatCents(order.total_amount)}
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

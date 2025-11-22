@@ -12,6 +12,7 @@ import {
 import { Eye, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
+import { formatCents } from '@/lib/format-money'
 
 export default async function QuotesPage() {
     const supabase = await createClient()
@@ -76,7 +77,7 @@ export default async function QuotesPage() {
                                             ? new Date(quote.event_date).toLocaleDateString()
                                             : 'Not set'}
                                     </TableCell>
-                                    <TableCell>${quote.total_amount}</TableCell>
+                                    <TableCell>{formatCents(quote.total_amount)}</TableCell>
                                     <TableCell>
                                         <span
                                             className={cn(

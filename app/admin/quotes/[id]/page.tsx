@@ -5,6 +5,7 @@ import { ArrowLeft, Mail, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { formatCents } from '@/lib/format-money'
 
 export default async function QuoteDetailPage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
@@ -146,19 +147,19 @@ export default async function QuoteDetailPage({ params }: { params: { id: string
                 <CardContent className="space-y-2">
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Subtotal</span>
-                        <span>${quote.subtotal}</span>
+                        <span>{formatCents(quote.subtotal)}</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Delivery Fee</span>
-                        <span>${quote.delivery_fee || 0}</span>
+                        <span>{formatCents(quote.delivery_fee || 0)}</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Setup Fee</span>
-                        <span>${quote.setup_fee || 0}</span>
+                        <span>{formatCents(quote.setup_fee || 0)}</span>
                     </div>
                     <div className="flex justify-between border-t pt-2 font-bold text-lg">
                         <span>Total</span>
-                        <span>${quote.total_amount}</span>
+                        <span>{formatCents(quote.total_amount)}</span>
                     </div>
                 </CardContent>
             </Card>

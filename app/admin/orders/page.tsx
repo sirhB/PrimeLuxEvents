@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table'
 import { Eye } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { formatCents } from '@/lib/format-money'
 
 export default async function OrdersPage() {
     const supabase = await createClient()
@@ -52,7 +53,7 @@ export default async function OrdersPage() {
                                             </span>
                                         </div>
                                     </TableCell>
-                                    <TableCell>${order.total_amount}</TableCell>
+                                    <TableCell>{formatCents(order.total_amount)}</TableCell>
                                     <TableCell>
                                         <span className="capitalize">{order.status}</span>
                                     </TableCell>

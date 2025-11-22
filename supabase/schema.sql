@@ -1,34 +1,6 @@
 -- Enable UUID extension
 create extension if not exists "uuid-ossp";
 
--- Products Table
-create table products (
-  id uuid default uuid_generate_v4() primary key,
-  name text not null,
-  description text,
-  price decimal(10, 2) not null,
-  category_id uuid references categories(id) on delete set null,
-  image_url text,
-  images jsonb default '[]'::jsonb,
-  stock integer default 0,
-  modifiers jsonb default '[]'::jsonb,
-  assembly_items jsonb default '[]'::jsonb,
-  -- Rental-specific fields
-  rental_price_daily decimal(10, 2),
-  rental_price_weekend decimal(10, 2),
-  rental_price_weekly decimal(10, 2),
-  quantity_available integer default 1,
-  quantity_reserved integer default 0,
-  minimum_rental_days integer default 1,
-  setup_fee decimal(10, 2) default 0,
-  sku text,
-  weight decimal(10, 2),
-  features jsonb default '[]'::jsonb,
-  care_instructions text,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
 -- Categories Table
 create table categories (
   id uuid default uuid_generate_v4() primary key,
@@ -38,19 +10,47 @@ create table categories (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Products Table
+create table products (
+  id uuid default uuid_generate_v4() primary key,
+  name text not null,
+  description text,
+  price integer not null, -- stored in cents
+  category_id uuid references categories(id) on delete set null,
+  image_url text,
+  images jsonb default '[]'::jsonb,
+  stock integer default 0,
+  modifiers jsonb default '[]'::jsonb,
+  assembly_items jsonb default '[]'::jsonb,
+  -- Rental-specific fields
+  rental_price_daily integer, -- stored in cents
+  rental_price_weekend integer, -- stored in cents
+  rental_price_weekly integer, -- stored in cents
+  quantity_available integer default 1,
+  quantity_reserved integer default 0,
+  minimum_rental_days integer default 1,
+  setup_fee integer default 0, -- stored in cents
+  sku text,
+  weight decimal(10, 2),
+  features jsonb default '[]'::jsonb,
+  care_instructions text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- Orders Table
 create table orders (
   id uuid default uuid_generate_v4() primary key,
   customer_name text not null,
   customer_email text not null,
   customer_phone text,
-  total_amount decimal(10, 2) not null,
-  subtotal decimal(10, 2),
-  tax_rate decimal(5, 4),
-  tax_amount decimal(10, 2),
-  delivery_fee decimal(10, 2) default 0,
-  setup_fee decimal(10, 2) default 0,
-  discount_amount decimal(10, 2) default 0,
+  total_amount integer not null, -- stored in cents
+  subtotal integer, -- stored in cents
+  tax_rate decimal(5, 4), -- percentage (e.g., 0.08875 for 8.875%)
+  tax_amount integer, -- stored in cents
+  delivery_fee integer default 0, -- stored in cents
+  setup_fee integer default 0, -- stored in cents
+  discount_amount integer default 0, -- stored in cents
   status text default 'pending',
   delivery_address text,
   delivery_time text,
@@ -66,7 +66,7 @@ create table order_items (
   order_id uuid references orders(id) on delete cascade,
   product_id uuid references products(id),
   quantity integer not null,
-  price_at_time decimal(10, 2) not null
+  price_at_time integer not null -- stored in cents
 );
 
 -- Content Table (for CMS)
@@ -101,10 +101,10 @@ create table quotes (
   event_type text,
   venue_address text,
   cart_data jsonb not null,
-  subtotal decimal(10, 2) not null,
-  delivery_fee decimal(10, 2) default 0,
-  setup_fee decimal(10, 2) default 0,
-  total_amount decimal(10, 2) not null,
+  subtotal integer not null, -- stored in cents
+  delivery_fee integer default 0, -- stored in cents
+  setup_fee integer default 0, -- stored in cents
+  total_amount integer not null, -- stored in cents
   status text default 'draft',
   expires_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,

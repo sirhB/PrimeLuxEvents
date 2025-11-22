@@ -38,7 +38,13 @@ interface OrderInvoiceProps {
 }
 
 export function OrderInvoice({ order }: OrderInvoiceProps) {
-    // Calculate subtotal from order items if not provided
+    // Helper function to convert cents to dollar display
+    const formatCents = (cents: number | null | undefined): string => {
+        if (cents === null || cents === undefined) return '$0.00'
+        return `$${(cents / 100).toFixed(2)}`
+    }
+
+    // Calculate subtotal from order items if not provided (in cents)
     const calculatedSubtotal = order.subtotal ||
         order.order_items.reduce((sum, item) => sum + (item.quantity * item.price_at_time), 0)
 
@@ -125,10 +131,10 @@ export function OrderInvoice({ order }: OrderInvoiceProps) {
                                     </td>
                                     <td className="py-4 text-center text-sm">{item.quantity}</td>
                                     <td className="py-4 text-right text-sm font-mono">
-                                        ${item.price_at_time.toFixed(2)}
+                                        {formatCents(item.price_at_time)}
                                     </td>
                                     <td className="py-4 text-right text-sm font-mono font-semibold">
-                                        ${lineTotal.toFixed(2)}
+                                        {formatCents(lineTotal)}
                                     </td>
                                 </tr>
                             )
@@ -143,27 +149,27 @@ export function OrderInvoice({ order }: OrderInvoiceProps) {
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between py-2">
                             <span className="text-gray-600">Subtotal:</span>
-                            <span className="font-mono">${calculatedSubtotal.toFixed(2)}</span>
+                            <span className="font-mono">{formatCents(calculatedSubtotal)}</span>
                         </div>
 
                         {deliveryFee > 0 && (
                             <div className="flex justify-between py-2">
                                 <span className="text-gray-600">Delivery Fee:</span>
-                                <span className="font-mono">${deliveryFee.toFixed(2)}</span>
+                                <span className="font-mono">{formatCents(deliveryFee)}</span>
                             </div>
                         )}
 
                         {setupFee > 0 && (
                             <div className="flex justify-between py-2">
                                 <span className="text-gray-600">Setup Fee:</span>
-                                <span className="font-mono">${setupFee.toFixed(2)}</span>
+                                <span className="font-mono">{formatCents(setupFee)}</span>
                             </div>
                         )}
 
                         {discountAmount > 0 && (
                             <div className="flex justify-between py-2 text-green-700">
                                 <span>Discount:</span>
-                                <span className="font-mono">-${discountAmount.toFixed(2)}</span>
+                                <span className="font-mono">-{formatCents(discountAmount)}</span>
                             </div>
                         )}
 
@@ -172,13 +178,13 @@ export function OrderInvoice({ order }: OrderInvoiceProps) {
                                 <span className="text-gray-600">
                                     Tax {order.tax_rate ? `(${(order.tax_rate * 100).toFixed(3)}%)` : ''}:
                                 </span>
-                                <span className="font-mono">${taxAmount.toFixed(2)}</span>
+                                <span className="font-mono">{formatCents(taxAmount)}</span>
                             </div>
                         )}
 
                         <div className="flex justify-between py-4 border-t-2 border-black text-lg font-bold">
                             <span>Total:</span>
-                            <span className="font-mono">${order.total_amount.toFixed(2)}</span>
+                            <span className="font-mono">{formatCents(order.total_amount)}</span>
                         </div>
                     </div>
                 </div>

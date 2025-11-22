@@ -3,6 +3,7 @@ import { Package, ShoppingCart, FileText, DollarSign, AlertTriangle, Calendar } 
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { formatCents } from '@/lib/format-money'
 
 export default async function AdminDashboardPage() {
     const supabase = await createClient()
@@ -35,7 +36,7 @@ export default async function AdminDashboardPage() {
         .limit(5)
 
     // Calculate metrics
-    const totalRevenue = orders?.reduce((sum, order) => sum + parseFloat(order.total_amount), 0) || 0
+    const totalRevenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0
     const orderCount = orders?.length || 0
     const pendingQuotes = quotes?.filter((q) => q.status === 'draft' || q.status === 'sent').length || 0
     const lowStockProducts =
@@ -58,7 +59,7 @@ export default async function AdminDashboardPage() {
                         <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+                        <div className="text-2xl font-bold">{formatCents(totalRevenue)}</div>
                         <p className="text-xs text-muted-foreground">All time</p>
                     </CardContent>
                 </Card>
@@ -113,7 +114,7 @@ export default async function AdminDashboardPage() {
                                             {new Date(order.created_at).toLocaleDateString()}
                                         </p>
                                     </div>
-                                    <div className="font-medium">${order.total_amount}</div>
+                                    <div className="font-medium">{formatCents(order.total_amount)}</div>
                                 </div>
                             ))}
                             {recentOrders?.length === 0 && (
