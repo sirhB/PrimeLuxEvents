@@ -1,453 +1,207 @@
-"use client"
+'use client'
 
-import { useState, useMemo } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { Check, Plus, Grid3x3, List, ArrowUpDown, Calendar, Package, Eye, Minus } from "lucide-react"
-import { useCart } from "@/components/providers/cart-provider"
-import { CatalogSearch } from "@/components/catalog-search"
-import { CatalogFilters } from "@/components/catalog-filters"
-import { ProductQuickView } from "@/components/product-quick-view"
-import { Button } from "@/components/ui/button"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
+import { useState, useMemo } from 'react'
+import { ProductCard } from '@/components/product-card'
+import { SearchBar } from '@/components/catalog/search-bar'
+import { CategoryCard } from '@/components/catalog/category-card'
+import { PackageCard } from '@/components/catalog/package-card'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
 
 interface Product {
     id: string
     name: string
-    description: string
+    description: string | null
     price: number
-    rental_price_daily?: number
-    rental_price_weekend?: number
-    rental_price_weekly?: number
-    image_url: string
-    images?: string[]
-    category_id: string
-    categories?: { name: string }
-    quantity_available?: number
-    features?: string[]
-    sku?: string
+    image_url: string | null
+    category_id: string | null
+    categories?: { name: string } | null
+    is_featured?: boolean
+}
+
+interface Category {
+    id: string
+    name: string
+    image_url?: string | null
+    is_featured?: boolean
+}
+
+interface Package {
+    id: string
+    name: string
+    description: string | null
+    price: number
+    image_url: string | null
+    is_featured?: boolean
 }
 
 interface CatalogClientProps {
-    heroTitle: string
+    heroTitle?: string
     products: Product[]
-    categories: string[]
+    categories: Category[]
+    packages: Package[]
 }
 
-type ViewMode = "grid" | "list"
-type SortOption = "newest" | "price-low" | "price-high" | "name"
+export default function CatalogClient({ heroTitle, products, categories, packages }: CatalogClientProps) {
+    const [searchQuery, setSearchQuery] = useState('')
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
-interface FilterOptions {
-    categories: string[]
-    priceRange: [number, number]
-    features: string[]
-}
-
-export default function CatalogClient({ heroTitle, products, categories }: CatalogClientProps) {
-    const [searchQuery, setSearchQuery] = useState("")
-    const [viewMode, setViewMode] = useState<ViewMode>("grid")
-    const [sortBy, setSortBy] = useState<SortOption>("newest")
-    const [filters, setFilters] = useState<FilterOptions>({
-        categories: [],
-        priceRange: [0, 1000],
-        features: []
-    })
-    const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null)
-    const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
-    const [quantities, setQuantities] = useState<Record<string, number>>({})
-
-    const { items, addItem, removeItem } = useCart()
-
-    const updateQuantity = (productId: string, delta: number) => {
-        setQuantities(prev => {
-            const current = prev[productId] || 1
-            const newQuantity = Math.max(1, current + delta)
-            return { ...prev, [productId]: newQuantity }
-        })
-    }
-
-    const getQuantity = (productId: string) => quantities[productId] || 1
-
-    // Calculate max price for filter
-    const maxPrice = useMemo(() => {
-        return Math.max(...products.map(p => p.rental_price_daily || p.price || 0), 1000)
-    }, [products])
-
-    // Filter and sort products
+    // Filter logic
     const filteredProducts = useMemo(() => {
-        let result = [...products]
+        let filtered = products
 
-        // Search filter
+        if (selectedCategory) {
+            filtered = filtered.filter(p => p.categories?.name === selectedCategory)
+        }
+
         if (searchQuery) {
             const query = searchQuery.toLowerCase()
-            result = result.filter(p =>
+            filtered = filtered.filter(p =>
                 p.name.toLowerCase().includes(query) ||
-                p.description?.toLowerCase().includes(query) ||
-                p.categories?.name.toLowerCase().includes(query) ||
-                p.sku?.toLowerCase().includes(query)
+                p.description?.toLowerCase().includes(query)
             )
         }
 
-        // Category filter
-        if (filters.categories.length > 0) {
-            result = result.filter(p =>
-                filters.categories.includes(p.categories?.name || "")
-            )
-        }
+        return filtered
+    }, [products, selectedCategory, searchQuery])
 
-        // Price filter
-        const [minPrice, maxPrice] = filters.priceRange
-        result = result.filter(p => {
-            const price = p.rental_price_daily || p.price
-            return price >= minPrice && price <= maxPrice
-        })
+    const filteredCategories = useMemo(() => {
+        if (!searchQuery) return categories
+        const query = searchQuery.toLowerCase()
+        return categories.filter(c => c.name.toLowerCase().includes(query))
+    }, [categories, searchQuery])
 
-        // Features filter
-        if (filters.features.length > 0) {
-            result = result.filter(p =>
-                filters.features.some(f => p.features?.includes(f))
-            )
-        }
+    const featuredPackages = useMemo(() => {
+        return packages.filter(p => p.is_featured)
+    }, [packages])
 
-        // Sort
-        switch (sortBy) {
-            case "price-low":
-                result.sort((a, b) => (a.rental_price_daily || a.price) - (b.rental_price_daily || b.price))
-                break
-            case "price-high":
-                result.sort((a, b) => (b.rental_price_daily || b.price) - (a.rental_price_daily || a.price))
-                break
-            case "name":
-                result.sort((a, b) => a.name.localeCompare(b.name))
-                break
-            case "newest":
-            default:
-                // Already in newest order from query
-                break
-        }
+    const featuredProducts = useMemo(() => {
+        return products.filter(p => p.is_featured)
+    }, [products])
 
-        return result
-    }, [products, searchQuery, filters, sortBy])
+    // Handlers
+    const handleCategoryClick = (categoryName: string) => {
+        setSelectedCategory(categoryName)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
 
-    const isInCart = (id: string) => items.some((item) => item.productId === id)
-
-    const toggleCart = (id: string) => {
-        if (isInCart(id)) {
-            removeItem(id)
-        } else {
-            addItem(id, getQuantity(id))
-        }
+    const handleBackToCatalog = () => {
+        setSelectedCategory(null)
+        setSearchQuery('')
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/20">
-            <div className="py-12 md:py-20">
-                <div className="container mx-auto px-4 md:px-6">
-                    {/* Header */}
-                    <div className="flex flex-col gap-6 mb-12">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                            <div>
-                                <h1 className="text-4xl md:text-6xl font-serif mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                                    {heroTitle}
-                                </h1>
-                                <p className="text-muted-foreground flex items-center gap-2">
-                                    <Package className="h-4 w-4" />
-                                    {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}
-                                </p>
-                            </div>
+        <div className="min-h-screen bg-background pb-20">
+            {/* Hero Section */}
+            <section className="relative py-20 px-4 text-center bg-gradient-to-b from-background to-background/50 border-b border-border/50">
+                <div className="max-w-4xl mx-auto">
+                    <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gold to-white animate-gradient-x">
+                        {selectedCategory ? selectedCategory : (heroTitle || "Rental Catalog")}
+                    </h1>
+                    <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+                        {selectedCategory
+                            ? `Browse our collection of ${selectedCategory.toLowerCase()}.`
+                            : "Explore our premium collection of event rentals, packages, and exclusive deals."
+                        }
+                    </p>
 
-                            {/* View Toggle */}
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant={viewMode === "grid" ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setViewMode("grid")}
-                                >
-                                    <Grid3x3 className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    variant={viewMode === "list" ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setViewMode("list")}
-                                >
-                                    <List className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* Search and Filters Bar */}
-                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                            <CatalogSearch onSearch={setSearchQuery} />
-
-                            <div className="flex gap-2 items-center w-full sm:w-auto">
-                                <CatalogFilters
-                                    categories={categories}
-                                    onFilterChange={setFilters}
-                                    maxPrice={maxPrice}
-                                />
-
-                                <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-                                    <SelectTrigger className="w-[180px]">
-                                        <ArrowUpDown className="h-4 w-4 mr-2" />
-                                        <SelectValue placeholder="Sort by" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="newest">Newest First</SelectItem>
-                                        <SelectItem value="price-low">Price: Low to High</SelectItem>
-                                        <SelectItem value="price-high">Price: High to Low</SelectItem>
-                                        <SelectItem value="name">Name: A to Z</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Products Grid/List */}
-                    {filteredProducts.length === 0 ? (
-                        <div className="text-center py-20">
-                            <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                            <h3 className="text-xl font-semibold mb-2">No products found</h3>
-                            <p className="text-muted-foreground">Try adjusting your filters or search query</p>
-                        </div>
-                    ) : viewMode === "grid" ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                            {filteredProducts.map((product, index) => (
-                                <div
-                                    key={product.id}
-                                    className="group flex flex-col animate-fade-in-up hover:scale-[1.02] transition-transform duration-300"
-                                    style={{ animationDelay: `${index * 50}ms` }}
-                                >
-                                    <div className="relative aspect-[3/4] overflow-hidden bg-secondary mb-4 rounded-lg shadow-lg group-hover:shadow-2xl transition-shadow duration-300">
-                                        <Link href={`/catalog/${product.id}`}>
-                                            <Image
-                                                src={product.image_url || "/placeholder.svg"}
-                                                alt={product.name}
-                                                fill
-                                                className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                            />
-                                        </Link>
-
-
-
-                                        {/* Quick View Button */}
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault()
-                                                setQuickViewProduct(product)
-                                                setIsQuickViewOpen(true)
-                                            }}
-                                            className="absolute bottom-4 left-4 h-12 w-12 rounded-full bg-background/95 backdrop-blur flex items-center justify-center shadow-lg hover:bg-background transition-all duration-300 hover:scale-110 opacity-0 group-hover:opacity-100 z-10"
-                                        >
-                                            <Eye className="h-5 w-5" />
-                                            <span className="sr-only">Quick view</span>
-                                        </button>
-
-                                        {/* Quantity Selector */}
-                                        <div className={`absolute bottom-4 right-16 h-12 rounded-full bg-background/95 backdrop-blur flex items-center shadow-lg transition-all duration-300 ${isInCart(product.id) ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100 z-10'}`}>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault()
-                                                    updateQuantity(product.id, -1)
-                                                }}
-                                                className="h-12 w-10 flex items-center justify-center hover:bg-muted/50 rounded-l-full transition-colors"
-                                            >
-                                                <Minus className="h-3 w-3" />
-                                            </button>
-                                            <span className="w-8 text-center font-medium text-sm">
-                                                {getQuantity(product.id)}
-                                            </span>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault()
-                                                    updateQuantity(product.id, 1)
-                                                }}
-                                                className="h-12 w-10 flex items-center justify-center hover:bg-muted/50 rounded-r-full transition-colors"
-                                            >
-                                                <Plus className="h-3 w-3" />
-                                            </button>
-                                        </div>
-
-                                        {/* Add to Cart Button */}
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault()
-                                                toggleCart(product.id)
-                                            }}
-                                            className="absolute bottom-4 right-4 h-12 w-12 rounded-full bg-background/95 backdrop-blur flex items-center justify-center shadow-lg hover:bg-background transition-all duration-300 hover:scale-110 z-10"
-                                        >
-                                            {isInCart(product.id) ? (
-                                                <Check className="h-5 w-5 text-green-600" />
-                                            ) : (
-                                                <Plus className="h-5 w-5" />
-                                            )}
-                                            <span className="sr-only">Add to quote</span>
-                                        </button>
-                                    </div>
-
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex justify-between items-start gap-2">
-                                            <div className="flex-1">
-                                                <Link href={`/catalog/${product.id}`}>
-                                                    <h3 className="font-serif text-lg hover:underline decoration-1 underline-offset-4 line-clamp-2">
-                                                        {product.name}
-                                                    </h3>
-                                                </Link>
-                                                <p className="text-sm text-muted-foreground">
-                                                    {product.categories?.name || 'Uncategorized'}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="font-semibold text-lg">
-                                                ${(product.rental_price_daily || product.price).toFixed(2)}
-                                            </span>
-                                            <span className="text-xs text-muted-foreground">/ day</span>
-                                        </div>
-
-                                        {product.features && product.features.length > 0 && (
-                                            <div className="flex flex-wrap gap-1 mt-1">
-                                                {product.features.slice(0, 2).map((feature, idx) => (
-                                                    <Badge key={idx} variant="secondary" className="text-xs">
-                                                        {feature}
-                                                    </Badge>
-                                                ))}
-                                                {product.features.length > 2 && (
-                                                    <Badge variant="secondary" className="text-xs">
-                                                        +{product.features.length - 2}
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="space-y-6">
-                            {filteredProducts.map((product, index) => (
-                                <div
-                                    key={product.id}
-                                    className="group flex flex-col sm:flex-row gap-6 p-6 bg-card rounded-lg shadow-md hover:shadow-xl transition-all duration-300 animate-fade-in-up"
-                                    style={{ animationDelay: `${index * 30}ms` }}
-                                >
-                                    <div className="relative w-full sm:w-48 aspect-[4/3] sm:aspect-square overflow-hidden bg-secondary rounded-lg flex-shrink-0">
-                                        <Link href={`/catalog/${product.id}`}>
-                                            <Image
-                                                src={product.image_url || "/placeholder.svg"}
-                                                alt={product.name}
-                                                fill
-                                                className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                            />
-                                        </Link>
-
-                                    </div>
-
-                                    <div className="flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <div className="flex justify-between items-start gap-4 mb-2">
-                                                <div>
-                                                    <Link href={`/catalog/${product.id}`}>
-                                                        <h3 className="font-serif text-2xl hover:underline decoration-1 underline-offset-4">
-                                                            {product.name}
-                                                        </h3>
-                                                    </Link>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {product.categories?.name || 'Uncategorized'}
-                                                        {product.sku && ` • SKU: ${product.sku}`}
-                                                    </p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="font-semibold text-2xl">
-                                                        ${(product.rental_price_daily || product.price).toFixed(2)}
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground">per day</div>
-                                                </div>
-                                            </div>
-
-                                            <p className="text-muted-foreground line-clamp-2 mb-3">
-                                                {product.description}
-                                            </p>
-
-                                            {product.features && product.features.length > 0 && (
-                                                <div className="flex flex-wrap gap-2 mb-3">
-                                                    {product.features.map((feature, idx) => (
-                                                        <Badge key={idx} variant="secondary">
-                                                            {feature}
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="flex gap-2">
-                                            {!isInCart(product.id) && (
-                                                <div className="flex items-center border rounded-md h-10">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-full w-8 rounded-none rounded-l-md"
-                                                        onClick={() => updateQuantity(product.id, -1)}
-                                                    >
-                                                        <Minus className="h-3 w-3" />
-                                                    </Button>
-                                                    <span className="w-8 text-center text-sm font-medium">
-                                                        {getQuantity(product.id)}
-                                                    </span>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-full w-8 rounded-none rounded-r-md"
-                                                        onClick={() => updateQuantity(product.id, 1)}
-                                                    >
-                                                        <Plus className="h-3 w-3" />
-                                                    </Button>
-                                                </div>
-                                            )}
-                                            <Button
-                                                variant={isInCart(product.id) ? "outline" : "default"}
-                                                onClick={() => toggleCart(product.id)}
-                                                className="gap-2"
-                                            >
-                                                {isInCart(product.id) ? (
-                                                    <>
-                                                        <Check className="h-4 w-4" /> Added
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Plus className="h-4 w-4" /> Add to Quote
-                                                    </>
-                                                )}
-                                            </Button>
-                                            <Button variant="outline" asChild>
-                                                <Link href={`/catalog/${product.id}`}>
-                                                    View Details
-                                                </Link>
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                    <SearchBar
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder="Search for products, categories, or packages..."
+                    />
                 </div>
-            </div>
+            </section>
 
-            {/* Quick View Modal */}
-            <ProductQuickView
-                product={quickViewProduct}
-                open={isQuickViewOpen}
-                onOpenChange={setIsQuickViewOpen}
-                onAddToCart={toggleCart}
-                isInCart={quickViewProduct ? isInCart(quickViewProduct.id) : false}
-            />
+            <div className="container mx-auto px-4">
+                {/* If a category is selected, show products in that category */}
+                {selectedCategory ? (
+                    <div className="space-y-8">
+                        <Button
+                            variant="ghost"
+                            onClick={handleBackToCatalog}
+                            className="mb-8 hover:text-gold transition-colors"
+                        >
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Back to Catalog
+                        </Button>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredProducts.map((product) => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+
+                        {filteredProducts.length === 0 && (
+                            <div className="text-center py-20">
+                                <p className="text-muted-foreground text-lg">No products found in this category.</p>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    // Main Catalog View
+                    <div className="space-y-20">
+
+                        {/* Featured Packages / Deals */}
+                        {(featuredPackages.length > 0 || featuredProducts.length > 0) && !searchQuery && (
+                            <section>
+                                <div className="flex items-center justify-between mb-8">
+                                    <h2 className="text-3xl font-serif font-bold">Featured Deals & Packages</h2>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {featuredPackages.map(pkg => (
+                                        <PackageCard
+                                            key={pkg.id}
+                                            name={pkg.name}
+                                            description={pkg.description}
+                                            price={pkg.price}
+                                            imageUrl={pkg.image_url}
+                                            onViewDetails={() => console.log('View package', pkg.id)}
+                                        />
+                                    ))}
+                                    {/* Also show featured products here if needed, or in a separate section */}
+                                    {featuredProducts.slice(0, 3).map(product => (
+                                        <ProductCard key={product.id} product={product} />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Categories Grid */}
+                        <section>
+                            <h2 className="text-3xl font-serif font-bold mb-8">Browse by Category</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {filteredCategories.map((category) => (
+                                    <CategoryCard
+                                        key={category.id}
+                                        name={category.name}
+                                        imageUrl={category.image_url}
+                                        onClick={() => handleCategoryClick(category.name)}
+                                    />
+                                ))}
+                            </div>
+
+                            {filteredCategories.length === 0 && (
+                                <div className="text-center py-12">
+                                    <p className="text-muted-foreground">No categories found matching your search.</p>
+                                </div>
+                            )}
+                        </section>
+
+                        {/* All Products (if searching) */}
+                        {searchQuery && (
+                            <section>
+                                <h2 className="text-3xl font-serif font-bold mb-8">Products</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {filteredProducts.map((product) => (
+                                        <ProductCard key={product.id} product={product} />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     )
 }

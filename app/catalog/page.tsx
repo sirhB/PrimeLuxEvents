@@ -13,14 +13,20 @@ export default async function CatalogPage() {
 
   const { data: categories } = await supabase
     .from('categories')
-    .select('name')
+    .select('*')
     .order('name')
+
+  const { data: packages } = await supabase
+    .from('packages')
+    .select('*')
+    .order('created_at', { ascending: false })
 
   return (
     <CatalogClient
       heroTitle={content['catalog.hero.title']}
       products={products || []}
-      categories={['All', ...(categories?.map(c => c.name) || [])]}
+      categories={categories || []}
+      packages={packages || []}
     />
   )
 }

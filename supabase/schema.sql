@@ -7,6 +7,8 @@ create table categories (
   name text not null unique,
   slug text not null unique,
   description text,
+  image_url text,
+  is_featured boolean default false,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
@@ -34,6 +36,7 @@ create table products (
   weight decimal(10, 2),
   features jsonb default '[]'::jsonb,
   care_instructions text,
+  is_featured boolean default false,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -123,6 +126,26 @@ create table quotes (
   expires_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Packages Table
+create table packages (
+  id uuid default uuid_generate_v4() primary key,
+  name text not null,
+  description text,
+  price integer not null, -- stored in cents
+  image_url text,
+  is_featured boolean default false,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Package Items Table
+create table package_items (
+  id uuid default uuid_generate_v4() primary key,
+  package_id uuid references packages(id) on delete cascade,
+  product_id uuid references products(id) on delete cascade,
+  quantity integer not null default 1
 );
 
 -- RLS Policies
@@ -235,5 +258,73 @@ create policy "Admins can view all quotes."
 
 create policy "Admins can update quotes."
   on quotes for update
+  using ( auth.role() = 'authenticated' );
+
+-- Packages: Public read, Admin write
+create policy "Public packages are viewable by everyone."
+  on packages for select
+  using ( true );
+
+create policy "Admins can insert packages."
+  on packages for insert
+  with check ( auth.role() = 'authenticated' );
+
+create policy "Admins can update packages."
+  on packages for update
+  using ( auth.role() = 'authenticated' );
+
+create policy "Admins can delete packages."
+  on packages for delete
+  using ( auth.role() = 'authenticated' );
+
+-- Package Items: Public read, Admin write
+create policy "Public package items are viewable by everyone."
+  on package_items for select
+  using ( true );
+
+create policy "Admins can insert package items."
+  on package_items for insert
+  with check ( auth.role() = 'authenticated' );
+
+create policy "Admins can update package items."
+  on package_items for update
+  using ( auth.role() = 'authenticated' );
+
+create policy "Admins can delete package items."
+  on package_items for delete
+  using ( auth.role() = 'authenticated' );
+
+-- Packages: Public read, Admin write
+create policy "Public packages are viewable by everyone."
+  on packages for select
+  using ( true );
+
+create policy "Admins can insert packages."
+  on packages for insert
+  with check ( auth.role() = 'authenticated' );
+
+create policy "Admins can update packages."
+  on packages for update
+  using ( auth.role() = 'authenticated' );
+
+create policy "Admins can delete packages."
+  on packages for delete
+  using ( auth.role() = 'authenticated' );
+
+-- Package Items: Public read, Admin write
+create policy "Public package items are viewable by everyone."
+  on package_items for select
+  using ( true );
+
+create policy "Admins can insert package items."
+  on package_items for insert
+  with check ( auth.role() = 'authenticated' );
+
+create policy "Admins can update package items."
+  on package_items for update
+  using ( auth.role() = 'authenticated' );
+
+create policy "Admins can delete package items."
+  on package_items for delete
   using ( auth.role() = 'authenticated' );
 
