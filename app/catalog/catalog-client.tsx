@@ -6,7 +6,10 @@ import { SearchBar } from '@/components/catalog/search-bar'
 import { CategoryCard } from '@/components/catalog/category-card'
 import { PackageCard } from '@/components/catalog/package-card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, LayoutGrid, List } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { cn, formatCurrency } from '@/lib/utils'
 
 interface Product {
     id: string
@@ -17,6 +20,7 @@ interface Product {
     category_id: string | null
     categories?: { name: string } | null
     is_featured?: boolean
+    rental_price_daily?: number
 }
 
 interface Category {
@@ -45,6 +49,7 @@ interface CatalogClientProps {
 export default function CatalogClient({ heroTitle, products, categories, packages }: CatalogClientProps) {
     const [searchQuery, setSearchQuery] = useState('')
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
     // Filter logic
     const filteredProducts = useMemo(() => {
@@ -117,18 +122,83 @@ export default function CatalogClient({ heroTitle, products, categories, package
                 {/* If a category is selected, show products in that category */}
                 {selectedCategory ? (
                     <div className="space-y-8">
-                        <Button
-                            variant="ghost"
-                            onClick={handleBackToCatalog}
-                            className="mb-8 hover:text-gold transition-colors"
-                        >
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Catalog
-                        </Button>
+                        <div className="flex items-center justify-between mb-8">
+                            <Button
+                                variant="ghost"
+                                onClick={handleBackToCatalog}
+                                className="hover:text-gold transition-colors"
+                            >
+                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                Back to Catalog
+                            </Button>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <div className="flex items-center gap-2 border rounded-lg p-1">
+                                <Button
+                                    variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                                    size="icon"
+                                    onClick={() => setViewMode('grid')}
+                                    className="h-8 w-8"
+                                >
+                                    <LayoutGrid className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                                    size="icon"
+                                    onClick={() => setViewMode('list')}
+                                    className="h-8 w-8"
+                                >
+                                    <List className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+
+                        <div className={cn(
+                            "grid gap-8",
+                            viewMode === 'grid'
+                                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                                : "grid-cols-1"
+                        )}>
                             {filteredProducts.map((product) => (
-                                <ProductCard key={product.id} product={product} />
+                                viewMode === 'grid' ? (
+                                    <ProductCard key={product.id} product={product} />
+                                ) : (
+                                    <div key={product.id} className="flex gap-6 border rounded-xl p-4 hover:border-gold/50 transition-colors">
+                                        <div className="relative w-48 aspect-[4/3] flex-shrink-0 overflow-hidden rounded-lg bg-secondary">
+                                            {product.image_url ? (
+                                                <Image
+                                                    src={product.image_url}
+                                                    alt={product.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            ) : (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 text-neutral-400">
+                                                    No Image
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col justify-between flex-grow">
+                                            <div>
+                                                <h3 className="text-xl font-serif font-bold mb-2">{product.name}</h3>
+                                                <p className="text-muted-foreground line-clamp-2 mb-4">{product.description}</p>
+                                                <p className="text-sm text-muted-foreground mb-2">
+                                                    Category: {product.categories?.name || 'Uncategorized'}
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center justify-between mt-4">
+                                                <div className="flex items-baseline gap-2">
+                                                    <span className="text-lg font-semibold text-gold">
+                                                        {formatCurrency(product.rental_price_daily || product.price)}
+                                                    </span>
+                                                    <span className="text-sm text-muted-foreground">/ day</span>
+                                                </div>
+                                                <Button asChild>
+                                                    <Link href={`/catalog/${product.id}`}>View Details</Link>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
                             ))}
                         </div>
 

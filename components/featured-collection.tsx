@@ -11,7 +11,7 @@ export function FeaturedCollection() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 animate-fade-in-up">
           <div>
-            <h2 className="text-3xl md:text-5xl font-serif mb-4">Curated Collection</h2>
+            <h2 className="text-3xl md:text-5xl font-serif mb-4">Featured Rentals</h2>
             <p className="text-muted-foreground max-w-md">Hand-picked pieces that define luxury and elegance.</p>
           </div>
           <Link

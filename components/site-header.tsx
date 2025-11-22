@@ -60,7 +60,7 @@ export function SiteHeader() {
                   onClick={() => setIsOpen(false)}
                   className="text-2xl font-serif hover:text-muted-foreground transition-colors"
                 >
-                  Collection
+                  Rental Catalog
                 </Link>
                 <Link
                   href="/gallery"
@@ -110,7 +110,7 @@ export function SiteHeader() {
             href="/catalog"
             className="text-sm font-medium uppercase tracking-widest hover:text-muted-foreground transition-colors"
           >
-            Collection
+            Rental Catalog
           </Link>
           <Link
             href="/gallery"
