@@ -206,7 +206,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[])
                 payment_status: 'pending',
                 status: 'pending',
                 is_overbooked: isOverbooked,
-                pickup_date: formData.sameDayPickup ? formData.eventDate : formData.pickupDate,
+                pickup_date: formData.sameDayPickup ? formData.eventDate : (formData.pickupDate || null),
                 pickup_time: formData.pickupTime,
                 pickup_notes: formData.pickupNotes,
                 same_day_pickup: formData.sameDayPickup || false,

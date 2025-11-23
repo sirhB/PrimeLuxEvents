@@ -192,6 +192,11 @@ export default function CheckoutPage() {
                 return
             }
 
+            if (!sameDayPickup && !pickupDate) {
+                setError("Please select a pickup date.")
+                return
+            }
+
             // Update Context with Event Details
             setEventDetails({
                 date,
