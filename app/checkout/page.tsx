@@ -620,98 +620,6 @@ export default function CheckoutPage() {
                                     </div>
                                 </CardContent>
                             </Card>
-                        </div>
-
-                        <div className="flex justify-between pt-4">
-                            <Button variant="outline" onClick={handlePrevStep}>
-                                <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                            </Button>
-                            <Button onClick={handleNextStep} size="lg">
-                                Continue to Payment <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
-                        </div>
-                    </motion.div>
-                )}
-
-                {/* Step 3: Payment */}
-                {currentStep === 3 && (
-                    <motion.div
-                        className="grid lg:grid-cols-3 gap-8"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <div className="lg:col-span-2 space-y-6">
-                            <Card className="border-primary/20">
-                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                            <ShoppingBag className="h-5 w-5 text-primary" />
-                                        </div>
-                                        <div>
-                                            <CardTitle>Review Order</CardTitle>
-                                            <CardDescription>Adjust quantities if needed</CardDescription>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="space-y-4 pt-6">{" "}
-                                    <div className="space-y-3">
-                                        {items.map((item, index) => {
-                                            const product = cartProducts.find((p) => p.id === item.productId)
-                                            if (!product) return null
-                                            return (
-                                                <motion.div
-                                                    key={item.productId}
-                                                    className="flex gap-4 py-2 border-b last:border-0"
-                                                    initial={{ opacity: 0, x: -20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                                                >
-                                                    <div className="h-16 w-16 rounded border bg-muted overflow-hidden flex-shrink-0">
-                                                        <img
-                                                            src={product.image_url || '/placeholder.svg'}
-                                                            alt={product.name}
-                                                            className="h-full w-full object-cover"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <h4 className="font-medium font-serif">{product.name}</h4>
-                                                        <div className="flex items-center gap-2 mt-1">
-                                                            <Button
-                                                                size="sm"
-                                                                variant="outline"
-                                                                className="h-6 w-6 p-0"
-                                                                onClick={() => {
-                                                                    updateQuantity(item.productId, item.quantity - 1)
-                                                                    toast.info('Quantity updated')
-                                                                }}
-                                                            >
-                                                                <Minus className="h-3 w-3" />
-                                                            </Button>
-                                                            <span className="text-sm font-medium w-8 text-center">
-                                                                {item.quantity}
-                                                            </span>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="outline"
-                                                                className="h-6 w-6 p-0"
-                                                                onClick={() => {
-                                                                    updateQuantity(item.productId, item.quantity + 1)
-                                                                    toast.info('Quantity updated')
-                                                                }}
-                                                            >
-                                                                <Plus className="h-3 w-3" />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                    <p className="font-medium">{formatCurrency(product.price * item.quantity)}</p>
-                                                </motion.div>
-                                            )
-                                        })}
-                                    </div>
-                                </CardContent>
-                            </Card>
 
                             {/* Pickup Information */}
                             <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
@@ -819,6 +727,98 @@ export default function CheckoutPage() {
                                             rows={3}
                                             className="resize-none"
                                         />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        <div className="flex justify-between pt-4">
+                            <Button variant="outline" onClick={handlePrevStep}>
+                                <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                            </Button>
+                            <Button onClick={handleNextStep} size="lg">
+                                Continue to Payment <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Step 3: Payment */}
+                {currentStep === 3 && (
+                    <motion.div
+                        className="grid lg:grid-cols-3 gap-8"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <div className="lg:col-span-2 space-y-6">
+                            <Card className="border-primary/20">
+                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <ShoppingBag className="h-5 w-5 text-primary" />
+                                        </div>
+                                        <div>
+                                            <CardTitle>Review Order</CardTitle>
+                                            <CardDescription>Adjust quantities if needed</CardDescription>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-4 pt-6">{" "}
+                                    <div className="space-y-3">
+                                        {items.map((item, index) => {
+                                            const product = cartProducts.find((p) => p.id === item.productId)
+                                            if (!product) return null
+                                            return (
+                                                <motion.div
+                                                    key={item.productId}
+                                                    className="flex gap-4 py-2 border-b last:border-0"
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                                                >
+                                                    <div className="h-16 w-16 rounded border bg-muted overflow-hidden flex-shrink-0">
+                                                        <img
+                                                            src={product.image_url || '/placeholder.svg'}
+                                                            alt={product.name}
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <h4 className="font-medium font-serif">{product.name}</h4>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="h-6 w-6 p-0"
+                                                                onClick={() => {
+                                                                    updateQuantity(item.productId, item.quantity - 1)
+                                                                    toast.info('Quantity updated')
+                                                                }}
+                                                            >
+                                                                <Minus className="h-3 w-3" />
+                                                            </Button>
+                                                            <span className="text-sm font-medium w-8 text-center">
+                                                                {item.quantity}
+                                                            </span>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="h-6 w-6 p-0"
+                                                                onClick={() => {
+                                                                    updateQuantity(item.productId, item.quantity + 1)
+                                                                    toast.info('Quantity updated')
+                                                                }}
+                                                            >
+                                                                <Plus className="h-3 w-3" />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                    <p className="font-medium">{formatCurrency(product.price * item.quantity)}</p>
+                                                </motion.div>
+                                            )
+                                        })}
                                     </div>
                                 </CardContent>
                             </Card>
