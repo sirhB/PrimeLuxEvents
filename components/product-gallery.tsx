@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -11,11 +11,22 @@ interface ProductGalleryProps {
     images: string[]
     productName: string
     className?: string
+    selectedImage?: string
 }
 
-export function ProductGallery({ images, productName, className }: ProductGalleryProps) {
+export function ProductGallery({ images, productName, className, selectedImage: externalSelectedImage }: ProductGalleryProps) {
     const [selectedImage, setSelectedImage] = useState(0)
     const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+
+    // Update selected image when external prop changes
+    useEffect(() => {
+        if (externalSelectedImage) {
+            const index = images.indexOf(externalSelectedImage)
+            if (index !== -1) {
+                setSelectedImage(index)
+            }
+        }
+    }, [externalSelectedImage, images])
 
     const nextImage = () => {
         setSelectedImage((prev) => (prev + 1) % images.length)

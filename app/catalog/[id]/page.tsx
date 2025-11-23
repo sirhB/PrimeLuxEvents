@@ -37,6 +37,15 @@ interface Modifier {
   options: ModifierOption[]
 }
 
+interface ProductImage {
+  id: string
+  image_url: string
+  alt_text: string
+  display_order: number
+  modifier_id?: string
+  option_id?: string
+}
+
 interface Product {
   id: string
   name: string
@@ -57,6 +66,7 @@ interface Product {
   care_instructions?: string
   sku?: string
   weight?: number
+  product_images?: ProductImage[]
 }
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
@@ -66,6 +76,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [loading, setLoading] = useState(true)
   const [selectedModifiers, setSelectedModifiers] = useState<Record<string, ModifierOption>>({})
   const [quantity, setQuantity] = useState(1)
+  const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | undefined>(undefined)
 
 
   const { items, addItem, removeItem, updateQuantity: updateCartQuantity } = useCart()
@@ -76,7 +87,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     async function fetchProduct() {
       const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select('*, product_images(*)')
         .eq('id', id)
         .single()
 
@@ -153,6 +164,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         ...prev,
         [modifierId]: option
       }))
+
+      // Check if there's an image for this modifier option
+      const matchingImage = product.product_images?.find(
+        img => img.modifier_id === modifierId && img.option_id === optionId
+      )
+
+      if (matchingImage) {
+        setSelectedGalleryImage(matchingImage.image_url)
+      }
     }
   }
 
@@ -170,9 +190,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     }
   }
 
-  const galleryImages = product.images && product.images.length > 0
-    ? product.images
-    : [product.image_url]
+  const galleryImages = product.product_images && product.product_images.length > 0
+    ? [product.image_url, ...product.product_images.sort((a, b) => a.display_order - b.display_order).map(img => img.image_url)]
+    : product.images && product.images.length > 0
+      ? product.images
+      : [product.image_url]
+
+  // Remove duplicates
+  const uniqueGalleryImages = Array.from(new Set(galleryImages))
 
   const canAddToCart = true
 
@@ -193,7 +218,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           {/* Image Gallery */}
           <div className={`${isLoaded ? "animate-fade-in-up" : "opacity-0"}`}>
-            <ProductGallery images={galleryImages} productName={product.name} />
+            <ProductGallery
+              images={uniqueGalleryImages}
+              productName={product.name}
+              selectedImage={selectedGalleryImage}
+            />
           </div>
 
           {/* Details Section */}
