@@ -125,7 +125,7 @@ INSERT INTO content (key, value, type) VALUES
   "Floor plan assistance",
   "Custom mood boards"
 ]', 'json'),
-('services.list.design.image', '/placeholder.svg?key=design-consult', 'image'),
+('services.list.design.image', '/service-design.png', 'image'),
 
 ('services.list.delivery.title', 'White Glove Delivery', 'text'),
 ('services.list.delivery.description', 'Our logistics team is the backbone of our operation. We pride ourselves on punctuality and professionalism. Our uniformed delivery crew handles every item with care, ensuring that your rentals arrive in perfect condition and on time, every time.', 'text'),
@@ -134,7 +134,7 @@ INSERT INTO content (key, value, type) VALUES
   "Real-time tracking updates",
   "Careful handling and protection"
 ]', 'json'),
-('services.list.delivery.image', '/placeholder.svg?key=delivery', 'image'),
+('services.list.delivery.image', '/logistics-planning.jpg', 'image'),
 
 ('services.list.setup.title', 'Setup & Installation', 'text'),
 ('services.list.setup.description', 'Want to walk into a fully realized event? For an additional fee, our team can handle the complete setup and installation of your rentals. From placing chairs to hanging lighting, we ensure everything is positioned exactly according to your floor plan.', 'text'),
@@ -143,7 +143,7 @@ INSERT INTO content (key, value, type) VALUES
   "Execution of detailed floor plans",
   "On-site styling assistance"
 ]', 'json'),
-('services.list.setup.image', '/placeholder.svg?key=setup', 'image'),
+('services.list.setup.image', '/service-setup.png', 'image'),
 
 ('services.cta.title', 'Experience the PrimeLux Difference', 'text'),
 ('services.cta.description', 'Let us handle the details so you can enjoy the moment. Contact us today to discuss your event needs.', 'text'),
@@ -159,31 +159,31 @@ INSERT INTO content (key, value, type) VALUES
     "title": "Browse & Select",
     "description": "Explore our extensive catalog of luxury furniture and decor online. Our platform allows you to view real-time availability, detailed specifications, and high-resolution images. Simply add items to your cart to start building your event.",
     "details": ["Real-Time Availability", "Detailed Product Specs", "Curated Collections"],
-    "image": "/elegant-wedding-reception-table-setting.jpg"
+    "image": "/open-planner.png"
   },
   {
     "title": "Build Your Quote",
     "description": "Create a comprehensive quote instantly. Adjust quantities, select your event dates, and input venue details directly in your cart. No waiting for a salesperson—you have full control over your rental list and budget.",
     "details": ["Instant Pricing", "Self-Service Cart", "Budget Management"],
-    "image": "/rustic-wooden-dining-table.jpg"
+    "image": "/design-consultation.jpg"
   },
   {
     "title": "Secure Reservation",
     "description": "Ready to book? Secure your items immediately with a 50% deposit through our secure online portal. You''ll receive an instant confirmation and a detailed contract. Our logistics team will then reach out to coordinate the finer details.",
     "details": ["Instant Booking", "Secure Online Payment", "Immediate Confirmation"],
-    "image": "/gold-chiavari-chair.jpg"
+    "image": "/concierge-service.jpg"
   },
   {
     "title": "Professional Delivery",
     "description": "On the day of your event, our uniformed team arrives on time to deliver your items to a secure drop-off location. Need us to handle the heavy lifting? Full setup and installation services are available for an additional fee.",
     "details": ["Uniformed Delivery Team", "Scheduled Drop-off", "Setup Available (Add-on)"],
-    "image": "/luxury-event-setup-ballroom-chandelier.jpg"
+    "image": "/logistics-planning.jpg"
   },
   {
     "title": "Seamless Retrieval",
     "description": "Standard rentals cover a 24-hour period. We typically schedule pickup for the day following your event to ensure a stress-free conclusion. Same-night or custom pickup times can be arranged upon request.",
     "details": ["24-Hour Rental Period", "Next-Day Pickup", "Flexible Scheduling"],
-    "image": "/emerald-green-velvet-sofa.jpg"
+    "image": "/event-breakdown.jpg"
   }
 ]', 'json'),
 ('howitworks.concierge.title', 'Need a Custom Touch?', 'text'),

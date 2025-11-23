@@ -31,7 +31,7 @@ export default async function ServicesPage() {
             <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
               <div className="order-2 md:order-1 relative aspect-video md:aspect-[4/3] bg-muted rounded-lg overflow-hidden">
                 <Image
-                  src={content['services.list.design.image'] || "/placeholder.svg?key=design-consult"}
+                  src={content['services.list.design.image'] || "/service-design.png"}
                   alt="Design Consultation"
                   fill
                   className="object-cover"
@@ -77,7 +77,7 @@ export default async function ServicesPage() {
               </div>
               <div className="relative aspect-video md:aspect-[4/3] bg-muted rounded-lg overflow-hidden">
                 <Image
-                  src={content['services.list.delivery.image'] || "/placeholder.svg?key=delivery"}
+                  src={content['services.list.delivery.image'] || "/logistics-planning.jpg"}
                   alt="White Glove Delivery"
                   fill
                   className="object-cover"
@@ -89,7 +89,7 @@ export default async function ServicesPage() {
             <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
               <div className="order-2 md:order-1 relative aspect-video md:aspect-[4/3] bg-muted rounded-lg overflow-hidden">
                 <Image
-                  src={content['services.list.setup.image'] || "/placeholder.svg?key=setup"}
+                  src={content['services.list.setup.image'] || "/service-setup.png"}
                   alt="Setup and Breakdown"
                   fill
                   className="object-cover"
