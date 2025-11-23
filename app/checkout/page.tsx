@@ -179,10 +179,66 @@ export default function CheckoutPage() {
             ...prev,
             deliveryDate: date ? format(date, 'yyyy-MM-dd') : prev.deliveryDate,
             eventDate: date ? format(date, 'yyyy-MM-dd') : prev.eventDate,
-            deliveryTime: startTime || prev.deliveryTime, // Default delivery time to start time if not set?
-            // We might want separate delivery time, but for now let's sync them or keep them separate in UI
+            deliveryTime: startTime || prev.deliveryTime,
         }))
     }, [date, startTime])
+
+    // Load saved data from localStorage
+    useEffect(() => {
+        const savedData = localStorage.getItem('checkout_form_data')
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData)
+
+                // Restore Form Data
+                if (parsed.formData) setFormData(parsed.formData)
+
+                // Restore Event Details
+                if (parsed.date) setDate(new Date(parsed.date))
+                if (parsed.startTime) setStartTime(parsed.startTime)
+                if (parsed.endTime) setEndTime(parsed.endTime)
+                if (parsed.venueType) setVenueType(parsed.venueType)
+
+                // Restore Logistics
+                if (parsed.hasElevator !== undefined) setHasElevator(parsed.hasElevator)
+                if (parsed.hasStairs !== undefined) setHasStairs(parsed.hasStairs)
+                if (parsed.hasLoadingDock !== undefined) setHasLoadingDock(parsed.hasLoadingDock)
+
+                // Restore Pickup Details
+                if (parsed.pickupDate) setPickupDate(new Date(parsed.pickupDate))
+                if (parsed.pickupTime) setPickupTime(parsed.pickupTime)
+                if (parsed.sameDayPickup !== undefined) setSameDayPickup(parsed.sameDayPickup)
+                if (parsed.pickupNotes) setPickupNotes(parsed.pickupNotes)
+
+            } catch (e) {
+                console.error("Failed to load saved checkout data", e)
+            }
+        }
+    }, [])
+
+    // Save data to localStorage on change
+    useEffect(() => {
+        // Only save if we have some data entered to avoid overwriting with empty initial state if loading is slow
+        // But here initial state is empty strings, so it's fine.
+        // We should probably debounce this or just let it run on every change (it's cheap).
+
+        const dataToSave = {
+            formData,
+            date: date ? date.toISOString() : null,
+            startTime,
+            endTime,
+            venueType,
+            hasElevator,
+            hasStairs,
+            hasLoadingDock,
+            pickupDate: pickupDate ? pickupDate.toISOString() : null,
+            pickupTime,
+            sameDayPickup,
+            pickupNotes
+        }
+
+        localStorage.setItem('checkout_form_data', JSON.stringify(dataToSave))
+    }, [formData, date, startTime, endTime, venueType, hasElevator, hasStairs, hasLoadingDock, pickupDate, pickupTime, sameDayPickup, pickupNotes])
 
     const handleNextStep = () => {
         if (currentStep === 2) {
@@ -258,6 +314,7 @@ export default function CheckoutPage() {
             if (result.success) {
                 setIsSuccess(true)
                 clearCart()
+                localStorage.removeItem('checkout_form_data')
                 setTimeout(() => {
                     router.push(`/order-confirmation?orderId=${result.orderId}`)
                 }, 2000)
