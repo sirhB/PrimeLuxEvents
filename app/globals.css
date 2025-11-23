@@ -57,6 +57,17 @@
   --sidebar-accent-foreground: oklch(0.15 0.02 85);
   --sidebar-border: oklch(0.88 0.02 90);
   --sidebar-ring: oklch(0.15 0.02 85);
+
+  /* Modern Dashboard Colors */
+  --dashboard-background: #0F0F12;
+  --dashboard-card: #18181B;
+  --dashboard-card-hover: #202024;
+  --dashboard-text: #FFFFFF;
+  --dashboard-text-muted: #A1A1AA;
+  --dashboard-accent-purple: #8B5CF6;
+  --dashboard-accent-green: #10B981;
+  --dashboard-accent-orange: #F59E0B;
+  --dashboard-accent-blue: #3B82F6;
 }
 
 .dark {

@@ -51,31 +51,30 @@ export default function PackSlipPage() {
         setHasSearched(true)
 
         try {
-            // 1. Get reservations for this date
-            const { data: reservations, error: resError } = await supabase
-                .from('rental_reservations')
+            // 1. Get orders for this delivery date
+            const { data: ordersData, error: orderError } = await supabase
+                .from('orders')
                 .select(`
-                    quantity,
-                    order_id,
-                    order:orders (
-                        id,
-                        customer_name,
-                        delivery_address,
-                        delivery_time,
-                        delivery_date,
-                        delivery_notes
-                    ),
-                    product:products (
-                        id,
-                        name,
-                        assembly_items
+                    id,
+                    customer_name,
+                    delivery_address,
+                    delivery_time,
+                    delivery_date,
+                    delivery_notes,
+                    order_items (
+                        quantity,
+                        products (
+                            id,
+                            name,
+                            assembly_items
+                        )
                     )
                 `)
-                .eq('start_date', date)
+                .eq('delivery_date', date)
 
-            if (resError) throw resError
+            if (orderError) throw orderError
 
-            if (!reservations || reservations.length === 0) {
+            if (!ordersData || ordersData.length === 0) {
                 setItems([])
                 setAssemblySummary({})
                 setOrders([])
@@ -91,64 +90,63 @@ export default function PackSlipPage() {
             // --- By Order View Logic ---
             const orderMap = new Map<string, OrderPack>()
 
-            reservations.forEach((res: any) => {
-                const product = res.product
-                const order = res.order
-                if (!product) return
+            ordersData.forEach((order: any) => {
+                const orderItems = order.order_items
 
-                // Aggregate Items
-                const current = itemMap.get(product.id) || {
-                    id: product.id,
-                    name: product.name,
-                    quantity: 0,
-                    assemblyItems: product.assembly_items || []
-                }
-                current.quantity += res.quantity
-                itemMap.set(product.id, current)
-
-                // Aggregate Assembly
-                if (product.assembly_items && Array.isArray(product.assembly_items)) {
-                    product.assembly_items.forEach((part: string | AssemblyItem) => {
-                        let partName = ''
-                        let partQty = 0
-
-                        if (typeof part === 'string') {
-                            partName = part
-                            partQty = res.quantity
-                        } else {
-                            partName = part.name
-                            partQty = part.quantity * res.quantity
-                        }
-
-                        assemblyMap[partName] = (assemblyMap[partName] || 0) + partQty
-                    })
+                // Initialize Order Pack
+                const orderPack = {
+                    id: order.id,
+                    customerName: order.customer_name,
+                    deliveryAddress: order.delivery_address,
+                    deliveryTime: order.delivery_time,
+                    deliveryDate: order.delivery_date,
+                    deliveryNotes: order.delivery_notes,
+                    items: [] as PackItem[],
+                    assemblySummary: {} as Record<string, number>
                 }
 
-                // By Order Logic
-                if (order) {
-                    const orderPack = orderMap.get(order.id) || {
-                        id: order.id,
-                        customerName: order.customer_name,
-                        deliveryAddress: order.delivery_address,
-                        deliveryTime: order.delivery_time,
-                        deliveryDate: order.delivery_date,
-                        deliveryNotes: order.delivery_notes,
-                        items: [] as PackItem[],
-                        assemblySummary: {} as Record<string, number>
+                orderItems.forEach((item: any) => {
+                    const product = item.products
+                    const quantity = item.quantity
+
+                    if (!product) return
+
+                    // --- Aggregate Logic ---
+                    const current = itemMap.get(product.id) || {
+                        id: product.id,
+                        name: product.name,
+                        quantity: 0,
+                        assemblyItems: product.assembly_items || []
                     }
+                    current.quantity += quantity
+                    itemMap.set(product.id, current)
 
-                    // Add item to order pack
-                    const existingItemIndex = orderPack.items.findIndex((i) => i.id === product.id)
-                    if (existingItemIndex >= 0) {
-                        orderPack.items[existingItemIndex].quantity += res.quantity
-                    } else {
-                        orderPack.items.push({
-                            id: product.id,
-                            name: product.name,
-                            quantity: res.quantity,
-                            assemblyItems: product.assembly_items || []
+                    // Aggregate Assembly
+                    if (product.assembly_items && Array.isArray(product.assembly_items)) {
+                        product.assembly_items.forEach((part: string | AssemblyItem) => {
+                            let partName = ''
+                            let partQty = 0
+
+                            if (typeof part === 'string') {
+                                partName = part
+                                partQty = quantity
+                            } else {
+                                partName = part.name
+                                partQty = part.quantity * quantity
+                            }
+
+                            assemblyMap[partName] = (assemblyMap[partName] || 0) + partQty
                         })
                     }
+
+                    // --- By Order Logic ---
+                    // Add item to order pack
+                    orderPack.items.push({
+                        id: product.id,
+                        name: product.name,
+                        quantity: quantity,
+                        assemblyItems: product.assembly_items || []
+                    })
 
                     // Add assembly to order pack
                     if (product.assembly_items && Array.isArray(product.assembly_items)) {
@@ -158,18 +156,18 @@ export default function PackSlipPage() {
 
                             if (typeof part === 'string') {
                                 partName = part
-                                partQty = res.quantity
+                                partQty = quantity
                             } else {
                                 partName = part.name
-                                partQty = part.quantity * res.quantity
+                                partQty = part.quantity * quantity
                             }
 
                             orderPack.assemblySummary[partName] = (orderPack.assemblySummary[partName] || 0) + partQty
                         })
                     }
+                })
 
-                    orderMap.set(order.id, orderPack)
-                }
+                orderMap.set(order.id, orderPack)
             })
 
             setItems(Array.from(itemMap.values()))
@@ -258,7 +256,7 @@ export default function PackSlipPage() {
 
                             {items.length === 0 ? (
                                 <div className="text-center py-12 text-muted-foreground border rounded-lg border-dashed">
-                                    No reservations found for this date.
+                                    No orders found for this date.
                                 </div>
                             ) : (
                                 <>

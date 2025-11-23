@@ -1,6 +1,5 @@
-import { AdminSidebar } from '@/components/admin-sidebar'
-import { AdminSearch } from '@/components/admin-search'
-import { AdminBreadcrumb } from '@/components/admin/breadcrumb'
+import { ModernSidebar } from '@/components/admin/modern-sidebar'
+import { ModernHeader } from '@/components/admin/modern-header'
 
 export default function AdminLayout({
     children,
@@ -8,19 +7,16 @@ export default function AdminLayout({
     children: React.ReactNode
 }) {
     return (
-        <div className="flex min-h-screen w-full">
+        <div className="flex min-h-screen w-full bg-[var(--dashboard-background)] text-[var(--dashboard-text)] font-sans">
             <div className="print:hidden">
-                <AdminSidebar />
+                <ModernSidebar />
             </div>
-            <main className="flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-8 print:p-0 print:block bg-muted/30">
-                <div className="flex flex-col gap-4 print:hidden">
-                    <div className="flex items-center justify-between">
-                        <AdminBreadcrumb />
-                        <AdminSearch />
-                    </div>
-                </div>
-                {children}
-            </main>
+            <div className="flex flex-1 flex-col md:pl-20 transition-all duration-300">
+                <ModernHeader />
+                <main className="flex-1 p-4 md:p-8 pt-0 overflow-y-auto">
+                    {children}
+                </main>
+            </div>
         </div>
     )
 }

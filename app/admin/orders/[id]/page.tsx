@@ -45,11 +45,7 @@ export default async function OrderDetailsPage({
         .eq('id', id)
         .single()
 
-    // Get rental reservations for this order
-    const { data: reservations } = await supabase
-        .from('rental_reservations')
-        .select('*, products(name)')
-        .eq('order_id', id)
+
 
     if (error || !order) {
         notFound()
@@ -128,46 +124,7 @@ export default async function OrderDetailsPage({
                     </Card>
                 </div>
 
-                {/* Rental Reservations */}
-                {reservations && reservations.length > 0 && (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Calendar className="h-5 w-5" />
-                                Rental Reservations
-                            </CardTitle>
-                            <CardDescription>Scheduled rental dates for this order</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                {reservations.map((reservation) => (
-                                    <div
-                                        key={reservation.id}
-                                        className="flex items-center justify-between border-b pb-4 last:border-0"
-                                    >
-                                        <div>
-                                            <p className="font-medium">
-                                                {reservation.products?.name || 'Unknown Product'}
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">
-                                                Quantity: {reservation.quantity}
-                                            </p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm font-medium">
-                                                {new Date(reservation.start_date).toLocaleDateString()} -{' '}
-                                                {new Date(reservation.end_date).toLocaleDateString()}
-                                            </p>
-                                            <p className="text-xs text-muted-foreground capitalize">
-                                                Status: {reservation.status}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
+
 
                 {/* Order Items */}
                 <Card>
