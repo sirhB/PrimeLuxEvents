@@ -99,13 +99,13 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
     return (
         <div className="min-h-screen bg-background pb-20">
-            {/* Hero Section */}
-            <section className="relative py-20 px-4 text-center bg-background border-b border-border/50">
+            {/* Hero Section - More Compact */}
+            <section className="relative py-12 px-4 text-center bg-background border-b border-border/50">
                 <div className="max-w-4xl mx-auto">
-                    <h1 className="text-4xl md:text-6xl font-serif font-bold mb-6 text-gold animate-fade-in">
+                    <h1 className="text-3xl md:text-4xl font-serif font-bold mb-3 text-gold animate-fade-in">
                         {selectedCategory ? selectedCategory : (heroTitle || "Rental Catalog")}
                     </h1>
-                    <p className="text-muted-foreground text-lg mb-12 max-w-2xl mx-auto">
+                    <p className="text-muted-foreground text-base mb-8 max-w-2xl mx-auto">
                         {selectedCategory
                             ? `Browse our collection of ${selectedCategory.toLowerCase()}.`
                             : "Explore our premium collection of event rentals, packages, and exclusive deals."
@@ -212,7 +212,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                     </div>
                 ) : (
                     // Main Catalog View
-                    <div className="space-y-16">
+                    <div className="space-y-10">
 
                         {/* Featured Products Carousel */}
                         {featuredProducts.length > 0 && !searchQuery && (
@@ -251,10 +251,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             </CarouselSection>
                         )}
 
-                        {/* Categories Grid */}
+                        {/* Categories Grid - More Compact */}
                         <section>
-                            <h2 className="text-3xl font-serif font-bold mb-8">Browse by Category</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <h2 className="text-2xl font-serif font-bold mb-4">Browse by Category</h2>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                 {filteredCategories.map((category) => (
                                     <CategoryCard
                                         key={category.id}
@@ -275,8 +275,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
                         {/* All Products (if searching) */}
                         {searchQuery && (
                             <section>
-                                <h2 className="text-3xl font-serif font-bold mb-8">Products</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                <h2 className="text-2xl font-serif font-bold mb-4">Products</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {filteredProducts.map((product) => (
                                         <ProductCard key={product.id} product={product} />
                                     ))}

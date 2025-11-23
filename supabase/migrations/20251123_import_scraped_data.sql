@@ -271,18 +271,19 @@ BEGIN
   ('Bamboo Chair (Silver)', 'Bamboo Chair (Silver).', 700, cat_chairs, 'https://placehold.co/600x400?text=Bamboo+Chair+(Silver)', 700, 10),
   ('Folding Acrylic Chair (Gold)', 'Folding Acrylic Chair (Gold).', 1125, cat_chairs, 'https://placehold.co/600x400?text=Folding+Acrylic+Chair+(Gold)', 1125, 10);
 
--- Tables
+  -- Tables
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Banquet Round Party Table', 'Round banquet table for parties.', 1100, cat_tables, 'https://placehold.co/600x400?text=Round+Banquet+Table', 1100, 20),
-  ('Rectangular Banquet Table', 'Rectangular banquet table.', 1100, cat_tables, 'https://placehold.co/600x400?text=Rectangular+Banquet+Table', 1100, 20),
-  ('Gold Mirror Table', 'Luxurious gold mirror table.', 25000, cat_tables, 'https://placehold.co/600x400?text=Gold+Mirror+Table', 25000, 5),
-  ('Gold Serpentine Table', 'Unique gold serpentine table.', 22500, cat_tables, 'https://placehold.co/600x400?text=Gold+Serpentine+Table', 22500, 5),
-  ('Vogue Triangular Table', 'Modern vogue triangular table.', 35000, cat_tables, 'https://placehold.co/600x400?text=Vogue+Triangular+Table', 35000, 5),
-  ('Fab Glass Table', 'Fabulous glass table.', 25000, cat_tables, 'https://placehold.co/600x400?text=Fab+Glass+Table', 25000, 5),
-  ('Clear Rectangular Table', 'Modern clear rectangular table.', 25000, cat_tables, 'https://placehold.co/600x400?text=Clear+Rectangular+Table', 25000, 5),
-  ('Olivia Rectangular Table', 'Elegant Olivia rectangular table.', 35000, cat_tables, 'https://placehold.co/600x400?text=Olivia+Rectangular+Table', 35000, 5);
+  ('White lux table', 'White lux table.', 1100, cat_tables, 'https://placehold.co/600x400?text=White+lux+table', 1100, 50),
+  ('BANQUET ROUND PARTY TABLES', 'BANQUET ROUND PARTY TABLES.', 1100, cat_tables, 'https://placehold.co/600x400?text=BANQUET+ROUND+PARTY+TABLES', 1100, 50),
+  ('RECTANGULAR BANQUET TABLES', 'RECTANGULAR BANQUET TABLES.', 1100, cat_tables, 'https://placehold.co/600x400?text=RECTANGULAR+BANQUET+TABLES', 1100, 50),
+  ('gold mirrior table', 'gold mirrior table.', 25000, cat_tables, 'https://placehold.co/600x400?text=gold+mirrior+table', 25000, 50),
+  ('Gold Serpentine table', 'Gold Serpentine table.', 22500, cat_tables, 'https://placehold.co/600x400?text=Gold+Serpentine+table', 22500, 50),
+  ('Vogue Triangular Table', 'Vogue Triangular Table.', 35000, cat_tables, 'https://placehold.co/600x400?text=Vogue+Triangular+Table', 35000, 50),
+  ('Fab Glass Table', 'Fab Glass Table.', 25000, cat_tables, 'https://placehold.co/600x400?text=Fab+Glass+Table', 25000, 50),
+  ('Clear Rectangular Table', 'Clear Rectangular Table.', 25000, cat_tables, 'https://placehold.co/600x400?text=Clear+Rectangular+Table', 25000, 50),
+  ('Olivia Rectangular Table', 'Olivia Rectangular Table.', 35000, cat_tables, 'https://placehold.co/600x400?text=Olivia+Rectangular+Table', 35000, 50);
 
-    -- Backdrops
+-- Backdrops
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
   ('Scottsdale Arch', 'Scottsdale Arch.', 37500, cat_backdrops, 'https://static.wixstatic.com/media/938d0f_c74ec89aecc1453c9483f15c759ea512~mv2.png/v1/fill/w_432,h_432,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/938d0f_c74ec89aecc1453c9483f15c759ea512~mv2.png', 37500, 10),
   ('Sapphire acrh', 'Sapphire acrh.', 25000, cat_backdrops, 'https://static.wixstatic.com/media/938d0f_7e5bde18cb914fb2a26c5af24003c4fb~mv2.png/v1/fill/w_432,h_432,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/938d0f_7e5bde18cb914fb2a26c5af24003c4fb~mv2.png', 25000, 10),
@@ -313,46 +314,49 @@ BEGIN
   ('LUX SILVER BAR STOOL', 'LUX SILVER BAR STOOL.', 2000, cat_bar_stools, 'https://placehold.co/600x400?text=LUX+SILVER+BAR+STOOL', 2000, 10),
   ('O Back Gold Bar Stool', 'O Back Gold Bar Stool.', 2500, cat_bar_stools, 'https://placehold.co/600x400?text=O+Back+Gold+Bar+Stool', 2500, 10);
 
--- Flower Walls
+  -- Flower Walls
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Grand Flower Wall Backdrop', 'Stunning grand flower wall.', 40000, cat_flower_walls, 'https://placehold.co/600x400?text=Grand+Flower+Wall', 40000, 2),
-  ('Flower Wall & Balloon', 'Flower wall with balloon garland.', 52200, cat_flower_walls, 'https://placehold.co/600x400?text=Flower+Wall+Balloon', 52200, 2),
-  ('Flower Wall (Touch of Pink)', 'Flower wall with pink accents.', 25000, cat_flower_walls, 'https://placehold.co/600x400?text=Flower+Wall+Pink', 25000, 2);
+  ('RED FLOWER WALL BACKDROP', 'RED FLOWER WALL BACKDROP.', 40000, cat_flower_walls, 'https://placehold.co/600x400?text=RED+FLOWER+WALL+BACKDROP', 40000, 10),
+  ('Grand Flower Wall Backdrop', 'Grand Flower Wall Backdrop.', 40000, cat_flower_walls, 'https://placehold.co/600x400?text=Grand+Flower+Wall+Backdrop', 40000, 10),
+  ('FLOWER WALL & BALLOON', 'FLOWER WALL & BALLOON.', 52200, cat_flower_walls, 'https://placehold.co/600x400?text=FLOWER+WALL+&+BALLOON', 52200, 10),
+  ('Flower Wall (Touch of Pink)', 'Flower Wall (Touch of Pink).', 25000, cat_flower_walls, 'https://placehold.co/600x400?text=Flower+Wall+(Touch+of+Pink)', 25000, 10);
 
   -- Shimmer Walls
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Shimmer Wall (Gold)', 'Gold shimmer wall.', 22500, cat_shimmer_walls, 'https://placehold.co/600x400?text=Shimmer+Wall+Gold', 22500, 3),
-  ('Shimmer Wall (Black)', 'Black shimmer wall.', 22500, cat_shimmer_walls, 'https://placehold.co/600x400?text=Shimmer+Wall+Black', 22500, 3),
-  ('Shimmer Wall (Silver)', 'Silver shimmer wall.', 22500, cat_shimmer_walls, 'https://placehold.co/600x400?text=Shimmer+Wall+Silver', 22500, 3);
+  ('Shimmer Wall (Gold)', 'Shimmer Wall (Gold).', 22500, cat_shimmer_walls, 'https://placehold.co/600x400?text=Shimmer+Wall+(Gold)', 22500, 10),
+  ('Shimmer Wall (Black)', 'Shimmer Wall (Black).', 22500, cat_shimmer_walls, 'https://placehold.co/600x400?text=Shimmer+Wall+(Black)', 22500, 10),
+  ('Shimmer Wall (Silver)', 'Shimmer Wall (Silver).', 22500, cat_shimmer_walls, 'https://placehold.co/600x400?text=Shimmer+Wall+(Silver)', 22500, 10);
 
   -- Soft Touch Walls
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Soft Touch Wall (Black)', 'Black soft touch wall.', 15000, cat_soft_touch_walls, 'https://placehold.co/600x400?text=Soft+Touch+Wall', 15000, 2);
+  ('Soft Touch Wall (Black)', 'Soft Touch Wall (Black).', 15000, cat_soft_touch_walls, 'https://placehold.co/600x400?text=Soft+Touch+Wall+(Black)', 15000, 10);
 
   -- Decorations Props
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Trio Wedding Gold Arch', 'Set of 3 gold wedding arches.', 105000, cat_decor_props, 'https://placehold.co/600x400?text=Trio+Gold+Arch', 105000, 1),
-  ('Telephone Booth', 'Classic telephone booth prop.', 27500, cat_decor_props, 'https://placehold.co/600x400?text=Telephone+Booth', 27500, 1),
-  ('Zebra Prop', 'Life-size zebra prop.', 12500, cat_decor_props, 'https://placehold.co/600x400?text=Zebra', 12500, 1),
-  ('Giraffe Prop', 'Life-size giraffe prop.', 22500, cat_decor_props, 'https://placehold.co/600x400?text=Giraffe', 22500, 1),
-  ('Elephant Prop', 'Life-size elephant prop.', 22500, cat_decor_props, 'https://placehold.co/600x400?text=Elephant', 22500, 1),
-  ('Table Top Elephant', 'Small table top elephant decor.', 1000, cat_decor_props, 'https://placehold.co/600x400?text=Table+Top+Elephant', 1000, 10),
-  ('Gold Number Stand', 'Gold stand for numbers.', 5000, cat_decor_props, 'https://placehold.co/600x400?text=Gold+Number+Stand', 5000, 10);
+  ('Green Tree', 'Green Tree.', 5000, cat_decor_props, 'https://placehold.co/600x400?text=Green+Tree', 5000, 10),
+  ('Trio Wedding Gold Arch', 'Trio Wedding Gold Arch.', 105000, cat_decor_props, 'https://placehold.co/600x400?text=Trio+Wedding+Gold+Arch', 105000, 10),
+  ('Telephone Booth', 'Telephone Booth.', 27500, cat_decor_props, 'https://placehold.co/600x400?text=Telephone+Booth', 27500, 10),
+  ('Zebra', 'Zebra.', 12500, cat_decor_props, 'https://placehold.co/600x400?text=Zebra', 12500, 10),
+  ('Giraffe', 'Giraffe.', 22500, cat_decor_props, 'https://placehold.co/600x400?text=Giraffe', 22500, 10),
+  ('Elephant', 'Elephant.', 22500, cat_decor_props, 'https://placehold.co/600x400?text=Elephant', 22500, 10),
+  ('Table Top Elephant', 'Table Top Elephant.', 1000, cat_decor_props, 'https://placehold.co/600x400?text=Table+Top+Elephant', 1000, 10),
+  ('Gold Number Stand', 'Gold Number Stand.', 5000, cat_decor_props, 'https://placehold.co/600x400?text=Gold+Number+Stand', 5000, 10);
 
   -- LED Signs
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Happy Birthday LED Sign', 'Neon Happy Birthday sign.', 7500, cat_led_signs, 'https://placehold.co/600x400?text=Happy+Birthday+Sign', 7500, 5),
-  ('Let''s Party LED Sign', 'Neon Let''s Party sign.', 7500, cat_led_signs, 'https://placehold.co/600x400?text=Lets+Party+Sign', 7500, 5);
+  ('Happy Birthday LED Sign', 'Happy Birthday LED Sign.', 7500, cat_led_signs, 'https://placehold.co/600x400?text=Happy+Birthday+LED+Sign', 7500, 10),
+  ('Let''s Party LED Sign', 'Let''s Party LED Sign.', 7500, cat_led_signs, 'https://placehold.co/600x400?text=Let''s+Party+LED+Sign', 7500, 10);
 
   -- Lit Letters
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('OH BABY Marquee', 'Marquee letters spelling OH BABY.', 50500, cat_lit_letters, 'https://placehold.co/600x400?text=OH+BABY', 50500, 1),
-  ('Black Marquee Numbers', 'Black marquee numbers (per digit).', 10000, cat_lit_letters, 'https://placehold.co/600x400?text=Black+Marquee+Numbers', 10000, 10),
-  ('Marquee Letter', 'Individual marquee letter.', 12500, cat_lit_letters, 'https://placehold.co/600x400?text=Marquee+Letter', 12500, 50),
-  ('Large Marquee Cross', 'Large marquee cross with lights.', 12500, cat_lit_letters, 'https://placehold.co/600x400?text=Marquee+Cross', 12500, 1),
-  ('White Marquee Number', 'White marquee number (per digit).', 8500, cat_lit_letters, 'https://placehold.co/600x400?text=White+Marquee+Number', 8500, 10);
+  ('BABY MARQUEE', 'BABY MARQUEE.', 50500, cat_lit_letters, 'https://placehold.co/600x400?text=BABY+MARQUEE', 50500, 10),
+  ('OH BABY MARQUEE', 'OH BABY MARQUEE.', 50500, cat_lit_letters, 'https://placehold.co/600x400?text=OH+BABY+MARQUEE', 50500, 10),
+  ('BLACK MARQUEE NUMBERS', 'BLACK MARQUEE NUMBERS.', 10000, cat_lit_letters, 'https://placehold.co/600x400?text=BLACK+MARQUEE+NUMBERS', 10000, 10),
+  ('MARQUEE LETTER', 'MARQUEE LETTER.', 12500, cat_lit_letters, 'https://placehold.co/600x400?text=MARQUEE+LETTER', 12500, 10),
+  ('LARGE MARQUEE CROSS WITH LIGHT', 'LARGE MARQUEE CROSS WITH LIGHT.', 12500, cat_lit_letters, 'https://placehold.co/600x400?text=LARGE+MARQUEE+CROSS+WITH+LIGHT', 12500, 10),
+  ('WHITE MARQUEE NUMBER', 'WHITE MARQUEE NUMBER.', 8500, cat_lit_letters, 'https://placehold.co/600x400?text=WHITE+MARQUEE+NUMBER', 8500, 10);
 
-    -- Bar Counters
+-- Bar Counters
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
   ('Malibu Bar 6ft', 'Malibu Bar 6ft.', 32500, cat_bar_counters, 'https://placehold.co/600x400?text=Malibu+Bar+6ft', 32500, 10),
   ('Lux Bar', 'Lux Bar.', 35000, cat_bar_counters, 'https://placehold.co/600x400?text=Lux+Bar', 35000, 10),
@@ -363,136 +367,222 @@ BEGIN
   ('Laminate black bar', 'Laminate black bar.', 7500, cat_bar_counters, 'https://placehold.co/600x400?text=Laminate+black+bar', 7500, 10),
   ('GRASS BAR', 'GRASS BAR.', 15000, cat_bar_counters, 'https://placehold.co/600x400?text=GRASS+BAR', 15000, 10);
 
--- Bar Tables
+  -- Bar Tables
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('LED Champagne Table', 'Illuminated champagne table.', 5000, cat_bar_tables, 'https://placehold.co/600x400?text=LED+Champagne+Table', 5000, 5),
-  ('Highboy Cocktail Table Cover', 'Spandex cover for highboy tables.', 1350, cat_bar_tables, 'https://placehold.co/600x400?text=Highboy+Cover', 1350, 20),
-  ('Cocktail Table', 'Standard cocktail table.', 1450, cat_bar_tables, 'https://placehold.co/600x400?text=Cocktail+Table', 1450, 20),
-  ('LED Cocktail Table', 'Illuminated cocktail table.', 3500, cat_bar_tables, 'https://placehold.co/600x400?text=LED+Cocktail+Table', 3500, 10),
-  ('Trisha Bar Table (Silver)', 'Silver Trisha bar table.', 10000, cat_bar_tables, 'https://placehold.co/600x400?text=Trisha+Silver', 10000, 5),
-  ('Trisha Bar Table (Gold)', 'Gold Trisha bar table.', 10000, cat_bar_tables, 'https://placehold.co/600x400?text=Trisha+Gold', 10000, 5),
-  ('Circle Bar Table (Silver)', 'Silver circle bar table.', 10000, cat_bar_tables, 'https://placehold.co/600x400?text=Circle+Silver', 10000, 5),
-  ('Circle Bar Table (Gold)', 'Gold circle bar table.', 10000, cat_bar_tables, 'https://placehold.co/600x400?text=Circle+Gold', 10000, 5);
+  ('White cocktail', 'White cocktail.', 1100, cat_bar_tables, 'https://placehold.co/600x400?text=White+cocktail', 1100, 10),
+  ('Led Champagne table', 'Led Champagne table.', 5000, cat_bar_tables, 'https://placehold.co/600x400?text=Led+Champagne+table', 5000, 10),
+  ('Highboy Cocktail Round Spandex Table cover', 'Highboy Cocktail Round Spandex Table cover.', 1350, cat_bar_tables, 'https://placehold.co/600x400?text=Highboy+Cocktail+Round+Spandex+Table+cover', 1350, 10),
+  ('COCKTAIL TABLES', 'COCKTAIL TABLES.', 1450, cat_bar_tables, 'https://placehold.co/600x400?text=COCKTAIL+TABLES', 1450, 10),
+  ('Spandex Tablecloth for Cocktail Tables', 'Spandex Tablecloth for Cocktail Tables.', 1350, cat_bar_tables, 'https://placehold.co/600x400?text=Spandex+Tablecloth+for+Cocktail+Tables', 1350, 10),
+  ('LED COCKTABLE TABLE', 'LED COCKTABLE TABLE.', 3500, cat_bar_tables, 'https://placehold.co/600x400?text=LED+COCKTABLE+TABLE', 3500, 10),
+  ('Trisha Bar Table (Silver)', 'Trisha Bar Table (Silver).', 10000, cat_bar_tables, 'https://placehold.co/600x400?text=Trisha+Bar+Table+(Silver)', 10000, 10),
+  ('Trisha Bar Table (Gold)', 'Trisha Bar Table (Gold).', 10000, cat_bar_tables, 'https://placehold.co/600x400?text=Trisha+Bar+Table+(Gold)', 10000, 10),
+  ('Circle Bar Table (Silver)', 'Circle Bar Table (Silver).', 10000, cat_bar_tables, 'https://placehold.co/600x400?text=Circle+Bar+Table+(Silver)', 10000, 10),
+  ('Circle Bar Table (Gold)', 'Circle Bar Table (Gold).', 10000, cat_bar_tables, 'https://placehold.co/600x400?text=Circle+Bar+Table+(Gold)', 10000, 10);
 
   -- Benches & Ottomans
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Pink Elegance Loveseat', 'Elegant pink loveseat.', 19500, cat_benches, 'https://placehold.co/600x400?text=Pink+Loveseat', 19500, 2),
-  ('Elegance Lux Loveseat', 'Luxury elegance loveseat.', 19500, cat_benches, 'https://placehold.co/600x400?text=Elegance+Loveseat', 19500, 2),
-  ('Lounge Circles', 'Circular lounge seating.', 6500, cat_benches, 'https://placehold.co/600x400?text=Lounge+Circles', 6500, 5),
-  ('Hendrix Velvet Loveseat', 'Hendrix 52" velvet flared arm loveseat.', 20000, cat_benches, 'https://placehold.co/600x400?text=Hendrix+Loveseat', 20000, 2);
+  ('Single Velvet Lux', 'Single Velvet Lux.', 19500, cat_benches, 'https://placehold.co/600x400?text=Single+Velvet+Lux', 19500, 10),
+  ('Pink Elegance Loveseat', 'Pink Elegance Loveseat.', 19500, cat_benches, 'https://placehold.co/600x400?text=Pink+Elegance+Loveseat', 19500, 10),
+  ('Elegance Lux Loveseat', 'Elegance Lux Loveseat.', 19500, cat_benches, 'https://placehold.co/600x400?text=Elegance+Lux+Loveseat', 19500, 10),
+  ('Lounge Circles', 'Lounge Circles.', 6500, cat_benches, 'https://placehold.co/600x400?text=Lounge+Circles', 6500, 10),
+  ('Hendrix 52" Velvet Flared Arm Loveseat', 'Hendrix 52" Velvet Flared Arm Loveseat.', 20000, cat_benches, 'https://placehold.co/600x400?text=Hendrix+52"+Velvet+Flared+Arm+Loveseat', 20000, 10),
+  ('Cage sofa', 'Cage sofa.', 20625, cat_benches, 'https://placehold.co/600x400?text=Cage+sofa', 20625, 10);
 
   -- Sofas & Loveseats
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Hendrix Velvet Sofa', 'Hendrix velvet flared arm sofa.', 16000, cat_sofas, 'https://placehold.co/600x400?text=Hendrix+Sofa', 16000, 2),
-  ('Lux Sofa', 'Standard luxury sofa.', 15000, cat_sofas, 'https://placehold.co/600x400?text=Lux+Sofa', 15000, 2),
-  ('Cage Sofa', 'Modern cage style sofa.', 20625, cat_sofas, 'https://placehold.co/600x400?text=Cage+Sofa', 20625, 2),
-  ('3 Piece Lux Set', 'Complete 3-piece luxury furniture set.', 27000, cat_sofas, 'https://placehold.co/600x400?text=3+Piece+Set', 27000, 1),
-  ('Lux Pink Sofa', 'Pink luxury sofa.', 20000, cat_sofas, 'https://placehold.co/600x400?text=Lux+Pink+Sofa', 20000, 1),
-  ('Fancy Royal Sofa', 'Ornate royal style sofa.', 24650, cat_sofas, 'https://placehold.co/600x400?text=Royal+Sofa', 24650, 1),
-  ('Nude Sofa', 'Nude colored sofa.', 20000, cat_sofas, 'https://placehold.co/600x400?text=Nude+Sofa', 20000, 1),
-  ('Chic Sofa (Black)', 'Black chic sofa.', 30000, cat_sofas, 'https://placehold.co/600x400?text=Chic+Black+Sofa', 30000, 1),
-  ('White Dotted Throne Sofa', 'White throne sofa with dots.', 24000, cat_sofas, 'https://placehold.co/600x400?text=Throne+Sofa', 24000, 1);
+  ('Wave sofa', 'Wave sofa.', 16000, cat_sofas, 'https://placehold.co/600x400?text=Wave+sofa', 16000, 10),
+  ('Hendrix Velvet Flared Arm Loveseats', 'Hendrix Velvet Flared Arm Loveseats.', 16000, cat_sofas, 'https://placehold.co/600x400?text=Hendrix+Velvet+Flared+Arm+Loveseats', 16000, 10),
+  ('Lux Sofa', 'Lux Sofa.', 15000, cat_sofas, 'https://placehold.co/600x400?text=Lux+Sofa', 15000, 10),
+  ('Cage sofa', 'Cage sofa.', 20625, cat_sofas, 'https://placehold.co/600x400?text=Cage+sofa', 20625, 10),
+  ('3 PIECE LUX SET', '3 PIECE LUX SET.', 27000, cat_sofas, 'https://placehold.co/600x400?text=3+PIECE+LUX+SET', 27000, 10),
+  ('Lux Pink sofa', 'Lux Pink sofa.', 20000, cat_sofas, 'https://placehold.co/600x400?text=Lux+Pink+sofa', 20000, 10),
+  ('fancy Royal Sofa', 'fancy Royal Sofa.', 24650, cat_sofas, 'https://placehold.co/600x400?text=fancy+Royal+Sofa', 24650, 10),
+  ('NUDE SOFA', 'NUDE SOFA.', 20000, cat_sofas, 'https://placehold.co/600x400?text=NUDE+SOFA', 20000, 10),
+  ('Chic Sofa (Black)', 'Chic Sofa (Black).', 30000, cat_sofas, 'https://placehold.co/600x400?text=Chic+Sofa+(Black)', 30000, 10),
+  ('White Dotted Throne Sofa', 'White Dotted Throne Sofa.', 24000, cat_sofas, 'https://placehold.co/600x400?text=White+Dotted+Throne+Sofa', 24000, 10);
 
   -- Kids Backdrops
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Princess Express Train', 'Princess themed train backdrop.', 42500, cat_kids_backdrops, 'https://placehold.co/600x400?text=Princess+Train', 42500, 1),
-  ('Story Book Backdrop', 'Story book themed backdrop.', 27500, cat_kids_backdrops, 'https://placehold.co/600x400?text=Story+Book', 27500, 1),
-  ('Royal Castle', 'Royal castle backdrop.', 47500, cat_kids_backdrops, 'https://placehold.co/600x400?text=Royal+Castle', 47500, 1),
-  ('Blast Zone Magic Castle', 'Inflatable magic castle.', 27500, cat_kids_backdrops, 'https://placehold.co/600x400?text=Magic+Castle', 27500, 1);
+  ('Dreamland Train', 'Dreamland Train.', 42500, cat_kids_backdrops, 'https://placehold.co/600x400?text=Dreamland+Train', 42500, 10),
+  ('Princess Express Train', 'Princess Express Train.', 42500, cat_kids_backdrops, 'https://placehold.co/600x400?text=Princess+Express+Train', 42500, 10),
+  ('Story Book', 'Story Book.', 27500, cat_kids_backdrops, 'https://placehold.co/600x400?text=Story+Book', 27500, 10),
+  ('Royal Castle', 'Royal Castle.', 47500, cat_kids_backdrops, 'https://placehold.co/600x400?text=Royal+Castle', 47500, 10),
+  ('Blast Zone Magic Castle', 'Blast Zone Magic Castle.', 27500, cat_kids_backdrops, 'https://placehold.co/600x400?text=Blast+Zone+Magic+Castle', 27500, 10);
 
   -- Kids Chairs
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Kids Chiavari Chair (Blue)', 'Blue Chiavari chair for kids.', 500, cat_kids_chairs, 'https://placehold.co/600x400?text=Kids+Chiavari+Blue', 500, 20),
-  ('Kids White Samsonite Chair', 'White folding chair for kids.', 225, cat_kids_chairs, 'https://placehold.co/600x400?text=Kids+White+Samsonite', 225, 30),
-  ('Kids Bamboo Chair (Pink)', 'Pink bamboo chair for kids.', 500, cat_kids_chairs, 'https://placehold.co/600x400?text=Kids+Bamboo+Pink', 500, 20);
+  ('Kids Bow Back Chair', 'Kids Bow Back Chair.', 500, cat_kids_chairs, 'https://placehold.co/600x400?text=Kids+Bow+Back+Chair', 500, 10),
+  ('kids Chiavari Blue Chair', 'kids Chiavari Blue Chair.', 500, cat_kids_chairs, 'https://placehold.co/600x400?text=kids+Chiavari+Blue+Chair', 500, 10),
+  ('KIDS White Samsonite Chair', 'KIDS White Samsonite Chair.', 225, cat_kids_chairs, 'https://placehold.co/600x400?text=KIDS+White+Samsonite+Chair', 225, 10),
+  ('Kids Bamboo Chair (Pink)', 'Kids Bamboo Chair (Pink).', 500, cat_kids_chairs, 'https://placehold.co/600x400?text=Kids+Bamboo+Chair+(Pink)', 500, 10);
 
   -- Kids Thrones
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Kids King Throne Chair (White)', 'White king throne chair for kids.', 12000, cat_kids_thrones, 'https://placehold.co/600x400?text=Kids+King+Throne', 12000, 2);
+  ('Kids Bow Back Chair', 'Kids Bow Back Chair.', 12000, cat_kids_thrones, 'https://placehold.co/600x400?text=Kids+Bow+Back+Chair', 12000, 10),
+  ('Kids King Throne Chair (White)', 'Kids King Throne Chair (White).', 12000, cat_kids_thrones, 'https://placehold.co/600x400?text=Kids+King+Throne+Chair+(White)', 12000, 10);
 
   -- Charger Plates
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Eclipse Gold Charger', 'Gold eclipse charger plate.', 650, cat_charger_plates, 'https://placehold.co/600x400?text=Eclipse+Gold', 650, 100),
-  ('Natural Tone Charger', 'Natural tone charger plate.', 100, cat_charger_plates, 'https://placehold.co/600x400?text=Natural+Tone', 100, 100),
-  ('Reef Charger Plate (Pink)', 'Pink reef charger plate.', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Pink', 350, 50),
-  ('Reef Charger Plate (Gold)', 'Gold reef charger plate.', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Gold', 350, 50),
-  ('Reef Charger Plate (Silver)', 'Silver reef charger plate.', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Silver', 350, 50),
-  ('Reef Charger Plate (Black)', 'Black reef charger plate.', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Black', 350, 50);
+  ('Plain Red Chargers', 'Plain Red Chargers.', 650, cat_charger_plates, 'https://placehold.co/600x400?text=Plain+Red+Chargers', 650, 50),
+  ('Eclipse Gold Charger', 'Eclipse Gold Charger.', 650, cat_charger_plates, 'https://placehold.co/600x400?text=Eclipse+Gold+Charger', 650, 50),
+  ('Natural Tone Charger', 'Natural Tone Charger.', 100, cat_charger_plates, 'https://placehold.co/600x400?text=Natural+Tone+Charger', 100, 50),
+  ('Reef Charger Plate (Pink)', 'Reef Charger Plate (Pink).', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Charger+Plate+(Pink)', 350, 50),
+  ('Reef Charger Plate (Navy Blue)', 'Reef Charger Plate (Navy Blue).', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Charger+Plate+(Navy+Blue)', 350, 50),
+  ('Reef Charger Plate (Purple)', 'Reef Charger Plate (Purple).', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Charger+Plate+(Purple)', 350, 50),
+  ('Reef Charger Plate (Gold)', 'Reef Charger Plate (Gold).', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Charger+Plate+(Gold)', 350, 50),
+  ('Reef Charger Plate (Black)', 'Reef Charger Plate (Black).', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Charger+Plate+(Black)', 350, 50),
+  ('Reef Charger Plate (Aqua Blue)', 'Reef Charger Plate (Aqua Blue).', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Charger+Plate+(Aqua+Blue)', 350, 50),
+  ('Reef Charger Plate (Baby Blue)', 'Reef Charger Plate (Baby Blue).', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Charger+Plate+(Baby+Blue)', 350, 50),
+  ('Reef Charger Plate (Burgundy)', 'Reef Charger Plate (Burgundy).', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Charger+Plate+(Burgundy)', 350, 50),
+  ('Reef Charger Plate (Silver)', 'Reef Charger Plate (Silver).', 350, cat_charger_plates, 'https://placehold.co/600x400?text=Reef+Charger+Plate+(Silver)', 350, 50);
 
   -- Dinnerware
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Blanc Wine Glass', 'Elegant wine glass.', 135, cat_dinnerware, 'https://placehold.co/600x400?text=Wine+Glass', 135, 100),
-  ('Champagne Flute', 'Classic champagne flute.', 125, cat_dinnerware, 'https://placehold.co/600x400?text=Champagne+Flute', 125, 100),
-  ('Gold Flatware Set', 'Matte gold silverware.', 195, cat_dinnerware, 'https://placehold.co/600x400?text=Gold+Flatware', 195, 100),
-  ('White Dinner Plate', '10.5 inch white dinner plate.', 105, cat_dinnerware, 'https://placehold.co/600x400?text=White+Dinner+Plate', 105, 100),
-  ('Black Dinner Plate', '10.5 inch black dinner plate.', 105, cat_dinnerware, 'https://placehold.co/600x400?text=Black+Dinner+Plate', 105, 100),
-  ('Gold Rim Dinner Plate', 'Dinner plate with gold rim.', 125, cat_dinnerware, 'https://placehold.co/600x400?text=Gold+Rim+Plate', 125, 100),
-  ('Glass Carafe', '1 liter glass carafe.', 600, cat_dinnerware, 'https://placehold.co/600x400?text=Glass+Carafe', 600, 20);
+  ('White Dessert Plate', 'White Dessert Plate.', 99, cat_dinnerware, 'https://placehold.co/600x400?text=White+Dessert+Plate', 99, 50),
+  ('Blanc Wine Glass', 'Blanc Wine Glass.', 135, cat_dinnerware, 'https://placehold.co/600x400?text=Blanc+Wine+Glass', 135, 50),
+  ('Rocks / Old Fashioned Glass', 'Rocks / Old Fashioned Glass.', 135, cat_dinnerware, 'https://placehold.co/600x400?text=Rocks+/+Old+Fashioned+Glass', 135, 50),
+  ('Champagne Flute 6.25oz', 'Champagne Flute 6.25oz.', 125, cat_dinnerware, 'https://placehold.co/600x400?text=Champagne+Flute+6.25oz', 125, 50),
+  ('Modern luxury Matte Gold Silverware', 'Modern luxury Matte Gold Silverware.', 195, cat_dinnerware, 'https://placehold.co/600x400?text=Modern+luxury+Matte+Gold+Silverware', 195, 50),
+  ('Stoneware Mug 12oz', 'Stoneware Mug 12oz.', 99, cat_dinnerware, 'https://placehold.co/600x400?text=Stoneware+Mug+12oz', 99, 50),
+  ('Stemless Glass 20.5oz', 'Stemless Glass 20.5oz.', 135, cat_dinnerware, 'https://placehold.co/600x400?text=Stemless+Glass+20.5oz', 135, 50),
+  ('Stainless Steel Steak Knives', 'Stainless Steel Steak Knives.', 99, cat_dinnerware, 'https://placehold.co/600x400?text=Stainless+Steel+Steak+Knives', 99, 50),
+  ('The Drop Flatware Stainless Steel Silverware', 'The Drop Flatware Stainless Steel Silverware.', 105, cat_dinnerware, 'https://placehold.co/600x400?text=The+Drop+Flatware+Stainless+Steel+Silverware', 105, 50),
+  ('Bentley stainless steel spoon', 'Bentley stainless steel spoon.', 95, cat_dinnerware, 'https://placehold.co/600x400?text=Bentley+stainless+steel+spoon', 95, 50),
+  ('White Plate 7.5 in', 'White Plate 7.5 in.', 99, cat_dinnerware, 'https://placehold.co/600x400?text=White+Plate+7.5+in', 99, 50),
+  ('White Dinner Plate 10.5 in', 'White Dinner Plate 10.5 in.', 105, cat_dinnerware, 'https://placehold.co/600x400?text=White+Dinner+Plate+10.5+in', 105, 50),
+  ('Classic Black Plate 10.5 in', 'Classic Black Plate 10.5 in.', 105, cat_dinnerware, 'https://placehold.co/600x400?text=Classic+Black+Plate+10.5+in', 105, 50),
+  ('Classic Black Plate 7.5 in', 'Classic Black Plate 7.5 in.', 99, cat_dinnerware, 'https://placehold.co/600x400?text=Classic+Black+Plate+7.5+in', 99, 50),
+  ('White serving Coupe Bone China Plate', 'White serving Coupe Bone China Plate.', 95, cat_dinnerware, 'https://placehold.co/600x400?text=White+serving+Coupe+Bone+China+Plate', 95, 50),
+  ('Gold Rim Dinner Plates 10.5 in', 'Gold Rim Dinner Plates 10.5 in.', 125, cat_dinnerware, 'https://placehold.co/600x400?text=Gold+Rim+Dinner+Plates+10.5+in', 125, 50),
+  ('Glass Pint Jar 16oz', 'Glass Pint Jar 16oz.', 125, cat_dinnerware, 'https://placehold.co/600x400?text=Glass+Pint+Jar+16oz', 125, 50),
+  ('Glass Carafe 1 liter', 'Glass Carafe 1 liter.', 600, cat_dinnerware, 'https://placehold.co/600x400?text=Glass+Carafe+1+liter', 600, 50);
 
   -- Flowers & Centerpieces
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Elegant Candles', 'Set of elegant candles.', 6500, cat_flowers, 'https://placehold.co/600x400?text=Candles', 6500, 10),
-  ('Lux Triangle w/ Flowers', 'Triangle arch with flowers.', 8500, cat_flowers, 'https://placehold.co/600x400?text=Triangle+Flowers', 8500, 5),
-  ('Floral Ball', 'Decorative floral ball.', 3500, cat_flowers, 'https://placehold.co/600x400?text=Floral+Ball', 3500, 10),
-  ('Spring Valley Centerpiece', 'Spring themed centerpiece.', 4500, cat_flowers, 'https://placehold.co/600x400?text=Spring+Centerpiece', 4500, 10),
-  ('Flower Runner (Purple & Pink)', 'Large flower runner.', 37500, cat_flowers, 'https://placehold.co/600x400?text=Flower+Runner', 37500, 2);
+  ('Green Tree', 'Green Tree.', 6500, cat_flowers, 'https://placehold.co/600x400?text=Green+Tree', 6500, 10),
+  ('ELEGANT CANDLES', 'ELEGANT CANDLES.', 6500, cat_flowers, 'https://placehold.co/600x400?text=ELEGANT+CANDLES', 6500, 10),
+  ('LUX TRIANGLE W/FLOWERS', 'LUX TRIANGLE W/FLOWERS.', 8500, cat_flowers, 'https://placehold.co/600x400?text=LUX+TRIANGLE+W/FLOWERS', 8500, 10),
+  ('FLORAL BALL', 'FLORAL BALL.', 3500, cat_flowers, 'https://placehold.co/600x400?text=FLORAL+BALL', 3500, 10),
+  ('3 GOBLETS', '3 GOBLETS.', 3500, cat_flowers, 'https://placehold.co/600x400?text=3+GOBLETS', 3500, 10),
+  ('Spring Valley Centerpiece', 'Spring Valley Centerpiece.', 4500, cat_flowers, 'https://placehold.co/600x400?text=Spring+Valley+Centerpiece', 4500, 10),
+  ('The Elegance Centerpiece', 'The Elegance Centerpiece.', 4500, cat_flowers, 'https://placehold.co/600x400?text=The+Elegance+Centerpiece', 4500, 10),
+  ('Peach Time Centerpiece', 'Peach Time Centerpiece.', 4500, cat_flowers, 'https://placehold.co/600x400?text=Peach+Time+Centerpiece', 4500, 10),
+  ('Flower Runner (Purple & Pink)', 'Flower Runner (Purple & Pink).', 37500, cat_flowers, 'https://placehold.co/600x400?text=Flower+Runner+(Purple+&+Pink)', 37500, 10),
+  ('Flower Runner (Pink)', 'Flower Runner (Pink).', 12000, cat_flowers, 'https://placehold.co/600x400?text=Flower+Runner+(Pink)', 12000, 10),
+  ('Flower Runner (Purple)', 'Flower Runner (Purple).', 12000, cat_flowers, 'https://placehold.co/600x400?text=Flower+Runner+(Purple)', 12000, 10);
 
   -- Table Linens
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Velvet Tablecloth', 'Luxurious velvet tablecloth.', 2500, cat_linens, 'https://placehold.co/600x400?text=Velvet+Tablecloth', 2500, 20),
-  ('Sequins Tablecloth', 'Sparkling sequins tablecloth.', 2500, cat_linens, 'https://placehold.co/600x400?text=Sequins+Tablecloth', 2500, 20),
-  ('Large Rosette Tablecloth', 'Tablecloth with large rosettes.', 5000, cat_linens, 'https://placehold.co/600x400?text=Rosette+Tablecloth', 5000, 10),
-  ('Payette Sequin Tablecloth', 'Iridescent payette sequin tablecloth.', 4000, cat_linens, 'https://placehold.co/600x400?text=Payette+Tablecloth', 4000, 10);
+  ('SOLID STRIPE TABLECLOTH', 'SOLID STRIPE TABLECLOTH.', 2500, cat_linens, 'https://placehold.co/600x400?text=SOLID+STRIPE+TABLECLOTH', 2500, 100),
+  ('BEETHOVEN TABLECLOTH', 'BEETHOVEN TABLECLOTH.', 2500, cat_linens, 'https://placehold.co/600x400?text=BEETHOVEN+TABLECLOTH', 2500, 100),
+  ('CHECKS TABLECLOTH', 'CHECKS TABLECLOTH.', 2500, cat_linens, 'https://placehold.co/600x400?text=CHECKS+TABLECLOTH', 2500, 100),
+  ('PLAID TABLECLOTH', 'PLAID TABLECLOTH.', 2500, cat_linens, 'https://placehold.co/600x400?text=PLAID+TABLECLOTH', 2500, 100),
+  ('AWNING STRIPE TABLECLOTH', 'AWNING STRIPE TABLECLOTH.', 2500, cat_linens, 'https://placehold.co/600x400?text=AWNING+STRIPE+TABLECLOTH', 2500, 100),
+  ('VELVET TABLECLOTH', 'VELVET TABLECLOTH.', 2500, cat_linens, 'https://placehold.co/600x400?text=VELVET+TABLECLOTH', 2500, 100),
+  ('RACE CAR TABLECLOTH', 'RACE CAR TABLECLOTH.', 3300, cat_linens, 'https://placehold.co/600x400?text=RACE+CAR+TABLECLOTH', 3300, 100),
+  ('SEQUINS TABLECLOTH', 'SEQUINS TABLECLOTH.', 2500, cat_linens, 'https://placehold.co/600x400?text=SEQUINS+TABLECLOTH', 2500, 100),
+  ('Flower on Sequin Taffeta Tablecloth 120" Round', 'Flower on Sequin Taffeta Tablecloth 120" Round.', 2500, cat_linens, 'https://placehold.co/600x400?text=Flower+on+Sequin+Taffeta+Tablecloth+120"+Round', 2500, 100),
+  ('Large Rosette Flower Tablecloth', 'Large Rosette Flower Tablecloth.', 5000, cat_linens, 'https://placehold.co/600x400?text=Large+Rosette+Flower+Tablecloth', 5000, 100),
+  ('ROUND PINTUCK TABLECLOTH', 'ROUND PINTUCK TABLECLOTH.', 2500, cat_linens, 'https://placehold.co/600x400?text=ROUND+PINTUCK+TABLECLOTH', 2500, 100),
+  ('ROUND PAYETTE SEQUIN TABLECLOTH IRIDESCENT', 'ROUND PAYETTE SEQUIN TABLECLOTH IRIDESCENT.', 4000, cat_linens, 'https://placehold.co/600x400?text=ROUND+PAYETTE+SEQUIN+TABLECLOTH+IRIDESCENT', 4000, 100),
+  ('RECTANGULAR POLYESTER TABLECLOTH', 'RECTANGULAR POLYESTER TABLECLOTH.', 1500, cat_linens, 'https://placehold.co/600x400?text=RECTANGULAR+POLYESTER+TABLECLOTH', 1500, 100),
+  ('ROUND POLYESTER TABLECLOTH', 'ROUND POLYESTER TABLECLOTH.', 1500, cat_linens, 'https://placehold.co/600x400?text=ROUND+POLYESTER+TABLECLOTH', 1500, 100),
+  ('ROUND SILK EMBROIDERED POLYESTER TABLECLOTH', 'ROUND SILK EMBROIDERED POLYESTER TABLECLOTH.', 2500, cat_linens, 'https://placehold.co/600x400?text=ROUND+SILK+EMBROIDERED+POLYESTER+TABLECLOTH', 2500, 100);
 
   -- Napkins
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Table Napkin (Any Color)', 'Cloth table napkin (various colors available).', 250, cat_napkins, 'https://placehold.co/600x400?text=Napkin', 250, 500);
+  ('Table Napkin (Any Color)', 'Table Napkin (Any Color).', 250, cat_napkins, 'https://placehold.co/600x400?text=Table+Napkin+(Any+Color)', 250, 100);
 
   -- Misc
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Green Columns', 'Decorative green columns.', 20000, cat_misc, 'https://placehold.co/600x400?text=Green+Columns', 20000, 2),
-  ('Pink Columns', 'Decorative pink columns.', 20000, cat_misc, 'https://placehold.co/600x400?text=Pink+Columns', 20000, 2);
+  ('Green Columns', 'Green Columns.', 20000, cat_misc, 'https://placehold.co/600x400?text=Green+Columns', 20000, 10),
+  ('Pink Columns', 'Pink Columns.', 20000, cat_misc, 'https://placehold.co/600x400?text=Pink+Columns', 20000, 10),
+  ('Blush Columns', 'Blush Columns.', 20000, cat_misc, 'https://placehold.co/600x400?text=Blush+Columns', 20000, 10),
+  ('Hot Pink Columns', 'Hot Pink Columns.', 20000, cat_misc, 'https://placehold.co/600x400?text=Hot+Pink+Columns', 20000, 10),
+  ('Purple Columns', 'Purple Columns.', 20000, cat_misc, 'https://placehold.co/600x400?text=Purple+Columns', 20000, 10),
+  ('NUDE COLUMNS', 'NUDE COLUMNS.', 20000, cat_misc, 'https://placehold.co/600x400?text=NUDE+COLUMNS', 20000, 10);
 
   -- Pedestals
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Silver Pedestal', 'Silver display pedestal.', 6000, cat_pedestals, 'https://placehold.co/600x400?text=Silver+Pedestal', 6000, 4),
-  ('Black Columns', 'Black display columns.', 20000, cat_pedestals, 'https://placehold.co/600x400?text=Black+Columns', 20000, 2),
-  ('Cylinder Pedestals Set', 'Set of 3 metal cylinder pedestals.', 15000, cat_pedestals, 'https://placehold.co/600x400?text=Cylinder+Pedestals', 15000, 2),
-  ('Ruth Pedestals (Gold)', 'Gold Ruth style pedestals.', 22500, cat_pedestals, 'https://placehold.co/600x400?text=Ruth+Gold', 22500, 2),
-  ('Acrylic Pedestals (White)', 'White acrylic cylinder pedestals.', 16000, cat_pedestals, 'https://placehold.co/600x400?text=Acrylic+Pedestals', 16000, 2);
+  ('Slatted Pedestal', 'Slatted Pedestal.', 6000, cat_pedestals, 'https://placehold.co/600x400?text=Slatted+Pedestal', 6000, 10),
+  ('Silver Pedestal', 'Silver Pedestal.', 6000, cat_pedestals, 'https://placehold.co/600x400?text=Silver+Pedestal', 6000, 10),
+  ('BLACK COLUMNS', 'BLACK COLUMNS.', 20000, cat_pedestals, 'https://placehold.co/600x400?text=BLACK+COLUMNS', 20000, 10),
+  ('3 PIECE SET OF METAL CYLINDER PEDESTALS DISPLAY - SILVER', '3 PIECE SET OF METAL CYLINDER PEDESTALS DISPLAY - SILVER.', 15000, cat_pedestals, 'https://placehold.co/600x400?text=3+PIECE+SET+OF+METAL+CYLINDER+PEDESTALS+DISPLAY+-+', 15000, 10),
+  ('Royal Blue Columns', 'Royal Blue Columns.', 20000, cat_pedestals, 'https://placehold.co/600x400?text=Royal+Blue+Columns', 20000, 10),
+  ('Ruth Pedestals (Gold)', 'Ruth Pedestals (Gold).', 22500, cat_pedestals, 'https://placehold.co/600x400?text=Ruth+Pedestals+(Gold)', 22500, 10),
+  ('Gold Square Pedestals', 'Gold Square Pedestals.', 8000, cat_pedestals, 'https://placehold.co/600x400?text=Gold+Square+Pedestals', 8000, 10),
+  ('Ruth Pedestals (Silver)', 'Ruth Pedestals (Silver).', 22500, cat_pedestals, 'https://placehold.co/600x400?text=Ruth+Pedestals+(Silver)', 22500, 10),
+  ('Cylinder Acrylic Pedestals (White)', 'Cylinder Acrylic Pedestals (White).', 16000, cat_pedestals, 'https://placehold.co/600x400?text=Cylinder+Acrylic+Pedestals+(White)', 16000, 10);
 
   -- Shelves
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Charice Shelf', 'Charice display shelf.', 15000, cat_shelves, 'https://placehold.co/600x400?text=Charice+Shelf', 15000, 2);
+  ('Charice Shelf', 'Charice Shelf.', 15000, cat_shelves, 'https://placehold.co/600x400?text=Charice+Shelf', 15000, 10);
 
   -- Sweets Carts
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Pumpkin Cart', 'Pumpkin shaped cart.', 20000, cat_sweets_carts, 'https://placehold.co/600x400?text=Pumpkin+Cart', 20000, 1),
-  ('White Rustic Cart', 'Rustic white cart.', 30000, cat_sweets_carts, 'https://placehold.co/600x400?text=Rustic+Cart', 30000, 1),
-  ('All White Cart', 'Classic all white cart.', 25000, cat_sweets_carts, 'https://placehold.co/600x400?text=White+Cart', 25000, 1),
-  ('White Wagon Cart', 'White wagon style cart.', 22500, cat_sweets_carts, 'https://placehold.co/600x400?text=Wagon+Cart', 22500, 1);
+  ('Prime cycle cart', 'Prime cycle cart.', 20000, cat_sweets_carts, 'https://placehold.co/600x400?text=Prime+cycle+cart', 20000, 10),
+  ('Pumpkin Cart', 'Pumpkin Cart.', 20000, cat_sweets_carts, 'https://placehold.co/600x400?text=Pumpkin+Cart', 20000, 10),
+  ('White Rustic cart', 'White Rustic cart.', 30000, cat_sweets_carts, 'https://placehold.co/600x400?text=White+Rustic+cart', 30000, 10),
+  ('All White Cart', 'All White Cart.', 25000, cat_sweets_carts, 'https://placehold.co/600x400?text=All+White+Cart', 25000, 10),
+  ('White Wagon Cart', 'White Wagon Cart.', 22500, cat_sweets_carts, 'https://placehold.co/600x400?text=White+Wagon+Cart', 22500, 10);
 
   -- Cake Tables
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('LED Roses Table', 'Table with LED roses.', 15000, cat_cake_tables, 'https://placehold.co/600x400?text=LED+Roses+Table', 15000, 2),
-  ('Squeeze Me Stand (Blue)', 'Blue squeeze me stand.', 12500, cat_cake_tables, 'https://placehold.co/600x400?text=Squeeze+Me+Blue', 12500, 2),
-  ('Squeeze Me Stand (Pink)', 'Pink squeeze me stand.', 12500, cat_cake_tables, 'https://placehold.co/600x400?text=Squeeze+Me+Pink', 12500, 2),
-  ('Girl Treat Table', 'Treat table for girls.', 17500, cat_cake_tables, 'https://placehold.co/600x400?text=Girl+Treat+Table', 17500, 2),
-  ('Boy Treat Table', 'Treat table for boys.', 15000, cat_cake_tables, 'https://placehold.co/600x400?text=Boy+Treat+Table', 15000, 2),
-  ('Diamond Cake Table (Gold)', 'Gold diamond cake table.', 16000, cat_cake_tables, 'https://placehold.co/600x400?text=Diamond+Cake+Table', 16000, 2);
+  ('LED ROSES TABLE', 'LED ROSES TABLE.', 15000, cat_cake_tables, 'https://placehold.co/600x400?text=LED+ROSES+TABLE', 15000, 10),
+  ('Squeeze Me Stand (Blue)', 'Squeeze Me Stand (Blue).', 12500, cat_cake_tables, 'https://placehold.co/600x400?text=Squeeze+Me+Stand+(Blue)', 12500, 10),
+  ('Squeeze Me Stand (Pink)', 'Squeeze Me Stand (Pink).', 12500, cat_cake_tables, 'https://placehold.co/600x400?text=Squeeze+Me+Stand+(Pink)', 12500, 10),
+  ('GIRL Treat Table', 'GIRL Treat Table.', 17500, cat_cake_tables, 'https://placehold.co/600x400?text=GIRL+Treat+Table', 17500, 10),
+  ('BOY Treat Table', 'BOY Treat Table.', 15000, cat_cake_tables, 'https://placehold.co/600x400?text=BOY+Treat+Table', 15000, 10),
+  ('Diamond Cake Table (Gold)', 'Diamond Cake Table (Gold).', 16000, cat_cake_tables, 'https://placehold.co/600x400?text=Diamond+Cake+Table+(Gold)', 16000, 10);
 
   -- Tents
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
-  ('Tent Installation', 'Professional tent installation.', 12500, cat_tents, 'https://placehold.co/600x400?text=Tent+Install', 12500, 10),
-  ('10x10 Tent', '10x10 foot tent.', 15000, cat_tents, 'https://placehold.co/600x400?text=10x10+Tent', 15000, 5),
-  ('20x30 Tent', '20x30 foot tent.', 67500, cat_tents, 'https://placehold.co/600x400?text=20x30+Tent', 67500, 2),
-  ('20x40 Tent', '20x40 foot tent.', 87500, cat_tents, 'https://placehold.co/600x400?text=20x40+Tent', 87500, 2),
-  ('20x20 Tent', '20x20 foot tent.', 47500, cat_tents, 'https://placehold.co/600x400?text=20x20+Tent', 47500, 2),
-  ('LED Cabana', 'Illuminated cabana.', 71500, cat_tents, 'https://placehold.co/600x400?text=LED+Cabana', 71500, 2),
-  ('Single Cabana', 'Single cabana with sofa and table.', 65000, cat_tents, 'https://placehold.co/600x400?text=Single+Cabana', 65000, 2),
-  ('Outdoor Package #1', 'Basic outdoor event package.', 99000, cat_tents, 'https://placehold.co/600x400?text=Outdoor+Pkg+1', 99000, 1),
-  ('Outdoor Package #2', 'Standard outdoor event package.', 129350, cat_tents, 'https://placehold.co/600x400?text=Outdoor+Pkg+2', 129350, 1),
-  ('Outdoor Package #3', 'Premium outdoor event package.', 114500, cat_tents, 'https://placehold.co/600x400?text=Outdoor+Pkg+3', 114500, 1),
-  ('Outdoor Package #4', 'Deluxe outdoor event package.', 168150, cat_tents, 'https://placehold.co/600x400?text=Outdoor+Pkg+4', 168150, 1);
+  ('Tent Installation', 'Tent Installation.', 12500, cat_tents, 'https://placehold.co/600x400?text=Tent+Installation', 12500, 10),
+  ('10x10 Tent', '10x10 Tent.', 15000, cat_tents, 'https://placehold.co/600x400?text=10x10+Tent', 15000, 10),
+  ('20x30 Tent', '20x30 Tent.', 67500, cat_tents, 'https://placehold.co/600x400?text=20x30+Tent', 67500, 10),
+  ('20x40 Tent', '20x40 Tent.', 87500, cat_tents, 'https://placehold.co/600x400?text=20x40+Tent', 87500, 10),
+  ('20x20 Tent', '20x20 Tent.', 47500, cat_tents, 'https://placehold.co/600x400?text=20x20+Tent', 47500, 10),
+  ('LED Cabana', 'LED Cabana.', 71500, cat_tents, 'https://placehold.co/600x400?text=LED+Cabana', 71500, 10),
+  ('Single Cabana', 'Single Cabana.', 65000, cat_tents, 'https://placehold.co/600x400?text=Single+Cabana', 65000, 10),
+  ('Outdoor Package #1', 'Outdoor Package #1.', 99000, cat_tents, 'https://placehold.co/600x400?text=Outdoor+Package+#1', 99000, 10),
+  ('Outdoor Package #2', 'Outdoor Package #2.', 129350, cat_tents, 'https://placehold.co/600x400?text=Outdoor+Package+#2', 129350, 10),
+  ('Outdoor Package #3', 'Outdoor Package #3.', 114500, cat_tents, 'https://placehold.co/600x400?text=Outdoor+Package+#3', 114500, 10),
+  ('Outdoor Package #4', 'Outdoor Package #4.', 168150, cat_tents, 'https://placehold.co/600x400?text=Outdoor+Package+#4', 168150, 10);
+
+  -- Buffet Service
+  INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
+  ('White Wagon Cart', 'White Wagon Cart.', 22500, cat_buffet, 'https://placehold.co/600x400?text=White+Wagon+Cart', 22500, 10),
+  ('White serving Coupe Bone China Plate', 'White serving Coupe Bone China Plate.', 95, cat_buffet, 'https://placehold.co/600x400?text=White+serving+Coupe+Bone+China+Plate', 95, 10),
+  ('Gold Cake Stand', 'Gold Cake Stand.', 5000, cat_buffet, 'https://placehold.co/600x400?text=Gold+Cake+Stand', 5000, 10);
+
+  -- Chafing Dishes
+  INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
+  ('6 BURNER STOVE', '6 BURNER STOVE.', 15000, cat_chafing, 'https://placehold.co/600x400?text=6+BURNER+STOVE', 15000, 10),
+  ('Char Griller', 'Char Griller.', 12500, cat_chafing, 'https://placehold.co/600x400?text=Char+Griller', 12500, 10),
+  ('Food warmer', 'Food warmer.', 4500, cat_chafing, 'https://placehold.co/600x400?text=Food+warmer', 4500, 10);
+
+  -- Cooking & Prep
+  INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
+  ('Food warmer', 'Food warmer.', 4500, cat_cooking, 'https://placehold.co/600x400?text=Food+warmer', 4500, 10),
+  ('Elite Dripless Rectangular Chafer with Gold', 'Elite Dripless Rectangular Chafer with Gold.', 4500, cat_cooking, 'https://placehold.co/600x400?text=Elite+Dripless+Rectangular+Chafer+with+Gold', 4500, 10),
+  ('Renaissance Chafer', 'Renaissance Chafer.', 3000, cat_cooking, 'https://placehold.co/600x400?text=Renaissance+Chafer', 3000, 10),
+  ('Economy 8 Qt. Full Size Stainless Steel Chafer', 'Economy 8 Qt. Full Size Stainless Steel Chafer.', 1500, cat_cooking, 'https://placehold.co/600x400?text=Economy+8+Qt.+Full+Size+Stainless+Steel+Chafe', 1500, 10),
+  ('Deluxe 8 Qt. Full Size Gold Accent Chafer', 'Deluxe 8 Qt. Full Size Gold Accent Chafer.', 2500, cat_cooking, 'https://placehold.co/600x400?text=Deluxe+8+Qt.+Full+Size+Gold+Accent+Chafer', 2500, 10),
+  ('Deluxe 4 Qt. Round Gold Accent Chafer', 'Deluxe 4 Qt. Round Gold Accent Chafer.', 1500, cat_cooking, 'https://placehold.co/600x400?text=Deluxe+4+Qt.+Round+Gold+Accent+Chafer', 1500, 10),
+  ('Classic Half Size Round Chafer', 'Classic Half Size Round Chafer.', 2500, cat_cooking, 'https://placehold.co/600x400?text=Classic+Half+Size+Round+Chafer', 2500, 10),
+  ('Full Size Chafer Choice Classic 8 Qt.', 'Full Size Chafer Choice Classic 8 Qt..', 2500, cat_cooking, 'https://placehold.co/600x400?text=Full+Size+Chafer+Choice+Classic+8+Qt.', 2500, 10);
+
+  -- Flooring & Staging
+  INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
+  ('Installation', 'Installation.', 12500, cat_flooring, 'https://placehold.co/600x400?text=Installation', 12500, 10),
+  ('Dance Floor 3x3', 'Dance Floor 3x3.', 3200, cat_flooring, 'https://placehold.co/600x400?text=Dance+Floor+3x3', 3200, 10),
+  ('QuickLock Staging 8''x8'' Indoor/Outdoor Stage System', 'QuickLock Staging 8''x8'' Indoor/Outdoor Stage System.', 45000, cat_flooring, 'https://placehold.co/600x400?text=QuickLock+Staging+8''x8''+Indoor/Outdoor+Stag', 45000, 10),
+  ('Pure white Stage 8x8', 'Pure white Stage 8x8.', 80000, cat_flooring, 'https://placehold.co/600x400?text=Pure+white+Stage+8x8', 80000, 10),
+  ('Acrylic Stage 8''x 8''', 'Acrylic Stage 8''x 8''.', 57500, cat_flooring, 'https://placehold.co/600x400?text=Acrylic+Stage+8''x+8''', 57500, 10);
+
+  -- Kids Tables
+  INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available) VALUES
+  ('KIDS 6FT TABLE', 'KIDS 6FT TABLE.', 1500, cat_kids_tables, 'https://placehold.co/600x400?text=KIDS+6FT+TABLE', 1500, 10);
 
 END $$;

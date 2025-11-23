@@ -83,13 +83,13 @@ export function CarouselSection({
     return (
         <section className="relative">
             {/* Header */}
-            <div className="flex items-end justify-between mb-8">
+            <div className="flex items-end justify-between mb-5">
                 <div>
-                    <h2 className="text-3xl md:text-4xl font-serif font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    <h2 className="text-2xl md:text-3xl font-serif font-bold mb-1 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                         {title}
                     </h2>
                     {subtitle && (
-                        <p className="text-muted-foreground text-sm md:text-base max-w-2xl">
+                        <p className="text-muted-foreground text-sm max-w-2xl">
                             {subtitle}
                         </p>
                     )}
@@ -102,40 +102,40 @@ export function CarouselSection({
                         size="icon"
                         onClick={scrollPrev}
                         disabled={!prevBtnEnabled}
-                        className="h-12 w-12 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30 transition-all duration-300"
+                        className="h-10 w-10 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30 transition-all duration-300"
                     >
-                        <ChevronLeft className="h-5 w-5" />
+                        <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <Button
                         variant="outline"
                         size="icon"
                         onClick={scrollNext}
                         disabled={!nextBtnEnabled}
-                        className="h-12 w-12 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30 transition-all duration-300"
+                        className="h-10 w-10 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30 transition-all duration-300"
                     >
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>
             </div>
 
             {/* Carousel */}
             <div className="overflow-hidden" ref={emblaRef}>
-                <div className="flex gap-6 md:gap-8">
+                <div className="flex gap-4 md:gap-6">
                     {children}
                 </div>
             </div>
 
             {/* Dot Indicators */}
-            <div className="flex items-center justify-center gap-2 mt-8">
+            <div className="flex items-center justify-center gap-2 mt-5">
                 {scrollSnaps.map((_, index) => (
                     <button
                         key={index}
                         onClick={() => scrollTo(index)}
                         className={cn(
-                            "h-2 rounded-full transition-all duration-300",
+                            "h-1.5 rounded-full transition-all duration-300",
                             index === selectedIndex
-                                ? "w-8 bg-gold"
-                                : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                                ? "w-6 bg-gold"
+                                : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
                         )}
                         aria-label={`Go to slide ${index + 1}`}
                     />

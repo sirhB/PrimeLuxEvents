@@ -21,7 +21,7 @@ export function SiteFooter() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/catalog" className="hover:text-foreground transition-colors">
-                  Collection
+                  Rental Catalog
                 </Link>
               </li>
               <li>

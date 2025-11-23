@@ -330,7 +330,7 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
 -- Catalog Page Content
 INSERT INTO content (key, value, type) VALUES
-('catalog.hero.title', 'The Collection', 'text'),
+('catalog.hero.title', 'Rental Catalog', 'text'),
 ('catalog.hero.subtitle', 'Premium event rentals for unforgettable celebrations', 'text'),
 ('catalog.rental.policy.title', 'Rental Information', 'text'),
 ('catalog.rental.policy.description', 'All rentals include a 24-hour period with delivery and pickup. Extended rental periods and setup services available.', 'text'),

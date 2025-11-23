@@ -88,7 +88,7 @@ export function CartSheet() {
                     <p className="text-sm text-muted-foreground max-w-xs">Browse our collection and add items to get started.</p>
                   </div>
                   <Button variant="outline" size="lg" onClick={() => setIsOpen(false)}>
-                    Browse Collection
+                    Browse Catalog
                   </Button>
                 </div>
               ) : (
