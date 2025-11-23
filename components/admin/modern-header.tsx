@@ -1,8 +1,8 @@
 'use client'
 
-import { Search, Bell, User } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { Bell, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { AdminSearch } from '@/components/admin-search'
 
 export function ModernHeader() {
     return (
@@ -18,12 +18,8 @@ export function ModernHeader() {
 
             <div className="flex items-center gap-4">
                 {/* Search */}
-                <div className="relative hidden md:block">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--dashboard-text-muted)]" />
-                    <Input
-                        placeholder="Search..."
-                        className="pl-10 w-64 bg-[var(--dashboard-card)] border-none text-[var(--dashboard-text)] placeholder:text-[var(--dashboard-text-muted)] rounded-full focus-visible:ring-1 focus-visible:ring-[var(--dashboard-accent-gold)]"
-                    />
+                <div className="hidden md:block">
+                    <AdminSearch />
                 </div>
 
                 {/* Notifications */}
