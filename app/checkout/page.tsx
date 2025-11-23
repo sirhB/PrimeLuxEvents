@@ -23,7 +23,7 @@ import { toast } from 'sonner'
 
 export default function CheckoutPage() {
     const router = useRouter()
-    const { items, eventDetails, clearCart, isLoaded, addItem, updateQuantity, setEventDetails } = useCart()
+    const { items, eventDetails, clearCart, isLoaded, addItem, updateQuantity, setEventDetails, removeItem } = useCart()
     const [currentStep, setCurrentStep] = useState(1)
 
     // Step 1: Supplemental Items State
@@ -134,7 +134,28 @@ export default function CheckoutPage() {
             const supabase = createClient()
             const productIds = items.map((item) => item.productId)
             const { data } = await supabase.from('products').select('*').in('id', productIds)
-            if (data) setCartProducts(data)
+
+            if (data) {
+                setCartProducts(data)
+
+                // Check for invalid items and remove them
+                const validIds = data.map(p => p.id)
+                const invalidItems = items.filter(i => !validIds.includes(i.productId))
+
+                if (invalidItems.length > 0) {
+                    console.log("Removing invalid items:", invalidItems)
+                    // We need to be careful not to trigger infinite loops if removeItem updates items dependency
+                    // But since we are inside useEffect[items], updating items will trigger this again.
+                    // However, next time invalidItems will be empty.
+                    // To avoid multiple re-renders, we can just do it.
+
+                    invalidItems.forEach(item => {
+                        removeItem(item.productId)
+                    })
+
+                    toast.error("Some items were removed as they are no longer available")
+                }
+            }
         }
         fetchCartProducts()
     }, [items])
