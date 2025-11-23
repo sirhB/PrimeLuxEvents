@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
-import { Loader2, Check, AlertCircle, CalendarIcon, Clock, MapPin, Truck, ArrowRight, ArrowLeft, ShoppingBag } from 'lucide-react'
+import { Loader2, Check, AlertCircle, CalendarIcon, Clock, MapPin, Truck, ArrowRight, ArrowLeft, ShoppingBag, Plus, Minus } from 'lucide-react'
 import { createOrder, calculateOrderTotal, type CheckoutFormData, type CartItem } from '@/app/actions/checkout'
 import { formatCurrency } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/client'
@@ -18,15 +18,18 @@ import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Checkbox } from "@/components/ui/checkbox"
+import { motion, AnimatePresence } from 'framer-motion'
+import { toast } from 'sonner'
 
 export default function CheckoutPage() {
     const router = useRouter()
-    const { items, eventDetails, clearCart, isLoaded, addItem, setEventDetails } = useCart()
+    const { items, eventDetails, clearCart, isLoaded, addItem, updateQuantity, setEventDetails } = useCart()
     const [currentStep, setCurrentStep] = useState(1)
 
     // Step 1: Supplemental Items State
     const [supplementalProducts, setSupplementalProducts] = useState<any[]>([])
     const [isLoadingSupplemental, setIsLoadingSupplemental] = useState(true)
+    const [supplementalQuantities, setSupplementalQuantities] = useState<Record<string, number>>({})
 
     // Step 2 & 3 State
     const [isLoading, setIsLoading] = useState(false)
@@ -81,6 +84,13 @@ export default function CheckoutPage() {
                 // Shuffle and take 3
                 const shuffled = available.sort(() => 0.5 - Math.random()).slice(0, 3)
                 setSupplementalProducts(shuffled)
+
+                // Initialize quantities to 1 for each product
+                const initialQuantities: Record<string, number> = {}
+                shuffled.forEach(p => {
+                    initialQuantities[p.id] = 1
+                })
+                setSupplementalQuantities(initialQuantities)
             }
             setIsLoadingSupplemental(false)
         }
@@ -89,6 +99,23 @@ export default function CheckoutPage() {
             fetchSupplemental()
         }
     }, [currentStep, items])
+
+    // Helper function to update supplemental product quantity
+    const updateSupplementalQuantity = (productId: string, quantity: number) => {
+        setSupplementalQuantities(prev => ({
+            ...prev,
+            [productId]: Math.max(1, Math.min(99, quantity))
+        }))
+    }
+
+    // Helper function to add supplemental item to cart
+    const handleAddSupplementalItem = (product: any) => {
+        const quantity = supplementalQuantities[product.id] || 1
+        addItem(product.id, quantity)
+        toast.success('Added to cart!', {
+            description: `${product.name} (${quantity})`
+        })
+    }
 
     // Fetch Cart Products
     useEffect(() => {
@@ -142,7 +169,7 @@ export default function CheckoutPage() {
             ...prev,
             deliveryDate: date ? format(date, 'yyyy-MM-dd') : prev.deliveryDate,
             eventDate: date ? format(date, 'yyyy-MM-dd') : prev.eventDate,
-            deliveryTime: startTime, // Default delivery time to start time if not set?
+            deliveryTime: startTime || prev.deliveryTime, // Default delivery time to start time if not set?
             // We might want separate delivery time, but for now let's sync them or keep them separate in UI
         }))
     }, [date, startTime])
@@ -230,17 +257,40 @@ export default function CheckoutPage() {
     if (isSuccess) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
-                <Card className="max-w-md w-full">
-                    <CardContent className="pt-6 text-center space-y-4">
-                        <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 mx-auto">
-                            <Check className="h-8 w-8" />
-                        </div>
-                        <h2 className="text-2xl font-serif">Order Placed Successfully!</h2>
-                        <p className="text-muted-foreground">
-                            Thank you for your order. You'll receive a confirmation email shortly.
-                        </p>
-                    </CardContent>
-                </Card>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                    <Card className="max-w-md w-full">
+                        <CardContent className="pt-6 text-center space-y-4">
+                            <motion.div
+                                className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 mx-auto"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                            >
+                                <Check className="h-8 w-8" />
+                            </motion.div>
+                            <motion.h2
+                                className="text-2xl font-serif"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                            >
+                                Order Placed Successfully!
+                            </motion.h2>
+                            <motion.p
+                                className="text-muted-foreground"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.4 }}
+                            >
+                                Thank you for your order. You'll receive a confirmation email shortly.
+                            </motion.p>
+                        </CardContent>
+                    </Card>
+                </motion.div>
             </div>
         )
     }
@@ -253,33 +303,61 @@ export default function CheckoutPage() {
                     <div className="flex items-center justify-between relative">
                         <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-0.5 bg-border -z-10"></div>
                         {[1, 2, 3].map((step) => (
-                            <div key={step} className={cn(
-                                "flex flex-col items-center gap-2 bg-background px-2",
-                                step <= currentStep ? "text-primary" : "text-muted-foreground"
-                            )}>
-                                <div className={cn(
-                                    "h-8 w-8 rounded-full flex items-center justify-center border-2 font-medium text-sm",
-                                    step <= currentStep ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground bg-background"
-                                )}>
+                            <motion.div
+                                key={step}
+                                className={cn(
+                                    "flex flex-col items-center gap-2 bg-background px-2",
+                                    step <= currentStep ? "text-primary" : "text-muted-foreground"
+                                )}
+                                initial={false}
+                                animate={{
+                                    scale: step === currentStep ? 1.05 : 1,
+                                }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <motion.div
+                                    className={cn(
+                                        "h-8 w-8 rounded-full flex items-center justify-center border-2 font-medium text-sm",
+                                        step <= currentStep ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground bg-background"
+                                    )}
+                                    initial={false}
+                                    animate={{
+                                        backgroundColor: step <= currentStep ? "hsl(var(--primary))" : "hsl(var(--background))",
+                                        borderColor: step <= currentStep ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))",
+                                    }}
+                                    transition={{ duration: 0.3 }}
+                                >
                                     {step}
-                                </div>
+                                </motion.div>
                                 <span className="text-xs font-medium hidden sm:block">
                                     {step === 1 ? "Add-ons" : step === 2 ? "Details" : "Payment"}
                                 </span>
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
 
-                <h1 className="text-3xl font-serif mb-8 text-center">
+                <motion.h1
+                    className="text-3xl font-serif mb-8 text-center"
+                    key={currentStep}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
                     {currentStep === 1 && "Complete Your Look"}
                     {currentStep === 2 && "Event & Delivery Details"}
                     {currentStep === 3 && "Review & Payment"}
-                </h1>
+                </motion.h1>
 
                 {/* Step 1: Supplemental Items */}
                 {currentStep === 1 && (
-                    <div className="space-y-8">
+                    <motion.div
+                        className="space-y-8"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                    >
                         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
                             {isLoadingSupplemental ? (
                                 Array(3).fill(0).map((_, i) => (
@@ -292,29 +370,64 @@ export default function CheckoutPage() {
                                     </Card>
                                 ))
                             ) : (
-                                supplementalProducts.map((product) => (
-                                    <Card key={product.id} className="overflow-hidden flex flex-col">
-                                        <div className="aspect-square relative bg-muted">
-                                            <img
-                                                src={product.image_url || '/placeholder.svg'}
-                                                alt={product.name}
-                                                className="object-cover w-full h-full"
-                                            />
-                                        </div>
-                                        <CardHeader className="p-4 pb-2">
-                                            <CardTitle className="text-lg font-serif line-clamp-1">{product.name}</CardTitle>
-                                            <CardDescription>{formatCurrency(product.price)}</CardDescription>
-                                        </CardHeader>
-                                        <CardFooter className="p-4 pt-0 mt-auto">
-                                            <Button
-                                                variant="outline"
-                                                className="w-full"
-                                                onClick={() => addItem(product.id)}
-                                            >
-                                                <ShoppingBag className="mr-2 h-4 w-4" /> Add to Cart
-                                            </Button>
-                                        </CardFooter>
-                                    </Card>
+                                supplementalProducts.map((product, index) => (
+                                    <motion.div
+                                        key={product.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{
+                                            duration: 0.4,
+                                            delay: index * 0.1,
+                                            ease: "easeOut"
+                                        }}
+                                    >
+                                        <Card className="overflow-hidden flex flex-col h-full">
+                                            <div className="aspect-square relative bg-muted">
+                                                <img
+                                                    src={product.image_url || '/placeholder.svg'}
+                                                    alt={product.name}
+                                                    className="object-cover w-full h-full"
+                                                />
+                                            </div>
+                                            <CardHeader className="p-4 pb-2">
+                                                <CardTitle className="text-lg font-serif line-clamp-1">{product.name}</CardTitle>
+                                                <CardDescription>{formatCurrency(product.price)}</CardDescription>
+                                            </CardHeader>
+                                            <CardFooter className="p-4 pt-0 mt-auto flex flex-col gap-3">
+                                                <div className="flex items-center justify-between w-full">
+                                                    <span className="text-sm text-muted-foreground">Quantity:</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="h-8 w-8 p-0"
+                                                            onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) - 1)}
+                                                        >
+                                                            <Minus className="h-3 w-3" />
+                                                        </Button>
+                                                        <span className="w-8 text-center font-medium">
+                                                            {supplementalQuantities[product.id] || 1}
+                                                        </span>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="h-8 w-8 p-0"
+                                                            onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) + 1)}
+                                                        >
+                                                            <Plus className="h-3 w-3" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    variant="outline"
+                                                    className="w-full"
+                                                    onClick={() => handleAddSupplementalItem(product)}
+                                                >
+                                                    <ShoppingBag className="mr-2 h-4 w-4" /> Add to Cart
+                                                </Button>
+                                            </CardFooter>
+                                        </Card>
+                                    </motion.div>
                                 ))
                             )}
                         </div>
@@ -323,17 +436,28 @@ export default function CheckoutPage() {
                                 Continue to Details <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* Step 2: Event & Delivery Details */}
                 {currentStep === 2 && (
-                    <div className="space-y-6">
+                    <motion.div
+                        className="space-y-6"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                    >
                         {error && (
-                            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 flex items-start gap-3 text-destructive">
+                            <motion.div
+                                className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 flex items-start gap-3 text-destructive"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.2 }}
+                            >
                                 <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
                                 <p>{error}</p>
-                            </div>
+                            </motion.div>
                         )}
 
                         <div className="grid gap-6">
@@ -491,12 +615,18 @@ export default function CheckoutPage() {
                                 Continue to Payment <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* Step 3: Payment */}
                 {currentStep === 3 && (
-                    <div className="grid lg:grid-cols-3 gap-8">
+                    <motion.div
+                        className="grid lg:grid-cols-3 gap-8"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                    >
                         <div className="lg:col-span-2 space-y-6">
                             <Card>
                                 <CardHeader>
@@ -504,11 +634,17 @@ export default function CheckoutPage() {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="space-y-3">
-                                        {items.map((item) => {
+                                        {items.map((item, index) => {
                                             const product = cartProducts.find((p) => p.id === item.productId)
                                             if (!product) return null
                                             return (
-                                                <div key={item.productId} className="flex gap-4 py-2 border-b last:border-0">
+                                                <motion.div
+                                                    key={item.productId}
+                                                    className="flex gap-4 py-2 border-b last:border-0"
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                                                >
                                                     <div className="h-16 w-16 rounded border bg-muted overflow-hidden flex-shrink-0">
                                                         <img
                                                             src={product.image_url || '/placeholder.svg'}
@@ -518,10 +654,36 @@ export default function CheckoutPage() {
                                                     </div>
                                                     <div className="flex-1">
                                                         <h4 className="font-medium font-serif">{product.name}</h4>
-                                                        <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="h-6 w-6 p-0"
+                                                                onClick={() => {
+                                                                    updateQuantity(item.productId, item.quantity - 1)
+                                                                    toast.info('Quantity updated')
+                                                                }}
+                                                            >
+                                                                <Minus className="h-3 w-3" />
+                                                            </Button>
+                                                            <span className="text-sm font-medium w-8 text-center">
+                                                                {item.quantity}
+                                                            </span>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="h-6 w-6 p-0"
+                                                                onClick={() => {
+                                                                    updateQuantity(item.productId, item.quantity + 1)
+                                                                    toast.info('Quantity updated')
+                                                                }}
+                                                            >
+                                                                <Plus className="h-3 w-3" />
+                                                            </Button>
+                                                        </div>
                                                     </div>
                                                     <p className="font-medium">{formatCurrency(product.price * item.quantity)}</p>
-                                                </div>
+                                                </motion.div>
                                             )
                                         })}
                                     </div>
@@ -611,7 +773,7 @@ export default function CheckoutPage() {
                                 </CardContent>
                             </Card>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
             </div>
         </div>
