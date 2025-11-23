@@ -24,6 +24,7 @@ export interface CheckoutFormData {
 export interface CartItem {
     productId: string
     quantity: number
+    modifiers?: Record<string, any>
 }
 
 /**
@@ -99,7 +100,12 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
     items.forEach((item) => {
         const product = products.find((p) => p.id === item.productId)
         if (product) {
-            subtotal += product.price * item.quantity
+            // Calculate modifier price
+            const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
+                return acc + (curr.priceAdjustment || 0)
+            }, 0)
+
+            subtotal += (product.price + modifiersPrice) * item.quantity
             if (product.setup_fee) {
                 setupFee += product.setup_fee * item.quantity
             }
@@ -228,12 +234,21 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[])
         }
 
         // Create order items
-        const orderItems = items.map((item) => ({
-            order_id: order.id,
-            product_id: item.productId,
-            quantity: item.quantity,
-            price_at_time: totals.products.find((p) => p.id === item.productId)?.price || 0,
-        }))
+        const orderItems = items.map((item) => {
+            const product = totals.products.find((p) => p.id === item.productId)
+            const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
+                return acc + (curr.priceAdjustment || 0)
+            }, 0)
+            const priceAtTime = (product?.price || 0) + modifiersPrice
+
+            return {
+                order_id: order.id,
+                product_id: item.productId,
+                quantity: item.quantity,
+                price_at_time: priceAtTime,
+                modifiers: item.modifiers || {}
+            }
+        })
 
         const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
 

@@ -120,9 +120,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     notFound()
   }
 
-  const cartItem = items.find((item) => item.productId === product.id)
+  const cartItem = items.find((item) =>
+    item.productId === product.id &&
+    JSON.stringify(item.modifiers || {}) === JSON.stringify(selectedModifiers)
+  )
   const isInCart = !!cartItem
-  const isInCartFn = (productId: string) => items.some((item) => item.productId === productId)
+
+  // Helper to check if ANY variant of this product is in cart (for related products etc)
+  const isProductInCart = (productId: string) => items.some((item) => item.productId === productId)
+
   const maxQuantity = 100
 
   const basePrice = product.rental_price_daily || product.price
@@ -133,9 +139,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   const toggleCart = () => {
     if (isInCart) {
-      removeItem(product.id)
+      if (cartItem) removeItem(cartItem.id)
     } else {
-      addItem(product.id)
+      addItem(product.id, quantity, selectedModifiers)
     }
   }
 
@@ -325,7 +331,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 onClick={() => {
                   if (isInCart) {
                     if (cartItem?.quantity !== quantity) {
-                      updateCartQuantity(product.id, quantity)
+                      if (cartItem) updateCartQuantity(cartItem.id, quantity)
                     } else {
                       // Maybe remove if they click "Added to Quote"? Or do nothing?
                       // User said "update the button to be able to save cart changes"
@@ -337,10 +343,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                       // Let's make it:
                       // If quantity changed: "Update Quote"
                       // If quantity same: "Added to Quote" (click to remove?)
-                      removeItem(product.id)
+                      if (cartItem) removeItem(cartItem.id)
                     }
                   } else {
-                    addItem(product.id, quantity)
+                    addItem(product.id, quantity, selectedModifiers)
                   }
                 }}
                 variant={isInCart && cartItem?.quantity === quantity ? "outline" : "default"}
@@ -441,7 +447,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               currentProduct={product}
               allProducts={allProducts}
               onAddToCart={toggleCart}
-              isInCart={isInCartFn}
+              isInCart={isProductInCart}
               maxItems={4}
             />
           </div>

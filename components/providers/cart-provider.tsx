@@ -3,16 +3,18 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { type EventDetails, EventDetailsDialog } from "@/components/event-details-dialog"
 
-type CartItem = {
+export type CartItem = {
+  id: string
   productId: string
   quantity: number
+  modifiers?: Record<string, any>
 }
 
 type CartContextType = {
   items: CartItem[]
-  addItem: (productId: string, quantity?: number) => void
-  removeItem: (productId: string) => void
-  updateQuantity: (productId: string, quantity: number) => void
+  addItem: (productId: string, quantity?: number, modifiers?: Record<string, any>) => void
+  removeItem: (cartItemId: string) => void
+  updateQuantity: (cartItemId: string, quantity: number) => void
   clearCart: () => void
   cartCount: number
   eventDetails: EventDetails | null
@@ -70,26 +72,41 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [eventDetails, isLoaded])
 
-  const addItem = (productId: string, quantity: number = 1) => {
+  const addItem = (productId: string, quantity: number = 1, modifiers: Record<string, any> = {}) => {
     setItems((prev) => {
-      const existing = prev.find((item) => item.productId === productId)
+      // Check if item with same product ID AND same modifiers exists
+      const existing = prev.find((item) =>
+        item.productId === productId &&
+        JSON.stringify(item.modifiers || {}) === JSON.stringify(modifiers)
+      )
+
       if (existing) {
-        return prev.map((item) => (item.productId === productId ? { ...item, quantity: item.quantity + quantity } : item))
+        return prev.map((item) =>
+          item.id === existing.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        )
       }
-      return [...prev, { productId, quantity }]
+
+      return [...prev, {
+        id: crypto.randomUUID(),
+        productId,
+        quantity,
+        modifiers
+      }]
     })
   }
 
-  const removeItem = (productId: string) => {
-    setItems((prev) => prev.filter((item) => item.productId !== productId))
+  const removeItem = (cartItemId: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== cartItemId))
   }
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (cartItemId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(productId)
+      removeItem(cartItemId)
       return
     }
-    setItems((prev) => prev.map((item) => (item.productId === productId ? { ...item, quantity } : item)))
+    setItems((prev) => prev.map((item) => (item.id === cartItemId ? { ...item, quantity } : item)))
   }
 
   const handleEventDetailsSubmit = (details: EventDetails) => {

@@ -150,7 +150,7 @@ export default function CheckoutPage() {
                     // To avoid multiple re-renders, we can just do it.
 
                     invalidItems.forEach(item => {
-                        removeItem(item.productId)
+                        removeItem(item.id)
                     })
 
                     toast.error("Some items were removed as they are no longer available")
@@ -176,6 +176,7 @@ export default function CheckoutPage() {
                 const cartItems: CartItem[] = items.map((item) => ({
                     productId: item.productId,
                     quantity: item.quantity,
+                    modifiers: item.modifiers
                 }))
 
                 const calculated = await calculateOrderTotal(cartItems, addressToUse)
@@ -314,6 +315,7 @@ export default function CheckoutPage() {
             const cartItems: CartItem[] = items.map((item) => ({
                 productId: item.productId,
                 quantity: item.quantity,
+                modifiers: item.modifiers
             }))
 
             // Final sync of form data before submission

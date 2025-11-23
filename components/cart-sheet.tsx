@@ -99,8 +99,15 @@ export function CartSheet() {
 
                     const price = product.rental_price_daily || product.price
 
+                    // Calculate modifiers price
+                    const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
+                      return acc + (curr.priceAdjustment || 0)
+                    }, 0)
+
+                    const itemPrice = price + modifiersPrice
+
                     return (
-                      <div key={item.productId} className="flex gap-5 p-4 rounded-xl border border-border/50 bg-secondary/20 hover:bg-secondary/30 transition-colors">
+                      <div key={item.id} className="flex gap-5 p-4 rounded-xl border border-border/50 bg-secondary/20 hover:bg-secondary/30 transition-colors">
                         <div className="h-24 w-24 rounded-lg border border-border/50 bg-background overflow-hidden flex-shrink-0">
                           <img
                             src={product.image_url || "/placeholder.svg"}
@@ -116,12 +123,24 @@ export function CartSheet() {
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8 flex-shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                onClick={() => removeItem(item.productId)}
+                                onClick={() => removeItem(item.id)}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
-                            <p className="text-sm font-medium text-gold">{formatCurrency(price)} <span className="text-xs text-muted-foreground">/ day</span></p>
+                            <p className="text-sm font-medium text-gold">{formatCurrency(itemPrice)} <span className="text-xs text-muted-foreground">/ day</span></p>
+
+                            {/* Display Modifiers */}
+                            {item.modifiers && Object.keys(item.modifiers).length > 0 && (
+                              <div className="text-xs text-muted-foreground space-y-1">
+                                {Object.entries(item.modifiers).map(([key, option]: [string, any]) => (
+                                  <div key={key} className="flex items-center gap-1">
+                                    <span className="capitalize">{key}:</span>
+                                    <span className="font-medium text-foreground">{option.label || option.name || option}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                           <div className="flex items-center justify-between mt-3">
                             <div className="flex items-center gap-3 border border-border/50 rounded-lg p-1 bg-background">
@@ -129,7 +148,7 @@ export function CartSheet() {
                                 variant="ghost"
                                 size="icon"
                                 className="h-7 w-7 hover:bg-secondary"
-                                onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                 disabled={item.quantity <= 1}
                               >
                                 <Minus className="h-3.5 w-3.5" />
@@ -139,12 +158,12 @@ export function CartSheet() {
                                 variant="ghost"
                                 size="icon"
                                 className="h-7 w-7 hover:bg-secondary"
-                                onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               >
                                 <Plus className="h-3.5 w-3.5" />
                               </Button>
                             </div>
-                            <p className="text-sm font-semibold">{formatCurrency(price * item.quantity)}</p>
+                            <p className="text-sm font-semibold">{formatCurrency(itemPrice * item.quantity)}</p>
                           </div>
                         </div>
                       </div>
