@@ -210,15 +210,15 @@ export default function CatalogClient({ heroTitle, products, categories, package
                     </div>
                 ) : (
                     // Main Catalog View
-                    <div className="space-y-20">
+                    <div className="space-y-12">
 
                         {/* Featured Packages / Deals */}
                         {(featuredPackages.length > 0 || featuredProducts.length > 0) && !searchQuery && (
                             <section>
-                                <div className="flex items-center justify-between mb-8">
-                                    <h2 className="text-3xl font-serif font-bold">Featured Deals & Packages</h2>
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-2xl font-serif font-bold">Featured Deals & Packages</h2>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {featuredPackages.map(pkg => (
                                         <PackageCard
                                             key={pkg.id}
@@ -230,7 +230,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                         />
                                     ))}
                                     {/* Also show featured products here if needed, or in a separate section */}
-                                    {featuredProducts.slice(0, 3).map(product => (
+                                    {featuredProducts.slice(0, 1).map(product => (
                                         <ProductCard key={product.id} product={product} />
                                     ))}
                                 </div>

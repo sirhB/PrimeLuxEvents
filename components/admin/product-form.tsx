@@ -79,7 +79,15 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     }
 
     // Modifier State & Handlers
-    const [modifiers, setModifiers] = useState<Modifier[]>(product?.modifiers || [])
+    // Convert modifier price adjustments from cents to dollars for display
+    const modifiersInDollars = product?.modifiers?.map((m: Modifier) => ({
+        ...m,
+        options: m.options.map(o => ({
+            ...o,
+            priceAdjustment: o.priceAdjustment / 100
+        }))
+    })) || []
+    const [modifiers, setModifiers] = useState<Modifier[]>(modifiersInDollars)
 
     const addModifier = () => {
         setModifiers([
@@ -158,15 +166,28 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         setLoading(true)
 
         const formData = new FormData(e.currentTarget)
+        // Convert price from dollars to cents for storage
+        const priceInDollars = parseFloat(formData.get('price') as string)
+        const priceInCents = Math.round(priceInDollars * 100)
+
+        // Convert modifier price adjustments from dollars to cents
+        const modifiersInCents = modifiers.map(m => ({
+            ...m,
+            options: m.options.map(o => ({
+                ...o,
+                priceAdjustment: Math.round(o.priceAdjustment * 100)
+            }))
+        }))
+
         const data = {
             name: formData.get('name') as string,
             description: formData.get('description') as string,
-            price: parseFloat(formData.get('price') as string),
+            price: priceInCents,
             stock: parseInt(formData.get('stock') as string),
             category_id: (formData.get('category_id') as string) || null,
             image_url: formData.get('image_url') as string,
             is_featured: formData.get('is_featured') === 'on',
-            modifiers: modifiers,
+            modifiers: modifiersInCents,
             assembly_items: assemblyItems.filter(item => item.name.trim() !== ''),
         }
 
@@ -215,13 +236,15 @@ export function ProductForm({ product, categories }: ProductFormProps) {
 
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="price">Price</Label>
+                    <Label htmlFor="price">Price ($)</Label>
                     <Input
                         id="price"
                         name="price"
                         type="number"
                         step="0.01"
-                        defaultValue={product?.price}
+                        min="0"
+                        defaultValue={product?.price ? (product.price / 100).toFixed(2) : ''}
+                        placeholder="0.00"
                         required
                     />
                 </div>
