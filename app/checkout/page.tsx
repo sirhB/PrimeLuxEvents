@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
-import { Loader2, Check, AlertCircle, CalendarIcon, Clock, MapPin, Truck, ArrowRight, ArrowLeft, ShoppingBag, Plus, Minus } from 'lucide-react'
+import { Loader2, Check, AlertCircle, CalendarIcon, Clock, MapPin, Truck, ArrowRight, ArrowLeft, ShoppingBag, Plus, Minus, Package } from 'lucide-react'
 import { createOrder, calculateOrderTotal, type CheckoutFormData, type CartItem } from '@/app/actions/checkout'
 import { formatCurrency } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/client'
@@ -51,6 +51,10 @@ export default function CheckoutPage() {
         eventDate: eventDetails?.date ? new Date(eventDetails.date).toISOString().split('T')[0] : '',
         eventType: eventDetails?.eventType || '',
         venueAddress: eventDetails?.venueAddress || '',
+        pickupDate: '',
+        pickupTime: '',
+        pickupNotes: '',
+        sameDayPickup: false,
     })
 
     // Additional Event Details State (not directly in CheckoutFormData but needed for UI/Logic)
@@ -61,6 +65,12 @@ export default function CheckoutPage() {
     const [hasElevator, setHasElevator] = useState(eventDetails?.logistics?.hasElevator || false)
     const [hasStairs, setHasStairs] = useState(eventDetails?.logistics?.hasStairs || false)
     const [hasLoadingDock, setHasLoadingDock] = useState(eventDetails?.logistics?.hasLoadingDock || false)
+
+    // Pickup Details State
+    const [pickupDate, setPickupDate] = useState<Date | undefined>()
+    const [pickupTime, setPickupTime] = useState("")
+    const [sameDayPickup, setSameDayPickup] = useState(false)
+    const [pickupNotes, setPickupNotes] = useState("")
 
     // Redirect if cart is empty (only if loaded)
     useEffect(() => {
@@ -230,7 +240,12 @@ export default function CheckoutPage() {
                 deliveryDate: date ? format(date, 'yyyy-MM-dd') : formData.deliveryDate,
                 eventDate: date ? format(date, 'yyyy-MM-dd') : formData.eventDate,
                 // Ensure delivery time is set, default to start time if empty
-                deliveryTime: formData.deliveryTime || startTime
+                deliveryTime: formData.deliveryTime || startTime,
+                // Include pickup data
+                pickupDate: sameDayPickup ? (date ? format(date, 'yyyy-MM-dd') : formData.eventDate) : (pickupDate ? format(pickupDate, 'yyyy-MM-dd') : ''),
+                pickupTime,
+                pickupNotes,
+                sameDayPickup,
             }
 
             const result = await createOrder(finalFormData, cartItems)
@@ -628,11 +643,19 @@ export default function CheckoutPage() {
                         transition={{ duration: 0.3 }}
                     >
                         <div className="lg:col-span-2 space-y-6">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Review Order</CardTitle>
+                            <Card className="border-primary/20">
+                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <ShoppingBag className="h-5 w-5 text-primary" />
+                                        </div>
+                                        <div>
+                                            <CardTitle>Review Order</CardTitle>
+                                            <CardDescription>Adjust quantities if needed</CardDescription>
+                                        </div>
+                                    </div>
                                 </CardHeader>
-                                <CardContent className="space-y-4">
+                                <CardContent className="space-y-4 pt-6">{" "}
                                     <div className="space-y-3">
                                         {items.map((item, index) => {
                                             const product = cartProducts.find((p) => p.id === item.productId)
@@ -690,12 +713,130 @@ export default function CheckoutPage() {
                                 </CardContent>
                             </Card>
 
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Payment Method</CardTitle>
-                                    <CardDescription>Secure payment processing powered by Stripe</CardDescription>
+                            {/* Pickup Information */}
+                            <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
+                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <Package className="h-5 w-5 text-primary" />
+                                        </div>
+                                        <div>
+                                            <CardTitle>Pickup Information</CardTitle>
+                                            <CardDescription>When should we collect the items?</CardDescription>
+                                        </div>
+                                    </div>
                                 </CardHeader>
-                                <CardContent>
+                                <CardContent className="pt-6 space-y-6">
+                                    {/* Same Day Pickup Toggle */}
+                                    <div className="flex items-center justify-between p-4 rounded-lg border border-primary/20 bg-primary/5">
+                                        <div className="flex items-center gap-3">
+                                            <Clock className="h-5 w-5 text-primary" />
+                                            <div>
+                                                <Label htmlFor="sameDayPickup" className="text-base font-medium cursor-pointer">
+                                                    Same-Day Pickup
+                                                </Label>
+                                                <p className="text-sm text-muted-foreground">Pick up items the same day as your event</p>
+                                            </div>
+                                        </div>
+                                        <Checkbox
+                                            id="sameDayPickup"
+                                            checked={sameDayPickup}
+                                            onCheckedChange={(c) => setSameDayPickup(c as boolean)}
+                                            className="h-5 w-5"
+                                        />
+                                    </div>
+
+                                    {/* Pickup Date */}
+                                    <div className="space-y-2">
+                                        <Label className="flex items-center gap-2">
+                                            <CalendarIcon className="h-4 w-4 text-primary" />
+                                            Pickup Date {!sameDayPickup && "*"}
+                                        </Label>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant={"outline"}
+                                                    className={cn(
+                                                        "w-full justify-start text-left font-normal",
+                                                        !pickupDate && !sameDayPickup && "text-muted-foreground"
+                                                    )}
+                                                    disabled={sameDayPickup}
+                                                >
+                                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                                    {sameDayPickup
+                                                        ? (date ? format(date, "PPP") + " (Same as event)" : "Same as event date")
+                                                        : (pickupDate ? format(pickupDate, "PPP") : <span>Pick a date</span>)
+                                                    }
+                                                </Button>
+                                            </PopoverTrigger>
+                                            {!sameDayPickup && (
+                                                <PopoverContent className="w-auto p-0">
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={pickupDate}
+                                                        onSelect={setPickupDate}
+                                                        initialFocus
+                                                        disabled={(date) => date < new Date()}
+                                                    />
+                                                </PopoverContent>
+                                            )}
+                                        </Popover>
+                                        {sameDayPickup && (
+                                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                                <Check className="h-3 w-3 text-primary" />
+                                                Items will be picked up on the event date
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Pickup Time */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="pickupTime" className="flex items-center gap-2">
+                                            <Clock className="h-4 w-4 text-primary" />
+                                            Preferred Pickup Time
+                                        </Label>
+                                        <Input
+                                            id="pickupTime"
+                                            type="time"
+                                            value={pickupTime}
+                                            onChange={(e) => setPickupTime(e.target.value)}
+                                            className="w-full"
+                                        />
+                                        <p className="text-xs text-muted-foreground">We'll do our best to accommodate your preferred time</p>
+                                    </div>
+
+                                    {/* Pickup Notes */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="pickupNotes" className="flex items-center gap-2">
+                                            <MapPin className="h-4 w-4 text-primary" />
+                                            Pickup Instructions
+                                        </Label>
+                                        <Textarea
+                                            id="pickupNotes"
+                                            placeholder="Any special instructions for pickup? (e.g., loading dock access, contact person, etc.)"
+                                            value={pickupNotes}
+                                            onChange={(e) => setPickupNotes(e.target.value)}
+                                            rows={3}
+                                            className="resize-none"
+                                        />
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Payment Method */}
+                            <Card className="border-primary/20">
+                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                            <Truck className="h-5 w-5 text-primary" />
+                                        </div>
+                                        <div>
+                                            <CardTitle>Payment Method</CardTitle>
+                                            <CardDescription>Secure payment processing powered by Stripe</CardDescription>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="pt-6">
                                     <div className="bg-muted/50 border border-border rounded-lg p-6 text-center space-y-2">
                                         <p className="text-sm text-muted-foreground">
                                             Payment processing will be integrated once Stripe is configured.

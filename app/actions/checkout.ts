@@ -15,6 +15,10 @@ export interface CheckoutFormData {
     eventDate: string
     eventType: string
     venueAddress: string
+    pickupDate?: string
+    pickupTime?: string
+    pickupNotes?: string
+    sameDayPickup?: boolean
 }
 
 export interface CartItem {
@@ -202,6 +206,10 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[])
                 payment_status: 'pending',
                 status: 'pending',
                 is_overbooked: isOverbooked,
+                pickup_date: formData.sameDayPickup ? formData.eventDate : formData.pickupDate,
+                pickup_time: formData.pickupTime,
+                pickup_notes: formData.pickupNotes,
+                same_day_pickup: formData.sameDayPickup || false,
             })
             .select()
             .single()
