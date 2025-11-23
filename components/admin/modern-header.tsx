@@ -22,7 +22,7 @@ export function ModernHeader() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--dashboard-text-muted)]" />
                     <Input
                         placeholder="Search..."
-                        className="pl-10 w-64 bg-[var(--dashboard-card)] border-none text-[var(--dashboard-text)] placeholder:text-[var(--dashboard-text-muted)] rounded-full focus-visible:ring-1 focus-visible:ring-[var(--dashboard-accent-purple)]"
+                        className="pl-10 w-64 bg-[var(--dashboard-card)] border-none text-[var(--dashboard-text)] placeholder:text-[var(--dashboard-text-muted)] rounded-full focus-visible:ring-1 focus-visible:ring-[var(--dashboard-accent-gold)]"
                     />
                 </div>
 
@@ -40,7 +40,7 @@ export function ModernHeader() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full bg-gradient-to-r from-[var(--dashboard-accent-purple)] to-[var(--dashboard-accent-blue)] text-white hover:opacity-90"
+                    className="rounded-full bg-gradient-to-r from-[var(--dashboard-accent-gold)] to-[var(--dashboard-accent-blue)] text-white hover:opacity-90"
                 >
                     <User className="h-5 w-5" />
                 </Button>

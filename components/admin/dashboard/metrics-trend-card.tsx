@@ -12,7 +12,7 @@ interface MetricsTrendCardProps {
 
 export function MetricsTrendCard({ title, value, data, trend }: MetricsTrendCardProps) {
     return (
-        <Card className="bg-gradient-to-br from-[var(--dashboard-accent-purple)]/20 to-[var(--dashboard-accent-blue)]/5 border-none text-[var(--dashboard-text)] shadow-lg overflow-hidden">
+        <Card className="bg-gradient-to-br from-[var(--dashboard-accent-gold)]/20 to-[var(--dashboard-accent-blue)]/5 border-none text-[var(--dashboard-text)] shadow-lg overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)]">
                     {title}
@@ -30,19 +30,19 @@ export function MetricsTrendCard({ title, value, data, trend }: MetricsTrendCard
                         <AreaChart data={data}>
                             <defs>
                                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="var(--dashboard-accent-purple)" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="var(--dashboard-accent-purple)" stopOpacity={0} />
+                                    <stop offset="5%" stopColor="var(--dashboard-accent-gold)" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="var(--dashboard-accent-gold)" stopOpacity={0} />
                                 </linearGradient>
                             </defs>
                             <Tooltip
                                 contentStyle={{ backgroundColor: 'var(--dashboard-card)', border: '1px solid var(--border)', borderRadius: '8px' }}
                                 itemStyle={{ color: 'var(--dashboard-text)' }}
-                                cursor={{ stroke: 'var(--dashboard-accent-purple)', strokeWidth: 1 }}
+                                cursor={{ stroke: 'var(--dashboard-accent-gold)', strokeWidth: 1 }}
                             />
                             <Area
                                 type="monotone"
                                 dataKey="value"
-                                stroke="var(--dashboard-accent-purple)"
+                                stroke="var(--dashboard-accent-gold)"
                                 fillOpacity={1}
                                 fill="url(#colorValue)"
                                 strokeWidth={2}

@@ -58,7 +58,7 @@ export function ModernSidebar() {
             >
                 {/* Logo */}
                 <div className="mb-8">
-                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[var(--dashboard-accent-purple)] to-[var(--dashboard-accent-blue)] flex items-center justify-center text-white font-bold text-xl">
+                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[var(--dashboard-accent-gold)] to-[var(--dashboard-accent-blue)] flex items-center justify-center text-white font-bold text-xl">
                         P
                     </div>
                 </div>
@@ -74,14 +74,14 @@ export function ModernSidebar() {
                                 className={cn(
                                     "flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-200 group relative",
                                     isActive
-                                        ? "bg-transparent text-[var(--dashboard-accent-purple)]"
+                                        ? "bg-transparent text-[var(--dashboard-accent-gold)]"
                                         : "text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)]"
                                 )}
                                 title={item.label}
                             >
-                                <item.icon className={cn("h-6 w-6", isActive && "text-[var(--dashboard-accent-purple)]")} />
+                                <item.icon className={cn("h-6 w-6", isActive && "text-[var(--dashboard-accent-gold)]")} />
                                 {isActive && (
-                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[var(--dashboard-accent-purple)] rounded-r-full" />
+                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[var(--dashboard-accent-gold)] rounded-r-full" />
                                 )}
                             </Link>
                         )

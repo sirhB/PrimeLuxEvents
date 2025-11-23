@@ -58,7 +58,14 @@ export default async function CategoriesPage() {
                         <TableBody>
                             {categories?.map((category) => (
                                 <TableRow key={category.id}>
-                                    <TableCell className="font-medium">{category.name}</TableCell>
+                                    <TableCell className="font-medium">
+                                        <Link
+                                            href={`/admin/products?category_id=${category.id}`}
+                                            className="hover:underline text-[var(--dashboard-accent-gold)]"
+                                        >
+                                            {category.name}
+                                        </Link>
+                                    </TableCell>
                                     <TableCell>{category.slug}</TableCell>
                                     <TableCell>{category.description}</TableCell>
                                     <TableCell className="text-right">

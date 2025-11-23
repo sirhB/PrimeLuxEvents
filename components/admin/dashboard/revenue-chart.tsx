@@ -38,7 +38,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
                             />
                             <Bar
                                 dataKey="total"
-                                fill="var(--dashboard-accent-purple)"
+                                fill="var(--dashboard-accent-gold)"
                                 radius={[4, 4, 0, 0]}
                             />
                         </BarChart>

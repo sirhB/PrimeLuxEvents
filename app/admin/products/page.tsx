@@ -13,12 +13,24 @@ import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { Card, CardContent } from '@/components/ui/card'
 
-export default async function ProductsPage() {
+export default async function ProductsPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ category_id?: string }>
+}) {
+    const { category_id } = await searchParams
     const supabase = await createClient()
-    const { data: products, error } = await supabase
+
+    let query = supabase
         .from('products')
         .select('*, categories(name)')
         .order('created_at', { ascending: false })
+
+    if (category_id) {
+        query = query.eq('category_id', category_id)
+    }
+
+    const { data: products, error } = await query
 
     async function deleteProduct(formData: FormData) {
         'use server'
@@ -34,8 +46,13 @@ export default async function ProductsPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Products</h1>
                     <p className="text-muted-foreground mt-1">
-                        Manage your product catalog and inventory
+                        {category_id ? 'Viewing products in selected category' : 'Manage your product catalog and inventory'}
                     </p>
+                    {category_id && (
+                        <Button variant="link" asChild className="p-0 h-auto text-[var(--dashboard-accent-gold)]">
+                            <Link href="/admin/products">Clear Filter</Link>
+                        </Button>
+                    )}
                 </div>
                 <Button asChild>
                     <Link href="/admin/products/new">
@@ -65,7 +82,7 @@ export default async function ProductsPage() {
                                     <TableCell>{product.stock}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="icon" asChild>
+                                            <Button variant="ghost" size="icon" asChild title="Edit Product">
                                                 <Link href={`/admin/products/${product.id}`}>
                                                     <Pencil className="h-4 w-4" />
                                                     <span className="sr-only">Edit</span>

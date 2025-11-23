@@ -38,7 +38,7 @@ export function RecentActivityList({ orders }: RecentActivityListProps) {
                                 {order.customer_name}
                             </div>
                             <div>
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--dashboard-accent-purple)]/20 text-[var(--dashboard-accent-purple)]">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--dashboard-accent-gold)]/20 text-[var(--dashboard-accent-gold)]">
                                     In progress
                                 </span>
                             </div>
