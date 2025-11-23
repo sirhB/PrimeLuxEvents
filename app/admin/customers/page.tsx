@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/table'
 import { Users } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { SearchInput } from '@/components/admin/search-input'
+import { PaginationControls } from '@/components/admin/pagination-controls'
 
 interface Customer {
     email: string
@@ -20,7 +22,12 @@ interface Customer {
     lastOrderDate?: string
 }
 
-export default async function CustomersPage() {
+export default async function CustomersPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string; search?: string }>
+}) {
+    const { page = '1', search } = await searchParams
     const supabase = await createClient()
 
     // Aggregate customer data from orders and quotes
@@ -84,14 +91,39 @@ export default async function CustomersPage() {
         (a, b) => b.totalSpent - a.totalSpent
     )
 
+    const currentPage = parseInt(page)
+    const pageSize = 10
+
+    let filteredCustomers = customers
+
+    if (search) {
+        const searchLower = search.toLowerCase()
+        filteredCustomers = customers.filter(c =>
+            c.name.toLowerCase().includes(searchLower) ||
+            c.email.toLowerCase().includes(searchLower) ||
+            (c.phone && c.phone.includes(searchLower))
+        )
+    }
+
+    const totalCount = filteredCustomers.length
+    const start = (currentPage - 1) * pageSize
+    const paginatedCustomers = filteredCustomers.slice(start, start + pageSize)
+
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-                <p className="text-muted-foreground mt-1">
-                    View customer information and order history
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
+                    <p className="text-muted-foreground mt-1">
+                        View customer information and order history
+                    </p>
+                </div>
             </div>
+
+            <div className="flex items-center justify-between gap-4">
+                <SearchInput placeholder="Search customers..." />
+            </div>
+
             <Card>
                 <CardContent className="p-0">
                     <Table>
@@ -107,7 +139,7 @@ export default async function CustomersPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {customers.map((customer) => (
+                            {paginatedCustomers.map((customer) => (
                                 <TableRow key={customer.email}>
                                     <TableCell className="font-medium">{customer.name}</TableCell>
                                     <TableCell>{customer.email}</TableCell>
@@ -124,7 +156,7 @@ export default async function CustomersPage() {
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {customers.length === 0 && (
+                            {paginatedCustomers.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={7} className="text-center h-24">
                                         <div className="flex flex-col items-center gap-2">
@@ -138,6 +170,16 @@ export default async function CustomersPage() {
                     </Table>
                 </CardContent>
             </Card>
+
+            {totalCount > 0 && (
+                <PaginationControls
+                    hasNextPage={start + pageSize < totalCount}
+                    hasPrevPage={start > 0}
+                    totalCount={totalCount}
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                />
+            )}
         </div>
     )
 }

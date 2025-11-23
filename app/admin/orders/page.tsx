@@ -12,22 +12,48 @@ import {
 import { Eye } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCents } from '@/lib/format-money'
+import { SearchInput } from '@/components/admin/search-input'
+import { PaginationControls } from '@/components/admin/pagination-controls'
 
-export default async function OrdersPage() {
+export default async function OrdersPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string; search?: string }>
+}) {
+    const { page = '1', search } = await searchParams
     const supabase = await createClient()
-    const { data: orders } = await supabase
+
+    const currentPage = parseInt(page)
+    const pageSize = 10
+    const start = (currentPage - 1) * pageSize
+    const end = start + pageSize - 1
+
+    let query = supabase
         .from('orders')
-        .select('*')
+        .select('*', { count: 'exact' })
         .order('created_at', { ascending: false })
+
+    if (search) {
+        query = query.or(`id.ilike.%${search}%,customer_name.ilike.%${search}%,customer_email.ilike.%${search}%`)
+    }
+
+    const { data: orders, count } = await query.range(start, end)
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
-                <p className="text-muted-foreground mt-1">
-                    View and manage customer orders
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
+                    <p className="text-muted-foreground mt-1">
+                        View and manage customer orders
+                    </p>
+                </div>
             </div>
+
+            <div className="flex items-center justify-between gap-4">
+                <SearchInput placeholder="Search orders..." />
+            </div>
+
             <Card>
                 <CardContent className="p-0">
                     <Table>
@@ -80,7 +106,7 @@ export default async function OrdersPage() {
                             ))}
                             {orders?.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center">
+                                    <TableCell colSpan={7} className="text-center">
                                         No orders found.
                                     </TableCell>
                                 </TableRow>
@@ -89,6 +115,16 @@ export default async function OrdersPage() {
                     </Table>
                 </CardContent>
             </Card>
+
+            {count !== null && count > 0 && (
+                <PaginationControls
+                    hasNextPage={end < count}
+                    hasPrevPage={start > 0}
+                    totalCount={count}
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                />
+            )}
         </div>
     )
 }

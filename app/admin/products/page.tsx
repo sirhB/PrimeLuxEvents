@@ -12,25 +12,36 @@ import {
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { Card, CardContent } from '@/components/ui/card'
+import { SearchInput } from '@/components/admin/search-input'
+import { PaginationControls } from '@/components/admin/pagination-controls'
 
 export default async function ProductsPage({
     searchParams,
 }: {
-    searchParams: Promise<{ category_id?: string }>
+    searchParams: Promise<{ category_id?: string; page?: string; search?: string }>
 }) {
-    const { category_id } = await searchParams
+    const { category_id, page = '1', search } = await searchParams
     const supabase = await createClient()
+
+    const currentPage = parseInt(page)
+    const pageSize = 10
+    const start = (currentPage - 1) * pageSize
+    const end = start + pageSize - 1
 
     let query = supabase
         .from('products')
-        .select('*, categories(name)')
+        .select('*, categories(name)', { count: 'exact' })
         .order('created_at', { ascending: false })
 
     if (category_id) {
         query = query.eq('category_id', category_id)
     }
 
-    const { data: products, error } = await query
+    if (search) {
+        query = query.ilike('name', `%${search}%`)
+    }
+
+    const { data: products, count } = await query.range(start, end)
 
     async function deleteProduct(formData: FormData) {
         'use server'
@@ -61,6 +72,11 @@ export default async function ProductsPage({
                     </Link>
                 </Button>
             </div>
+
+            <div className="flex items-center justify-between gap-4">
+                <SearchInput placeholder="Search products..." />
+            </div>
+
             <Card>
                 <CardContent className="p-0">
                     <Table>
@@ -78,7 +94,12 @@ export default async function ProductsPage({
                                 <TableRow key={product.id}>
                                     <TableCell className="font-medium">{product.name}</TableCell>
                                     <TableCell>{product.categories?.name || 'Uncategorized'}</TableCell>
-                                    <TableCell>${product.price}</TableCell>
+                                    <TableCell>
+                                        {new Intl.NumberFormat('en-US', {
+                                            style: 'currency',
+                                            currency: 'USD',
+                                        }).format(product.price / 100)}
+                                    </TableCell>
                                     <TableCell>{product.stock}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
@@ -110,6 +131,16 @@ export default async function ProductsPage({
                     </Table>
                 </CardContent>
             </Card>
+
+            {count !== null && count > 0 && (
+                <PaginationControls
+                    hasNextPage={end < count}
+                    hasPrevPage={start > 0}
+                    totalCount={count}
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                />
+            )}
         </div>
     )
 }

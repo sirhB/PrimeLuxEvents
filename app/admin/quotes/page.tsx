@@ -13,13 +13,32 @@ import { Eye, FileText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCents } from '@/lib/format-money'
+import { SearchInput } from '@/components/admin/search-input'
+import { PaginationControls } from '@/components/admin/pagination-controls'
 
-export default async function QuotesPage() {
+export default async function QuotesPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string; search?: string }>
+}) {
+    const { page = '1', search } = await searchParams
     const supabase = await createClient()
-    const { data: quotes } = await supabase
+
+    const currentPage = parseInt(page)
+    const pageSize = 10
+    const start = (currentPage - 1) * pageSize
+    const end = start + pageSize - 1
+
+    let query = supabase
         .from('quotes')
-        .select('*')
+        .select('*', { count: 'exact' })
         .order('created_at', { ascending: false })
+
+    if (search) {
+        query = query.or(`id.ilike.%${search}%,customer_name.ilike.%${search}%,customer_email.ilike.%${search}%`)
+    }
+
+    const { data: quotes, count } = await query.range(start, end)
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -38,12 +57,19 @@ export default async function QuotesPage() {
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Quotes</h1>
-                <p className="text-muted-foreground mt-1">
-                    View and manage customer quotes
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Quotes</h1>
+                    <p className="text-muted-foreground mt-1">
+                        View and manage customer quotes
+                    </p>
+                </div>
             </div>
+
+            <div className="flex items-center justify-between gap-4">
+                <SearchInput placeholder="Search quotes..." />
+            </div>
+
             <Card>
                 <CardContent className="p-0">
                     <Table>
@@ -117,6 +143,16 @@ export default async function QuotesPage() {
                     </Table>
                 </CardContent>
             </Card>
+
+            {count !== null && count > 0 && (
+                <PaginationControls
+                    hasNextPage={end < count}
+                    hasPrevPage={start > 0}
+                    totalCount={count}
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                />
+            )}
         </div>
     )
 }
