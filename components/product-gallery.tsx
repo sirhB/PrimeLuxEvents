@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface ProductGalleryProps {
     images: string[]
@@ -17,46 +18,78 @@ interface ProductGalleryProps {
 export function ProductGallery({ images, productName, className, selectedImage: externalSelectedImage }: ProductGalleryProps) {
     const [selectedImage, setSelectedImage] = useState(0)
     const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+    const [direction, setDirection] = useState(0)
 
     // Update selected image when external prop changes
     useEffect(() => {
         if (externalSelectedImage) {
             const index = images.indexOf(externalSelectedImage)
             if (index !== -1) {
+                setDirection(index > selectedImage ? 1 : -1)
                 setSelectedImage(index)
             }
         }
     }, [externalSelectedImage, images])
 
-    const nextImage = () => {
-        setSelectedImage((prev) => (prev + 1) % images.length)
-    }
-
-    const prevImage = () => {
-        setSelectedImage((prev) => (prev - 1 + images.length) % images.length)
+    const paginate = (newDirection: number) => {
+        setDirection(newDirection)
+        setSelectedImage((prev) => (prev + newDirection + images.length) % images.length)
     }
 
     if (images.length === 0) {
         return null
     }
 
+    const variants = {
+        enter: (direction: number) => ({
+            x: direction > 0 ? 1000 : -1000,
+            opacity: 0
+        }),
+        center: {
+            zIndex: 1,
+            x: 0,
+            opacity: 1
+        },
+        exit: (direction: number) => ({
+            zIndex: 0,
+            x: direction < 0 ? 1000 : -1000,
+            opacity: 0
+        })
+    }
+
     return (
         <>
             <div className={cn("space-y-4", className)}>
-                {/* Main Image */}
-                <div className="relative aspect-[3/4] bg-secondary overflow-hidden rounded-lg group">
-                    <Image
-                        src={images[selectedImage]}
-                        alt={`${productName} - Image ${selectedImage + 1}`}
-                        fill
-                        className="object-cover"
-                        priority
-                    />
+                {/* Main Image Container */}
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-secondary group">
+                    <AnimatePresence initial={false} custom={direction}>
+                        <motion.div
+                            key={selectedImage}
+                            custom={direction}
+                            variants={variants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{
+                                x: { type: "spring", stiffness: 300, damping: 30 },
+                                opacity: { duration: 0.2 }
+                            }}
+                            className="absolute inset-0 w-full h-full"
+                        >
+                            <Image
+                                src={images[selectedImage]}
+                                alt={`${productName} - Image ${selectedImage + 1}`}
+                                fill
+                                className="object-cover"
+                                priority
+                            />
+                        </motion.div>
+                    </AnimatePresence>
 
                     {/* Zoom Button */}
                     <button
                         onClick={() => setIsLightboxOpen(true)}
-                        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-background/90 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-background/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-background"
                     >
                         <ZoomIn className="h-5 w-5" />
                     </button>
@@ -65,14 +98,14 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                     {images.length > 1 && (
                         <>
                             <button
-                                onClick={prevImage}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/90 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                onClick={() => paginate(-1)}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-background"
                             >
                                 <ChevronLeft className="h-5 w-5" />
                             </button>
                             <button
-                                onClick={nextImage}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/90 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                onClick={() => paginate(1)}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-background"
                             >
                                 <ChevronRight className="h-5 w-5" />
                             </button>
@@ -81,7 +114,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
                     {/* Image Counter */}
                     {images.length > 1 && (
-                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-background/90 backdrop-blur text-sm">
+                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-background/80 backdrop-blur text-xs font-medium">
                             {selectedImage + 1} / {images.length}
                         </div>
                     )}
@@ -89,13 +122,16 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
                 {/* Thumbnails */}
                 {images.length > 1 && (
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="flex gap-2 overflow-x-auto pb-2 px-1 scrollbar-hide">
                         {images.map((image, index) => (
                             <button
                                 key={index}
-                                onClick={() => setSelectedImage(index)}
+                                onClick={() => {
+                                    setDirection(index > selectedImage ? 1 : -1)
+                                    setSelectedImage(index)
+                                }}
                                 className={cn(
-                                    "relative aspect-square bg-secondary overflow-hidden rounded-md transition-all",
+                                    "relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all",
                                     selectedImage === index
                                         ? "ring-2 ring-primary ring-offset-2"
                                         : "opacity-60 hover:opacity-100"
@@ -115,27 +151,44 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
             {/* Lightbox */}
             <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
-                <DialogContent className="max-w-7xl w-full h-[90vh] p-0">
-                    <div className="relative w-full h-full flex items-center justify-center bg-black">
-                        <Image
-                            src={images[selectedImage]}
-                            alt={`${productName} - Image ${selectedImage + 1}`}
-                            fill
-                            className="object-contain"
-                        />
+                <DialogContent className="max-w-[95vw] w-full h-[90vh] p-0 border-none bg-black/95">
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        <AnimatePresence initial={false} custom={direction}>
+                            <motion.div
+                                key={selectedImage}
+                                custom={direction}
+                                variants={variants}
+                                initial="enter"
+                                animate="center"
+                                exit="exit"
+                                transition={{
+                                    x: { type: "spring", stiffness: 300, damping: 30 },
+                                    opacity: { duration: 0.2 }
+                                }}
+                                className="absolute inset-0 w-full h-full"
+                            >
+                                <Image
+                                    src={images[selectedImage]}
+                                    alt={`${productName} - Image ${selectedImage + 1}`}
+                                    fill
+                                    className="object-contain"
+                                    quality={100}
+                                />
+                            </motion.div>
+                        </AnimatePresence>
 
                         {/* Navigation in Lightbox */}
                         {images.length > 1 && (
                             <>
                                 <button
-                                    onClick={prevImage}
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors z-10"
+                                    onClick={() => paginate(-1)}
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors z-20"
                                 >
                                     <ChevronLeft className="h-6 w-6 text-white" />
                                 </button>
                                 <button
-                                    onClick={nextImage}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors z-10"
+                                    onClick={() => paginate(1)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors z-20"
                                 >
                                     <ChevronRight className="h-6 w-6 text-white" />
                                 </button>
@@ -145,17 +198,10 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                         {/* Close Button */}
                         <button
                             onClick={() => setIsLightboxOpen(false)}
-                            className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors z-10"
+                            className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors z-20"
                         >
                             <X className="h-5 w-5 text-white" />
                         </button>
-
-                        {/* Image Counter */}
-                        {images.length > 1 && (
-                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-white/10 backdrop-blur text-white">
-                                {selectedImage + 1} / {images.length}
-                            </div>
-                        )}
                     </div>
                 </DialogContent>
             </Dialog>
