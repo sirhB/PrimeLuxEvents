@@ -35,8 +35,8 @@ export function MetricsTrendCard({ title, value, data, trend }: MetricsTrendCard
                                 </linearGradient>
                             </defs>
                             <Tooltip
-                                contentStyle={{ backgroundColor: '#18181B', border: 'none', borderRadius: '8px' }}
-                                itemStyle={{ color: '#fff' }}
+                                contentStyle={{ backgroundColor: 'var(--dashboard-card)', border: '1px solid var(--border)', borderRadius: '8px' }}
+                                itemStyle={{ color: 'var(--dashboard-text)' }}
                                 cursor={{ stroke: 'var(--dashboard-accent-purple)', strokeWidth: 1 }}
                             />
                             <Area

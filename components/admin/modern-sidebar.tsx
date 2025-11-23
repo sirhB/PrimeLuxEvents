@@ -52,7 +52,7 @@ export function ModernSidebar() {
             {/* Sidebar Container */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-40 w-20 flex flex-col items-center py-8 transition-transform duration-300 ease-in-out md:translate-x-0 bg-[var(--dashboard-background)] border-r border-[var(--dashboard-card)]",
+                    "fixed inset-y-0 left-0 z-40 w-20 flex flex-col items-center py-8 transition-transform duration-300 ease-in-out md:translate-x-0 bg-[var(--dashboard-background)] border-r border-[var(--border)]",
                     isMobileOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >

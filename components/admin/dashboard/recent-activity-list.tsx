@@ -15,10 +15,10 @@ export function RecentActivityList({ orders }: RecentActivityListProps) {
                 <div className="flex items-center gap-4">
                     <CardTitle className="text-lg font-medium">Recent Orders</CardTitle>
                     <div className="flex items-center gap-2 text-sm text-[var(--dashboard-text-muted)]">
-                        <span className="cursor-pointer hover:text-white">Filter</span>
+                        <span className="cursor-pointer hover:text-[var(--dashboard-text)]">Filter</span>
                     </div>
                 </div>
-                <Button variant="ghost" size="sm" asChild className="text-[var(--dashboard-text-muted)] hover:text-white">
+                <Button variant="ghost" size="sm" asChild className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)]">
                     <Link href="/admin/orders" className="flex items-center gap-1">
                         See all <ArrowRight className="h-4 w-4" />
                     </Link>

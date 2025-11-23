@@ -58,12 +58,12 @@
   --sidebar-border: oklch(0.88 0.02 90);
   --sidebar-ring: oklch(0.15 0.02 85);
 
-  /* Modern Dashboard Colors */
-  --dashboard-background: #0F0F12;
-  --dashboard-card: #18181B;
-  --dashboard-card-hover: #202024;
-  --dashboard-text: #FFFFFF;
-  --dashboard-text-muted: #A1A1AA;
+  /* Modern Dashboard Colors - Mapped to Original Palette */
+  --dashboard-background: var(--background);
+  --dashboard-card: var(--card);
+  --dashboard-card-hover: var(--secondary);
+  --dashboard-text: var(--foreground);
+  --dashboard-text-muted: var(--muted-foreground);
   --dashboard-accent-purple: #8B5CF6;
   --dashboard-accent-green: #10B981;
   --dashboard-accent-orange: #F59E0B;

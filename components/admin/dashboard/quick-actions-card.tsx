@@ -18,12 +18,12 @@ export function QuickActionsCard() {
                     Manage your store efficiently.
                 </p>
                 <div className="flex gap-3">
-                    <Button asChild className="bg-[var(--dashboard-card)] hover:bg-[var(--dashboard-card-hover)] text-white border-none">
+                    <Button asChild className="bg-[var(--dashboard-card)] hover:bg-[var(--dashboard-card-hover)] text-[var(--dashboard-text)] border-none">
                         <Link href="/admin/products/new">
                             Add Product
                         </Link>
                     </Button>
-                    <Button variant="ghost" size="icon" asChild className="rounded-full bg-[var(--dashboard-card)]/50 hover:bg-[var(--dashboard-card)] text-white">
+                    <Button variant="ghost" size="icon" asChild className="rounded-full bg-[var(--dashboard-card)]/50 hover:bg-[var(--dashboard-card)] text-[var(--dashboard-text)]">
                         <Link href="/admin/orders">
                             <ArrowRight className="h-4 w-4" />
                         </Link>
