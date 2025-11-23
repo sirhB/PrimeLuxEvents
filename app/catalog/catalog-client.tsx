@@ -4,7 +4,9 @@ import { useState, useMemo } from 'react'
 import { ProductCard } from '@/components/product-card'
 import { SearchBar } from '@/components/catalog/search-bar'
 import { CategoryCard } from '@/components/catalog/category-card'
-import { PackageCard } from '@/components/catalog/package-card'
+import { FeaturedProductCard } from '@/components/catalog/featured-product-card'
+import { DealCard } from '@/components/catalog/deal-card'
+import { CarouselSection } from '@/components/catalog/carousel-section'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, LayoutGrid, List } from 'lucide-react'
 import Image from 'next/image'
@@ -210,31 +212,43 @@ export default function CatalogClient({ heroTitle, products, categories, package
                     </div>
                 ) : (
                     // Main Catalog View
-                    <div className="space-y-12">
+                    <div className="space-y-16">
 
-                        {/* Featured Packages / Deals */}
-                        {(featuredPackages.length > 0 || featuredProducts.length > 0) && !searchQuery && (
-                            <section>
-                                <div className="flex items-center justify-between mb-6">
-                                    <h2 className="text-2xl font-serif font-bold">Featured Deals & Packages</h2>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {featuredPackages.map(pkg => (
-                                        <PackageCard
-                                            key={pkg.id}
+                        {/* Featured Products Carousel */}
+                        {featuredProducts.length > 0 && !searchQuery && (
+                            <CarouselSection
+                                title="Featured Rentals"
+                                subtitle="Hand-picked premium pieces that define luxury and elegance"
+                            >
+                                {featuredProducts.map(product => (
+                                    <div key={product.id} className="flex-[0_0_85%] md:flex-[0_0_60%] lg:flex-[0_0_45%] min-w-0">
+                                        <FeaturedProductCard product={product} />
+                                    </div>
+                                ))}
+                            </CarouselSection>
+                        )}
+
+                        {/* Deals & Packages Carousel */}
+                        {featuredPackages.length > 0 && !searchQuery && (
+                            <CarouselSection
+                                title="Special Deals & Packages"
+                                subtitle="Limited-time offers on our most popular packages"
+                                autoPlay={true}
+                                autoPlayInterval={6000}
+                            >
+                                {featuredPackages.map(pkg => (
+                                    <div key={pkg.id} className="flex-[0_0_85%] md:flex-[0_0_55%] lg:flex-[0_0_40%] min-w-0">
+                                        <DealCard
                                             name={pkg.name}
                                             description={pkg.description}
                                             price={pkg.price}
                                             imageUrl={pkg.image_url}
                                             onViewDetails={() => console.log('View package', pkg.id)}
+                                            dealBadge="PACKAGE DEAL"
                                         />
-                                    ))}
-                                    {/* Also show featured products here if needed, or in a separate section */}
-                                    {featuredProducts.slice(0, 1).map(product => (
-                                        <ProductCard key={product.id} product={product} />
-                                    ))}
-                                </div>
-                            </section>
+                                    </div>
+                                ))}
+                            </CarouselSection>
                         )}
 
                         {/* Categories Grid */}

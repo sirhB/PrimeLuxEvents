@@ -1,0 +1,168 @@
+'use client'
+
+import { ReactNode, useCallback, useEffect, useState } from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+
+interface CarouselSectionProps {
+    title: string
+    subtitle?: string
+    children: ReactNode
+    autoPlay?: boolean
+    autoPlayInterval?: number
+}
+
+export function CarouselSection({
+    title,
+    subtitle,
+    children,
+    autoPlay = false,
+    autoPlayInterval = 5000
+}: CarouselSectionProps) {
+    const [emblaRef, emblaApi] = useEmblaCarousel({
+        loop: true,
+        align: 'start',
+        skipSnaps: false,
+        dragFree: false,
+    })
+
+    const [prevBtnEnabled, setPrevBtnEnabled] = useState(false)
+    const [nextBtnEnabled, setNextBtnEnabled] = useState(false)
+    const [selectedIndex, setSelectedIndex] = useState(0)
+    const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
+
+    const scrollPrev = useCallback(() => {
+        if (emblaApi) emblaApi.scrollPrev()
+    }, [emblaApi])
+
+    const scrollNext = useCallback(() => {
+        if (emblaApi) emblaApi.scrollNext()
+    }, [emblaApi])
+
+    const scrollTo = useCallback((index: number) => {
+        if (emblaApi) emblaApi.scrollTo(index)
+    }, [emblaApi])
+
+    const onSelect = useCallback(() => {
+        if (!emblaApi) return
+        setSelectedIndex(emblaApi.selectedScrollSnap())
+        setPrevBtnEnabled(emblaApi.canScrollPrev())
+        setNextBtnEnabled(emblaApi.canScrollNext())
+    }, [emblaApi])
+
+    useEffect(() => {
+        if (!emblaApi) return
+        onSelect()
+        setScrollSnaps(emblaApi.scrollSnapList())
+        emblaApi.on('select', onSelect)
+        emblaApi.on('reInit', onSelect)
+
+        return () => {
+            emblaApi.off('select', onSelect)
+            emblaApi.off('reInit', onSelect)
+        }
+    }, [emblaApi, onSelect])
+
+    // Auto-play functionality
+    useEffect(() => {
+        if (!emblaApi || !autoPlay) return
+
+        const interval = setInterval(() => {
+            if (emblaApi.canScrollNext()) {
+                emblaApi.scrollNext()
+            } else {
+                emblaApi.scrollTo(0)
+            }
+        }, autoPlayInterval)
+
+        return () => clearInterval(interval)
+    }, [emblaApi, autoPlay, autoPlayInterval])
+
+    return (
+        <section className="relative">
+            {/* Header */}
+            <div className="flex items-end justify-between mb-8">
+                <div>
+                    <h2 className="text-3xl md:text-4xl font-serif font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                        {title}
+                    </h2>
+                    {subtitle && (
+                        <p className="text-muted-foreground text-sm md:text-base max-w-2xl">
+                            {subtitle}
+                        </p>
+                    )}
+                </div>
+
+                {/* Navigation Arrows - Desktop */}
+                <div className="hidden md:flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={scrollPrev}
+                        disabled={!prevBtnEnabled}
+                        className="h-12 w-12 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30 transition-all duration-300"
+                    >
+                        <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={scrollNext}
+                        disabled={!nextBtnEnabled}
+                        className="h-12 w-12 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30 transition-all duration-300"
+                    >
+                        <ChevronRight className="h-5 w-5" />
+                    </Button>
+                </div>
+            </div>
+
+            {/* Carousel */}
+            <div className="overflow-hidden" ref={emblaRef}>
+                <div className="flex gap-6 md:gap-8">
+                    {children}
+                </div>
+            </div>
+
+            {/* Dot Indicators */}
+            <div className="flex items-center justify-center gap-2 mt-8">
+                {scrollSnaps.map((_, index) => (
+                    <button
+                        key={index}
+                        onClick={() => scrollTo(index)}
+                        className={cn(
+                            "h-2 rounded-full transition-all duration-300",
+                            index === selectedIndex
+                                ? "w-8 bg-gold"
+                                : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                        )}
+                        aria-label={`Go to slide ${index + 1}`}
+                    />
+                ))}
+            </div>
+
+            {/* Mobile Navigation Arrows */}
+            <div className="flex md:hidden items-center justify-center gap-4 mt-6">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollPrev}
+                    disabled={!prevBtnEnabled}
+                    className="h-10 w-10 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30"
+                >
+                    <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={scrollNext}
+                    disabled={!nextBtnEnabled}
+                    className="h-10 w-10 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30"
+                >
+                    <ChevronRight className="h-4 w-4" />
+                </Button>
+            </div>
+        </section>
+    )
+}
