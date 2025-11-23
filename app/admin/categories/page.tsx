@@ -9,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, Eye } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { Card, CardContent } from '@/components/ui/card'
 
@@ -58,19 +58,18 @@ export default async function CategoriesPage() {
                         <TableBody>
                             {categories?.map((category) => (
                                 <TableRow key={category.id}>
-                                    <TableCell className="font-medium">
-                                        <Link
-                                            href={`/admin/products?category_id=${category.id}`}
-                                            className="hover:underline text-[var(--dashboard-accent-gold)]"
-                                        >
-                                            {category.name}
-                                        </Link>
-                                    </TableCell>
+                                    <TableCell className="font-medium">{category.name}</TableCell>
                                     <TableCell>{category.slug}</TableCell>
                                     <TableCell>{category.description}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="icon" asChild>
+                                            <Button variant="ghost" size="icon" asChild title="View Products">
+                                                <Link href={`/admin/products?category_id=${category.id}`}>
+                                                    <Eye className="h-4 w-4" />
+                                                    <span className="sr-only">View Products</span>
+                                                </Link>
+                                            </Button>
+                                            <Button variant="ghost" size="icon" asChild title="Edit Category">
                                                 <Link href={`/admin/categories/${category.id}`}>
                                                     <Pencil className="h-4 w-4" />
                                                     <span className="sr-only">Edit</span>
@@ -78,7 +77,7 @@ export default async function CategoriesPage() {
                                             </Button>
                                             <form action={deleteCategory}>
                                                 <input type="hidden" name="id" value={category.id} />
-                                                <Button variant="ghost" size="icon" type="submit">
+                                                <Button variant="ghost" size="icon" type="submit" title="Delete Category">
                                                     <Trash2 className="h-4 w-4 text-red-500" />
                                                     <span className="sr-only">Delete</span>
                                                 </Button>
