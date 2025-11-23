@@ -141,6 +141,14 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[])
         // Calculate totals
         const totals = await calculateOrderTotal(items, formData.deliveryAddress)
 
+        // Validate that all items exist
+        if (totals.products.length !== items.length) {
+            const foundIds = totals.products.map(p => p.id)
+            const missingItems = items.filter(i => !foundIds.includes(i.productId))
+            console.error('Missing products:', missingItems)
+            throw new Error('Some items in your cart are no longer available. Please refresh the page.')
+        }
+
         // Create payment intent (mock for now if no Stripe key)
         let paymentIntent
         if (stripe) {
