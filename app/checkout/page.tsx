@@ -314,43 +314,118 @@ export default function CheckoutPage() {
         <div className="min-h-screen bg-background py-12">
             <div className="container max-w-4xl mx-auto px-4">
                 {/* Progress Steps */}
-                <div className="mb-8">
-                    <div className="flex items-center justify-between relative">
-                        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-0.5 bg-border -z-10"></div>
-                        {[1, 2, 3].map((step) => (
-                            <motion.div
-                                key={step}
-                                className={cn(
-                                    "flex flex-col items-center gap-2 bg-background px-2",
-                                    step <= currentStep ? "text-primary" : "text-muted-foreground"
-                                )}
-                                initial={false}
-                                animate={{
-                                    scale: step === currentStep ? 1.05 : 1,
-                                }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <motion.div
-                                    className={cn(
-                                        "h-8 w-8 rounded-full flex items-center justify-center border-2 font-medium text-sm",
-                                        step <= currentStep ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground bg-background"
-                                    )}
-                                    initial={false}
-                                    animate={{
-                                        backgroundColor: step <= currentStep ? "hsl(var(--primary))" : "hsl(var(--background))",
-                                        borderColor: step <= currentStep ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))",
-                                    }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    {step}
-                                </motion.div>
-                                <span className="text-xs font-medium hidden sm:block">
-                                    {step === 1 ? "Add-ons" : step === 2 ? "Details" : "Payment"}
-                                </span>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
+                <motion.div
+                    className="mb-12"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5 shadow-lg">
+                        <CardContent className="p-6">
+                            <div className="relative">
+                                {/* Progress Bar Background */}
+                                <div className="absolute left-0 top-[52px] w-full h-1 bg-border rounded-full overflow-hidden">
+                                    <motion.div
+                                        className="h-full bg-gradient-to-r from-primary to-primary/60"
+                                        initial={{ width: "0%" }}
+                                        animate={{
+                                            width: currentStep === 1 ? "0%" : currentStep === 2 ? "50%" : "100%"
+                                        }}
+                                        transition={{ duration: 0.5, ease: "easeInOut" }}
+                                    />
+                                </div>
+
+                                {/* Steps */}
+                                <div className="flex items-start justify-between relative">
+                                    {[
+                                        { num: 1, label: "Add-ons", desc: "Complete your look" },
+                                        { num: 2, label: "Details", desc: "Event information" },
+                                        { num: 3, label: "Payment", desc: "Review & confirm" }
+                                    ].map((step, index) => (
+                                        <motion.div
+                                            key={step.num}
+                                            className={cn(
+                                                "flex flex-col items-center gap-3 bg-background px-4 py-2 rounded-lg relative z-10",
+                                                "transition-all duration-300",
+                                                step.num <= currentStep ? "text-primary" : "text-muted-foreground"
+                                            )}
+                                            initial={false}
+                                            animate={{
+                                                scale: step.num === currentStep ? 1.05 : 1,
+                                                y: step.num === currentStep ? -4 : 0,
+                                            }}
+                                            transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
+                                        >
+                                            {/* Step Circle */}
+                                            <motion.div
+                                                className={cn(
+                                                    "relative h-14 w-14 rounded-full flex items-center justify-center font-bold text-lg shadow-md",
+                                                    "transition-all duration-300",
+                                                    step.num < currentStep
+                                                        ? "bg-primary text-primary-foreground border-2 border-primary"
+                                                        : step.num === currentStep
+                                                            ? "bg-primary text-primary-foreground border-4 border-primary/30 shadow-lg shadow-primary/20"
+                                                            : "bg-muted text-muted-foreground border-2 border-border"
+                                                )}
+                                                initial={false}
+                                                animate={{
+                                                    boxShadow: step.num === currentStep
+                                                        ? "0 10px 25px -5px rgba(var(--primary-rgb, 217 119 6) / 0.3), 0 8px 10px -6px rgba(var(--primary-rgb, 217 119 6) / 0.3)"
+                                                        : "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+                                                }}
+                                                whileHover={{ scale: 1.1 }}
+                                            >
+                                                {step.num < currentStep ? (
+                                                    <motion.div
+                                                        initial={{ scale: 0, rotate: -180 }}
+                                                        animate={{ scale: 1, rotate: 0 }}
+                                                        transition={{ type: "spring", stiffness: 200 }}
+                                                    >
+                                                        <Check className="h-7 w-7" />
+                                                    </motion.div>
+                                                ) : (
+                                                    <span>{step.num}</span>
+                                                )}
+
+                                                {/* Pulse animation for current step */}
+                                                {step.num === currentStep && (
+                                                    <motion.div
+                                                        className="absolute inset-0 rounded-full bg-primary"
+                                                        initial={{ scale: 1, opacity: 0.5 }}
+                                                        animate={{ scale: 1.5, opacity: 0 }}
+                                                        transition={{
+                                                            duration: 2,
+                                                            repeat: Infinity,
+                                                            ease: "easeOut"
+                                                        }}
+                                                    />
+                                                )}
+                                            </motion.div>
+
+                                            {/* Step Label */}
+                                            <div className="text-center">
+                                                <motion.p
+                                                    className={cn(
+                                                        "font-semibold text-sm sm:text-base whitespace-nowrap",
+                                                        step.num === currentStep && "text-primary"
+                                                    )}
+                                                    animate={{
+                                                        fontWeight: step.num === currentStep ? 700 : 600,
+                                                    }}
+                                                >
+                                                    {step.label}
+                                                </motion.p>
+                                                <p className="text-xs text-muted-foreground hidden sm:block mt-1">
+                                                    {step.desc}
+                                                </p>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.div>
 
                 <motion.h1
                     className="text-3xl font-serif mb-8 text-center"
