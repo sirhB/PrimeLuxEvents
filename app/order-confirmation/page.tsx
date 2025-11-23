@@ -2,13 +2,15 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Check, Loader2, Package, Mail, Phone } from 'lucide-react'
+import { Check, Loader2, Package, Mail, Phone, MapPin, Calendar, Clock, ArrowRight, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { formatCurrency } from '@/lib/stripe'
 import { format } from 'date-fns'
+import { motion } from 'framer-motion'
+import confetti from 'canvas-confetti'
 
 function OrderConfirmationContent() {
     const searchParams = useSearchParams()
@@ -38,6 +40,27 @@ function OrderConfirmationContent() {
                 if (itemsData) {
                     setOrderItems(itemsData)
                 }
+
+                // Trigger confetti
+                const duration = 3 * 1000
+                const animationEnd = Date.now() + duration
+                const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
+
+                const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min
+
+                const interval: any = setInterval(function () {
+                    const timeLeft = animationEnd - Date.now()
+
+                    if (timeLeft <= 0) {
+                        return clearInterval(interval)
+                    }
+
+                    const particleCount = 50 * (timeLeft / duration)
+
+                    // since particles fall down, start a bit higher than random
+                    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } })
+                    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } })
+                }, 250)
             }
 
             setIsLoading(false)
@@ -70,168 +93,187 @@ function OrderConfirmationContent() {
     }
 
     return (
-        <div className="min-h-screen bg-background py-12">
-            <div className="container max-w-4xl mx-auto px-4">
-                {/* Success Header */}
-                <div className="text-center mb-8">
-                    <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 mx-auto mb-4">
-                        <Check className="h-8 w-8" />
-                    </div>
-                    <h1 className="text-4xl font-serif mb-2">Order Confirmed!</h1>
-                    <p className="text-muted-foreground">
-                        Thank you for your order. We've sent a confirmation email to {order.customer_email}
+        <div className="min-h-screen bg-background py-12 relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-amber-50/50 to-transparent -z-10" />
+
+            <div className="container max-w-3xl mx-auto px-4">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="text-center mb-12"
+                >
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                        className="h-24 w-24 rounded-full bg-green-100 flex items-center justify-center text-green-600 mx-auto mb-6 shadow-sm"
+                    >
+                        <Check className="h-12 w-12" />
+                    </motion.div>
+                    <h1 className="text-4xl md:text-5xl font-serif mb-4 text-foreground">Order Confirmed!</h1>
+                    <p className="text-lg text-muted-foreground max-w-md mx-auto">
+                        Thank you for choosing PrimeLux Events. We've sent a confirmation email to <span className="font-medium text-foreground">{order.customer_email}</span>.
                     </p>
-                </div>
+                    <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-full text-sm font-medium border border-amber-100">
+                        <Package className="h-4 w-4" />
+                        Order #{order.id.slice(0, 8).toUpperCase()}
+                    </div>
+                </motion.div>
 
-                {/* Order Details */}
-                <div className="grid md:grid-cols-2 gap-6 mb-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Package className="h-5 w-5" />
-                                Order Information
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2 text-sm">
-                            <div>
-                                <span className="text-muted-foreground">Order Number:</span>
-                                <p className="font-mono">{order.id.slice(0, 8).toUpperCase()}</p>
-                            </div>
-                            <div>
-                                <span className="text-muted-foreground">Order Date:</span>
-                                <p>{format(new Date(order.created_at), 'PPP')}</p>
-                            </div>
-                            <div>
-                                <span className="text-muted-foreground">Status:</span>
-                                <p className="capitalize">{order.status}</p>
-                            </div>
-                            <div>
-                                <span className="text-muted-foreground">Payment Status:</span>
-                                <p className="capitalize">{order.payment_status}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <Mail className="h-5 w-5" />
-                                Contact Information
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2 text-sm">
-                            <div>
-                                <span className="text-muted-foreground">Name:</span>
-                                <p>{order.customer_name}</p>
-                            </div>
-                            <div>
-                                <span className="text-muted-foreground">Email:</span>
-                                <p>{order.customer_email}</p>
-                            </div>
-                            <div>
-                                <span className="text-muted-foreground">Phone:</span>
-                                <p>{order.customer_phone}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Delivery Details */}
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>Delivery Details</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2 text-sm">
-                        <div>
-                            <span className="text-muted-foreground">Delivery Address:</span>
-                            <p>{order.delivery_address}</p>
-                        </div>
-                        <div className="grid sm:grid-cols-2 gap-4">
-                            <div>
-                                <span className="text-muted-foreground">Delivery Date:</span>
-                                <p>{order.delivery_date ? format(new Date(order.delivery_date), 'PPP') : 'TBD'}</p>
-                            </div>
-                            <div>
-                                <span className="text-muted-foreground">Delivery Time:</span>
-                                <p>{order.delivery_time || 'TBD'}</p>
-                            </div>
-                        </div>
-                        {order.delivery_notes && (
-                            <div>
-                                <span className="text-muted-foreground">Special Instructions:</span>
-                                <p>{order.delivery_notes}</p>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-
-                {/* Order Items */}
-                <Card className="mb-6">
-                    <CardHeader>
-                        <CardTitle>Order Items</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            {orderItems.map((item) => (
-                                <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0">
-                                    <div className="h-16 w-16 rounded border bg-muted overflow-hidden flex-shrink-0">
-                                        <img
-                                            src={item.products?.image_url || '/placeholder.svg'}
-                                            alt={item.products?.name}
-                                            className="h-full w-full object-cover"
-                                        />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h4 className="font-medium">{item.products?.name}</h4>
-                                        <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-medium">{formatCurrency(item.price_at_time * item.quantity)}</p>
-                                        <p className="text-sm text-muted-foreground">{formatCurrency(item.price_at_time)} each</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Order Summary */}
-                        <div className="mt-6 pt-6 border-t space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Subtotal</span>
-                                <span>{formatCurrency(order.subtotal)}</span>
-                            </div>
-                            {order.setup_fee > 0 && (
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Setup Fee</span>
-                                    <span>{formatCurrency(order.setup_fee)}</span>
-                                </div>
-                            )}
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                    Tax ({((order.tax_rate || 0) * 100).toFixed(2)}%)
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="space-y-6"
+                >
+                    {/* Order Summary Card */}
+                    <Card className="overflow-hidden border-border/50 shadow-sm">
+                        <CardHeader className="bg-muted/30 border-b border-border/50 pb-4">
+                            <div className="flex items-center justify-between">
+                                <CardTitle className="text-lg font-serif">Order Summary</CardTitle>
+                                <span className="text-sm text-muted-foreground">
+                                    {format(new Date(order.created_at), 'PPP')}
                                 </span>
-                                <span>{formatCurrency(order.tax_amount)}</span>
                             </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">Delivery Fee</span>
-                                <span>{formatCurrency(order.delivery_fee)}</span>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="divide-y divide-border/50">
+                                {orderItems.map((item) => (
+                                    <div key={item.id} className="flex gap-4 p-6 hover:bg-muted/10 transition-colors">
+                                        <div className="h-20 w-20 rounded-lg border bg-muted overflow-hidden flex-shrink-0">
+                                            <img
+                                                src={item.products?.image_url || '/placeholder.svg'}
+                                                alt={item.products?.name}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-medium text-base truncate">{item.products?.name}</h4>
+                                            <p className="text-sm text-muted-foreground mt-1">Quantity: {item.quantity}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-medium">{formatCurrency(item.price_at_time * item.quantity)}</p>
+                                            <p className="text-sm text-muted-foreground">{formatCurrency(item.price_at_time)} ea</p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="flex justify-between font-medium text-lg pt-2 border-t">
-                                <span>Total</span>
-                                <span>{formatCurrency(order.total_amount)}</span>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
 
-                {/* Actions */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button asChild variant="outline">
-                        <Link href="/catalog">Continue Shopping</Link>
-                    </Button>
-                    <Button asChild>
-                        <Link href="/">Return Home</Link>
-                    </Button>
-                </div>
+                            <div className="bg-muted/30 p-6 space-y-3">
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Subtotal</span>
+                                    <span>{formatCurrency(order.subtotal)}</span>
+                                </div>
+                                {order.setup_fee > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-muted-foreground">Setup Fee</span>
+                                        <span>{formatCurrency(order.setup_fee)}</span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">
+                                        Tax ({((order.tax_rate || 0) * 100).toFixed(2)}%)
+                                    </span>
+                                    <span>{formatCurrency(order.tax_amount)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-muted-foreground">Delivery Fee</span>
+                                    <span>{formatCurrency(order.delivery_fee)}</span>
+                                </div>
+                                <div className="flex justify-between font-serif text-xl pt-4 border-t border-border/50 mt-4">
+                                    <span>Total</span>
+                                    <span>{formatCurrency(order.total_amount)}</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Details Grid */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {/* Delivery Details */}
+                        <Card className="border-border/50 shadow-sm h-full">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-lg font-serif">
+                                    <MapPin className="h-5 w-5 text-primary" />
+                                    Delivery Details
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div>
+                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Address</span>
+                                    <p className="mt-1">{order.delivery_address}</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Date</span>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                                            <p>{order.delivery_date ? format(new Date(order.delivery_date), 'PPP') : 'TBD'}</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Time</span>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <Clock className="h-4 w-4 text-muted-foreground" />
+                                            <p>{order.delivery_time || 'TBD'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {order.delivery_notes && (
+                                    <div className="pt-2 border-t border-border/50">
+                                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Notes</span>
+                                        <p className="mt-1 text-sm text-muted-foreground italic">"{order.delivery_notes}"</p>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        {/* Contact Info */}
+                        <Card className="border-border/50 shadow-sm h-full">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2 text-lg font-serif">
+                                    <Mail className="h-5 w-5 text-primary" />
+                                    Contact Information
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div>
+                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Customer</span>
+                                    <p className="mt-1 font-medium">{order.customer_name}</p>
+                                </div>
+                                <div>
+                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</span>
+                                    <p className="mt-1">{order.customer_email}</p>
+                                </div>
+                                <div>
+                                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Phone</span>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <Phone className="h-4 w-4 text-muted-foreground" />
+                                        <p>{order.customer_phone}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+                        <Button asChild variant="outline" size="lg" className="h-12 px-8">
+                            <Link href="/catalog">
+                                <ShoppingBag className="mr-2 h-4 w-4" />
+                                Continue Shopping
+                            </Link>
+                        </Button>
+                        <Button asChild size="lg" className="h-12 px-8">
+                            <Link href="/">
+                                Return Home
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
+                    </div>
+                </motion.div>
             </div>
         </div>
     )

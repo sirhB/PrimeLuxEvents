@@ -72,12 +72,12 @@ export default function CheckoutPage() {
     const [sameDayPickup, setSameDayPickup] = useState(false)
     const [pickupNotes, setPickupNotes] = useState("")
 
-    // Redirect if cart is empty (only if loaded)
+    // Redirect if cart is empty (only if loaded and not successful)
     useEffect(() => {
-        if (isLoaded && items.length === 0) {
+        if (isLoaded && items.length === 0 && !isSuccess) {
             router.push('/catalog')
         }
-    }, [items, isLoaded, router])
+    }, [items, isLoaded, router, isSuccess])
 
     // Fetch Supplemental Products
     useEffect(() => {
@@ -286,7 +286,7 @@ export default function CheckoutPage() {
                     hasElevator,
                     hasStairs,
                     hasLoadingDock,
-                    notes: formData.deliveryNotes
+                    notes: formData.deliveryNotes || ''
                 }
             })
 
