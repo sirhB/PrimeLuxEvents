@@ -14,13 +14,14 @@ import { Card, CardContent } from '@/components/ui/card'
 import { formatCents } from '@/lib/format-money'
 import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
+import { StatusFilter } from '@/components/admin/status-filter'
 
 export default async function OrdersPage({
     searchParams,
 }: {
-    searchParams: Promise<{ page?: string; search?: string }>
+    searchParams: Promise<{ page?: string; search?: string; status?: string }>
 }) {
-    const { page = '1', search } = await searchParams
+    const { page = '1', search, status } = await searchParams
     const supabase = await createClient()
 
     const currentPage = parseInt(page)
@@ -35,6 +36,10 @@ export default async function OrdersPage({
 
     if (search) {
         query = query.or(`id.ilike.%${search}%,customer_name.ilike.%${search}%,customer_email.ilike.%${search}%`)
+    }
+
+    if (status) {
+        query = query.eq('status', status)
     }
 
     const { data: orders, count } = await query.range(start, end)
@@ -52,6 +57,15 @@ export default async function OrdersPage({
 
             <div className="flex items-center justify-between gap-4">
                 <SearchInput placeholder="Search orders..." />
+                <StatusFilter
+                    statuses={[
+                        { value: 'pending', label: 'Pending' },
+                        { value: 'confirmed', label: 'Confirmed' },
+                        { value: 'processing', label: 'Processing' },
+                        { value: 'delivered', label: 'Delivered' },
+                        { value: 'cancelled', label: 'Cancelled' },
+                    ]}
+                />
             </div>
 
             <Card>

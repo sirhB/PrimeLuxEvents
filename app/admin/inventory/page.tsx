@@ -10,27 +10,47 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, Package } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { SearchInput } from '@/components/admin/search-input'
+import { PaginationControls } from '@/components/admin/pagination-controls'
 
-export default async function InventoryPage() {
+export default async function InventoryPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string; search?: string }>
+}) {
+    const { page = '1', search } = await searchParams
     const supabase = await createClient()
 
-
+    const currentPage = parseInt(page)
+    const pageSize = 10
+    const start = (currentPage - 1) * pageSize
+    const end = start + pageSize - 1
 
     // Get products with availability info
-    const { data: products } = await supabase
+    let query = supabase
         .from('products')
-        .select('id, name, sku, quantity_available, quantity_reserved')
+        .select('id, name, sku, quantity_available, quantity_reserved', { count: 'exact' })
         .order('name')
 
+    if (search) {
+        query = query.or(`name.ilike.%${search}%,sku.ilike.%${search}%`)
+    }
 
+    const { data: products, count } = await query.range(start, end)
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Inventory Management</h1>
-                <p className="text-muted-foreground mt-1">
-                    Track rental reservations and product availability
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Inventory Management</h1>
+                    <p className="text-muted-foreground mt-1">
+                        Track rental reservations and product availability
+                    </p>
+                </div>
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+                <SearchInput placeholder="Search inventory..." />
             </div>
 
             {/* Product Availability Overview */}
@@ -93,7 +113,15 @@ export default async function InventoryPage() {
                 </CardContent>
             </Card>
 
-
+            {count !== null && count > 0 && (
+                <PaginationControls
+                    hasNextPage={end < count}
+                    hasPrevPage={start > 0}
+                    totalCount={count}
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                />
+            )}
         </div>
     )
 }

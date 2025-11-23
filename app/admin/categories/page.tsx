@@ -12,13 +12,32 @@ import {
 import { Plus, Pencil, Trash2, Eye } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { Card, CardContent } from '@/components/ui/card'
+import { SearchInput } from '@/components/admin/search-input'
+import { PaginationControls } from '@/components/admin/pagination-controls'
 
-export default async function CategoriesPage() {
+export default async function CategoriesPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ page?: string; search?: string }>
+}) {
+    const { page = '1', search } = await searchParams
     const supabase = await createClient()
-    const { data: categories } = await supabase
+
+    const currentPage = parseInt(page)
+    const pageSize = 10
+    const start = (currentPage - 1) * pageSize
+    const end = start + pageSize - 1
+
+    let query = supabase
         .from('categories')
-        .select('*')
+        .select('*', { count: 'exact' })
         .order('created_at', { ascending: false })
+
+    if (search) {
+        query = query.or(`name.ilike.%${search}%,slug.ilike.%${search}%,description.ilike.%${search}%`)
+    }
+
+    const { data: categories, count } = await query.range(start, end)
 
     async function deleteCategory(formData: FormData) {
         'use server'
@@ -44,6 +63,11 @@ export default async function CategoriesPage() {
                     </Link>
                 </Button>
             </div>
+
+            <div className="flex items-center justify-between gap-4">
+                <SearchInput placeholder="Search categories..." />
+            </div>
+
             <Card>
                 <CardContent className="p-0">
                     <Table>
@@ -97,6 +121,16 @@ export default async function CategoriesPage() {
                     </Table>
                 </CardContent>
             </Card>
+
+            {count !== null && count > 0 && (
+                <PaginationControls
+                    hasNextPage={end < count}
+                    hasPrevPage={start > 0}
+                    totalCount={count}
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                />
+            )}
         </div>
     )
 }
