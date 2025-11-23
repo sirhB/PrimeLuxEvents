@@ -74,7 +74,7 @@ export function ModernSidebar() {
                                 className={cn(
                                     "flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-200 group relative",
                                     isActive
-                                        ? "bg-[var(--dashboard-card)] text-[var(--dashboard-text)] shadow-lg shadow-black/20"
+                                        ? "bg-transparent text-[var(--dashboard-accent-purple)]"
                                         : "text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)]"
                                 )}
                                 title={item.label}
