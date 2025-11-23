@@ -141,7 +141,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   const handleModifierChange = (modifierId: string, optionId: string) => {
     const modifier = product.modifiers?.find(m => m.id === modifierId)
-    const option = modifier?.options.find(o => o.id === optionId)
+    const option = modifier?.options?.find(o => o.id === optionId)
     if (modifier && option) {
       setSelectedModifiers(prev => ({
         ...prev,
@@ -291,7 +291,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         value={selectedModifiers[modifier.id]?.id}
                       >
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {modifier.options.map((option) => (
+                          {modifier.options?.map((option) => (
                             <div
                               key={option.id}
                               className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-secondary/50 transition-colors"

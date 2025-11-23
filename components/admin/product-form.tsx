@@ -82,10 +82,10 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     // Convert modifier price adjustments from cents to dollars for display
     const modifiersInDollars = product?.modifiers?.map((m: Modifier) => ({
         ...m,
-        options: m.options.map(o => ({
+        options: m.options?.map(o => ({
             ...o,
             priceAdjustment: o.priceAdjustment / 100
-        }))
+        })) || []
     })) || []
     const [modifiers, setModifiers] = useState<Modifier[]>(modifiersInDollars)
 
@@ -119,7 +119,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                 return {
                     ...m,
                     options: [
-                        ...m.options,
+                        ...(m.options || []),
                         {
                             id: crypto.randomUUID(),
                             label: '',
@@ -137,7 +137,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             if (m.id === modifierId) {
                 return {
                     ...m,
-                    options: m.options.filter(o => o.id !== optionId)
+                    options: m.options?.filter(o => o.id !== optionId) || []
                 }
             }
             return m
@@ -149,7 +149,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             if (m.id === modifierId) {
                 return {
                     ...m,
-                    options: m.options.map(o => {
+                    options: m.options?.map(o => {
                         if (o.id === optionId) {
                             return { ...o, [field]: value }
                         }
@@ -173,10 +173,10 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         // Convert modifier price adjustments from dollars to cents
         const modifiersInCents = modifiers.map(m => ({
             ...m,
-            options: m.options.map(o => ({
+            options: m.options?.map(o => ({
                 ...o,
                 priceAdjustment: Math.round(o.priceAdjustment * 100)
-            }))
+            })) || []
         }))
 
         const data = {
@@ -369,7 +369,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
-                                {modifier.options.map((option, optIndex) => (
+                                {modifier.options?.map((option, optIndex) => (
                                     <div key={option.id} className="flex items-center gap-2">
                                         <Input
                                             placeholder="Option Label"
