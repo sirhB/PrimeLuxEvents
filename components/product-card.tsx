@@ -27,7 +27,7 @@ export function ProductCard({ product }: ProductCardProps) {
             href={`/catalog/${product.id}`}
             className="group flex flex-col h-full"
         >
-            <div className="relative aspect-[3/4] overflow-hidden bg-secondary mb-3 rounded-lg">
+            <div className="relative aspect-[4/5] overflow-hidden bg-secondary mb-2 rounded-lg">
                 {product.image_url ? (
                     <Image
                         src={product.image_url}
@@ -43,7 +43,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
 
             <div className="flex flex-col gap-1 flex-grow">
-                <h3 className="font-serif text-lg group-hover:underline decoration-1 underline-offset-4 line-clamp-2">
+                <h3 className="font-serif text-base font-medium group-hover:underline decoration-1 underline-offset-4 line-clamp-2">
                     {product.name}
                 </h3>
                 <p className="text-xs text-muted-foreground">
