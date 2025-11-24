@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import Image from "next/image" // Added Image import
-import { ScrollParallaxScene } from "@/components/scroll-parallax-scene"
+
 
 interface HeroSectionProps {
   title?: string
@@ -18,7 +18,6 @@ export function HeroSection({
 }: HeroSectionProps) {
   return (
     <section className="relative h-[90vh] w-full overflow-hidden bg-black">
-      <ScrollParallaxScene />
       <Image
         src="/luxury-event-setup-ballroom-chandelier.jpg"
         alt="Luxury Event Setup"
