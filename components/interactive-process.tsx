@@ -2,30 +2,36 @@
 
 import { motion, useScroll, useTransform } from "framer-motion"
 import { useRef } from "react"
-import { Search, MousePointerClick, CalendarCheck, PartyPopper, LucideIcon } from "lucide-react"
+import { Search, MousePointerClick, CalendarCheck, PartyPopper } from "lucide-react"
 
-// Icon mapping for CMS content
-const iconMap: Record<string, LucideIcon> = {
-    Search,
-    MousePointerClick,
-    CalendarCheck,
-    PartyPopper,
-}
+const steps = [
+    {
+        id: 1,
+        title: "Browse & Discover",
+        description: "Explore our curated collection of premium furniture, decor, and lighting.",
+        icon: Search,
+    },
+    {
+        id: 2,
+        title: "Select Your Favorites",
+        description: "Add items to your quote cart and customize quantities for your event size.",
+        icon: MousePointerClick,
+    },
+    {
+        id: 3,
+        title: "Secure Your Date",
+        description: "Submit your quote request. We'll confirm availability and send a custom proposal.",
+        icon: CalendarCheck,
+    },
+    {
+        id: 4,
+        title: "Celebrate in Style",
+        description: "We handle delivery and setup so you can focus on enjoying your unforgettable event.",
+        icon: PartyPopper,
+    },
+]
 
-interface ProcessStep {
-    id: number
-    title: string
-    description: string
-    icon: string
-}
-
-interface InteractiveProcessProps {
-    title: string
-    description: string
-    steps: ProcessStep[]
-}
-
-export function InteractiveProcess({ title, description, steps }: InteractiveProcessProps) {
+export function InteractiveProcess() {
     const containerRef = useRef<HTMLDivElement>(null)
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -42,7 +48,7 @@ export function InteractiveProcess({ title, description, steps }: InteractivePro
                         viewport={{ once: true }}
                         className="text-3xl md:text-5xl font-serif mb-6"
                     >
-                        {title}
+                        Seamless Luxury Experience
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -51,7 +57,7 @@ export function InteractiveProcess({ title, description, steps }: InteractivePro
                         transition={{ delay: 0.2 }}
                         className="text-lg text-muted-foreground"
                     >
-                        {description}
+                        From inspiration to celebration, we make the rental process effortless.
                     </motion.p>
                 </div>
 
@@ -74,9 +80,7 @@ export function InteractiveProcess({ title, description, steps }: InteractivePro
     )
 }
 
-function ProcessStep({ step, index }: { step: ProcessStep; index: number }) {
-    const Icon = iconMap[step.icon] || Search // Fallback to Search icon
-
+function ProcessStep({ step, index }: { step: typeof steps[0]; index: number }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -86,7 +90,7 @@ function ProcessStep({ step, index }: { step: ProcessStep; index: number }) {
             className="flex flex-col items-center text-center bg-background p-6 rounded-lg shadow-sm border border-border/50 relative group hover:-translate-y-2 transition-transform duration-300"
         >
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                <Icon className="w-8 h-8 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
+                <step.icon className="w-8 h-8 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
             </div>
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-background px-2 text-xs font-bold text-muted-foreground border border-border rounded-full">
                 0{step.id}

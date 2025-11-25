@@ -7,13 +7,7 @@ import { ArrowRight, Eye } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { motion } from "framer-motion"
 
-interface FeaturedCollectionProps {
-  title: string
-  description: string
-  ctaText: string
-}
-
-export function FeaturedCollection({ title, description, ctaText }: FeaturedCollectionProps) {
+export function FeaturedCollection() {
   const featuredProducts = products.filter((p) => p.featured).slice(0, 6)
 
   return (
@@ -27,14 +21,14 @@ export function FeaturedCollection({ title, description, ctaText }: FeaturedColl
           className="flex flex-col md:flex-row justify-between items-end gap-6"
         >
           <div>
-            <h2 className="text-3xl md:text-5xl font-serif mb-4">{title}</h2>
-            <p className="text-muted-foreground max-w-md">{description}</p>
+            <h2 className="text-3xl md:text-5xl font-serif mb-4">Trending in the Catalog</h2>
+            <p className="text-muted-foreground max-w-md">Hand-picked pieces that define luxury and elegance.</p>
           </div>
           <Link
             href="/catalog"
             className="group inline-flex items-center text-sm font-medium uppercase tracking-widest hover:text-primary transition-colors"
           >
-            {ctaText}
+            View All
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </motion.div>
