@@ -241,9 +241,19 @@ export default function CatalogClient({ heroTitle, products, categories, package
             {/* Main Content with Scroll Reveals */}
             <div className="container mx-auto px-4">
                 {/* Enhanced Content */}
-                {selectedCategory ? (
-                    <div className="space-y-8">
-                        <div className="flex items-center justify-between mb-8">
+                <motion.div
+                    key={selectedCategory ? 'category' : 'main'}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className={selectedCategory ? "space-y-8" : "space-y-10"}
+                >
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.6, delay: 0.3 }}
+                                    className="flex items-center justify-between mb-8"
+                                >
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
@@ -363,10 +373,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             >
                                 <p className="text-muted-foreground text-lg">No products found in this category.</p>
                             </motion.div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-10">
+                    {selectedCategory ? (
+                        {/* Enhanced Category View Content */}
                         {featuredProducts.length > 0 && !searchQuery && (
                             <motion.div
                                 initial={{ opacity: 0, y: 40 }}
@@ -617,11 +625,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     ))}
                                 </motion.div>
                             </motion.section>
-                        </div>
-                    )}
-                </div>
-            </div>
-            </div>
-        </motion.div>
+                    ) : null}
+                </motion.div>
     )
 }
