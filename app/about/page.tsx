@@ -7,6 +7,74 @@ import { motion, useScroll, useTransform } from "framer-motion"
 import { useRef, useEffect, useState } from "react"
 import { getSiteContent } from "@/lib/content"
 
+// Enhanced About Hero Section with Parallax Effects
+function AboutHeroSection({ title, description, image }: { title: string; description: string; image: string }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  })
+
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
+  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.05])
+
+  return (
+    <div ref={containerRef} className="relative h-[70vh] min-h-[600px] w-full overflow-hidden bg-black">
+      <motion.div style={{ y, scale }} className="absolute inset-0 w-full h-full">
+        <Image
+          src={image}
+          alt="About Us"
+          fill
+          className="object-cover opacity-60"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60" />
+      </motion.div>
+
+      <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 z-10">
+        <motion.div
+          style={{ opacity }}
+          className="max-w-4xl space-y-8"
+        >
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+            className="text-5xl md:text-7xl lg:text-8xl font-serif text-white tracking-tight leading-tight"
+          >
+            {title}
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
+            className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed font-light"
+          >
+            {description}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 1 }}
+            className="flex flex-col items-center gap-4 pt-8"
+          >
+            <span className="text-xs uppercase tracking-[0.2em] text-white/60">Scroll to Explore</span>
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="w-px h-12 bg-gradient-to-b from-white/0 via-white/40 to-white/0"
+            />
+          </motion.div>
+        </motion.div>
+      </div>
+    </div>
+  )
+}
+
 export default function AboutPage() {
   const [content, setContent] = useState<any>({})
 
@@ -273,72 +341,4 @@ export default function AboutPage() {
         </div>
       </motion.section>
     </motion.div>
-}
-
-// Enhanced About Hero Section with Parallax Effects
-function AboutHeroSection({ title, description, image }: { title: string; description: string; image: string }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  })
-
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
-  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.05])
-
-  return (
-    <div ref={containerRef} className="relative h-[70vh] min-h-[600px] w-full overflow-hidden bg-black">
-      <motion.div style={{ y, scale }} className="absolute inset-0 w-full h-full">
-        <Image
-          src={image}
-          alt="About Us"
-          fill
-          className="object-cover opacity-60"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/70" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60" />
-      </motion.div>
-
-      <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 z-10">
-        <motion.div
-          style={{ opacity }}
-          className="max-w-4xl space-y-8"
-        >
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-serif text-white tracking-tight leading-tight"
-          >
-            {title}
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
-            className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed font-light"
-          >
-            {description}
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 1 }}
-            className="flex flex-col items-center gap-4 pt-8"
-          >
-            <span className="text-xs uppercase tracking-[0.2em] text-white/60">Scroll to Explore</span>
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="w-px h-12 bg-gradient-to-b from-white/0 via-white/40 to-white/0"
-            />
-          </motion.div>
-        </motion.div>
-      </div>
-    </div>
-  )
 }
