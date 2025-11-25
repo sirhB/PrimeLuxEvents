@@ -13,12 +13,16 @@ import {
 } from "@/components/ui/select"
 import { MapPin, Phone, Mail } from "lucide-react"
 import { motion, useScroll, useTransform } from "framer-motion"
-import { useRef } from "react"
+import { useRef, useEffect, useState } from "react"
 import { getSiteContent } from "@/lib/content"
 import { ContactForm } from "@/components/contact-form"
 
-export default async function ContactPage() {
-  const content = await getSiteContent()
+export default function ContactPage() {
+  const [content, setContent] = useState<any>({})
+
+  useEffect(() => {
+    getSiteContent().then(setContent)
+  }, [])
 
   return (
     <motion.div

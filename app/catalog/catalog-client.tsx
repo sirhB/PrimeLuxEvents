@@ -285,7 +285,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     </Button>
                                 </motion.div>
                             </motion.div>
-                        </motion.div>
+                        </div>
 
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -363,7 +363,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             >
                                 <p className="text-muted-foreground text-lg">No products found in this category.</p>
                             </motion.div>
-                        </div>
+                        )}
                     </div>
                 ) : (
                     <div className="space-y-10">
@@ -617,11 +617,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     ))}
                                 </motion.div>
                             </motion.section>
+                        )}
                         </div>
                     )}
                 </div>
-            </div>
-            </div>
         </motion.div>
     )
 }
