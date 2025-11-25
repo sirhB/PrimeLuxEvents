@@ -4,6 +4,7 @@ import { use, useState, useEffect } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, Check, Plus, Minus, Package, Truck, Calendar as CalendarIcon, Info } from "lucide-react"
+import { motion } from "framer-motion"
 import { DateRange } from "react-day-picker"
 import { differenceInDays } from "date-fns"
 import { useCart } from "@/components/providers/cart-provider"
@@ -17,7 +18,7 @@ import { Separator } from "@/components/ui/separator"
 import { ProductGallery } from "@/components/product-gallery"
 import { RentalDatePicker } from "@/components/rental-date-picker"
 import { RelatedProducts } from "@/components/related-products"
-import { formatCurrency } from "@/lib/utils"
+import { formatCurrency, cn } from "@/lib/utils"
 import {
   Accordion,
   AccordionContent,
@@ -203,46 +204,66 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const canAddToCart = true
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10">
+    <div className="min-h-screen bg-background">
       {/* Breadcrumb */}
-      <div className="container mx-auto px-4 md:px-6 py-6">
-        <Link
-          href={product.categories?.name ? `/catalog?category=${encodeURIComponent(product.categories.name)}` : "/catalog"}
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors group"
+      <div className="container mx-auto px-4 md:px-6 py-8 md:py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-          Back to {product.categories?.name || 'Collection'}
-        </Link>
+          <Link
+            href={product.categories?.name ? `/catalog?category=${encodeURIComponent(product.categories.name)}` : "/catalog"}
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-gold transition-colors group"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            Back to {product.categories?.name || 'Collection'}
+          </Link>
+        </motion.div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 pb-20">
+      <div className="container mx-auto px-4 md:px-6 pb-20 md:pb-32">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           {/* Image Gallery */}
-          <div className={`${isLoaded ? "animate-fade-in-up" : "opacity-0"}`}>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
+            transition={{ duration: 0.6 }}
+          >
             <ProductGallery
               images={uniqueGalleryImages}
               productName={product.name}
               selectedImage={selectedGalleryImage}
             />
-          </div>
+          </motion.div>
 
           {/* Details Section */}
-          <div className={`flex flex-col gap-6 ${isLoaded ? "animate-fade-in-up delay-200" : "opacity-0"}`}>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : 20 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex flex-col gap-8"
+          >
             {/* Header */}
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge variant="outline" className="text-xs uppercase">
+              <div className="flex items-center gap-2 mb-4">
+                <Badge variant="outline" className="text-xs uppercase tracking-wider">
                   {product.sku || 'Product'}
                 </Badge>
+                {product.categories?.name && (
+                  <Badge variant="secondary" className="text-xs uppercase tracking-wider">
+                    {product.categories.name}
+                  </Badge>
+                )}
               </div>
-              <h1 className="text-4xl md:text-5xl font-serif mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                 {product.name}
               </h1>
               <div className="flex items-baseline gap-3">
-                <span className="text-3xl font-semibold">
+                <span className="text-4xl md:text-5xl font-bold text-gold">
                   {formatCurrency(basePrice)}
                 </span>
-                <span className="text-sm text-muted-foreground">/ day</span>
+                <span className="text-base text-muted-foreground">/ day</span>
               </div>
             </div>
 
@@ -250,7 +271,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
             {/* Description */}
             <div className="prose prose-stone max-w-none">
-              <p className="text-base leading-relaxed text-muted-foreground">
+              <p className="text-lg leading-relaxed text-muted-foreground">
                 {product.description}
               </p>
             </div>
@@ -357,29 +378,23 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             <div className="space-y-4">
               <Button
                 size="lg"
-                className="w-full text-lg h-14 shadow-lg hover:shadow-xl transition-all"
+                className={cn(
+                  "w-full text-lg h-14 rounded-full transition-all duration-300 hover:scale-105",
+                  isInCart && cartItem?.quantity === quantity
+                    ? "border-2 border-gold bg-transparent text-gold hover:bg-gold/10"
+                    : "bg-gold text-black hover:bg-gold/90 shadow-lg hover:shadow-xl"
+                )}
                 onClick={() => {
                   if (isInCart) {
                     if (cartItem?.quantity !== quantity) {
                       if (cartItem) updateCartQuantity(cartItem.id, quantity)
                     } else {
-                      // Maybe remove if they click "Added to Quote"? Or do nothing?
-                      // User said "update the button to be able to save cart changes"
-                      // If it's already saved, maybe just do nothing or show a toast?
-                      // Let's assume clicking "Added to Quote" does nothing or toggles off if they really want to remove.
-                      // But standard UX is usually "Remove" button or toggle.
-                      // Given the previous code was toggle, let's keep toggle functionality if quantity matches?
-                      // Or maybe better: if quantity matches, it says "Added to Quote" and is disabled or acts as remove?
-                      // Let's make it:
-                      // If quantity changed: "Update Quote"
-                      // If quantity same: "Added to Quote" (click to remove?)
                       if (cartItem) removeItem(cartItem.id)
                     }
                   } else {
                     addItem(product.id, quantity, selectedModifiers)
                   }
                 }}
-                variant={isInCart && cartItem?.quantity === quantity ? "outline" : "default"}
                 disabled={!canAddToCart}
               >
                 {isInCart ? (
@@ -471,15 +486,30 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       {/* Related Products Section */}
       {
         product && allProducts.length > 0 && (
-          <div className="container mx-auto px-4 md:px-6 pb-20">
-            <Separator className="mb-12" />
-            <RelatedProducts
-              currentProduct={product}
-              allProducts={allProducts}
-              onAddToCart={toggleCart}
-              isInCart={isProductInCart}
-              maxItems={4}
-            />
+          <div className="container mx-auto px-4 md:px-6 pb-20 md:pb-32">
+            <Separator className="mb-12 md:mb-16" />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="mb-12">
+                <span className="text-primary text-sm font-medium tracking-widest uppercase mb-2 block">
+                  Complete Your Look
+                </span>
+                <h2 className="text-3xl md:text-5xl font-serif mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                  You May Also Like
+                </h2>
+              </div>
+              <RelatedProducts
+                currentProduct={product}
+                allProducts={allProducts}
+                onAddToCart={toggleCart}
+                isInCart={isProductInCart}
+                maxItems={4}
+              />
+            </motion.div>
           </div>
         )
       }

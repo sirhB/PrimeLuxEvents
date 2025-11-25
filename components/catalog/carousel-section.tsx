@@ -81,15 +81,18 @@ export function CarouselSection({
     }, [emblaApi, autoPlay, autoPlayInterval])
 
     return (
-        <section className="relative">
+        <section className="relative py-8 md:py-12">
             {/* Header */}
-            <div className="flex items-end justify-between mb-5">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 md:mb-12">
                 <div>
-                    <h2 className="text-2xl md:text-3xl font-serif font-bold mb-1 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    <span className="text-primary text-sm font-medium tracking-widest uppercase mb-2 block">
+                        Featured
+                    </span>
+                    <h2 className="text-3xl md:text-5xl font-serif font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                         {title}
                     </h2>
                     {subtitle && (
-                        <p className="text-muted-foreground text-sm max-w-2xl">
+                        <p className="text-muted-foreground text-base max-w-2xl leading-relaxed">
                             {subtitle}
                         </p>
                     )}
