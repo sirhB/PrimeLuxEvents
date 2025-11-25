@@ -25,9 +25,15 @@ interface Product {
     categories?: { name: string } | { name: string }[] | null
 }
 
+interface Category {
+    id: string
+    name: string
+    image_url?: string | null
+}
+
 export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     const [query, setQuery] = useState("")
-    const [results, setResults] = useState<Product[]>([])
+    const [results, setResults] = useState<{ products: Product[], categories: Category[] }>({ products: [], categories: [] })
     const [isLoading, setIsLoading] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
 
@@ -50,14 +56,14 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     useEffect(() => {
         const fetchResults = async () => {
             if (debouncedQuery.length < 2) {
-                setResults([])
+                setResults({ products: [], categories: [] })
                 return
             }
 
             setIsLoading(true)
             try {
-                const products = await searchProducts(debouncedQuery)
-                setResults(products)
+                const data = await searchProducts(debouncedQuery)
+                setResults(data)
             } catch (error) {
                 console.error("Error fetching search results:", error)
             } finally {
@@ -127,48 +133,82 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                     <div className="flex justify-center py-8">
                                         <Loader2 className="w-8 h-8 animate-spin text-gold" />
                                     </div>
-                                ) : results.length > 0 ? (
+                                ) : (results.products.length > 0 || results.categories.length > 0) ? (
                                     <div className="grid gap-4">
-                                        {results.map((product) => (
-                                            <Link
-                                                key={product.id}
-                                                href={`/catalog/${product.id}`}
-                                                onClick={onClose}
-                                                className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
-                                            >
-                                                <div className="relative w-16 h-16 rounded-md overflow-hidden bg-secondary flex-shrink-0">
-                                                    {product.image_url ? (
-                                                        <Image
-                                                            src={product.image_url}
-                                                            alt={product.name}
-                                                            fill
-                                                            className="object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-xs">
-                                                            No Img
-                                                        </div>
-                                                    )}
+                                        {/* Category Results */}
+                                        {results.categories.length > 0 && (
+                                            <div className="mb-4">
+                                                <h3 className="text-sm font-medium text-muted-foreground mb-2 uppercase tracking-wider">Categories</h3>
+                                                <div className="grid gap-2">
+                                                    {results.categories.map((category) => (
+                                                        <Link
+                                                            key={category.id}
+                                                            href={`/catalog?category=${encodeURIComponent(category.name)}`}
+                                                            onClick={onClose}
+                                                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors group"
+                                                        >
+                                                            <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center text-gold">
+                                                                <Search className="w-5 h-5" />
+                                                            </div>
+                                                            <span className="font-medium text-foreground group-hover:text-gold transition-colors">
+                                                                View all in "{category.name}"
+                                                            </span>
+                                                        </Link>
+                                                    ))}
                                                 </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="font-medium text-foreground group-hover:text-gold transition-colors truncate">
-                                                        {product.name}
-                                                    </h4>
-                                                    <p className="text-sm text-muted-foreground line-clamp-1">
-                                                        {product.description}
-                                                    </p>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
-                                                            {(Array.isArray(product.categories) ? product.categories[0]?.name : product.categories?.name) || "Uncategorized"}
-                                                        </span>
-                                                        <span className="text-sm font-semibold text-gold">
-                                                            {formatCurrency(product.rental_price_daily || product.price)}
-                                                            <span className="text-xs text-muted-foreground font-normal">/day</span>
-                                                        </span>
-                                                    </div>
+                                            </div>
+                                        )}
+
+                                        {/* Product Results */}
+                                        {results.products.length > 0 && (
+                                            <div>
+                                                {results.categories.length > 0 && (
+                                                    <h3 className="text-sm font-medium text-muted-foreground mb-2 uppercase tracking-wider">Products</h3>
+                                                )}
+                                                <div className="grid gap-4">
+                                                    {results.products.map((product) => (
+                                                        <Link
+                                                            key={product.id}
+                                                            href={`/catalog/${product.id}`}
+                                                            onClick={onClose}
+                                                            className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                                                        >
+                                                            <div className="relative w-16 h-16 rounded-md overflow-hidden bg-secondary flex-shrink-0">
+                                                                {product.image_url ? (
+                                                                    <Image
+                                                                        src={product.image_url}
+                                                                        alt={product.name}
+                                                                        fill
+                                                                        className="object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-xs">
+                                                                        No Img
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <h4 className="font-medium text-foreground group-hover:text-gold transition-colors truncate">
+                                                                    {product.name}
+                                                                </h4>
+                                                                <p className="text-sm text-muted-foreground line-clamp-1">
+                                                                    {product.description}
+                                                                </p>
+                                                                <div className="flex items-center gap-2 mt-1">
+                                                                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
+                                                                        {(Array.isArray(product.categories) ? product.categories[0]?.name : product.categories?.name) || "Uncategorized"}
+                                                                    </span>
+                                                                    <span className="text-sm font-semibold text-gold">
+                                                                        {formatCurrency(product.rental_price_daily || product.price)}
+                                                                        <span className="text-xs text-muted-foreground font-normal">/day</span>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </Link>
+                                                    ))}
                                                 </div>
-                                            </Link>
-                                        ))}
+                                            </div>
+                                        )}
                                     </div>
                                 ) : query.length >= 2 ? (
                                     <div className="text-center py-12 text-muted-foreground">

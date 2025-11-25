@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { ProductCard } from '@/components/product-card'
 import { SearchBar } from '@/components/catalog/search-bar'
 import { CategoryCard } from '@/components/catalog/category-card'
@@ -49,9 +50,14 @@ interface CatalogClientProps {
 }
 
 export default function CatalogClient({ heroTitle, products, categories, packages }: CatalogClientProps) {
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const pathname = usePathname()
+
     const [searchQuery, setSearchQuery] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+
+    const selectedCategory = searchParams.get('category')
 
     // Filter logic
     const filteredProducts = useMemo(() => {
@@ -88,12 +94,16 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
     // Handlers
     const handleCategoryClick = (categoryName: string) => {
-        setSelectedCategory(categoryName)
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('category', categoryName)
+        router.push(`${pathname}?${params.toString()}`)
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     const handleBackToCatalog = () => {
-        setSelectedCategory(null)
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete('category')
+        router.push(`${pathname}?${params.toString()}`)
         setSearchQuery('')
     }
 

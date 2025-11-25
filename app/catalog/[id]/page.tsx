@@ -67,6 +67,7 @@ interface Product {
   sku?: string
   weight?: number
   product_images?: ProductImage[]
+  categories?: { name: string }
 }
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
@@ -87,7 +88,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     async function fetchProduct() {
       const { data, error } = await supabase
         .from('products')
-        .select('*, product_images(*)')
+        .select('*, product_images(*), categories(name)')
         .eq('id', id)
         .single()
 
@@ -206,11 +207,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       {/* Breadcrumb */}
       <div className="container mx-auto px-4 md:px-6 py-6">
         <Link
-          href="/catalog"
+          href={product.categories?.name ? `/catalog?category=${encodeURIComponent(product.categories.name)}` : "/catalog"}
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors group"
         >
           <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-          Back to Collection
+          Back to {product.categories?.name || 'Collection'}
         </Link>
       </div>
 

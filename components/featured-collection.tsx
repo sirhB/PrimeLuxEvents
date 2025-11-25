@@ -5,8 +5,7 @@ import Image from "next/image"
 import { products } from "@/lib/data"
 import { ArrowRight } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
-import { motion, useAnimate } from "framer-motion"
-import { useEffect } from "react"
+import { motion } from "framer-motion"
 
 export function FeaturedCollection() {
   const featuredProducts = products.filter((p) => p.featured).slice(0, 6)
@@ -51,32 +50,34 @@ interface Product {
 }
 
 function AutoScrollCarousel({ products }: { products: Product[] }) {
-  const [scope, animate] = useAnimate()
-
-  // Calculate the total width to scroll (card width + gap)
-  const cardWidth = 300 // w-[300px]
-  const gap = 32 // gap-8 = 2rem = 32px
+  // Calculate the total width of one set of products (card width + gap)
+  const cardWidth = 300
+  const gap = 32
   const totalWidth = (cardWidth + gap) * products.length
 
-  useEffect(() => {
-    const animation = async () => {
-      await animate(
-        scope.current,
-        { x: -totalWidth },
-        { duration: 30, ease: "linear", repeat: Infinity }
-      )
-    }
-    animation()
-  }, [animate, scope, totalWidth])
-
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden w-full">
+      {/* 
+        Gradient masks for smooth fade effect at edges 
+        Left mask: transparent to black
+        Right mask: black to transparent
+      */}
+      <div className="absolute left-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-background to-transparent" />
+      <div className="absolute right-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-background to-transparent" />
+
       <motion.div
-        ref={scope}
         className="flex gap-8"
+        animate={{ x: -totalWidth }}
+        transition={{
+          duration: 30,
+          ease: "linear",
+          repeat: Infinity,
+          repeatType: "loop",
+        }}
+        style={{ width: "max-content" }}
       >
-        {/* Render products twice for seamless loop */}
-        {[...products, ...products].map((product, index) => (
+        {/* Render products triple to ensure no gaps during the loop reset if screen is wide */}
+        {[...products, ...products, ...products].map((product, index) => (
           <motion.div
             key={`${product.id}-${index}`}
             className="flex-shrink-0 w-[300px]"
