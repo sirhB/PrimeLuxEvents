@@ -421,8 +421,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <Button
                   size="lg"
                   className="w-full text-lg h-14 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
-                size="lg"
-                className="w-full text-lg h-14 shadow-lg hover:shadow-xl transition-all"
                 onClick={() => {
                   if (isInCart) {
                     if (cartItem?.quantity !== quantity) {

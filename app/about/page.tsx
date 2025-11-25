@@ -4,11 +4,15 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { motion, useScroll, useTransform } from "framer-motion"
-import { useRef } from "react"
+import { useRef, useEffect, useState } from "react"
 import { getSiteContent } from "@/lib/content"
 
-export default async function AboutPage() {
-  const content = await getSiteContent()
+export default function AboutPage() {
+  const [content, setContent] = useState<any>({})
+
+  useEffect(() => {
+    getSiteContent().then(setContent)
+  }, [])
   const values = content['about.values.items'] || []
 
   return (
