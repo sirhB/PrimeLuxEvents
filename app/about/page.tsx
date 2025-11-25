@@ -341,4 +341,5 @@ export default function AboutPage() {
         </div>
       </motion.section>
     </motion.div>
-}
+  );
+};
