@@ -8,7 +8,7 @@ import { useRef, useEffect, useState } from "react"
 import { getSiteContent } from "@/lib/content"
 
 // Enhanced About Hero Section with Parallax Effects
-function AboutHeroSection({ title, description, image }: { title: string; description: string; image: string }) {
+const AboutHeroSection = ({ title, description, image }: { title: string; description: string; image: string }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,

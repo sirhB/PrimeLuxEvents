@@ -530,9 +530,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
 
       {/* Related Products Section */}
