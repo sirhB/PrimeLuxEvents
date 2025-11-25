@@ -110,23 +110,23 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
     return (
         <div className="min-h-screen bg-background">
-            {/* Hero Section */}
-            <section className="relative py-20 md:py-32 px-4 text-center bg-background border-b border-border/40">
-                <div className="container mx-auto px-4 md:px-6 max-w-5xl">
+            {/* Hero Section - Compact */}
+            <section className="relative py-8 md:py-12 px-4 text-center bg-background border-b border-border/40">
+                <div className="container mx-auto px-4 md:px-6 max-w-4xl">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="space-y-6"
+                        transition={{ duration: 0.5 }}
+                        className="space-y-4"
                     >
                         <div>
-                            <span className="text-primary text-sm font-medium tracking-widest uppercase mb-4 block">
+                            <span className="text-primary text-xs font-medium tracking-widest uppercase mb-2 block">
                                 {selectedCategory ? 'Category' : 'Curated Collections'}
                             </span>
-                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                                 {selectedCategory ? selectedCategory : (heroTitle || "Rental Catalog")}
                             </h1>
-                            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
                                 {selectedCategory
                                     ? `Browse our collection of ${selectedCategory.toLowerCase()}.`
                                     : "Explore our premium collection of event rentals, packages, and exclusive deals."
@@ -135,9 +135,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
                         </div>
 
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
+                            transition={{ duration: 0.5, delay: 0.1 }}
+                            className="pt-2"
                         >
                             <SearchBar
                                 value={searchQuery}
