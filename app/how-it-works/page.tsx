@@ -17,7 +17,7 @@ export default function HowItWorksPage() {
   })
 
   useEffect(() => {
-    import("@/lib/content").then((mod) => {
+    import("@/lib/content-client").then((mod) => {
       mod.getSiteContent().then(setContent)
     })
   }, [])
