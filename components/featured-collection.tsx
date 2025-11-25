@@ -50,12 +50,17 @@ interface Product {
 }
 
 function AutoScrollCarousel({ products }: { products: Product[] }) {
+  // Calculate the total width to scroll (card width + gap)
+  const cardWidth = 300 // w-[300px]
+  const gap = 32 // gap-8 = 2rem = 32px
+  const totalWidth = (cardWidth + gap) * products.length
+
   return (
     <div className="relative overflow-hidden">
       <motion.div
         className="flex gap-8"
         animate={{
-          x: [0, -100 * products.length],
+          x: [0, -totalWidth],
         }}
         transition={{
           x: {
