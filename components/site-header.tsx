@@ -144,7 +144,6 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-2 md:gap-4">
             <SearchTrigger onClick={() => setIsSearchOpen(true)} />
-            <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
             <Link
               href="/contact"
@@ -156,6 +155,7 @@ export function SiteHeader() {
           </div>
         </div>
       </header>
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   )
 }

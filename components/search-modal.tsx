@@ -87,12 +87,22 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100]"
                         onClick={onClose}
                     />
                     <div className="fixed inset-0 z-[101] flex items-start justify-center pt-20 px-4 pointer-events-none">
                         <motion.div
                             layoutId="search-container"
+                            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                            transition={{
+                                type: "spring",
+                                damping: 20,
+                                stiffness: 300,
+                                duration: 0.3
+                            }}
                             className="w-full max-w-2xl bg-background rounded-xl shadow-2xl overflow-hidden pointer-events-auto flex flex-col max-h-[80vh]"
                         >
                             <div className="flex items-center p-4 border-b border-border">
