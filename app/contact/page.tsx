@@ -2,6 +2,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { MapPin, Phone, Mail } from "lucide-react"
 import { getSiteContent } from "@/lib/content"
 
@@ -15,7 +22,7 @@ export default async function ContactPage() {
           {/* Contact Info */}
           <div className="space-y-12">
             <div className="space-y-6">
-              <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-tight">{content['contact.hero.title']}</h1>
+              <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-tight">Request a Consultation</h1>
               <p className="text-lg text-muted-foreground max-w-md">
                 {content['contact.hero.description']}
               </p>
@@ -95,12 +102,38 @@ export default async function ContactPage() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="venue">Venue</Label>
+                <Input id="venue" placeholder="e.g. The Grand Hotel" />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="caterer">Caterer</Label>
+                <Input id="caterer" placeholder="e.g. Delicious Eats" />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="budget">Budget</Label>
+                <Select>
+                  <SelectTrigger id="budget">
+                    <SelectValue placeholder="Select a budget range" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="under-1000">Under $1,000</SelectItem>
+                    <SelectItem value="1000-5000">$1,000 - $5,000</SelectItem>
+                    <SelectItem value="5000-10000">$5,000 - $10,000</SelectItem>
+                    <SelectItem value="10000-20000">$10,000 - $20,000</SelectItem>
+                    <SelectItem value="20000+">$20,000+</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="message">Message</Label>
                 <Textarea id="message" placeholder="Tell us about your event..." className="min-h-[150px]" />
               </div>
 
               <Button type="submit" className="w-full" size="lg">
-                Send Message
+                Request Consultation
               </Button>
             </form>
           </div>

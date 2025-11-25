@@ -10,26 +10,14 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart-sheet"
 import { Input } from "@/components/ui/input"
 import { useRouter, usePathname } from "next/navigation"
+import { SearchTrigger } from "@/components/search-trigger"
+import { SearchModal } from "@/components/search-modal"
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
-  const searchInputRef = useRef<HTMLInputElement>(null)
-  const router = useRouter()
   const pathname = usePathname()
 
-  useEffect(() => {
-    if (isSearchOpen && searchInputRef.current) {
-      searchInputRef.current.focus()
-    }
-  }, [isSearchOpen])
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // In a real app, this would redirect to search results
-    setIsSearchOpen(false)
-    router.push("/catalog")
-  }
 
   if (pathname?.startsWith('/admin')) {
     return null
@@ -155,34 +143,14 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-2 md:gap-4">
-            {isSearchOpen ? (
-              <form
-                onSubmit={handleSearchSubmit}
-                className="absolute inset-x-0 top-0 h-20 bg-background flex items-center px-4 md:px-6 z-50 animate-fade-in"
-              >
-                <Search className="h-5 w-5 text-muted-foreground mr-4" />
-                <Input
-                  ref={searchInputRef}
-                  type="search"
-                  placeholder="Search for chairs, tables, decor..."
-                  className="flex-1 border-none shadow-none focus-visible:ring-0 text-lg h-full bg-transparent"
-                />
-                <Button type="button" variant="ghost" size="icon" onClick={() => setIsSearchOpen(false)}>
-                  <X className="h-5 w-5" />
-                </Button>
-              </form>
-            ) : (
-              <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)} className="hidden md:flex">
-                <Search className="h-5 w-5" />
-                <span className="sr-only">Search</span>
-              </Button>
-            )}
+            <SearchTrigger onClick={() => setIsSearchOpen(true)} />
+            <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
             <Link
               href="/contact"
               className="hidden md:inline-flex text-sm font-medium uppercase tracking-widest hover:text-muted-foreground transition-colors"
             >
-              Start Quote
+              Request Consultation
             </Link>
             <CartSheet />
           </div>
