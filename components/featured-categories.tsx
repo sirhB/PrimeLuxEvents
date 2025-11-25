@@ -36,7 +36,13 @@ const categories = [
     },
 ]
 
-export function FeaturedCategories() {
+interface FeaturedCategoriesProps {
+    label: string
+    title: string
+    ctaText: string
+}
+
+export function FeaturedCategories({ label, title, ctaText }: FeaturedCategoriesProps) {
     return (
         <section className="py-24 bg-background relative overflow-hidden">
             <div className="container mx-auto px-4 md:px-6">
@@ -48,10 +54,10 @@ export function FeaturedCategories() {
                     className="mb-16 flex flex-col md:flex-row justify-between items-end gap-6"
                 >
                     <div className="max-w-2xl">
-                        <span className="text-primary text-sm font-medium tracking-widest uppercase mb-2 block">Curated Collections</span>
-                        <h2 className="text-4xl md:text-5xl font-serif text-foreground">Explore by Category</h2>
+                        <span className="text-primary text-sm font-medium tracking-widest uppercase mb-2 block">{label}</span>
+                        <h2 className="text-4xl md:text-5xl font-serif text-foreground">{title}</h2>
                     </div>
-                    <ButtonLink href="/catalog" text="View Full Catalog" />
+                    <ButtonLink href="/catalog" text={ctaText} />
                 </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[400px]">
