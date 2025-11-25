@@ -20,7 +20,7 @@ export default function ContactPage() {
   const [content, setContent] = useState<any>({})
 
   useEffect(() => {
-    import("@/lib/content-client").then((mod) => {
+    import("@/lib/content").then((mod) => {
       mod.getSiteContent().then(setContent)
     })
   }, [])

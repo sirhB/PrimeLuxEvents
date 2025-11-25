@@ -19,7 +19,7 @@ export default function AboutPage() {
 
   useEffect(() => {
     // Fetch content client-side
-    import("@/lib/content-client").then((mod) => {
+    import("@/lib/content").then((mod) => {
       mod.getSiteContent().then(setContent)
     })
   }, [])

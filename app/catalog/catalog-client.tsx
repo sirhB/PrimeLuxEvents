@@ -13,7 +13,6 @@ import { ArrowLeft, LayoutGrid, List } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { cn, formatCurrency } from '@/lib/utils'
-import { motion } from 'framer-motion'
 
 interface Product {
     id: string
@@ -113,37 +112,21 @@ export default function CatalogClient({ heroTitle, products, categories, package
             {/* Hero Section - More Compact */}
             <section className="relative py-12 px-4 text-center bg-background border-b border-border/50">
                 <div className="max-w-4xl mx-auto">
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="text-3xl md:text-4xl font-serif font-bold mb-3 text-primary"
-                    >
+                    <h1 className="text-3xl md:text-4xl font-serif font-bold mb-3 text-gold animate-fade-in">
                         {selectedCategory ? selectedCategory : (heroTitle || "Rental Catalog")}
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                        className="text-muted-foreground text-base mb-8 max-w-2xl mx-auto"
-                    >
+                    </h1>
+                    <p className="text-muted-foreground text-base mb-8 max-w-2xl mx-auto">
                         {selectedCategory
                             ? `Browse our collection of ${selectedCategory.toLowerCase()}.`
                             : "Explore our premium collection of event rentals, packages, and exclusive deals."
                         }
-                    </motion.p>
+                    </p>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                    >
-                        <SearchBar
-                            value={searchQuery}
-                            onChange={setSearchQuery}
-                            placeholder="Search for products, categories, or packages..."
-                        />
-                    </motion.div>
+                    <SearchBar
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder="Search for products, categories, or packages..."
+                    />
                 </div>
             </section>
 
@@ -187,9 +170,9 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
                                 : "grid-cols-1"
                         )}>
-                            {filteredProducts.map((product, index) => (
+                            {filteredProducts.map((product) => (
                                 viewMode === 'grid' ? (
-                                    <ProductCard key={product.id} product={product} index={index} />
+                                    <ProductCard key={product.id} product={product} />
                                 ) : (
                                     <div key={product.id} className="flex gap-6 border rounded-xl p-4 hover:border-gold/50 transition-colors">
                                         <div className="relative w-48 aspect-[4/3] flex-shrink-0 overflow-hidden rounded-lg bg-secondary">
@@ -280,30 +263,15 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
                         {/* Categories Grid - More Compact */}
                         <section>
-                            <motion.h2
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.6 }}
-                                className="text-2xl font-serif font-bold mb-4"
-                            >
-                                Browse by Category
-                            </motion.h2>
+                            <h2 className="text-2xl font-serif font-bold mb-4">Browse by Category</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {filteredCategories.map((category, index) => (
-                                    <motion.div
+                                {filteredCategories.map((category) => (
+                                    <CategoryCard
                                         key={category.id}
-                                        initial={{ opacity: 0, y: 30 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true, amount: 0.3 }}
-                                        transition={{ duration: 0.5, delay: index * 0.05 }}
-                                    >
-                                        <CategoryCard
-                                            name={category.name}
-                                            imageUrl={category.image_url}
-                                            onClick={() => handleCategoryClick(category.name)}
-                                        />
-                                    </motion.div>
+                                        name={category.name}
+                                        imageUrl={category.image_url}
+                                        onClick={() => handleCategoryClick(category.name)}
+                                    />
                                 ))}
                             </div>
 
@@ -317,17 +285,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
                         {/* All Products (if searching) */}
                         {searchQuery && (
                             <section>
-                                <motion.h2
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    className="text-2xl font-serif font-bold mb-4"
-                                >
-                                    Products
-                                </motion.h2>
+                                <h2 className="text-2xl font-serif font-bold mb-4">Products</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {filteredProducts.map((product, index) => (
-                                        <ProductCard key={product.id} product={product} index={index} />
+                                    {filteredProducts.map((product) => (
+                                        <ProductCard key={product.id} product={product} />
                                     ))}
                                 </div>
                             </section>
