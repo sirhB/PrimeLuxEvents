@@ -71,7 +71,7 @@ export function BrandValuesSection({
   // Merge passed items with default icons if possible, or just use defaults if no items passed
   // For simplicity in this demo, if items are passed via CMS (which don't have icons), we'll map them to the default icons by index
 
-  const displayValues = items && Array.isArray(items)
+  const displayValues = items
     ? items.map((item, index) => ({
       ...item,
       icon: defaultValues[index % defaultValues.length].icon

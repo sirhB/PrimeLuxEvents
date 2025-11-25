@@ -12,35 +12,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { motion } from "framer-motion"
 
 export function ContactForm() {
     const [hasVenue, setHasVenue] = useState<string>("")
     const [hasCaterer, setHasCaterer] = useState<string>("")
     const [hasPlanner, setHasPlanner] = useState<string>("")
 
-    const fieldVariants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: (i: number) => ({
-            opacity: 1,
-            y: 0,
-            transition: {
-                delay: i * 0.05,
-                duration: 0.5,
-            },
-        }),
-    }
-
     return (
         <form className="space-y-6">
-            <motion.div
-                custom={0}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-                className="grid sm:grid-cols-2 gap-4"
-            >
+            <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="first-name">First name</Label>
                     <Input id="first-name" placeholder="Jane" />
@@ -49,64 +29,29 @@ export function ContactForm() {
                     <Label htmlFor="last-name">Last name</Label>
                     <Input id="last-name" placeholder="Doe" />
                 </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-                custom={1}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-                className="space-y-2"
-            >
+            <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" placeholder="jane@example.com" type="email" />
-            </motion.div>
+            </div>
 
-            <motion.div
-                custom={2}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-                className="space-y-2"
-            >
+            <div className="space-y-2">
                 <Label htmlFor="phone">Phone</Label>
                 <Input id="phone" placeholder="(555) 000-0000" type="tel" />
-            </motion.div>
+            </div>
 
-            <motion.div
-                custom={3}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-                className="space-y-2"
-            >
+            <div className="space-y-2">
                 <Label htmlFor="event-date">Event Date (Optional)</Label>
                 <Input id="event-date" type="date" />
-            </motion.div>
+            </div>
 
-            <motion.div
-                custom={4}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-                className="space-y-2"
-            >
+            <div className="space-y-2">
                 <Label htmlFor="guests">Number of Guests</Label>
                 <Input id="guests" type="number" placeholder="e.g. 150" min="1" />
-            </motion.div>
+            </div>
 
-            <motion.div
-                custom={5}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-                className="space-y-2"
-            >
+            <div className="space-y-2">
                 <Label htmlFor="budget">Budget</Label>
                 <Select>
                     <SelectTrigger id="budget">
@@ -120,17 +65,10 @@ export function ContactForm() {
                         <SelectItem value="20000+">$20,000+</SelectItem>
                     </SelectContent>
                 </Select>
-            </motion.div>
+            </div>
 
             {/* Venue Question */}
-            <motion.div
-                custom={6}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-                className="space-y-2"
-            >
+            <div className="space-y-2">
                 <Label>Do you have a venue?</Label>
                 <div className="flex gap-4">
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -157,27 +95,14 @@ export function ContactForm() {
                     </label>
                 </div>
                 {hasVenue === "yes" && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="mt-3"
-                    >
+                    <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-300">
                         <Input id="venue" placeholder="e.g. The Grand Hotel" />
-                    </motion.div>
+                    </div>
                 )}
-            </motion.div>
+            </div>
 
             {/* Caterer Question */}
-            <motion.div
-                custom={7}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-                className="space-y-2"
-            >
+            <div className="space-y-2">
                 <Label>Do you have a caterer?</Label>
                 <div className="flex gap-4">
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -204,27 +129,14 @@ export function ContactForm() {
                     </label>
                 </div>
                 {hasCaterer === "yes" && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="mt-3"
-                    >
+                    <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-300">
                         <Input id="caterer" placeholder="e.g. Delicious Eats" />
-                    </motion.div>
+                    </div>
                 )}
-            </motion.div>
+            </div>
 
             {/* Event Planner Question */}
-            <motion.div
-                custom={8}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-                className="space-y-2"
-            >
+            <div className="space-y-2">
                 <Label>Do you have an event planner?</Label>
                 <div className="flex gap-4">
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -251,41 +163,20 @@ export function ContactForm() {
                     </label>
                 </div>
                 {hasPlanner === "yes" && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="mt-3"
-                    >
+                    <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-300">
                         <Input id="planner" placeholder="Event planner name or company" />
-                    </motion.div>
+                    </div>
                 )}
-            </motion.div>
+            </div>
 
-            <motion.div
-                custom={9}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-                className="space-y-2"
-            >
+            <div className="space-y-2">
                 <Label htmlFor="message">Message</Label>
                 <Textarea id="message" placeholder="Tell us about your event..." className="min-h-[150px]" />
-            </motion.div>
+            </div>
 
-            <motion.div
-                custom={10}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fieldVariants}
-            >
-                <Button type="submit" className="w-full hover:scale-105 transition-transform" size="lg">
-                    Request Consultation
-                </Button>
-            </motion.div>
+            <Button type="submit" className="w-full" size="lg">
+                Request Consultation
+            </Button>
         </form>
     )
 }
