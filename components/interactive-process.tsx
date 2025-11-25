@@ -22,10 +22,10 @@ interface ProcessStep {
 interface InteractiveProcessProps {
     title: string
     description: string
-    steps: ProcessStep[]
+    steps?: ProcessStep[]
 }
 
-export function InteractiveProcess({ title, description, steps }: InteractiveProcessProps) {
+export function InteractiveProcess({ title, description, steps = [] }: InteractiveProcessProps) {
     const containerRef = useRef<HTMLDivElement>(null)
     const { scrollYProgress } = useScroll({
         target: containerRef,

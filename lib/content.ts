@@ -1,16 +1,12 @@
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
 import { unstable_cache } from 'next/cache'
 
 export type ContentMap = Record<string, any>
 
 export async function getSiteContent() {
-    const supabase = createClient()
+    const supabase = await createClient()
 
-    // We use a client-side supabase instance but fetch in a server component context
-    // ideally we should use the server client here if we were passing cookies,
-    // but for public content, the anon key is fine.
-    // However, to use next/cache properly, we wrap the fetch.
-
+    // Use server-side supabase client for proper build-time data fetching
     const fetchContent = unstable_cache(
         async () => {
             const { data, error } = await supabase
