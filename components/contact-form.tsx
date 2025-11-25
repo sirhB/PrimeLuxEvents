@@ -51,6 +51,22 @@ export function ContactForm() {
                 <Input id="guests" type="number" placeholder="e.g. 150" min="1" />
             </div>
 
+            <div className="space-y-2">
+                <Label htmlFor="budget">Budget</Label>
+                <Select>
+                    <SelectTrigger id="budget">
+                        <SelectValue placeholder="Select a budget range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="under-1000">Under $1,000</SelectItem>
+                        <SelectItem value="1000-5000">$1,000 - $5,000</SelectItem>
+                        <SelectItem value="5000-10000">$5,000 - $10,000</SelectItem>
+                        <SelectItem value="10000-20000">$10,000 - $20,000</SelectItem>
+                        <SelectItem value="20000+">$20,000+</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+
             {/* Venue Question */}
             <div className="space-y-2">
                 <Label>Do you have a venue?</Label>
@@ -117,22 +133,6 @@ export function ContactForm() {
                         <Input id="caterer" placeholder="e.g. Delicious Eats" />
                     </div>
                 )}
-            </div>
-
-            <div className="space-y-2">
-                <Label htmlFor="budget">Budget</Label>
-                <Select>
-                    <SelectTrigger id="budget">
-                        <SelectValue placeholder="Select a budget range" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="under-1000">Under $1,000</SelectItem>
-                        <SelectItem value="1000-5000">$1,000 - $5,000</SelectItem>
-                        <SelectItem value="5000-10000">$5,000 - $10,000</SelectItem>
-                        <SelectItem value="10000-20000">$10,000 - $20,000</SelectItem>
-                        <SelectItem value="20000+">$20,000+</SelectItem>
-                    </SelectContent>
-                </Select>
             </div>
 
             {/* Event Planner Question */}
