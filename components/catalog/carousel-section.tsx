@@ -4,6 +4,7 @@ import { ReactNode, useCallback, useEffect, useState } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 interface CarouselSectionProps {
@@ -95,26 +96,61 @@ export function CarouselSection({
                     )}
                 </div>
 
-                {/* Navigation Arrows - Desktop */}
+                {/* Enhanced Navigation Arrows - Desktop */}
                 <div className="hidden md:flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={scrollPrev}
-                        disabled={!prevBtnEnabled}
-                        className="h-10 w-10 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30 transition-all duration-300"
+                    <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
                     >
-                        <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={scrollNext}
-                        disabled={!nextBtnEnabled}
-                        className="h-10 w-10 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30 transition-all duration-300"
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={scrollPrev}
+                            disabled={!prevBtnEnabled}
+                            className="h-10 w-10 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30 transition-all duration-300 relative overflow-hidden group"
+                        >
+                            <motion.div
+                                whileHover={{ x: -2 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </motion.div>
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                whileHover={{ scale: 1 }}
+                                transition={{ duration: 0.3 }}
+                                className="absolute inset-0 bg-gold/10 rounded-full"
+                            />
+                        </Button>
+                    </motion.div>
+
+                    <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
                     >
-                        <ChevronRight className="h-4 w-4" />
-                    </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={scrollNext}
+                            disabled={!nextBtnEnabled}
+                            className="h-10 w-10 rounded-full border-2 hover:border-gold hover:bg-gold/10 disabled:opacity-30 transition-all duration-300 relative overflow-hidden group"
+                        >
+                            <motion.div
+                                whileHover={{ x: 2 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </motion.div>
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                whileHover={{ scale: 1 }}
+                                transition={{ duration: 0.3 }}
+                                className="absolute inset-0 bg-gold/10 rounded-full"
+                            />
+                        </Button>
+                    </motion.div>
                 </div>
             </div>
 
@@ -125,22 +161,37 @@ export function CarouselSection({
                 </div>
             </div>
 
-            {/* Dot Indicators */}
-            <div className="flex items-center justify-center gap-2 mt-5">
+            {/* Enhanced Dot Indicators */}
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="flex items-center justify-center gap-2 mt-5"
+            >
                 {scrollSnaps.map((_, index) => (
-                    <button
+                    <motion.button
                         key={index}
                         onClick={() => scrollTo(index)}
                         className={cn(
-                            "h-1.5 rounded-full transition-all duration-300",
+                            "rounded-full transition-all duration-300",
                             index === selectedIndex
-                                ? "w-6 bg-gold"
-                                : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                                ? "w-6 h-1.5 bg-gold"
+                                : "w-1.5 h-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
                         )}
+                        whileHover={{
+                            scale: index === selectedIndex ? 1.1 : 1.2,
+                            backgroundColor: index === selectedIndex ? "#D4AF37" : "rgba(0,0,0,0.3)"
+                        }}
+                        whileTap={{ scale: 0.9 }}
+                        animate={{
+                            width: index === selectedIndex ? 24 : 6,
+                            backgroundColor: index === selectedIndex ? "#D4AF37" : "rgba(0,0,0,0.2)"
+                        }}
+                        transition={{ duration: 0.3 }}
                         aria-label={`Go to slide ${index + 1}`}
                     />
                 ))}
-            </div>
+            </motion.div>
 
             {/* Mobile Navigation Arrows */}
             <div className="flex md:hidden items-center justify-center gap-4 mt-6">

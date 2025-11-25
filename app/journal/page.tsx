@@ -1,5 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
+import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { getSiteContent } from "@/lib/content"
 
@@ -8,16 +9,38 @@ export default async function JournalPage() {
   const posts = content['journal.posts'] || []
 
   return (
-    <div className="py-12 md:py-20">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      className="py-12 md:py-20"
+    >
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 animate-fade-in-up">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6"
+        >
           <div>
-            <h1 className="text-4xl md:text-6xl font-serif mb-4">{content['journal.hero.title']}</h1>
-            <p className="text-lg text-muted-foreground max-w-xl">
+            <motion.h1
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="text-4xl md:text-6xl font-serif mb-4"
+            >
+              {content['journal.hero.title']}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="text-lg text-muted-foreground max-w-xl"
+            >
               {content['journal.hero.description']}
-            </p>
+            </motion.p>
           </div>
-        </div>
+        </motion.div>
 
         <div className="grid gap-12 md:gap-16">
           {posts.map((post: any, index: number) => (
