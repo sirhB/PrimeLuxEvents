@@ -102,6 +102,11 @@ export default async function ContactPage() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="guests">Number of Guests</Label>
+                <Input id="guests" type="number" placeholder="e.g. 150" min="1" />
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="venue">Venue</Label>
                 <Input id="venue" placeholder="e.g. The Grand Hotel" />
               </div>
