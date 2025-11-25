@@ -51,7 +51,7 @@ export function SiteHeader() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] sm:w-[400px] bg-background border-r border-border">
-                <nav className="flex flex-col gap-6 mt-10">
+                <nav className="flex flex-col gap-6 mt-10 px-4">
                   <Link
                     href="/"
                     onClick={() => setIsOpen(false)}
@@ -99,7 +99,7 @@ export function SiteHeader() {
                     onClick={() => setIsOpen(false)}
                     className="text-2xl font-serif hover:text-muted-foreground transition-colors"
                   >
-                    Contact
+                    Request Consultation
                   </Link>
                 </nav>
               </SheetContent>

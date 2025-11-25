@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select"
 import { MapPin, Phone, Mail } from "lucide-react"
 import { getSiteContent } from "@/lib/content"
+import { ContactForm } from "@/components/contact-form"
 
 export default async function ContactPage() {
   const content = await getSiteContent()
@@ -74,73 +75,7 @@ export default async function ContactPage() {
           {/* Contact Form */}
           <div className="bg-muted/30 p-8 md:p-12 rounded-lg border border-border/50">
             <h2 className="text-2xl font-serif mb-6">{content['contact.form.title']}</h2>
-            <form className="space-y-6">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="first-name">First name</Label>
-                  <Input id="first-name" placeholder="Jane" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="last-name">Last name</Label>
-                  <Input id="last-name" placeholder="Doe" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" placeholder="jane@example.com" type="email" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input id="phone" placeholder="(555) 000-0000" type="tel" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="event-date">Event Date (Optional)</Label>
-                <Input id="event-date" type="date" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="guests">Number of Guests</Label>
-                <Input id="guests" type="number" placeholder="e.g. 150" min="1" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="venue">Venue</Label>
-                <Input id="venue" placeholder="e.g. The Grand Hotel" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="caterer">Caterer</Label>
-                <Input id="caterer" placeholder="e.g. Delicious Eats" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="budget">Budget</Label>
-                <Select>
-                  <SelectTrigger id="budget">
-                    <SelectValue placeholder="Select a budget range" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="under-1000">Under $1,000</SelectItem>
-                    <SelectItem value="1000-5000">$1,000 - $5,000</SelectItem>
-                    <SelectItem value="5000-10000">$5,000 - $10,000</SelectItem>
-                    <SelectItem value="10000-20000">$10,000 - $20,000</SelectItem>
-                    <SelectItem value="20000+">$20,000+</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
-                <Textarea id="message" placeholder="Tell us about your event..." className="min-h-[150px]" />
-              </div>
-
-              <Button type="submit" className="w-full" size="lg">
-                Request Consultation
-              </Button>
-            </form>
+            <ContactForm />
           </div>
         </div>
       </div>

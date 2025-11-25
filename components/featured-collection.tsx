@@ -5,7 +5,8 @@ import Image from "next/image"
 import { products } from "@/lib/data"
 import { ArrowRight } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
-import { motion } from "framer-motion"
+import { motion, useAnimate } from "framer-motion"
+import { useEffect } from "react"
 
 export function FeaturedCollection() {
   const featuredProducts = products.filter((p) => p.featured).slice(0, 6)
@@ -50,26 +51,29 @@ interface Product {
 }
 
 function AutoScrollCarousel({ products }: { products: Product[] }) {
+  const [scope, animate] = useAnimate()
+
   // Calculate the total width to scroll (card width + gap)
   const cardWidth = 300 // w-[300px]
   const gap = 32 // gap-8 = 2rem = 32px
   const totalWidth = (cardWidth + gap) * products.length
 
+  useEffect(() => {
+    const animation = async () => {
+      await animate(
+        scope.current,
+        { x: -totalWidth },
+        { duration: 30, ease: "linear", repeat: Infinity }
+      )
+    }
+    animation()
+  }, [animate, scope, totalWidth])
+
   return (
     <div className="relative overflow-hidden">
       <motion.div
+        ref={scope}
         className="flex gap-8"
-        animate={{
-          x: [0, -totalWidth],
-        }}
-        transition={{
-          x: {
-            repeat: Infinity,
-            repeatType: "loop",
-            duration: 30,
-            ease: "linear",
-          },
-        }}
       >
         {/* Render products twice for seamless loop */}
         {[...products, ...products].map((product, index) => (
