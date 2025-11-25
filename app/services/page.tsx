@@ -1,7 +1,6 @@
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { motion } from "framer-motion"
 import { PencilRuler, Truck, Armchair, Sparkles } from "lucide-react"
 import { getSiteContent } from "@/lib/content"
 
@@ -13,55 +12,21 @@ export default async function ServicesPage() {
   const setupFeatures = content['services.setup.features'] || []
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      className="flex flex-col min-h-screen"
-    >
-      {/* Enhanced Hero Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="relative py-20 md:py-32 bg-muted/30"
-      >
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <section className="relative py-20 md:py-32 bg-muted/30">
         <div className="container px-4 md:px-6 text-center space-y-6">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="text-4xl md:text-6xl font-serif font-medium tracking-tight"
-          >
-            {content['services.hero.title']}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-lg md:text-xl font-light text-muted-foreground max-w-2xl mx-auto"
-          >
+          <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-tight">{content['services.hero.title']}</h1>
+          <p className="text-lg md:text-xl font-light text-muted-foreground max-w-2xl mx-auto">
             {content['services.hero.description']}
-          </motion.p>
+          </p>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Enhanced Services Grid */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="py-20 bg-background"
-      >
+      {/* Services Grid */}
+      <section className="py-20 bg-background">
         <div className="container px-4 md:px-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="grid gap-12 md:gap-24"
-          >
+          <div className="grid gap-12 md:gap-24">
             {/* Service 1 */}
             <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
               <div className="order-2 md:order-1 relative aspect-video md:aspect-[4/3] bg-muted rounded-lg overflow-hidden">
@@ -148,58 +113,25 @@ export default async function ServicesPage() {
                 </ul>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Enhanced CTA */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="py-24 bg-muted/30"
-      >
+      {/* CTA */}
+      <section className="py-24 bg-muted/30">
         <div className="container px-4 md:px-6 text-center space-y-8">
-          <motion.div
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3, type: "spring" }}
-            className="h-16 w-16 mx-auto rounded-full bg-background border border-border flex items-center justify-center text-primary mb-6"
-          >
+          <div className="h-16 w-16 mx-auto rounded-full bg-background border border-border flex items-center justify-center text-primary mb-6">
             <Sparkles className="h-8 w-8" />
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-3xl md:text-4xl font-serif"
-          >
-            {content['services.cta.title']}
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="text-muted-foreground text-lg max-w-2xl mx-auto"
-          >
+          </div>
+          <h2 className="text-3xl md:text-4xl font-serif">{content['services.cta.title']}</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             {content['services.cta.description']}
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <Button asChild size="lg" className="min-w-[200px]">
-              <Link href="/contact">{content['services.cta.button']}</Link>
-            </Button>
-          </motion.div>
+          </p>
+          <Button asChild size="lg" className="min-w-[200px]">
+            <Link href="/contact">{content['services.cta.button']}</Link>
+          </Button>
         </div>
-      </motion.section>
-    </motion.div>
+      </section>
+    </div>
   )
 }

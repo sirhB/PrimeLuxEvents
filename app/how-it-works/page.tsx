@@ -2,7 +2,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { motion } from "framer-motion"
 import { CheckCircle2, ArrowRight } from "lucide-react"
 import { getSiteContent } from "@/lib/content"
 
@@ -13,38 +12,16 @@ export default async function HowItWorksPage() {
   const faqs = content['howitworks.faq.list'] || []
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      className="flex flex-col min-h-screen"
-    >
-      {/* Enhanced Hero Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-        className="relative py-20 md:py-32 bg-muted/30"
-      >
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <section className="relative py-20 md:py-32 bg-muted/30">
         <div className="container px-4 md:px-6 text-center space-y-6">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="text-4xl md:text-6xl font-serif font-medium tracking-tight"
-          >
-            {content['howitworks.hero.title']}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-lg md:text-xl font-light text-muted-foreground max-w-2xl mx-auto"
-          >
+          <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-tight">{content['howitworks.hero.title']}</h1>
+          <p className="text-lg md:text-xl font-light text-muted-foreground max-w-2xl mx-auto">
             {content['howitworks.hero.description']}
-          </motion.p>
+          </p>
         </div>
-      </motion.section>
+      </section>
 
       {/* Steps Section */}
       <section className="py-20 bg-background">

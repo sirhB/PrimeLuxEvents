@@ -3,7 +3,6 @@
 import { use, useState, useEffect } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { motion } from "framer-motion"
 import { ArrowLeft, Check, Plus, Minus, Package, Truck, Calendar as CalendarIcon, Info } from "lucide-react"
 import { DateRange } from "react-day-picker"
 import { differenceInDays } from "date-fns"
@@ -204,100 +203,48 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const canAddToCart = true
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10"
-    >
-      {/* Enhanced Breadcrumb with Animation */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="container mx-auto px-4 md:px-6 py-6"
-      >
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/10">
+      {/* Breadcrumb */}
+      <div className="container mx-auto px-4 md:px-6 py-6">
         <Link
           href={product.categories?.name ? `/catalog?category=${encodeURIComponent(product.categories.name)}` : "/catalog"}
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-all duration-300 group hover:scale-105"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors group"
         >
-          <motion.div
-            whileHover={{ x: -4 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-          </motion.div>
+          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
           Back to {product.categories?.name || 'Collection'}
         </Link>
-      </motion.div>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
-        className="container mx-auto px-4 md:px-6 pb-20"
-      >
+      <div className="container mx-auto px-4 md:px-6 pb-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-          {/* Enhanced Image Gallery */}
-          <motion.div
-            initial={{ opacity: 0, x: -50, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            whileHover={{ scale: 1.02 }}
-            className="sticky top-8"
-          >
+          {/* Image Gallery */}
+          <div className={`${isLoaded ? "animate-fade-in-up" : "opacity-0"}`}>
             <ProductGallery
               images={uniqueGalleryImages}
               productName={product.name}
               selectedImage={selectedGalleryImage}
             />
-          </motion.div>
+          </div>
 
-          {/* Enhanced Details Section */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="flex flex-col gap-6"
-          >
-            {/* Enhanced Header with Staggered Animations */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0 }}
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 1.1 }}
-                className="flex items-center gap-2 mb-2"
-              >
-                <Badge variant="outline" className="text-xs uppercase hover:bg-gold/10 transition-colors">
+          {/* Details Section */}
+          <div className={`flex flex-col gap-6 ${isLoaded ? "animate-fade-in-up delay-200" : "opacity-0"}`}>
+            {/* Header */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="outline" className="text-xs uppercase">
                   {product.sku || 'Product'}
                 </Badge>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 1.2 }}
-                className="text-4xl md:text-5xl font-serif mb-4 bg-gradient-to-r from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent"
-              >
+              </div>
+              <h1 className="text-4xl md:text-5xl font-serif mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
                 {product.name}
-              </motion.h1>
-
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 1.3 }}
-                className="flex items-baseline gap-3"
-              >
-                <span className="text-3xl font-semibold text-gold">
+              </h1>
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-semibold">
                   {formatCurrency(basePrice)}
                 </span>
                 <span className="text-sm text-muted-foreground">/ day</span>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
 
             <Separator />
 
@@ -406,21 +353,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
             <Separator />
 
-            {/* Enhanced Add to Cart with Animations */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.8 }}
-              className="space-y-4"
-            >
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button
-                  size="lg"
-                  className="w-full text-lg h-14 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group"
+            {/* Add to Cart */}
+            <div className="space-y-4">
+              <Button
                 size="lg"
                 className="w-full text-lg h-14 shadow-lg hover:shadow-xl transition-all"
                 onClick={() => {
@@ -463,14 +398,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   </>
                 )}
               </Button>
-              </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 2.0 }}
-                className="flex items-start gap-2 text-xs text-muted-foreground bg-secondary/50 p-3 rounded-lg"
-              >
+
+
+              <div className="flex items-start gap-2 text-xs text-muted-foreground bg-secondary/50 p-3 rounded-lg">
                 <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
                 <p>
                   Delivery and setup fees calculated at checkout based on location and logistics requirements.
@@ -552,6 +483,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           </div>
         )
       }
-    </motion.div >
+    </div >
   )
 }

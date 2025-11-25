@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 
 export default function LoginPage() {
@@ -43,12 +42,7 @@ export default function LoginPage() {
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-900">
-            <motion.div
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-            >
-                <Card className="w-full max-w-md">
+            <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
                     <CardDescription>
@@ -86,7 +80,6 @@ export default function LoginPage() {
                     </CardFooter>
                 </form>
             </Card>
-            </motion.div>
         </div>
     )
 }
