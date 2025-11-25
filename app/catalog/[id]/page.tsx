@@ -473,8 +473,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <p>
                   Delivery and setup fees calculated at checkout based on location and logistics requirements.
                 </p>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
 
             <Separator />
 

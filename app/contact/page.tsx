@@ -128,7 +128,7 @@ export default function ContactPage() {
                 className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent"
               />
             </motion.div>
-          </motion.div>
+          </div>
 
           {/* Enhanced Contact Form */}
           <motion.div
