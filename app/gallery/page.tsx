@@ -1,3 +1,5 @@
+'use client'
+
 import { getSiteContent } from "@/lib/content"
 import { motion } from "framer-motion"
 import GalleryGrid from "./gallery-grid"

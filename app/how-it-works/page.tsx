@@ -1,3 +1,5 @@
+'use client'
+
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -155,6 +157,6 @@ export default async function HowItWorksPage() {
           </div>
         </div>
       </section>
-    </div>
+    </motion.div>
   )
 }

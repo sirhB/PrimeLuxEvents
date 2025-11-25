@@ -239,41 +239,21 @@ export default function CatalogClient({ heroTitle, products, categories, package
             />
 
             {/* Main Content with Scroll Reveals */}
-            <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="container mx-auto px-4"
-            >
-                {/* Smooth Category Transitions */}
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={selectedCategory || 'main-catalog'}
-                        initial={{ opacity: 0, y: 20, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                        transition={{
-                            duration: 0.4,
-                            ease: "easeInOut",
-                            opacity: { duration: 0.3 },
-                            y: { duration: 0.4 },
-                            scale: { duration: 0.4 }
-                        }}
-                    >
-                        {/* Enhanced Category View with Scroll Reveals */}
-                        {selectedCategory ? (
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="space-y-8"
-                    >
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.3 }}
-                            className="flex items-center justify-between mb-8"
-                        >
+            <div className="container mx-auto px-4">
+                {/* Enhanced Content */}
+                <motion.div
+                    key={selectedCategory ? 'category' : 'main'}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className={selectedCategory ? "space-y-8" : "space-y-10"}
+                >
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.6, delay: 0.3 }}
+                                    className="flex items-center justify-between mb-8"
+                                >
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
@@ -393,18 +373,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             >
                                 <p className="text-muted-foreground text-lg">No products found in this category.</p>
                             </motion.div>
-                        )}
-                    </motion.div>
-                ) : (
-                    // Enhanced Main Catalog View with Progressive Reveals
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.4 }}
-                        className="space-y-10"
-                    >
-
-                        {/* Enhanced Featured Products Carousel */}
+                    {selectedCategory ? (
+                        {/* Enhanced Category View Content */}
                         {featuredProducts.length > 0 && !searchQuery && (
                             <motion.div
                                 initial={{ opacity: 0, y: 40 }}
@@ -655,11 +625,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     ))}
                                 </motion.div>
                             </motion.section>
-                        )}
-                    </motion.div>
-                    </motion.div>
-                </AnimatePresence>
-            </motion.div>
-        </motion.div>
+                    ) : null}
+                </motion.div>
     )
 }
