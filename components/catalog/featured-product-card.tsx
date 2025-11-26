@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatCurrency } from '@/lib/utils'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface Product {
     id: string
@@ -26,16 +27,16 @@ export function FeaturedProductCard({ product }: FeaturedProductCardProps) {
     return (
         <Link
             href={`/catalog/${product.id}`}
-            className="group relative block w-full"
+            className="group relative block w-full h-full"
         >
-            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-secondary shadow-lg">
+            <div className="relative h-full aspect-[16/10] md:aspect-[2/1] overflow-hidden rounded-sm bg-secondary border border-transparent hover:border-gold/30 transition-all duration-500">
                 {/* Image */}
                 {product.image_url ? (
                     <Image
                         src={product.image_url}
                         alt={product.name}
                         fill
-                        className="object-cover transition-all duration-700 group-hover:scale-110"
+                        className="object-cover transition-all duration-1000 group-hover:scale-105"
                     />
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-neutral-900 text-neutral-700">
@@ -44,54 +45,50 @@ export function FeaturedProductCard({ product }: FeaturedProductCardProps) {
                 )}
 
                 {/* Gradient Overlays */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-70 group-hover:opacity-80 transition-opacity duration-500" />
-
-                {/* Gold Glow Effect on Hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-gold/20 via-transparent to-gold/10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent opacity-60" />
 
                 {/* Featured Badge */}
-                <div className="absolute top-4 left-4 flex items-center gap-2 bg-gold/95 backdrop-blur-sm text-black px-4 py-2 rounded-full font-semibold text-sm shadow-lg">
-                    <Sparkles className="h-4 w-4" />
-                    FEATURED
+                <div className="absolute top-6 left-6 flex items-center gap-2 bg-gold text-black px-3 py-1 rounded-sm font-medium text-xs tracking-widest uppercase shadow-lg">
+                    <Sparkles className="h-3 w-3" />
+                    Featured Collection
                 </div>
-
-                {/* Category Tag */}
-                {product.categories?.name && (
-                    <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-medium border border-white/20">
-                        {product.categories.name}
-                    </div>
-                )}
 
                 {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-2xl font-serif font-bold text-white mb-2 group-hover:text-gold transition-colors duration-300">
-                        {product.name}
-                    </h3>
+                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="max-w-2xl space-y-4">
+                        {product.categories?.name && (
+                            <span className="text-gold/80 text-xs font-medium tracking-widest uppercase">
+                                {product.categories.name}
+                            </span>
+                        )}
+                        <h3 className="text-3xl md:text-4xl font-serif font-medium text-white group-hover:text-gold transition-colors duration-300">
+                            {product.name}
+                        </h3>
 
-                    {product.description && (
-                        <p className="text-white/80 text-sm mb-4 line-clamp-2 max-w-2xl">
-                            {product.description}
-                        </p>
-                    )}
+                        {product.description && (
+                            <p className="text-gray-300 text-sm md:text-base line-clamp-2 max-w-xl leading-relaxed">
+                                {product.description}
+                            </p>
+                        )}
 
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-bold text-gold">
+                        <div className="flex items-baseline gap-3 pt-2">
+                            <span className="text-3xl font-light text-white">
                                 {formatCurrency(price)}
                             </span>
-                            <span className="text-white/70 text-sm">/ day</span>
-                        </div>
-
-                        <div className="opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300">
-                            <div className="bg-gold text-black px-6 py-2 rounded-full font-semibold text-sm shadow-lg">
-                                View Details →
-                            </div>
+                            <span className="text-white/60 text-sm">/ day</span>
                         </div>
                     </div>
-                </div>
 
-                {/* Border Glow */}
-                <div className="absolute inset-0 rounded-2xl ring-1 ring-white/10 group-hover:ring-gold/50 transition-all duration-500" />
+                    <div className="flex-shrink-0">
+                        <Button
+                            className="bg-white text-black hover:bg-gold hover:text-black rounded-full px-8 py-6 text-base transition-all duration-300 group-hover:translate-x-2"
+                        >
+                            View Details
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
             </div>
         </Link>
     )
