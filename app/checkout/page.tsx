@@ -362,32 +362,34 @@ export default function CheckoutPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
                 >
-                    <Card className="max-w-md w-full">
-                        <CardContent className="pt-6 text-center space-y-4">
+                    <Card className="max-w-md w-full border-gold/20 shadow-2xl shadow-gold/5">
+                        <CardContent className="pt-10 pb-10 text-center space-y-6">
                             <motion.div
-                                className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center text-green-600 mx-auto"
+                                className="h-20 w-20 rounded-full bg-gold/10 flex items-center justify-center text-gold mx-auto border border-gold/20"
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                             >
-                                <Check className="h-8 w-8" />
+                                <Check className="h-10 w-10" />
                             </motion.div>
-                            <motion.h2
-                                className="text-2xl font-serif"
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3 }}
-                            >
-                                Order Placed Successfully!
-                            </motion.h2>
-                            <motion.p
-                                className="text-muted-foreground"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.4 }}
-                            >
-                                Thank you for your order. You'll receive a confirmation email shortly.
-                            </motion.p>
+                            <div className="space-y-2">
+                                <motion.h2
+                                    className="text-3xl font-serif text-foreground"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                >
+                                    Order Placed Successfully!
+                                </motion.h2>
+                                <motion.p
+                                    className="text-muted-foreground text-lg"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.4 }}
+                                >
+                                    Thank you for your order. You'll receive a confirmation email shortly.
+                                </motion.p>
+                            </div>
                         </CardContent>
                     </Card>
                 </motion.div>
@@ -396,20 +398,20 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background py-12">
-            <div className="container max-w-4xl mx-auto px-4">
-                {/* Progress Steps */}
+        <div className="min-h-screen bg-background py-16 md:py-24">
+            <div className="container max-w-5xl mx-auto px-4">
+                {/* Progress Steps - Redesigned */}
                 <motion.div
-                    className="mb-8"
+                    className="mb-16"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
                 >
-                    <div className="relative">
+                    <div className="relative max-w-3xl mx-auto">
                         {/* Progress Bar Background */}
-                        <div className="absolute left-0 top-[28px] w-full h-0.5 bg-border rounded-full overflow-hidden">
+                        <div className="absolute left-0 top-[15px] w-full h-[1px] bg-border/60">
                             <motion.div
-                                className="h-full bg-gradient-to-r from-primary to-primary/60"
+                                className="h-full bg-gold"
                                 initial={{ width: "0%" }}
                                 animate={{
                                     width: currentStep === 1 ? "0%" : currentStep === 2 ? "50%" : "100%"
@@ -425,78 +427,49 @@ export default function CheckoutPage() {
                                 { num: 2, label: "Details", desc: "Event information" },
                                 { num: 3, label: "Payment", desc: "Review & confirm" }
                             ].map((step) => (
-                                <motion.div
-                                    key={step.num}
-                                    className={cn(
-                                        "flex flex-col items-center gap-2 relative z-10",
-                                        step.num <= currentStep ? "text-primary" : "text-muted-foreground"
-                                    )}
-                                    initial={false}
-                                    animate={{
-                                        scale: step.num === currentStep ? 1.05 : 1,
-                                    }}
-                                    transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
-                                >
+                                <div key={step.num} className="flex flex-col items-center gap-3 relative z-10 group cursor-default">
                                     {/* Step Circle */}
                                     <motion.div
                                         className={cn(
-                                            "relative h-12 w-12 rounded-full flex items-center justify-center font-semibold text-base shadow-sm",
+                                            "relative h-8 w-8 rounded-full flex items-center justify-center font-medium text-sm transition-colors duration-300 border",
                                             step.num < currentStep
-                                                ? "bg-primary text-primary-foreground"
+                                                ? "bg-gold border-gold text-black"
                                                 : step.num === currentStep
-                                                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                                                    : "bg-muted text-muted-foreground"
+                                                    ? "bg-background border-gold text-gold ring-4 ring-gold/10"
+                                                    : "bg-background border-border text-muted-foreground"
                                         )}
                                         initial={false}
-                                        whileHover={{ scale: 1.08 }}
+                                        animate={{
+                                            scale: step.num === currentStep ? 1.1 : 1,
+                                        }}
                                     >
                                         {step.num < currentStep ? (
-                                            <motion.div
-                                                initial={{ scale: 0, rotate: -180 }}
-                                                animate={{ scale: 1, rotate: 0 }}
-                                                transition={{ type: "spring", stiffness: 200 }}
-                                            >
-                                                <Check className="h-5 w-5" />
-                                            </motion.div>
+                                            <Check className="h-4 w-4" />
                                         ) : (
                                             <span>{step.num}</span>
-                                        )}
-
-                                        {/* Subtle pulse animation for current step */}
-                                        {step.num === currentStep && (
-                                            <motion.div
-                                                className="absolute inset-0 rounded-full bg-primary"
-                                                initial={{ scale: 1, opacity: 0.3 }}
-                                                animate={{ scale: 1.4, opacity: 0 }}
-                                                transition={{
-                                                    duration: 2,
-                                                    repeat: Infinity,
-                                                    ease: "easeOut"
-                                                }}
-                                            />
                                         )}
                                     </motion.div>
 
                                     {/* Step Label */}
-                                    <div className="text-center">
+                                    <div className="text-center space-y-0.5">
                                         <p className={cn(
-                                            "font-semibold text-sm whitespace-nowrap",
-                                            step.num === currentStep && "text-primary"
+                                            "font-serif text-base transition-colors duration-300",
+                                            step.num === currentStep ? "text-foreground font-medium" : "text-muted-foreground"
                                         )}>
                                             {step.label}
                                         </p>
-                                        <p className="text-xs text-muted-foreground hidden sm:block">
+                                        <p className="text-xs text-muted-foreground/60 hidden sm:block font-light tracking-wide uppercase">
                                             {step.desc}
                                         </p>
                                     </div>
-                                </motion.div>
+                                </div>
                             ))}
                         </div>
                     </div>
                 </motion.div>
 
                 <motion.h1
-                    className="text-3xl font-serif mb-8 text-center"
+                    className="text-4xl md:text-5xl font-serif mb-12 text-center text-foreground"
                     key={currentStep}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -510,19 +483,19 @@ export default function CheckoutPage() {
                 {/* Step 1: Supplemental Items */}
                 {currentStep === 1 && (
                     <motion.div
-                        className="space-y-8"
+                        className="space-y-12"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
                             {isLoadingSupplemental ? (
                                 Array(3).fill(0).map((_, i) => (
-                                    <Card key={i} className="animate-pulse">
-                                        <div className="h-48 bg-muted rounded-t-lg" />
-                                        <CardContent className="p-4 space-y-2">
-                                            <div className="h-4 bg-muted rounded w-3/4" />
+                                    <Card key={i} className="animate-pulse border-border/40">
+                                        <div className="h-64 bg-muted rounded-t-lg" />
+                                        <CardContent className="p-6 space-y-3">
+                                            <div className="h-5 bg-muted rounded w-3/4" />
                                             <div className="h-4 bg-muted rounded w-1/2" />
                                         </CardContent>
                                     </Card>
@@ -539,37 +512,37 @@ export default function CheckoutPage() {
                                             ease: "easeOut"
                                         }}
                                     >
-                                        <Card className="overflow-hidden flex flex-col h-full">
-                                            <div className="aspect-square relative bg-muted">
+                                        <Card className="overflow-hidden flex flex-col h-full border-border/40 hover:border-gold/30 transition-all duration-300 hover:shadow-lg hover:shadow-gold/5 group">
+                                            <div className="aspect-[4/5] relative bg-secondary/20 overflow-hidden">
                                                 <img
                                                     src={product.image_url || '/placeholder.svg'}
                                                     alt={product.name}
-                                                    className="object-cover w-full h-full"
+                                                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
                                                 />
                                             </div>
-                                            <CardHeader className="p-4 pb-2">
-                                                <CardTitle className="text-lg font-serif line-clamp-1">{product.name}</CardTitle>
-                                                <CardDescription>{formatCurrency(product.price)}</CardDescription>
+                                            <CardHeader className="p-6 pb-2">
+                                                <CardTitle className="text-xl font-serif line-clamp-1">{product.name}</CardTitle>
+                                                <CardDescription className="text-gold font-medium text-base">{formatCurrency(product.price)}</CardDescription>
                                             </CardHeader>
-                                            <CardFooter className="p-4 pt-0 mt-auto flex flex-col gap-3">
+                                            <CardFooter className="p-6 pt-2 mt-auto flex flex-col gap-4">
                                                 <div className="flex items-center justify-between w-full">
-                                                    <span className="text-sm text-muted-foreground">Quantity:</span>
-                                                    <div className="flex items-center gap-2">
+                                                    <span className="text-sm text-muted-foreground uppercase tracking-wider font-light">Quantity</span>
+                                                    <div className="flex items-center gap-3">
                                                         <Button
-                                                            size="sm"
+                                                            size="icon"
                                                             variant="outline"
-                                                            className="h-8 w-8 p-0"
+                                                            className="h-8 w-8 rounded-full border-border/50 hover:border-gold/50 hover:text-gold"
                                                             onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) - 1)}
                                                         >
                                                             <Minus className="h-3 w-3" />
                                                         </Button>
-                                                        <span className="w-8 text-center font-medium">
+                                                        <span className="w-6 text-center font-medium">
                                                             {supplementalQuantities[product.id] || 1}
                                                         </span>
                                                         <Button
-                                                            size="sm"
+                                                            size="icon"
                                                             variant="outline"
-                                                            className="h-8 w-8 p-0"
+                                                            className="h-8 w-8 rounded-full border-border/50 hover:border-gold/50 hover:text-gold"
                                                             onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) + 1)}
                                                         >
                                                             <Plus className="h-3 w-3" />
@@ -578,10 +551,10 @@ export default function CheckoutPage() {
                                                 </div>
                                                 <Button
                                                     variant="outline"
-                                                    className="w-full"
+                                                    className="w-full border-gold/30 hover:bg-gold hover:text-black hover:border-gold transition-all duration-300"
                                                     onClick={() => handleAddSupplementalItem(product)}
                                                 >
-                                                    <ShoppingBag className="mr-2 h-4 w-4" /> Add to Cart
+                                                    <ShoppingBag className="mr-2 h-4 w-4" /> Add to Quote
                                                 </Button>
                                             </CardFooter>
                                         </Card>
@@ -589,8 +562,8 @@ export default function CheckoutPage() {
                                 ))
                             )}
                         </div>
-                        <div className="flex justify-end">
-                            <Button onClick={handleNextStep} size="lg">
+                        <div className="flex justify-end pt-8 border-t border-border/40">
+                            <Button onClick={handleNextStep} size="lg" className="bg-black text-white hover:bg-black/80 rounded-full px-8 h-12 text-base">
                                 Continue to Details <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </div>
@@ -600,7 +573,7 @@ export default function CheckoutPage() {
                 {/* Step 2: Event & Delivery Details */}
                 {currentStep === 2 && (
                     <motion.div
-                        className="space-y-6"
+                        className="space-y-10 max-w-4xl mx-auto"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
@@ -608,7 +581,7 @@ export default function CheckoutPage() {
                     >
                         {error && (
                             <motion.div
-                                className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 flex items-start gap-3 text-destructive"
+                                className="bg-destructive/5 border border-destructive/20 rounded-lg p-4 flex items-start gap-3 text-destructive"
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.2 }}
@@ -618,13 +591,15 @@ export default function CheckoutPage() {
                             </motion.div>
                         )}
 
-                        <div className="grid gap-6">
+                        <div className="grid gap-10">
                             {/* Customer Info */}
-                            <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
-                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
-                                    <CardTitle>Contact Information</CardTitle>
-                                </CardHeader>
-                                <CardContent className="grid sm:grid-cols-2 gap-4">
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4 mb-2">
+                                    <div className="h-px flex-1 bg-border/60"></div>
+                                    <h2 className="text-2xl font-serif text-foreground">Contact Information</h2>
+                                    <div className="h-px flex-1 bg-border/60"></div>
+                                </div>
+                                <div className="grid sm:grid-cols-2 gap-6">
                                     <div className="space-y-2 sm:col-span-2">
                                         <Label htmlFor="customerName">Full Name *</Label>
                                         <Input
@@ -632,6 +607,7 @@ export default function CheckoutPage() {
                                             value={formData.customerName}
                                             onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                                             required
+                                            className="h-12 bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -642,6 +618,7 @@ export default function CheckoutPage() {
                                             value={formData.customerEmail}
                                             onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
                                             required
+                                            className="h-12 bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -652,43 +629,46 @@ export default function CheckoutPage() {
                                             value={formData.customerPhone}
                                             onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
                                             required
+                                            className="h-12 bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20"
                                         />
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </section>
 
                             {/* Event Details */}
-                            <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
-                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
-                                    <CardTitle>Event Details</CardTitle>
-                                </CardHeader>
-                                <CardContent className="grid gap-4">
-                                    <div className="grid sm:grid-cols-2 gap-4">
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4 mb-2">
+                                    <div className="h-px flex-1 bg-border/60"></div>
+                                    <h2 className="text-2xl font-serif text-foreground">Event Details</h2>
+                                    <div className="h-px flex-1 bg-border/60"></div>
+                                </div>
+                                <div className="grid gap-6">
+                                    <div className="grid sm:grid-cols-2 gap-6">
                                         <div className="grid gap-2">
                                             <Label>Event Date *</Label>
                                             <Popover>
                                                 <PopoverTrigger asChild>
                                                     <Button
                                                         variant={"outline"}
-                                                        className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
+                                                        className={cn("w-full justify-start text-left font-normal h-12 border-border/50 hover:border-gold/50 hover:bg-background", !date && "text-muted-foreground")}
                                                     >
                                                         <CalendarIcon className="mr-2 h-4 w-4" />
                                                         {date ? format(date, "PPP") : <span>Pick a date</span>}
                                                     </Button>
                                                 </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0">
-                                                    <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                                                <PopoverContent className="w-auto p-0 border-gold/20 shadow-xl">
+                                                    <Calendar mode="single" selected={date} onSelect={setDate} initialFocus className="p-3 pointer-events-auto" />
                                                 </PopoverContent>
                                             </Popover>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div className="grid grid-cols-2 gap-4">
                                             <div className="grid gap-2">
                                                 <Label>Start Time *</Label>
-                                                <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required />
+                                                <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required className="h-12 bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20" />
                                             </div>
                                             <div className="grid gap-2">
                                                 <Label>End Time *</Label>
-                                                <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required />
+                                                <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required className="h-12 bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20" />
                                             </div>
                                         </div>
                                     </div>
@@ -700,15 +680,16 @@ export default function CheckoutPage() {
                                             value={formData.venueAddress}
                                             onChange={(e) => setFormData({ ...formData, venueAddress: e.target.value, deliveryAddress: e.target.value })}
                                             required
+                                            className="h-12 bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20"
                                         />
                                         <p className="text-xs text-muted-foreground">We'll use this as the delivery address unless specified otherwise.</p>
                                     </div>
 
-                                    <div className="grid sm:grid-cols-2 gap-4">
+                                    <div className="grid sm:grid-cols-2 gap-6">
                                         <div className="grid gap-2">
                                             <Label>Venue Type</Label>
                                             <Select value={venueType} onValueChange={setVenueType}>
-                                                <SelectTrigger>
+                                                <SelectTrigger className="h-12 bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20">
                                                     <SelectValue placeholder="Select type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -727,30 +708,33 @@ export default function CheckoutPage() {
                                                 placeholder="Wedding, Gala, etc."
                                                 value={formData.eventType}
                                                 onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
+                                                className="h-12 bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20"
                                             />
                                         </div>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </section>
 
                             {/* Logistics */}
-                            <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
-                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
-                                    <CardTitle>Logistics & Access</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="flex flex-wrap gap-6">
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox id="elevator" checked={hasElevator} onCheckedChange={(c) => setHasElevator(c as boolean)} />
-                                            <Label htmlFor="elevator">Elevator Access</Label>
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4 mb-2">
+                                    <div className="h-px flex-1 bg-border/60"></div>
+                                    <h2 className="text-2xl font-serif text-foreground">Logistics & Access</h2>
+                                    <div className="h-px flex-1 bg-border/60"></div>
+                                </div>
+                                <div className="space-y-6">
+                                    <div className="flex flex-wrap gap-8 p-6 bg-secondary/10 rounded-lg border border-border/40">
+                                        <div className="flex items-center space-x-3">
+                                            <Checkbox id="elevator" checked={hasElevator} onCheckedChange={(c) => setHasElevator(c as boolean)} className="border-gold/50 data-[state=checked]:bg-gold data-[state=checked]:text-black" />
+                                            <Label htmlFor="elevator" className="cursor-pointer">Elevator Access</Label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox id="stairs" checked={hasStairs} onCheckedChange={(c) => setHasStairs(c as boolean)} />
-                                            <Label htmlFor="stairs">Stairs Required</Label>
+                                        <div className="flex items-center space-x-3">
+                                            <Checkbox id="stairs" checked={hasStairs} onCheckedChange={(c) => setHasStairs(c as boolean)} className="border-gold/50 data-[state=checked]:bg-gold data-[state=checked]:text-black" />
+                                            <Label htmlFor="stairs" className="cursor-pointer">Stairs Required</Label>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox id="loading_dock" checked={hasLoadingDock} onCheckedChange={(c) => setHasLoadingDock(c as boolean)} />
-                                            <Label htmlFor="loading_dock">Loading Dock</Label>
+                                        <div className="flex items-center space-x-3">
+                                            <Checkbox id="loading_dock" checked={hasLoadingDock} onCheckedChange={(c) => setHasLoadingDock(c as boolean)} className="border-gold/50 data-[state=checked]:bg-gold data-[state=checked]:text-black" />
+                                            <Label htmlFor="loading_dock" className="cursor-pointer">Loading Dock</Label>
                                         </div>
                                     </div>
                                     <div className="grid gap-2">
@@ -759,108 +743,98 @@ export default function CheckoutPage() {
                                             placeholder="Gate codes, parking instructions, specific room names..."
                                             value={formData.deliveryNotes}
                                             onChange={(e) => setFormData({ ...formData, deliveryNotes: e.target.value })}
+                                            className="min-h-[100px] bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20 resize-none"
                                         />
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </section>
 
                             {/* Pickup Information */}
-                            <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
-                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                            <Package className="h-5 w-5 text-primary" />
-                                        </div>
-                                        <div>
-                                            <CardTitle>Pickup Information</CardTitle>
-                                            <CardDescription>When should we collect the items?</CardDescription>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="pt-6 space-y-6">
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4 mb-2">
+                                    <div className="h-px flex-1 bg-border/60"></div>
+                                    <h2 className="text-2xl font-serif text-foreground">Pickup Information</h2>
+                                    <div className="h-px flex-1 bg-border/60"></div>
+                                </div>
+                                <div className="space-y-6">
                                     {/* Same Day Pickup Toggle */}
-                                    <div className="flex items-center justify-between p-4 rounded-lg border border-primary/20 bg-primary/5">
-                                        <div className="flex items-center gap-3">
-                                            <Clock className="h-5 w-5 text-primary" />
+                                    <div className="flex items-center justify-between p-6 rounded-lg border border-gold/20 bg-gold/5">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 rounded-full bg-gold/10 flex items-center justify-center text-gold">
+                                                <Clock className="h-5 w-5" />
+                                            </div>
                                             <div>
                                                 <Label htmlFor="sameDayPickup" className="text-base font-medium cursor-pointer">
                                                     Same-Day Pickup
                                                 </Label>
-                                                <p className="text-sm text-muted-foreground">Pick up items the same day as your event</p>
-                                                <p className="text-xs text-amber-600 mt-1">Additional fee applies (calculated at checkout)</p>
+                                                <p className="text-sm text-muted-foreground mt-0.5">Pick up items the same day as your event</p>
+                                                <p className="text-xs text-amber-600 mt-1 font-medium">Additional fee applies (calculated at checkout)</p>
                                             </div>
                                         </div>
                                         <Checkbox
                                             id="sameDayPickup"
                                             checked={sameDayPickup}
                                             onCheckedChange={(c) => setSameDayPickup(c as boolean)}
-                                            className="h-5 w-5"
+                                            className="h-6 w-6 border-gold/50 data-[state=checked]:bg-gold data-[state=checked]:text-black"
                                         />
                                     </div>
 
-                                    {/* Pickup Date */}
-                                    <div className="space-y-2">
-                                        <Label className="flex items-center gap-2">
-                                            <CalendarIcon className="h-4 w-4 text-primary" />
-                                            Pickup Date {!sameDayPickup && "*"}
-                                        </Label>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant={"outline"}
-                                                    className={cn(
-                                                        "w-full justify-start text-left font-normal",
-                                                        !pickupDate && !sameDayPickup && "text-muted-foreground"
-                                                    )}
-                                                    disabled={sameDayPickup}
-                                                >
-                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {sameDayPickup
-                                                        ? (date ? format(date, "PPP") + " (Same as event)" : "Same as event date")
-                                                        : (pickupDate ? format(pickupDate, "PPP") : <span>Pick a date</span>)
-                                                    }
-                                                </Button>
-                                            </PopoverTrigger>
-                                            {!sameDayPickup && (
-                                                <PopoverContent className="w-auto p-0">
-                                                    <Calendar
-                                                        mode="single"
-                                                        selected={pickupDate}
-                                                        onSelect={setPickupDate}
-                                                        initialFocus
-                                                        disabled={(date) => date < new Date()}
-                                                    />
-                                                </PopoverContent>
-                                            )}
-                                        </Popover>
-                                        {sameDayPickup && (
-                                            <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                                <Check className="h-3 w-3 text-primary" />
-                                                Items will be picked up on the event date
-                                            </p>
-                                        )}
-                                    </div>
+                                    <div className="grid sm:grid-cols-2 gap-6">
+                                        {/* Pickup Date */}
+                                        <div className="space-y-2">
+                                            <Label className="flex items-center gap-2">
+                                                Pickup Date {!sameDayPickup && "*"}
+                                            </Label>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-full justify-start text-left font-normal h-12 border-border/50 hover:border-gold/50 hover:bg-background",
+                                                            !pickupDate && !sameDayPickup && "text-muted-foreground"
+                                                        )}
+                                                        disabled={sameDayPickup}
+                                                    >
+                                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                                        {sameDayPickup
+                                                            ? (date ? format(date, "PPP") + " (Same as event)" : "Same as event date")
+                                                            : (pickupDate ? format(pickupDate, "PPP") : <span>Pick a date</span>)
+                                                        }
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                {!sameDayPickup && (
+                                                    <PopoverContent className="w-auto p-0 border-gold/20 shadow-xl">
+                                                        <Calendar
+                                                            mode="single"
+                                                            selected={pickupDate}
+                                                            onSelect={setPickupDate}
+                                                            initialFocus
+                                                            disabled={(date) => date < new Date()}
+                                                            className="p-3 pointer-events-auto"
+                                                        />
+                                                    </PopoverContent>
+                                                )}
+                                            </Popover>
+                                        </div>
 
-                                    {/* Pickup Time */}
-                                    <div className="space-y-2">
-                                        <Label htmlFor="pickupTime" className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4 text-primary" />
-                                            Preferred Pickup Time
-                                        </Label>
-                                        <Input
-                                            id="pickupTime"
-                                            type="time"
-                                            value={pickupTime}
-                                            onChange={(e) => setPickupTime(e.target.value)}
-                                            className="w-full"
-                                        />
-                                        <p className="text-xs text-muted-foreground">We'll do our best to accommodate your preferred time</p>
+                                        {/* Pickup Time */}
+                                        <div className="space-y-2">
+                                            <Label htmlFor="pickupTime" className="flex items-center gap-2">
+                                                Preferred Pickup Time
+                                            </Label>
+                                            <Input
+                                                id="pickupTime"
+                                                type="time"
+                                                value={pickupTime}
+                                                onChange={(e) => setPickupTime(e.target.value)}
+                                                className="w-full h-12 bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20"
+                                            />
+                                        </div>
                                     </div>
 
                                     {/* Pickup Notes */}
                                     <div className="space-y-2">
                                         <Label htmlFor="pickupNotes" className="flex items-center gap-2">
-                                            <MapPin className="h-4 w-4 text-primary" />
                                             Pickup Instructions
                                         </Label>
                                         <Textarea
@@ -869,18 +843,18 @@ export default function CheckoutPage() {
                                             value={pickupNotes}
                                             onChange={(e) => setPickupNotes(e.target.value)}
                                             rows={3}
-                                            className="resize-none"
+                                            className="resize-none min-h-[100px] bg-background border-border/50 focus:border-gold/50 focus:ring-gold/20"
                                         />
                                     </div>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </section>
                         </div>
 
-                        <div className="flex justify-between pt-4">
-                            <Button variant="outline" onClick={handlePrevStep}>
-                                <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                        <div className="flex justify-between pt-12 border-t border-border/40">
+                            <Button variant="ghost" onClick={handlePrevStep} className="hover:bg-transparent hover:text-gold px-0">
+                                <ArrowLeft className="mr-2 h-4 w-4" /> Back to Add-ons
                             </Button>
-                            <Button onClick={handleNextStep} size="lg">
+                            <Button onClick={handleNextStep} size="lg" className="bg-black text-white hover:bg-black/80 rounded-full px-8 h-12 text-base">
                                 Continue to Payment <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </div>
@@ -890,76 +864,76 @@ export default function CheckoutPage() {
                 {/* Step 3: Payment */}
                 {currentStep === 3 && (
                     <motion.div
-                        className="grid lg:grid-cols-3 gap-8"
+                        className="grid lg:grid-cols-3 gap-12"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <div className="lg:col-span-2 space-y-6">
-                            <Card className="border-primary/20">
-                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
+                        <div className="lg:col-span-2 space-y-8">
+                            {/* Review Order */}
+                            <Card className="border-border/40 overflow-hidden">
+                                <CardHeader className="bg-secondary/10 border-b border-border/40 py-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                            <ShoppingBag className="h-5 w-5 text-primary" />
-                                        </div>
-                                        <div>
-                                            <CardTitle>Review Order</CardTitle>
-                                            <CardDescription>Adjust quantities if needed</CardDescription>
-                                        </div>
+                                        <ShoppingBag className="h-5 w-5 text-gold" />
+                                        <CardTitle className="font-serif text-xl">Review Order</CardTitle>
                                     </div>
                                 </CardHeader>
-                                <CardContent className="space-y-4 pt-6">{" "}
-                                    <div className="space-y-3">
+                                <CardContent className="p-0">
+                                    <div className="divide-y divide-border/40">
                                         {items.map((item, index) => {
                                             const product = cartProducts.find((p) => p.id === item.productId)
                                             if (!product) return null
                                             return (
                                                 <motion.div
                                                     key={item.productId}
-                                                    className="flex gap-4 py-2 border-b last:border-0"
+                                                    className="flex gap-6 p-6 hover:bg-secondary/5 transition-colors"
                                                     initial={{ opacity: 0, x: -20 }}
                                                     animate={{ opacity: 1, x: 0 }}
                                                     transition={{ duration: 0.3, delay: index * 0.05 }}
                                                 >
-                                                    <div className="h-16 w-16 rounded border bg-muted overflow-hidden flex-shrink-0">
+                                                    <div className="h-24 w-24 rounded-lg border border-border/40 bg-muted overflow-hidden flex-shrink-0">
                                                         <img
                                                             src={product.image_url || '/placeholder.svg'}
                                                             alt={product.name}
                                                             className="h-full w-full object-cover"
                                                         />
                                                     </div>
-                                                    <div className="flex-1">
-                                                        <h4 className="font-medium font-serif">{product.name}</h4>
-                                                        <div className="flex items-center gap-2 mt-1">
-                                                            <Button
-                                                                size="sm"
-                                                                variant="outline"
-                                                                className="h-6 w-6 p-0"
-                                                                onClick={() => {
-                                                                    updateQuantity(item.productId, item.quantity - 1)
-                                                                    toast.info('Quantity updated')
-                                                                }}
-                                                            >
-                                                                <Minus className="h-3 w-3" />
-                                                            </Button>
-                                                            <span className="text-sm font-medium w-8 text-center">
-                                                                {item.quantity}
-                                                            </span>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="outline"
-                                                                className="h-6 w-6 p-0"
-                                                                onClick={() => {
-                                                                    updateQuantity(item.productId, item.quantity + 1)
-                                                                    toast.info('Quantity updated')
-                                                                }}
-                                                            >
-                                                                <Plus className="h-3 w-3" />
-                                                            </Button>
+                                                    <div className="flex-1 flex flex-col justify-between">
+                                                        <div>
+                                                            <h4 className="font-serif text-lg font-medium text-foreground">{product.name}</h4>
+                                                            <p className="text-gold font-medium mt-1">{formatCurrency(product.price * item.quantity)}</p>
+                                                        </div>
+                                                        <div className="flex items-center gap-3 mt-4">
+                                                            <div className="flex items-center border border-border/50 rounded-full">
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="ghost"
+                                                                    className="h-8 w-8 rounded-l-full hover:text-gold"
+                                                                    onClick={() => {
+                                                                        updateQuantity(item.productId, item.quantity - 1)
+                                                                        toast.info('Quantity updated')
+                                                                    }}
+                                                                >
+                                                                    <Minus className="h-3 w-3" />
+                                                                </Button>
+                                                                <span className="text-sm font-medium w-8 text-center">
+                                                                    {item.quantity}
+                                                                </span>
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="ghost"
+                                                                    className="h-8 w-8 rounded-r-full hover:text-gold"
+                                                                    onClick={() => {
+                                                                        updateQuantity(item.productId, item.quantity + 1)
+                                                                        toast.info('Quantity updated')
+                                                                    }}
+                                                                >
+                                                                    <Plus className="h-3 w-3" />
+                                                                </Button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <p className="font-medium">{formatCurrency(product.price * item.quantity)}</p>
                                                 </motion.div>
                                             )
                                         })}
@@ -968,21 +942,16 @@ export default function CheckoutPage() {
                             </Card>
 
                             {/* Payment Method */}
-                            <Card className="border-primary/20">
-                                <CardHeader className="border-b border-primary/10 bg-gradient-to-r from-primary/5 to-transparent">
+                            <Card className="border-border/40 overflow-hidden">
+                                <CardHeader className="bg-secondary/10 border-b border-border/40 py-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                            <Truck className="h-5 w-5 text-primary" />
-                                        </div>
-                                        <div>
-                                            <CardTitle>Payment Method</CardTitle>
-                                            <CardDescription>Secure payment processing powered by Stripe</CardDescription>
-                                        </div>
+                                        <Truck className="h-5 w-5 text-gold" />
+                                        <CardTitle className="font-serif text-xl">Payment Method</CardTitle>
                                     </div>
                                 </CardHeader>
-                                <CardContent className="pt-6">
-                                    <div className="bg-muted/50 border border-border rounded-lg p-6 text-center space-y-2">
-                                        <p className="text-sm text-muted-foreground">
+                                <CardContent className="p-8">
+                                    <div className="bg-gold/5 border border-gold/20 rounded-xl p-8 text-center space-y-3">
+                                        <p className="text-foreground font-medium">
                                             Payment processing will be integrated once Stripe is configured.
                                         </p>
                                         <p className="text-sm text-muted-foreground">
@@ -994,57 +963,62 @@ export default function CheckoutPage() {
                         </div>
 
                         <div className="lg:col-span-1">
-                            <Card className="sticky top-4">
-                                <CardHeader>
-                                    <CardTitle>Order Summary</CardTitle>
+                            <Card className="sticky top-24 border-gold/20 shadow-xl shadow-gold/5 overflow-hidden">
+                                <CardHeader className="bg-black text-white py-6">
+                                    <CardTitle className="font-serif text-xl text-center">Order Summary</CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-4">
+                                <CardContent className="p-6 space-y-6">
                                     {totals ? (
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-muted-foreground">Subtotal</span>
-                                                <span>{formatCurrency(totals.subtotal)}</span>
-                                            </div>
-                                            {totals.setupFee > 0 && (
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="text-muted-foreground">Setup Fee</span>
-                                                    <span>{formatCurrency(totals.setupFee)}</span>
+                                        <div className="space-y-4">
+                                            <div className="space-y-2 text-sm">
+                                                <div className="flex justify-between">
+                                                    <span className="text-muted-foreground">Subtotal</span>
+                                                    <span>{formatCurrency(totals.subtotal)}</span>
                                                 </div>
-                                            )}
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-muted-foreground">Tax ({(totals.taxRate * 100).toFixed(2)}%)</span>
-                                                <span>{formatCurrency(totals.taxAmount)}</span>
+                                                {totals.setupFee > 0 && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-muted-foreground">Setup Fee</span>
+                                                        <span>{formatCurrency(totals.setupFee)}</span>
+                                                    </div>
+                                                )}
+                                                <div className="flex justify-between">
+                                                    <span className="text-muted-foreground">Tax ({(totals.taxRate * 100).toFixed(2)}%)</span>
+                                                    <span>{formatCurrency(totals.taxAmount)}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-muted-foreground">Delivery Fee</span>
+                                                    <span>{isCalculating ? '...' : formatCurrency(totals.deliveryFee)}</span>
+                                                </div>
                                             </div>
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-muted-foreground">Delivery Fee</span>
-                                                <span>{isCalculating ? '...' : formatCurrency(totals.deliveryFee)}</span>
-                                            </div>
-                                            <div className="flex justify-between font-medium text-lg pt-2 border-t">
-                                                <span>Total</span>
-                                                <span>{formatCurrency(totals.totalAmount)}</span>
+
+                                            <div className="pt-4 border-t border-border/40">
+                                                <div className="flex justify-between items-baseline">
+                                                    <span className="font-serif text-lg">Total</span>
+                                                    <span className="font-bold text-2xl text-gold">{formatCurrency(totals.totalAmount)}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="flex justify-center py-4">
-                                            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                                        <div className="flex justify-center py-8">
+                                            <Loader2 className="h-8 w-8 animate-spin text-gold" />
                                         </div>
                                     )}
 
                                     {error && (
-                                        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 flex items-start gap-2">
+                                        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 flex items-start gap-2">
                                             <AlertCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
                                             <p className="text-sm text-destructive">{error}</p>
                                         </div>
                                     )}
 
                                     <Button
-                                        className="w-full h-12 text-base"
+                                        className="w-full h-14 text-lg bg-gold text-black hover:bg-gold/90 rounded-full font-medium shadow-lg hover:shadow-gold/20 transition-all duration-300"
                                         onClick={handleSubmit}
                                         disabled={isLoading || isCalculating || !totals}
                                     >
                                         {isLoading ? (
                                             <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                                                 Processing...
                                             </>
                                         ) : (
@@ -1052,7 +1026,7 @@ export default function CheckoutPage() {
                                         )}
                                     </Button>
 
-                                    <Button variant="ghost" className="w-full" onClick={handlePrevStep}>
+                                    <Button variant="ghost" className="w-full hover:bg-transparent hover:text-gold" onClick={handlePrevStep}>
                                         Back to Details
                                     </Button>
                                 </CardContent>
