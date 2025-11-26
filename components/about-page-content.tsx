@@ -4,12 +4,14 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { EditableContent } from "@/components/admin/editable-content"
 
 interface AboutPageContentProps {
     content: any
+    isEditing?: boolean
 }
 
-export function AboutPageContent({ content }: AboutPageContentProps) {
+export function AboutPageContent({ content, isEditing = false }: AboutPageContentProps) {
     const values = content['about.values.items'] || []
 
     return (
@@ -17,8 +19,12 @@ export function AboutPageContent({ content }: AboutPageContentProps) {
             {/* Hero Section */}
             <section className="relative h-[60vh] flex items-center justify-center overflow-hidden bg-black">
                 <div className="absolute inset-0 z-0">
-                    <Image
-                        src={content['about.hero.image'] || "/luxury-event-setup-ballroom-chandelier.jpg"}
+                    <EditableContent
+                        contentKey="about.hero.image"
+                        initialValue={content['about.hero.image'] || "/luxury-event-setup-ballroom-chandelier.jpg"}
+                        type="image"
+                        isEditing={isEditing}
+                        as={Image}
                         alt="Luxury Event Setup"
                         fill
                         className="object-cover opacity-60"
@@ -27,22 +33,27 @@ export function AboutPageContent({ content }: AboutPageContentProps) {
                     <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
                 </div>
                 <div className="container relative z-10 text-center text-white space-y-6 max-w-4xl px-4">
-                    <motion.h1
+                    <EditableContent
+                        contentKey="about.hero.title"
+                        initialValue={content['about.hero.title']}
+                        isEditing={isEditing}
+                        as={motion.h1}
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="text-5xl md:text-7xl font-serif font-medium tracking-tight"
-                    >
-                        {content['about.hero.title']}
-                    </motion.h1>
-                    <motion.p
+                    />
+                    <EditableContent
+                        contentKey="about.hero.description"
+                        initialValue={content['about.hero.description']}
+                        type="textarea"
+                        isEditing={isEditing}
+                        as={motion.p}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                         className="text-lg md:text-2xl font-light text-white/90 max-w-2xl mx-auto leading-relaxed"
-                    >
-                        {content['about.hero.description']}
-                    </motion.p>
+                    />
                 </div>
             </section>
 
@@ -57,13 +68,35 @@ export function AboutPageContent({ content }: AboutPageContentProps) {
                             transition={{ duration: 0.8 }}
                             className="space-y-8"
                         >
-                            <h2 className="text-4xl md:text-5xl font-serif text-foreground">
-                                {content['about.story.title']}
-                            </h2>
+                            <EditableContent
+                                contentKey="about.story.title"
+                                initialValue={content['about.story.title']}
+                                isEditing={isEditing}
+                                as="h2"
+                                className="text-4xl md:text-5xl font-serif text-foreground"
+                            />
                             <div className="space-y-6 text-muted-foreground text-lg leading-relaxed font-light">
-                                <p>{content['about.story.p1']}</p>
-                                <p>{content['about.story.p2']}</p>
-                                <p>{content['about.story.p3']}</p>
+                                <EditableContent
+                                    contentKey="about.story.p1"
+                                    initialValue={content['about.story.p1']}
+                                    type="textarea"
+                                    isEditing={isEditing}
+                                    as="p"
+                                />
+                                <EditableContent
+                                    contentKey="about.story.p2"
+                                    initialValue={content['about.story.p2']}
+                                    type="textarea"
+                                    isEditing={isEditing}
+                                    as="p"
+                                />
+                                <EditableContent
+                                    contentKey="about.story.p3"
+                                    initialValue={content['about.story.p3']}
+                                    type="textarea"
+                                    isEditing={isEditing}
+                                    as="p"
+                                />
                             </div>
                         </motion.div>
                         <motion.div
@@ -73,8 +106,12 @@ export function AboutPageContent({ content }: AboutPageContentProps) {
                             transition={{ duration: 0.8 }}
                             className="relative aspect-[4/5] md:aspect-square bg-secondary rounded-sm overflow-hidden shadow-2xl"
                         >
-                            <Image
-                                src={content['about.story.image'] || "/elegant-wedding-reception-table-setting.jpg"}
+                            <EditableContent
+                                contentKey="about.story.image"
+                                initialValue={content['about.story.image'] || "/elegant-wedding-reception-table-setting.jpg"}
+                                type="image"
+                                isEditing={isEditing}
+                                as={Image}
                                 alt="Our Story Image"
                                 fill
                                 className="object-cover hover:scale-105 transition-transform duration-700"
@@ -95,10 +132,21 @@ export function AboutPageContent({ content }: AboutPageContentProps) {
                         transition={{ duration: 0.6 }}
                         className="text-center max-w-3xl mx-auto mb-20"
                     >
-                        <h2 className="text-4xl md:text-5xl font-serif mb-6 text-foreground">{content['about.values.title']}</h2>
-                        <p className="text-xl text-muted-foreground font-light">
-                            {content['about.values.description']}
-                        </p>
+                        <EditableContent
+                            contentKey="about.values.title"
+                            initialValue={content['about.values.title']}
+                            isEditing={isEditing}
+                            as="h2"
+                            className="text-4xl md:text-5xl font-serif mb-6 text-foreground"
+                        />
+                        <EditableContent
+                            contentKey="about.values.description"
+                            initialValue={content['about.values.description']}
+                            type="textarea"
+                            isEditing={isEditing}
+                            as="p"
+                            className="text-xl text-muted-foreground font-light"
+                        />
                     </motion.div>
                     <div className="grid md:grid-cols-3 gap-8">
                         {values.map((value: any, index: number) => (
@@ -122,24 +170,29 @@ export function AboutPageContent({ content }: AboutPageContentProps) {
             <section className="py-32 bg-gold text-black relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
                 <div className="container px-4 md:px-6 text-center space-y-10 relative z-10">
-                    <motion.h2
+                    <EditableContent
+                        contentKey="about.cta.title"
+                        initialValue={content['about.cta.title']}
+                        isEditing={isEditing}
+                        as={motion.h2}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
                         className="text-4xl md:text-6xl font-serif"
-                    >
-                        {content['about.cta.title']}
-                    </motion.h2>
-                    <motion.p
+                    />
+                    <EditableContent
+                        contentKey="about.cta.description"
+                        initialValue={content['about.cta.description']}
+                        type="textarea"
+                        isEditing={isEditing}
+                        as={motion.p}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.1 }}
                         className="text-black/80 text-xl max-w-2xl mx-auto font-light"
-                    >
-                        {content['about.cta.description']}
-                    </motion.p>
+                    />
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -148,7 +201,14 @@ export function AboutPageContent({ content }: AboutPageContentProps) {
                         className="flex flex-col sm:flex-row gap-6 justify-center pt-6"
                     >
                         <Button asChild size="lg" className="min-w-[200px] bg-black text-white hover:bg-black/80 h-14 text-lg rounded-full border-2 border-transparent">
-                            <Link href="/catalog">{content['about.cta.primary']}</Link>
+                            <Link href="/catalog">
+                                <EditableContent
+                                    contentKey="about.cta.primary"
+                                    initialValue={content['about.cta.primary']}
+                                    isEditing={isEditing}
+                                    as="span"
+                                />
+                            </Link>
                         </Button>
                         <Button
                             asChild
@@ -156,7 +216,14 @@ export function AboutPageContent({ content }: AboutPageContentProps) {
                             variant="outline"
                             className="min-w-[200px] bg-transparent border-2 border-black/20 text-black hover:bg-black hover:text-white h-14 text-lg rounded-full"
                         >
-                            <Link href="/contact">{content['about.cta.secondary']}</Link>
+                            <Link href="/contact">
+                                <EditableContent
+                                    contentKey="about.cta.secondary"
+                                    initialValue={content['about.cta.secondary']}
+                                    isEditing={isEditing}
+                                    as="span"
+                                />
+                            </Link>
                         </Button>
                     </motion.div>
                 </div>
