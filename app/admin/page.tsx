@@ -1,4 +1,6 @@
-import { createClient } from '@/lib/supabase/server'
+'use client'
+
+import { createClient } from '@/lib/supabase/client'
 import { StatsCard } from '@/components/admin/dashboard/stats-card'
 import { RevenueChart } from '@/components/admin/dashboard/revenue-chart'
 import { RecentActivityList } from '@/components/admin/dashboard/recent-activity-list'
@@ -6,46 +8,72 @@ import { QuickActionsCard } from '@/components/admin/dashboard/quick-actions-car
 import { MetricsTrendCard } from '@/components/admin/dashboard/metrics-trend-card'
 import { DollarSign, ShoppingCart, FileText, AlertTriangle } from 'lucide-react'
 import { formatCents } from '@/lib/format-money'
+import { useEffect, useState } from 'react'
 
-export default async function AdminDashboardPage() {
-    const supabase = await createClient()
+export default function AdminDashboardPage() {
+    const supabase = createClient()
+    const [data, setData] = useState<{
+        totalRevenue: number
+        orderCount: number
+        pendingQuotes: number
+        lowStockProducts: number
+        recentOrders: any[]
+    }>({
+        totalRevenue: 0,
+        orderCount: 0,
+        pendingQuotes: 0,
+        lowStockProducts: 0,
+        recentOrders: []
+    })
 
-    // Fetch real data
-    const { data: orders } = await supabase
-        .from('orders')
-        .select('total_amount, created_at')
-        .order('created_at', { ascending: false })
+    useEffect(() => {
+        async function fetchData() {
+            // Fetch real data
+            const { data: orders } = await supabase
+                .from('orders')
+                .select('total_amount, created_at')
+                .order('created_at', { ascending: false })
 
-    const { data: quotes } = await supabase
-        .from('quotes')
-        .select('status')
+            const { data: quotes } = await supabase
+                .from('quotes')
+                .select('status')
 
-    const { data: products } = await supabase
-        .from('products')
-        .select('quantity_available, quantity_reserved')
+            const { data: products } = await supabase
+                .from('products')
+                .select('quantity_available, quantity_reserved')
 
-    const { data: recentOrders } = await supabase
-        .from('orders')
-        .select('id, customer_name, customer_email, total_amount, created_at')
-        .order('created_at', { ascending: false })
-        .limit(5)
+            const { data: recentOrders } = await supabase
+                .from('orders')
+                .select('id, customer_name, customer_email, total_amount, created_at')
+                .order('created_at', { ascending: false })
+                .limit(5)
 
+            // Calculate metrics
+            const totalRevenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0
+            const orderCount = orders?.length || 0
+            const pendingQuotes = quotes?.filter((q) => q.status === 'draft' || q.status === 'sent').length || 0
+            const lowStockProducts =
+                products?.filter((p) => p.quantity_available - p.quantity_reserved <= 2).length || 0
 
-    // Calculate metrics
-    const totalRevenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0
-    const orderCount = orders?.length || 0
-    const pendingQuotes = quotes?.filter((q) => q.status === 'draft' || q.status === 'sent').length || 0
-    const lowStockProducts =
-        products?.filter((p) => p.quantity_available - p.quantity_reserved <= 2).length || 0
+            setData({
+                totalRevenue,
+                orderCount,
+                pendingQuotes,
+                lowStockProducts,
+                recentOrders: recentOrders || []
+            })
+        }
 
-    // Prepare chart data (mocked for now based on real total, can be refined to be real daily data)
-    // In a real scenario, we would aggregate orders by date.
+        fetchData()
+    }, [])
+
+    // Prepare chart data
     const revenueData = [
-        { name: 'Mon', total: totalRevenue * 0.1 },
-        { name: 'Tue', total: totalRevenue * 0.2 },
-        { name: 'Wed', total: totalRevenue * 0.15 },
-        { name: 'Thu', total: totalRevenue * 0.3 },
-        { name: 'Fri', total: totalRevenue * 0.25 },
+        { name: 'Mon', total: data.totalRevenue * 0.1 },
+        { name: 'Tue', total: data.totalRevenue * 0.2 },
+        { name: 'Wed', total: data.totalRevenue * 0.15 },
+        { name: 'Thu', total: data.totalRevenue * 0.3 },
+        { name: 'Fri', total: data.totalRevenue * 0.25 },
     ]
 
     const trendData = [
@@ -65,28 +93,28 @@ export default async function AdminDashboardPage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <StatsCard
                     title="Total Revenue"
-                    value={formatCents(totalRevenue)}
+                    value={formatCents(data.totalRevenue)}
                     subtitle="All time"
                     icon={DollarSign}
                     index={0}
                 />
                 <StatsCard
                     title="Total Orders"
-                    value={orderCount}
+                    value={data.orderCount}
                     subtitle="All time"
                     icon={ShoppingCart}
                     index={1}
                 />
                 <StatsCard
                     title="Pending Quotes"
-                    value={pendingQuotes}
+                    value={data.pendingQuotes}
                     subtitle="Awaiting response"
                     icon={FileText}
                     index={2}
                 />
                 <StatsCard
                     title="Low Stock Alerts"
-                    value={lowStockProducts}
+                    value={data.lowStockProducts}
                     subtitle="Products need attention"
                     icon={AlertTriangle}
                     index={3}
@@ -103,7 +131,7 @@ export default async function AdminDashboardPage() {
                     <div className="grid gap-6 md:grid-cols-2">
                         <MetricsTrendCard
                             title="Completed Tasks"
-                            value={orderCount}
+                            value={data.orderCount}
                             data={trendData}
                             trend="+10% today"
                         />
@@ -113,7 +141,7 @@ export default async function AdminDashboardPage() {
 
                 {/* Right Column (Recent Activity) */}
                 <div className="md:col-span-4">
-                    <RecentActivityList orders={recentOrders || []} />
+                    <RecentActivityList orders={data.recentOrders} />
                 </div>
             </div>
         </div>
