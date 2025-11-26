@@ -58,16 +58,18 @@
   --sidebar-border: oklch(0.88 0.02 90);
   --sidebar-ring: oklch(0.15 0.02 85);
 
-  /* Modern Dashboard Colors - Mapped to Original Palette */
-  --dashboard-background: var(--background);
-  --dashboard-card: var(--card);
-  --dashboard-card-hover: var(--secondary);
-  --dashboard-text: var(--foreground);
-  --dashboard-text-muted: var(--muted-foreground);
+  /* Modern Dashboard Colors - Premium Gold/Black Theme */
+  --dashboard-background: #0a0a0a;
+  --dashboard-card: #171717;
+  --dashboard-card-hover: #262626;
+  --dashboard-text: #ededed;
+  --dashboard-text-muted: #a1a1aa;
+  --dashboard-border: #262626;
   --dashboard-accent-gold: #D4AF37;
   --dashboard-accent-green: #10B981;
   --dashboard-accent-orange: #F59E0B;
-  --dashboard-accent-blue: #3B82F6;
+  --dashboard-accent-blue: #D4AF37;
+  /* Unified accent color */
 }
 
 .dark {

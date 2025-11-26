@@ -36,7 +36,7 @@ export function ModernHeader() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full bg-gradient-to-r from-[var(--dashboard-accent-gold)] to-[var(--dashboard-accent-blue)] text-white hover:opacity-90"
+                    className="rounded-full bg-gradient-to-r from-[var(--dashboard-accent-gold)] to-yellow-600 text-black hover:opacity-90 shadow-lg shadow-gold/10"
                 >
                     <User className="h-5 w-5" />
                 </Button>

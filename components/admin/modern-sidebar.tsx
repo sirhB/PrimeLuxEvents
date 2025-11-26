@@ -52,13 +52,13 @@ export function ModernSidebar() {
             {/* Sidebar Container */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-40 w-20 flex flex-col items-center py-8 transition-transform duration-300 ease-in-out md:translate-x-0 bg-[var(--dashboard-background)] border-r border-[var(--border)]",
+                    "fixed inset-y-0 left-0 z-40 w-20 flex flex-col items-center py-8 transition-transform duration-300 ease-in-out md:translate-x-0 bg-[var(--dashboard-background)] border-r border-[var(--dashboard-border)]",
                     isMobileOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
                 {/* Logo */}
                 <div className="mb-8">
-                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[var(--dashboard-accent-gold)] to-[var(--dashboard-accent-blue)] flex items-center justify-center text-white font-bold text-xl">
+                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[var(--dashboard-accent-gold)] to-yellow-600 flex items-center justify-center text-black font-bold text-xl shadow-lg shadow-gold/20">
                         P
                     </div>
                 </div>

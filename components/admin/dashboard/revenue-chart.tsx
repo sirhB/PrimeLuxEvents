@@ -32,7 +32,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
                                 tickFormatter={(value) => `$${value}`}
                             />
                             <Tooltip
-                                contentStyle={{ backgroundColor: 'var(--dashboard-card)', border: '1px solid var(--border)', borderRadius: '8px' }}
+                                contentStyle={{ backgroundColor: 'var(--dashboard-card)', border: '1px solid var(--dashboard-border)', borderRadius: '8px' }}
                                 itemStyle={{ color: 'var(--dashboard-text)' }}
                                 cursor={{ fill: 'var(--dashboard-card-hover)' }}
                             />
