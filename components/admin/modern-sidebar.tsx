@@ -51,13 +51,12 @@ export function ModernSidebar() {
             </Button>
 
             {/* Sidebar Container */}
-            <motion.aside
-                initial={false}
-                animate={{ x: isMobileOpen ? 0 : -100 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-40 w-20 flex flex-col items-center py-8 md:translate-x-0 bg-[var(--dashboard-background)] border-r border-[var(--dashboard-border)]",
-                    !isMobileOpen && "-translate-x-full md:translate-x-0"
+                    "fixed inset-y-0 left-0 z-40 w-20 flex flex-col items-center py-8 bg-[var(--dashboard-background)] border-r border-[var(--dashboard-border)]",
+                    "transition-transform duration-300 ease-in-out",
+                    "md:translate-x-0",
+                    isMobileOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
                 {/* Logo */}
@@ -121,7 +120,7 @@ export function ModernSidebar() {
                         <LogOut className="h-6 w-6" />
                     </motion.button>
                 </div>
-            </motion.aside>
+            </aside>
         </>
     )
 }
