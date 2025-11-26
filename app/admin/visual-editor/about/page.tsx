@@ -27,7 +27,16 @@ export default function VisualEditorAboutPage() {
             } else {
                 // Transform array to object
                 const contentMap = data.reduce((acc: any, item: any) => {
-                    acc[item.key] = item.value
+                    let value = item.value
+                    // Try to parse JSON if it looks like an array or object
+                    if (typeof value === 'string' && (value.startsWith('[') || value.startsWith('{'))) {
+                        try {
+                            value = JSON.parse(value)
+                        } catch (e) {
+                            // Keep as string if parse fails
+                        }
+                    }
+                    acc[item.key] = value
                     return acc
                 }, {})
                 setContent(contentMap)
