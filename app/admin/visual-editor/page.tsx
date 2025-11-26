@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { VisualEditorNav } from "@/components/admin/visual-editor-nav"
+import { VisualEditorLanding } from "@/components/admin/visual-editor-landing"
 import { AboutPageContent } from "@/components/about-page-content"
 import { HowItWorksPageContent } from "@/components/how-it-works-page-content"
 import { ContactPageContent } from "@/components/contact-page-content"
@@ -12,17 +13,16 @@ import { JournalPageContent } from "@/components/journal-page-content"
 import { AnimatePresence, motion } from "framer-motion"
 
 export default function VisualEditorPage() {
-    const [activePage, setActivePage] = useState('about')
+    const [activePage, setActivePage] = useState<string | null>(null)
     const [content, setContent] = useState<any>(null)
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(false)
     const supabase = createClient()
 
     useEffect(() => {
+        if (!activePage) return
+
         async function fetchContent() {
             setLoading(true)
-            // Determine the key prefix based on the active page
-            // Note: Some pages might have different prefixes if not perfectly consistent, 
-            // but based on previous files: 'about.', 'howitworks.', 'contact.', 'gallery.', 'journal.'
             let keyPrefix = activePage + '.'
             if (activePage === 'how-it-works') keyPrefix = 'howitworks.'
 
@@ -35,10 +35,8 @@ export default function VisualEditorPage() {
                 console.error('Error fetching content:', error)
                 toast.error("Failed to load content")
             } else {
-                // Transform array to object and parse JSON
                 const contentMap = data.reduce((acc: any, item: any) => {
                     let value = item.value
-                    // Try to parse JSON if it looks like an array or object
                     if (typeof value === 'string' && (value.startsWith('[') || value.startsWith('{'))) {
                         try {
                             value = JSON.parse(value)
@@ -84,9 +82,17 @@ export default function VisualEditorPage() {
         }
     }
 
+    if (!activePage) {
+        return <VisualEditorLanding onSelectPage={setActivePage} />
+    }
+
     return (
         <div className="min-h-screen bg-background relative">
-            <VisualEditorNav activePage={activePage} onPageChange={setActivePage} />
+            <VisualEditorNav
+                activePage={activePage}
+                onPageChange={setActivePage}
+                onNavigateToLanding={() => setActivePage(null)}
+            />
 
             <AnimatePresence mode="wait">
                 <motion.div
