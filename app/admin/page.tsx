@@ -68,24 +68,28 @@ export default async function AdminDashboardPage() {
                     value={formatCents(totalRevenue)}
                     subtitle="All time"
                     icon={DollarSign}
+                    index={0}
                 />
                 <StatsCard
                     title="Total Orders"
                     value={orderCount}
                     subtitle="All time"
                     icon={ShoppingCart}
+                    index={1}
                 />
                 <StatsCard
                     title="Pending Quotes"
                     value={pendingQuotes}
                     subtitle="Awaiting response"
                     icon={FileText}
+                    index={2}
                 />
                 <StatsCard
                     title="Low Stock Alerts"
                     value={lowStockProducts}
                     subtitle="Products need attention"
                     icon={AlertTriangle}
+                    index={3}
                 />
             </div>
 

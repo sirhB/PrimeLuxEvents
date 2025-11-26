@@ -1,5 +1,6 @@
 import { ModernSidebar } from '@/components/admin/modern-sidebar'
 import { ModernHeader } from '@/components/admin/modern-header'
+import { AdminToastProvider } from '@/components/admin/toast-provider'
 
 export default function AdminLayout({
     children,
@@ -17,6 +18,7 @@ export default function AdminLayout({
                     {children}
                 </main>
             </div>
+            <AdminToastProvider />
         </div>
     )
 }

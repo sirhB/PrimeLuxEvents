@@ -1,4 +1,7 @@
+'use client'
+
 import * as React from "react"
+import { motion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
@@ -53,17 +56,43 @@ TableFooter.displayName = "TableFooter"
 
 const TableRow = React.forwardRef<
     HTMLTableRowElement,
-    React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
-    <tr
-        ref={ref}
-        className={cn(
-            "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
-            className
-        )}
-        {...props}
-    />
-))
+    React.HTMLAttributes<HTMLTableRowElement> & {
+        animate?: boolean
+    }
+>(({ className, animate = false, ...props }, ref) => {
+    const { animate: _, ...restProps } = props as any
+
+    if (!animate) {
+        return (
+            <tr
+                ref={ref}
+                className={cn(
+                    "border-b border-[var(--dashboard-border)] transition-all duration-200",
+                    "hover:bg-[var(--dashboard-card-hover)]",
+                    "data-[state=selected]:bg-[var(--dashboard-card-hover)]",
+                    className
+                )}
+                {...restProps}
+            />
+        )
+    }
+
+    return (
+        <motion.tr
+            ref={ref}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className={cn(
+                "border-b border-[var(--dashboard-border)] transition-all duration-200",
+                "hover:bg-[var(--dashboard-card-hover)]",
+                "data-[state=selected]:bg-[var(--dashboard-card-hover)]",
+                className
+            )}
+            {...restProps}
+        />
+    )
+})
 TableRow.displayName = "TableRow"
 
 const TableHead = React.forwardRef<
@@ -73,7 +102,8 @@ const TableHead = React.forwardRef<
     <th
         ref={ref}
         className={cn(
-            "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+            "h-12 px-4 text-left align-middle font-semibold text-[var(--dashboard-text)] uppercase text-xs tracking-wider",
+            "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
             className
         )}
         {...props}
