@@ -3,7 +3,7 @@
 import { use, useState, useEffect } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, Check, Plus, Minus, Package, Truck, Calendar as CalendarIcon, Info } from "lucide-react"
+import { ArrowLeft, Check, Plus, Minus, Package, Truck, Calendar as CalendarIcon, Info, ShieldCheck } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { DateRange } from "react-day-picker"
 import { differenceInDays } from "date-fns"
@@ -79,6 +79,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [selectedModifiers, setSelectedModifiers] = useState<Record<string, ModifierOption>>({})
   const [quantity, setQuantity] = useState(1)
   const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | undefined>(undefined)
+  const [dateRange, setDateRange] = useState<DateRange | undefined>()
+  const [rentalDays, setRentalDays] = useState(0)
 
 
   const { items, addItem, removeItem, updateQuantity: updateCartQuantity } = useCart()
@@ -178,7 +180,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     }
   }
 
-
+  const handleDateChange = (range: DateRange | undefined, days: number) => {
+    setDateRange(range)
+    setRentalDays(days)
+  }
 
   const incrementQuantity = () => {
     if (quantity < maxQuantity) {
@@ -202,6 +207,21 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const uniqueGalleryImages = Array.from(new Set(galleryImages))
 
   const canAddToCart = true
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -240,13 +260,13 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
           {/* Details Section */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : 20 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            variants={containerVariants}
+            initial="hidden"
+            animate={isLoaded ? "visible" : "hidden"}
             className="flex flex-col gap-8"
           >
             {/* Header */}
-            <div>
+            <motion.div variants={itemVariants}>
               <div className="flex items-center gap-2 mb-4">
                 <Badge variant="outline" className="text-xs uppercase tracking-wider border-gold/50 text-gold">
                   {product.sku || 'Product'}
@@ -266,32 +286,44 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 </span>
                 <span className="text-base text-muted-foreground">/ day</span>
               </div>
-            </div>
+            </motion.div>
 
-            <Separator className="bg-border/40" />
+            <motion.div variants={itemVariants}>
+              <Separator className="bg-border/40" />
+            </motion.div>
 
             {/* Description */}
-            <div className="prose prose-stone max-w-none">
+            <motion.div variants={itemVariants} className="prose prose-stone max-w-none">
               <p className="text-lg leading-relaxed text-muted-foreground">
                 {product.description}
               </p>
-            </div>
+            </motion.div>
 
             {/* Features */}
             {product.features && product.features.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <motion.div variants={itemVariants} className="flex flex-wrap gap-2">
                 {product.features.map((feature, idx) => (
                   <Badge key={idx} variant="secondary" className="px-3 py-1 text-sm bg-secondary/50">
                     {feature}
                   </Badge>
                 ))}
-              </div>
+              </motion.div>
             )}
 
-            <Separator className="bg-border/40" />
+            <motion.div variants={itemVariants}>
+              <Separator className="bg-border/40" />
+            </motion.div>
+
+            {/* Rental Date Picker */}
+            <motion.div variants={itemVariants}>
+              <RentalDatePicker
+                onDateChange={handleDateChange}
+                minDays={product.minimum_rental_days || 1}
+              />
+            </motion.div>
 
             {/* Quantity Selector */}
-            <div className="space-y-3">
+            <motion.div variants={itemVariants} className="space-y-3">
               <Label className="text-base font-medium">Quantity</Label>
               <div className="flex items-center gap-3">
                 <Button
@@ -299,7 +331,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   size="icon"
                   onClick={decrementQuantity}
                   disabled={quantity <= 1}
-                  className="h-12 w-12 rounded-full border-border/50"
+                  className="h-12 w-12 rounded-full border-border/50 hover:border-gold/50 hover:text-gold transition-colors"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -314,24 +346,23 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                       setQuantity(val)
                     }
                   }}
-                  className="w-20 text-center h-12 text-lg bg-transparent border-border/50"
+                  className="w-20 text-center h-12 text-lg bg-transparent border-border/50 focus:border-gold/50"
                 />
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={incrementQuantity}
                   disabled={quantity >= maxQuantity}
-                  className="h-12 w-12 rounded-full border-border/50"
+                  className="h-12 w-12 rounded-full border-border/50 hover:border-gold/50 hover:text-gold transition-colors"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
-
               </div>
-            </div>
+            </motion.div>
 
             {/* Modifiers Section */}
             {product.modifiers && product.modifiers.length > 0 && (
-              <>
+              <motion.div variants={itemVariants} className="space-y-6">
                 <Separator className="bg-border/40" />
                 <div className="space-y-6">
                   <Label className="text-base font-medium">Customize Your Rental</Label>
@@ -349,19 +380,24 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             <div
                               key={option.id}
                               className={cn(
-                                "flex items-center space-x-2 border rounded-sm p-4 transition-all duration-300 cursor-pointer",
+                                "relative flex items-center space-x-2 border rounded-lg p-4 transition-all duration-300 cursor-pointer overflow-hidden group",
                                 selectedModifiers[modifier.id]?.id === option.id
-                                  ? "border-gold bg-gold/5"
+                                  ? "border-gold bg-gold/5 shadow-md shadow-gold/10"
                                   : "border-border/50 hover:border-gold/30 hover:bg-secondary/30"
                               )}
                               onClick={() => handleModifierChange(modifier.id, option.id)}
                             >
-                              <RadioGroupItem value={option.id} id={option.id} className="text-gold border-muted-foreground" />
-                              <Label htmlFor={option.id} className="cursor-pointer flex-1 font-medium">
+                              <div className={cn(
+                                "absolute inset-0 bg-gradient-to-r from-gold/10 to-transparent opacity-0 transition-opacity duration-300",
+                                selectedModifiers[modifier.id]?.id === option.id ? "opacity-100" : "group-hover:opacity-50"
+                              )} />
+
+                              <RadioGroupItem value={option.id} id={option.id} className="text-gold border-muted-foreground z-10" />
+                              <Label htmlFor={option.id} className="cursor-pointer flex-1 font-medium z-10">
                                 <div className="flex justify-between items-center w-full">
                                   <span>{option.label}</span>
                                   {option.priceAdjustment > 0 && (
-                                    <span className="text-gold text-sm">
+                                    <span className="text-gold text-sm font-semibold">
                                       +{formatCurrency(option.priceAdjustment)}
                                     </span>
                                   )}
@@ -374,13 +410,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     </div>
                   ))}
                 </div>
-              </>
+              </motion.div>
             )}
 
-            <Separator className="bg-border/40" />
+            <motion.div variants={itemVariants}>
+              <Separator className="bg-border/40" />
+            </motion.div>
 
             {/* Add to Cart - Sticky on Mobile */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t border-border/20 lg:static lg:p-0 lg:bg-transparent lg:border-none z-50">
+            <motion.div
+              variants={itemVariants}
+              className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t border-border/20 lg:static lg:p-0 lg:bg-transparent lg:border-none z-50"
+            >
               <div className="container mx-auto lg:px-0 flex flex-col gap-4">
                 <div className="lg:hidden flex justify-between items-center mb-2">
                   <span className="text-sm font-medium text-muted-foreground">Total Estimate</span>
@@ -426,85 +467,92 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     )}
                   </Button>
 
-                  <div className="hidden lg:flex items-start gap-2 text-xs text-muted-foreground bg-secondary/30 p-3 rounded-sm border border-border/20">
-                    <Info className="h-4 w-4 mt-0.5 flex-shrink-0 text-gold" />
-                    <p>
-                      Delivery and setup fees calculated at checkout based on location and logistics requirements.
-                    </p>
+                  <div className="hidden lg:flex items-start gap-3 text-xs text-muted-foreground bg-secondary/30 p-4 rounded-lg border border-border/20">
+                    <ShieldCheck className="h-5 w-5 mt-0.5 flex-shrink-0 text-gold" />
+                    <div className="space-y-1">
+                      <p className="font-medium text-foreground">Worry-Free Rental</p>
+                      <p>
+                        Delivery and setup fees calculated at checkout. Damage waiver included.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <Separator className="bg-border/40 hidden lg:block" />
+            <motion.div variants={itemVariants}>
+              <Separator className="bg-border/40 hidden lg:block" />
+            </motion.div>
 
             {/* Additional Information */}
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="details" className="border-border/40">
-                <AccordionTrigger className="text-base font-medium hover:text-gold transition-colors">
-                  Product Details
-                </AccordionTrigger>
-                <AccordionContent className="space-y-2 text-sm text-muted-foreground">
-                  {product.sku && (
-                    <div className="flex justify-between py-1 border-b border-border/20">
-                      <span>SKU</span>
-                      <span className="font-medium text-foreground">{product.sku}</span>
-                    </div>
-                  )}
-                  {product.weight && (
-                    <div className="flex justify-between py-1 border-b border-border/20">
-                      <span>Weight</span>
-                      <span className="font-medium text-foreground">{product.weight} lbs</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between py-1">
-                    <span>Minimum Rental</span>
-                    <span className="font-medium text-foreground">
-                      {product.minimum_rental_days || 1} {(product.minimum_rental_days || 1) === 1 ? 'day' : 'days'}
-                    </span>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-
-              {product.care_instructions && (
-                <AccordionItem value="care" className="border-border/40">
+            <motion.div variants={itemVariants}>
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="details" className="border-border/40">
                   <AccordionTrigger className="text-base font-medium hover:text-gold transition-colors">
-                    Care Instructions
+                    Product Details
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
-                    {product.care_instructions}
+                  <AccordionContent className="space-y-2 text-sm text-muted-foreground">
+                    {product.sku && (
+                      <div className="flex justify-between py-1 border-b border-border/20">
+                        <span>SKU</span>
+                        <span className="font-medium text-foreground">{product.sku}</span>
+                      </div>
+                    )}
+                    {product.weight && (
+                      <div className="flex justify-between py-1 border-b border-border/20">
+                        <span>Weight</span>
+                        <span className="font-medium text-foreground">{product.weight} lbs</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between py-1">
+                      <span>Minimum Rental</span>
+                      <span className="font-medium text-foreground">
+                        {product.minimum_rental_days || 1} {(product.minimum_rental_days || 1) === 1 ? 'day' : 'days'}
+                      </span>
+                    </div>
                   </AccordionContent>
                 </AccordionItem>
-              )}
 
-              <AccordionItem value="rental" className="border-border/40">
-                <AccordionTrigger className="text-base font-medium hover:text-gold transition-colors">
-                  Rental Information
-                </AccordionTrigger>
-                <AccordionContent className="space-y-3 text-sm text-muted-foreground">
-                  <div className="flex gap-3 items-start">
-                    <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
-                    <p>Standard rental period includes 24-hour use</p>
-                  </div>
-                  <div className="flex gap-3 items-start">
-                    <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
-                    <p>Delivery typically occurs the day before your event</p>
-                  </div>
-                  <div className="flex gap-3 items-start">
-                    <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
-                    <p>Pickup scheduled for the day after your event</p>
-                  </div>
-                  <div className="flex gap-3 items-start">
-                    <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
-                    <p>Setup and installation available for additional fee</p>
-                  </div>
-                  <div className="flex gap-3 items-start">
-                    <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
-                    <p>Damage waiver included with all rentals</p>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+                {product.care_instructions && (
+                  <AccordionItem value="care" className="border-border/40">
+                    <AccordionTrigger className="text-base font-medium hover:text-gold transition-colors">
+                      Care Instructions
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                      {product.care_instructions}
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
+
+                <AccordionItem value="rental" className="border-border/40">
+                  <AccordionTrigger className="text-base font-medium hover:text-gold transition-colors">
+                    Rental Information
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-3 text-sm text-muted-foreground">
+                    <div className="flex gap-3 items-start">
+                      <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                      <p>Standard rental period includes 24-hour use</p>
+                    </div>
+                    <div className="flex gap-3 items-start">
+                      <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                      <p>Delivery typically occurs the day before your event</p>
+                    </div>
+                    <div className="flex gap-3 items-start">
+                      <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                      <p>Pickup scheduled for the day after your event</p>
+                    </div>
+                    <div className="flex gap-3 items-start">
+                      <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                      <p>Setup and installation available for additional fee</p>
+                    </div>
+                    <div className="flex gap-3 items-start">
+                      <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                      <p>Damage waiver included with all rentals</p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </motion.div>
           </motion.div>
         </div>
       </div>
