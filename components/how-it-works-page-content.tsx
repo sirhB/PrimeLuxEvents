@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { CheckCircle2, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
+import { EditableContent } from "@/components/admin/editable-content"
 
 interface HowItWorksPageContentProps {
     content: any
+    isEditing?: boolean
 }
 
-export function HowItWorksPageContent({ content }: HowItWorksPageContentProps) {
+export function HowItWorksPageContent({ content, isEditing = false }: HowItWorksPageContentProps) {
     const steps = content['howitworks.steps.list'] || []
     const faqs = content['howitworks.faq.list'] || []
 
@@ -20,22 +22,27 @@ export function HowItWorksPageContent({ content }: HowItWorksPageContentProps) {
             {/* Hero Section */}
             <section className="relative py-24 md:py-32 bg-secondary/20">
                 <div className="container px-4 md:px-6 text-center space-y-8">
-                    <motion.h1
+                    <EditableContent
+                        contentKey="howitworks.hero.title"
+                        initialValue={content['howitworks.hero.title']}
+                        isEditing={isEditing}
+                        as={motion.h1}
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="text-5xl md:text-7xl font-serif font-medium tracking-tight text-foreground"
-                    >
-                        {content['howitworks.hero.title']}
-                    </motion.h1>
-                    <motion.p
+                    />
+                    <EditableContent
+                        contentKey="howitworks.hero.description"
+                        initialValue={content['howitworks.hero.description']}
+                        type="textarea"
+                        isEditing={isEditing}
+                        as={motion.p}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                         className="text-lg md:text-2xl font-light text-muted-foreground max-w-3xl mx-auto leading-relaxed"
-                    >
-                        {content['howitworks.hero.description']}
-                    </motion.p>
+                    />
                 </div>
             </section>
 
@@ -106,13 +113,30 @@ export function HowItWorksPageContent({ content }: HowItWorksPageContentProps) {
                             transition={{ duration: 0.8 }}
                             className="space-y-8"
                         >
-                            <h2 className="text-4xl md:text-5xl font-serif font-medium">{content['howitworks.concierge.title']}</h2>
-                            <p className="text-black/80 text-xl leading-relaxed font-light">
-                                {content['howitworks.concierge.description']}
-                            </p>
+                            <EditableContent
+                                contentKey="howitworks.concierge.title"
+                                initialValue={content['howitworks.concierge.title']}
+                                isEditing={isEditing}
+                                as="h2"
+                                className="text-4xl md:text-5xl font-serif font-medium"
+                            />
+                            <EditableContent
+                                contentKey="howitworks.concierge.description"
+                                initialValue={content['howitworks.concierge.description']}
+                                type="textarea"
+                                isEditing={isEditing}
+                                as="p"
+                                className="text-black/80 text-xl leading-relaxed font-light"
+                            />
                             <Button asChild size="lg" className="mt-4 bg-black text-white hover:bg-black/80 h-14 text-lg rounded-full px-8 border-2 border-transparent">
                                 <Link href="/contact">
-                                    {content['howitworks.concierge.button']} <ArrowRight className="ml-2 h-5 w-5" />
+                                    <EditableContent
+                                        contentKey="howitworks.concierge.button"
+                                        initialValue={content['howitworks.concierge.button']}
+                                        isEditing={isEditing}
+                                        as="span"
+                                    />
+                                    <ArrowRight className="ml-2 h-5 w-5" />
                                 </Link>
                             </Button>
                         </motion.div>
@@ -123,19 +147,43 @@ export function HowItWorksPageContent({ content }: HowItWorksPageContentProps) {
                             transition={{ duration: 0.8 }}
                             className="bg-black/5 p-10 rounded-xl backdrop-blur-sm border border-black/10"
                         >
-                            <h3 className="text-2xl font-serif mb-8">{content['howitworks.concierge.list.title']}</h3>
+                            <EditableContent
+                                contentKey="howitworks.concierge.list.title"
+                                initialValue={content['howitworks.concierge.list.title']}
+                                isEditing={isEditing}
+                                as="h3"
+                                className="text-2xl font-serif mb-8"
+                            />
                             <ul className="space-y-6">
                                 <li className="flex items-center gap-4">
                                     <div className="h-10 w-10 rounded-full bg-black/10 flex items-center justify-center shrink-0 font-serif font-bold">1</div>
-                                    <span className="text-lg">{content['howitworks.concierge.list.item1']}</span>
+                                    <EditableContent
+                                        contentKey="howitworks.concierge.list.item1"
+                                        initialValue={content['howitworks.concierge.list.item1']}
+                                        isEditing={isEditing}
+                                        as="span"
+                                        className="text-lg"
+                                    />
                                 </li>
                                 <li className="flex items-center gap-4">
                                     <div className="h-10 w-10 rounded-full bg-black/10 flex items-center justify-center shrink-0 font-serif font-bold">2</div>
-                                    <span className="text-lg">{content['howitworks.concierge.list.item2']}</span>
+                                    <EditableContent
+                                        contentKey="howitworks.concierge.list.item2"
+                                        initialValue={content['howitworks.concierge.list.item2']}
+                                        isEditing={isEditing}
+                                        as="span"
+                                        className="text-lg"
+                                    />
                                 </li>
                                 <li className="flex items-center gap-4">
                                     <div className="h-10 w-10 rounded-full bg-black/10 flex items-center justify-center shrink-0 font-serif font-bold">3</div>
-                                    <span className="text-lg">{content['howitworks.concierge.list.item3']}</span>
+                                    <EditableContent
+                                        contentKey="howitworks.concierge.list.item3"
+                                        initialValue={content['howitworks.concierge.list.item3']}
+                                        isEditing={isEditing}
+                                        as="span"
+                                        className="text-lg"
+                                    />
                                 </li>
                             </ul>
                         </motion.div>
@@ -153,10 +201,21 @@ export function HowItWorksPageContent({ content }: HowItWorksPageContentProps) {
                         transition={{ duration: 0.6 }}
                         className="text-center mb-16"
                     >
-                        <h2 className="text-4xl font-serif mb-6 text-foreground">{content['howitworks.faq.title']}</h2>
-                        <p className="text-xl text-muted-foreground font-light">
-                            {content['howitworks.faq.description']}
-                        </p>
+                        <EditableContent
+                            contentKey="howitworks.faq.title"
+                            initialValue={content['howitworks.faq.title']}
+                            isEditing={isEditing}
+                            as="h2"
+                            className="text-4xl font-serif mb-6 text-foreground"
+                        />
+                        <EditableContent
+                            contentKey="howitworks.faq.description"
+                            initialValue={content['howitworks.faq.description']}
+                            type="textarea"
+                            isEditing={isEditing}
+                            as="p"
+                            className="text-xl text-muted-foreground font-light"
+                        />
                     </motion.div>
 
                     <Accordion type="single" collapsible className="w-full space-y-4">
@@ -170,7 +229,14 @@ export function HowItWorksPageContent({ content }: HowItWorksPageContentProps) {
 
                     <div className="mt-16 text-center">
                         <Button asChild variant="outline" size="lg" className="h-12 px-8 rounded-full border-border/50 hover:border-gold hover:text-gold transition-colors">
-                            <Link href="/faq">{content['howitworks.faq.button']}</Link>
+                            <Link href="/faq">
+                                <EditableContent
+                                    contentKey="howitworks.faq.button"
+                                    initialValue={content['howitworks.faq.button']}
+                                    isEditing={isEditing}
+                                    as="span"
+                                />
+                            </Link>
                         </Button>
                     </div>
                 </div>

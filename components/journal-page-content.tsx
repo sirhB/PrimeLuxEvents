@@ -4,12 +4,14 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
+import { EditableContent } from "@/components/admin/editable-content"
 
 interface JournalPageContentProps {
     content: any
+    isEditing?: boolean
 }
 
-export function JournalPageContent({ content }: JournalPageContentProps) {
+export function JournalPageContent({ content, isEditing = false }: JournalPageContentProps) {
     const posts = content['journal.posts'] || []
 
     const containerVariants = {
@@ -37,10 +39,21 @@ export function JournalPageContent({ content }: JournalPageContentProps) {
                     className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8"
                 >
                     <div>
-                        <h1 className="text-5xl md:text-7xl font-serif mb-6 text-foreground">{content['journal.hero.title']}</h1>
-                        <p className="text-xl text-muted-foreground max-w-xl font-light leading-relaxed">
-                            {content['journal.hero.description']}
-                        </p>
+                        <EditableContent
+                            contentKey="journal.hero.title"
+                            initialValue={content['journal.hero.title']}
+                            isEditing={isEditing}
+                            as="h1"
+                            className="text-5xl md:text-7xl font-serif mb-6 text-foreground"
+                        />
+                        <EditableContent
+                            contentKey="journal.hero.description"
+                            initialValue={content['journal.hero.description']}
+                            type="textarea"
+                            isEditing={isEditing}
+                            as="p"
+                            className="text-xl text-muted-foreground max-w-xl font-light leading-relaxed"
+                        />
                     </div>
                 </motion.div>
 

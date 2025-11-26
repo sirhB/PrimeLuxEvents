@@ -3,12 +3,14 @@
 import { MapPin, Phone, Mail } from "lucide-react"
 import { ContactForm } from "@/components/contact-form"
 import { motion } from "framer-motion"
+import { EditableContent } from "@/components/admin/editable-content"
 
 interface ContactPageContentProps {
     content: any
+    isEditing?: boolean
 }
 
-export function ContactPageContent({ content }: ContactPageContentProps) {
+export function ContactPageContent({ content, isEditing = false }: ContactPageContentProps) {
     return (
         <section className="py-24 md:py-32 bg-background min-h-screen">
             <div className="container px-4 md:px-6">
@@ -22,9 +24,14 @@ export function ContactPageContent({ content }: ContactPageContentProps) {
                     >
                         <div className="space-y-6">
                             <h1 className="text-5xl md:text-7xl font-serif font-medium tracking-tight text-foreground">Request a Consultation</h1>
-                            <p className="text-xl text-muted-foreground max-w-md font-light leading-relaxed">
-                                {content['contact.hero.description']}
-                            </p>
+                            <EditableContent
+                                contentKey="contact.hero.description"
+                                initialValue={content['contact.hero.description']}
+                                type="textarea"
+                                isEditing={isEditing}
+                                as="p"
+                                className="text-xl text-muted-foreground max-w-md font-light leading-relaxed"
+                            />
                         </div>
 
                         <div className="space-y-10">
@@ -33,10 +40,21 @@ export function ContactPageContent({ content }: ContactPageContentProps) {
                                     <MapPin className="h-5 w-5 text-foreground group-hover:text-gold transition-colors" />
                                 </div>
                                 <div>
-                                    <h3 className="font-serif text-xl mb-2">{content['contact.info.address.title']}</h3>
-                                    <p className="text-muted-foreground whitespace-pre-line text-lg font-light">
-                                        {content['contact.info.address.value']}
-                                    </p>
+                                    <EditableContent
+                                        contentKey="contact.info.address.title"
+                                        initialValue={content['contact.info.address.title']}
+                                        isEditing={isEditing}
+                                        as="h3"
+                                        className="font-serif text-xl mb-2"
+                                    />
+                                    <EditableContent
+                                        contentKey="contact.info.address.value"
+                                        initialValue={content['contact.info.address.value']}
+                                        type="textarea"
+                                        isEditing={isEditing}
+                                        as="p"
+                                        className="text-muted-foreground whitespace-pre-line text-lg font-light"
+                                    />
                                 </div>
                             </div>
 
@@ -45,9 +63,27 @@ export function ContactPageContent({ content }: ContactPageContentProps) {
                                     <Phone className="h-5 w-5 text-foreground group-hover:text-gold transition-colors" />
                                 </div>
                                 <div>
-                                    <h3 className="font-serif text-xl mb-2">{content['contact.info.phone.title']}</h3>
-                                    <p className="text-muted-foreground text-lg font-light">{content['contact.info.phone.value']}</p>
-                                    <p className="text-sm text-muted-foreground mt-1">{content['contact.info.phone.hours']}</p>
+                                    <EditableContent
+                                        contentKey="contact.info.phone.title"
+                                        initialValue={content['contact.info.phone.title']}
+                                        isEditing={isEditing}
+                                        as="h3"
+                                        className="font-serif text-xl mb-2"
+                                    />
+                                    <EditableContent
+                                        contentKey="contact.info.phone.value"
+                                        initialValue={content['contact.info.phone.value']}
+                                        isEditing={isEditing}
+                                        as="p"
+                                        className="text-muted-foreground text-lg font-light"
+                                    />
+                                    <EditableContent
+                                        contentKey="contact.info.phone.hours"
+                                        initialValue={content['contact.info.phone.hours']}
+                                        isEditing={isEditing}
+                                        as="p"
+                                        className="text-sm text-muted-foreground mt-1"
+                                    />
                                 </div>
                             </div>
 
@@ -56,8 +92,20 @@ export function ContactPageContent({ content }: ContactPageContentProps) {
                                     <Mail className="h-5 w-5 text-foreground group-hover:text-gold transition-colors" />
                                 </div>
                                 <div>
-                                    <h3 className="font-serif text-xl mb-2">{content['contact.info.email.title']}</h3>
-                                    <p className="text-muted-foreground text-lg font-light">{content['contact.info.email.value']}</p>
+                                    <EditableContent
+                                        contentKey="contact.info.email.title"
+                                        initialValue={content['contact.info.email.title']}
+                                        isEditing={isEditing}
+                                        as="h3"
+                                        className="font-serif text-xl mb-2"
+                                    />
+                                    <EditableContent
+                                        contentKey="contact.info.email.value"
+                                        initialValue={content['contact.info.email.value']}
+                                        isEditing={isEditing}
+                                        as="p"
+                                        className="text-muted-foreground text-lg font-light"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -77,7 +125,13 @@ export function ContactPageContent({ content }: ContactPageContentProps) {
                         transition={{ duration: 0.8, delay: 0.2 }}
                         className="bg-secondary/20 p-8 md:p-12 rounded-sm border border-border/50 hover:border-gold/30 transition-colors shadow-xl"
                     >
-                        <h2 className="text-3xl font-serif mb-8 text-foreground">{content['contact.form.title']}</h2>
+                        <EditableContent
+                            contentKey="contact.form.title"
+                            initialValue={content['contact.form.title']}
+                            isEditing={isEditing}
+                            as="h2"
+                            className="text-3xl font-serif mb-8 text-foreground"
+                        />
                         <ContactForm />
                     </motion.div>
                 </div>

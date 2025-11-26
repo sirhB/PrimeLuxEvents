@@ -32,7 +32,11 @@ const sidebarItems = [
     { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },
     { icon: Users, label: 'Customers', href: '/admin/customers' },
     { icon: FileText, label: 'Content', href: '/admin/content' },
-    { icon: Eye, label: 'Visual Editor', href: '/admin/visual-editor/about' },
+    { icon: Eye, label: 'Visual: About', href: '/admin/visual-editor/about' },
+    { icon: Eye, label: 'Visual: How It Works', href: '/admin/visual-editor/how-it-works' },
+    { icon: Eye, label: 'Visual: Contact', href: '/admin/visual-editor/contact' },
+    { icon: Eye, label: 'Visual: Gallery', href: '/admin/visual-editor/gallery' },
+    { icon: Eye, label: 'Visual: Journal', href: '/admin/visual-editor/journal' },
     { icon: Settings, label: 'Settings', href: '/admin/settings' },
 ]
 

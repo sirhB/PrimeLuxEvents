@@ -2,12 +2,14 @@
 
 import GalleryGrid from "@/app/gallery/gallery-grid"
 import { motion } from "framer-motion"
+import { EditableContent } from "@/components/admin/editable-content"
 
 interface GalleryPageContentProps {
     content: any
+    isEditing?: boolean
 }
 
-export function GalleryPageContent({ content }: GalleryPageContentProps) {
+export function GalleryPageContent({ content, isEditing = false }: GalleryPageContentProps) {
     const images = content['gallery.images'] || []
 
     return (
@@ -19,10 +21,21 @@ export function GalleryPageContent({ content }: GalleryPageContentProps) {
                     transition={{ duration: 0.8 }}
                     className="text-center max-w-3xl mx-auto mb-20"
                 >
-                    <h1 className="text-5xl md:text-7xl font-serif mb-8 text-foreground">{content['gallery.hero.title']}</h1>
-                    <p className="text-xl text-muted-foreground font-light leading-relaxed">
-                        {content['gallery.hero.description']}
-                    </p>
+                    <EditableContent
+                        contentKey="gallery.hero.title"
+                        initialValue={content['gallery.hero.title']}
+                        isEditing={isEditing}
+                        as="h1"
+                        className="text-5xl md:text-7xl font-serif mb-8 text-foreground"
+                    />
+                    <EditableContent
+                        contentKey="gallery.hero.description"
+                        initialValue={content['gallery.hero.description']}
+                        type="textarea"
+                        isEditing={isEditing}
+                        as="p"
+                        className="text-xl text-muted-foreground font-light leading-relaxed"
+                    />
                 </motion.div>
 
                 <GalleryGrid images={images} />
