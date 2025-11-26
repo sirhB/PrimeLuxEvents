@@ -4,7 +4,7 @@ import { use, useState, useEffect } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, Check, Plus, Minus, Package, Truck, Calendar as CalendarIcon, Info } from "lucide-react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { DateRange } from "react-day-picker"
 import { differenceInDays } from "date-fns"
 import { useCart } from "@/components/providers/cart-provider"
@@ -229,6 +229,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
             transition={{ duration: 0.6 }}
+            className="sticky top-24"
           >
             <ProductGallery
               images={uniqueGalleryImages}
@@ -247,16 +248,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             {/* Header */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Badge variant="outline" className="text-xs uppercase tracking-wider">
+                <Badge variant="outline" className="text-xs uppercase tracking-wider border-gold/50 text-gold">
                   {product.sku || 'Product'}
                 </Badge>
                 {product.categories?.name && (
-                  <Badge variant="secondary" className="text-xs uppercase tracking-wider">
+                  <Badge variant="secondary" className="text-xs uppercase tracking-wider bg-secondary/50">
                     {product.categories.name}
                   </Badge>
                 )}
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif mb-6 text-foreground leading-tight">
                 {product.name}
               </h1>
               <div className="flex items-baseline gap-3">
@@ -267,7 +268,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               </div>
             </div>
 
-            <Separator />
+            <Separator className="bg-border/40" />
 
             {/* Description */}
             <div className="prose prose-stone max-w-none">
@@ -280,16 +281,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             {product.features && product.features.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {product.features.map((feature, idx) => (
-                  <Badge key={idx} variant="secondary">
+                  <Badge key={idx} variant="secondary" className="px-3 py-1 text-sm bg-secondary/50">
                     {feature}
                   </Badge>
                 ))}
               </div>
             )}
 
-            <Separator />
-
-
+            <Separator className="bg-border/40" />
 
             {/* Quantity Selector */}
             <div className="space-y-3">
@@ -300,6 +299,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   size="icon"
                   onClick={decrementQuantity}
                   disabled={quantity <= 1}
+                  className="h-12 w-12 rounded-full border-border/50"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -312,19 +312,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     const val = parseInt(e.target.value)
                     if (!isNaN(val) && val >= 1 && val <= maxQuantity) {
                       setQuantity(val)
-                    } else if (e.target.value === '') {
-                      // Allow empty string for typing, but handle blur or submit to default to 1
-                      // For now, let's just not update if invalid, or maybe handle it better.
-                      // A simple approach is to only update if valid number.
                     }
                   }}
-                  className="w-20 text-center"
+                  className="w-20 text-center h-12 text-lg bg-transparent border-border/50"
                 />
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={incrementQuantity}
                   disabled={quantity >= maxQuantity}
+                  className="h-12 w-12 rounded-full border-border/50"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -335,12 +332,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             {/* Modifiers Section */}
             {product.modifiers && product.modifiers.length > 0 && (
               <>
-                <Separator />
-                <div className="space-y-4">
+                <Separator className="bg-border/40" />
+                <div className="space-y-6">
                   <Label className="text-base font-medium">Customize Your Rental</Label>
                   {product.modifiers.map((modifier) => (
                     <div key={modifier.id} className="space-y-3">
-                      <Label className="text-sm font-medium text-muted-foreground">
+                      <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
                         {modifier.name}
                       </Label>
                       <RadioGroup
@@ -351,16 +348,24 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                           {modifier.options?.map((option) => (
                             <div
                               key={option.id}
-                              className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-secondary/50 transition-colors"
+                              className={cn(
+                                "flex items-center space-x-2 border rounded-sm p-4 transition-all duration-300 cursor-pointer",
+                                selectedModifiers[modifier.id]?.id === option.id
+                                  ? "border-gold bg-gold/5"
+                                  : "border-border/50 hover:border-gold/30 hover:bg-secondary/30"
+                              )}
+                              onClick={() => handleModifierChange(modifier.id, option.id)}
                             >
-                              <RadioGroupItem value={option.id} id={option.id} />
-                              <Label htmlFor={option.id} className="cursor-pointer flex-1">
-                                <span className="font-medium">{option.label}</span>
-                                {option.priceAdjustment > 0 && (
-                                  <span className="text-muted-foreground ml-2">
-                                    +{formatCurrency(option.priceAdjustment)}
-                                  </span>
-                                )}
+                              <RadioGroupItem value={option.id} id={option.id} className="text-gold border-muted-foreground" />
+                              <Label htmlFor={option.id} className="cursor-pointer flex-1 font-medium">
+                                <div className="flex justify-between items-center w-full">
+                                  <span>{option.label}</span>
+                                  {option.priceAdjustment > 0 && (
+                                    <span className="text-gold text-sm">
+                                      +{formatCurrency(option.priceAdjustment)}
+                                    </span>
+                                  )}
+                                </div>
                               </Label>
                             </div>
                           ))}
@@ -372,82 +377,89 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               </>
             )}
 
-            <Separator />
+            <Separator className="bg-border/40" />
 
-            {/* Add to Cart */}
-            <div className="space-y-4">
-              <Button
-                size="lg"
-                className={cn(
-                  "w-full text-lg h-14 rounded-full transition-all duration-300 hover:scale-105",
-                  isInCart && cartItem?.quantity === quantity
-                    ? "border-2 border-gold bg-transparent text-gold hover:bg-gold/10"
-                    : "bg-gold text-black hover:bg-gold/90 shadow-lg hover:shadow-xl"
-                )}
-                onClick={() => {
-                  if (isInCart) {
-                    if (cartItem?.quantity !== quantity) {
-                      if (cartItem) updateCartQuantity(cartItem.id, quantity)
-                    } else {
-                      if (cartItem) removeItem(cartItem.id)
-                    }
-                  } else {
-                    addItem(product.id, quantity, selectedModifiers)
-                  }
-                }}
-                disabled={!canAddToCart}
-              >
-                {isInCart ? (
-                  cartItem?.quantity !== quantity ? (
-                    <>
-                      <Package className="mr-2 h-5 w-5" /> Update Quote
-                    </>
-                  ) : (
-                    <>
-                      <Check className="mr-2 h-5 w-5" /> Added to Quote
-                    </>
-                  )
-                ) : (
-                  <>
-                    <Plus className="mr-2 h-5 w-5" /> Add to Quote
-                  </>
-                )}
-              </Button>
+            {/* Add to Cart - Sticky on Mobile */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t border-border/20 lg:static lg:p-0 lg:bg-transparent lg:border-none z-50">
+              <div className="container mx-auto lg:px-0 flex flex-col gap-4">
+                <div className="lg:hidden flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-muted-foreground">Total Estimate</span>
+                  <span className="text-xl font-bold text-gold">{formatCurrency(totalPrice)}</span>
+                </div>
 
+                <div className="space-y-4">
+                  <Button
+                    size="lg"
+                    className={cn(
+                      "w-full text-lg h-14 rounded-full transition-all duration-300",
+                      isInCart && cartItem?.quantity === quantity
+                        ? "border-2 border-gold bg-transparent text-gold hover:bg-gold/10"
+                        : "bg-gold text-black hover:bg-gold/90 shadow-lg hover:shadow-gold/20 hover:scale-[1.02]"
+                    )}
+                    onClick={() => {
+                      if (isInCart) {
+                        if (cartItem?.quantity !== quantity) {
+                          if (cartItem) updateCartQuantity(cartItem.id, quantity)
+                        } else {
+                          if (cartItem) removeItem(cartItem.id)
+                        }
+                      } else {
+                        addItem(product.id, quantity, selectedModifiers)
+                      }
+                    }}
+                    disabled={!canAddToCart}
+                  >
+                    {isInCart ? (
+                      cartItem?.quantity !== quantity ? (
+                        <>
+                          <Package className="mr-2 h-5 w-5" /> Update Quote
+                        </>
+                      ) : (
+                        <>
+                          <Check className="mr-2 h-5 w-5" /> Added to Quote
+                        </>
+                      )
+                    ) : (
+                      <>
+                        <Plus className="mr-2 h-5 w-5" /> Add to Quote
+                      </>
+                    )}
+                  </Button>
 
-
-              <div className="flex items-start gap-2 text-xs text-muted-foreground bg-secondary/50 p-3 rounded-lg">
-                <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <p>
-                  Delivery and setup fees calculated at checkout based on location and logistics requirements.
-                </p>
+                  <div className="hidden lg:flex items-start gap-2 text-xs text-muted-foreground bg-secondary/30 p-3 rounded-sm border border-border/20">
+                    <Info className="h-4 w-4 mt-0.5 flex-shrink-0 text-gold" />
+                    <p>
+                      Delivery and setup fees calculated at checkout based on location and logistics requirements.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <Separator />
+            <Separator className="bg-border/40 hidden lg:block" />
 
             {/* Additional Information */}
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="details">
-                <AccordionTrigger className="text-base font-medium">
+              <AccordionItem value="details" className="border-border/40">
+                <AccordionTrigger className="text-base font-medium hover:text-gold transition-colors">
                   Product Details
                 </AccordionTrigger>
                 <AccordionContent className="space-y-2 text-sm text-muted-foreground">
                   {product.sku && (
-                    <div className="flex justify-between">
-                      <span>SKU:</span>
-                      <span className="font-medium">{product.sku}</span>
+                    <div className="flex justify-between py-1 border-b border-border/20">
+                      <span>SKU</span>
+                      <span className="font-medium text-foreground">{product.sku}</span>
                     </div>
                   )}
                   {product.weight && (
-                    <div className="flex justify-between">
-                      <span>Weight:</span>
-                      <span className="font-medium">{product.weight} lbs</span>
+                    <div className="flex justify-between py-1 border-b border-border/20">
+                      <span>Weight</span>
+                      <span className="font-medium text-foreground">{product.weight} lbs</span>
                     </div>
                   )}
-                  <div className="flex justify-between">
-                    <span>Minimum Rental:</span>
-                    <span className="font-medium">
+                  <div className="flex justify-between py-1">
+                    <span>Minimum Rental</span>
+                    <span className="font-medium text-foreground">
                       {product.minimum_rental_days || 1} {(product.minimum_rental_days || 1) === 1 ? 'day' : 'days'}
                     </span>
                   </div>
@@ -455,26 +467,41 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               </AccordionItem>
 
               {product.care_instructions && (
-                <AccordionItem value="care">
-                  <AccordionTrigger className="text-base font-medium">
+                <AccordionItem value="care" className="border-border/40">
+                  <AccordionTrigger className="text-base font-medium hover:text-gold transition-colors">
                     Care Instructions
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground">
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
                     {product.care_instructions}
                   </AccordionContent>
                 </AccordionItem>
               )}
 
-              <AccordionItem value="rental">
-                <AccordionTrigger className="text-base font-medium">
+              <AccordionItem value="rental" className="border-border/40">
+                <AccordionTrigger className="text-base font-medium hover:text-gold transition-colors">
                   Rental Information
                 </AccordionTrigger>
-                <AccordionContent className="space-y-2 text-sm text-muted-foreground">
-                  <p>• Standard rental period includes 24-hour use</p>
-                  <p>• Delivery typically occurs the day before your event</p>
-                  <p>• Pickup scheduled for the day after your event</p>
-                  <p>• Setup and installation available for additional fee</p>
-                  <p>• Damage waiver included with all rentals</p>
+                <AccordionContent className="space-y-3 text-sm text-muted-foreground">
+                  <div className="flex gap-3 items-start">
+                    <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                    <p>Standard rental period includes 24-hour use</p>
+                  </div>
+                  <div className="flex gap-3 items-start">
+                    <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                    <p>Delivery typically occurs the day before your event</p>
+                  </div>
+                  <div className="flex gap-3 items-start">
+                    <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                    <p>Pickup scheduled for the day after your event</p>
+                  </div>
+                  <div className="flex gap-3 items-start">
+                    <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                    <p>Setup and installation available for additional fee</p>
+                  </div>
+                  <div className="flex gap-3 items-start">
+                    <div className="h-1.5 w-1.5 rounded-full bg-gold mt-1.5 flex-shrink-0" />
+                    <p>Damage waiver included with all rentals</p>
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -487,20 +514,21 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       {
         product && allProducts.length > 0 && (
           <div className="container mx-auto px-4 md:px-6 pb-20 md:pb-32">
-            <Separator className="mb-12 md:mb-16" />
+            <Separator className="mb-12 md:mb-16 bg-border/40" />
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <div className="mb-12">
-                <span className="text-primary text-sm font-medium tracking-widest uppercase mb-2 block">
+              <div className="mb-12 text-center md:text-left">
+                <span className="text-gold text-sm font-medium tracking-widest uppercase mb-2 block">
                   Complete Your Look
                 </span>
-                <h2 className="text-3xl md:text-5xl font-serif mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                <h2 className="text-3xl md:text-5xl font-serif mb-4 text-foreground">
                   You May Also Like
                 </h2>
+                <div className="h-1 w-20 bg-gold mx-auto md:mx-0" />
               </div>
               <RelatedProducts
                 currentProduct={product}

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
@@ -59,9 +58,9 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
     return (
         <>
-            <div className={cn("space-y-4", className)}>
+            <div className={cn("space-y-6", className)}>
                 {/* Main Image Container */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-secondary group">
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-secondary group border border-border/20">
                     <AnimatePresence initial={false} custom={direction}>
                         <motion.div
                             key={selectedImage}
@@ -89,7 +88,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                     {/* Zoom Button */}
                     <button
                         onClick={() => setIsLightboxOpen(true)}
-                        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-background/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-background"
+                        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gold hover:text-black text-white z-10"
                     >
                         <ZoomIn className="h-5 w-5" />
                     </button>
@@ -99,13 +98,13 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                         <>
                             <button
                                 onClick={() => paginate(-1)}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-background"
+                                className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gold hover:text-black text-white z-10"
                             >
                                 <ChevronLeft className="h-5 w-5" />
                             </button>
                             <button
                                 onClick={() => paginate(1)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-background"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gold hover:text-black text-white z-10"
                             >
                                 <ChevronRight className="h-5 w-5" />
                             </button>
@@ -114,7 +113,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
                     {/* Image Counter */}
                     {images.length > 1 && (
-                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-background/80 backdrop-blur text-xs font-medium">
+                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm text-xs font-medium text-white">
                             {selectedImage + 1} / {images.length}
                         </div>
                     )}
@@ -122,7 +121,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
                 {/* Thumbnails */}
                 {images.length > 1 && (
-                    <div className="flex gap-2 overflow-x-auto pb-2 px-1 scrollbar-hide">
+                    <div className="flex gap-3 overflow-x-auto pb-2 px-1 scrollbar-hide">
                         {images.map((image, index) => (
                             <button
                                 key={index}
@@ -131,10 +130,10 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                                     setSelectedImage(index)
                                 }}
                                 className={cn(
-                                    "relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden transition-all",
+                                    "relative flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden transition-all duration-300",
                                     selectedImage === index
-                                        ? "ring-2 ring-primary ring-offset-2"
-                                        : "opacity-60 hover:opacity-100"
+                                        ? "ring-2 ring-gold ring-offset-2 ring-offset-background opacity-100"
+                                        : "opacity-50 hover:opacity-100 grayscale hover:grayscale-0"
                                 )}
                             >
                                 <Image
@@ -182,15 +181,15 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                             <>
                                 <button
                                     onClick={() => paginate(-1)}
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors z-20"
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-gold hover:text-black text-white transition-all duration-300 z-20"
                                 >
-                                    <ChevronLeft className="h-6 w-6 text-white" />
+                                    <ChevronLeft className="h-6 w-6" />
                                 </button>
                                 <button
                                     onClick={() => paginate(1)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors z-20"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-gold hover:text-black text-white transition-all duration-300 z-20"
                                 >
-                                    <ChevronRight className="h-6 w-6 text-white" />
+                                    <ChevronRight className="h-6 w-6" />
                                 </button>
                             </>
                         )}
@@ -198,9 +197,9 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                         {/* Close Button */}
                         <button
                             onClick={() => setIsLightboxOpen(false)}
-                            className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition-colors z-20"
+                            className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-gold hover:text-black text-white transition-all duration-300 z-20"
                         >
-                            <X className="h-5 w-5 text-white" />
+                            <X className="h-5 w-5" />
                         </button>
                     </div>
                 </DialogContent>
