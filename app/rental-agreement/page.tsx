@@ -11,7 +11,6 @@ export default function RentalAgreementPage() {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-secondary/20 via-background to-secondary/10">
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5" />
         <motion.div
           className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"
           initial={{ opacity: 0 }}
