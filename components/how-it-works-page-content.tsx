@@ -31,7 +31,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="text-5xl md:text-7xl font-serif font-medium tracking-tight text-foreground"
+                        className="text-5xl md:text-7xl font-serif font-medium tracking-tight text-foreground text-center"
                     />
                     <EditableContent
                         contentKey="howitworks.hero.description"
@@ -42,7 +42,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                        className="text-lg md:text-2xl font-light text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+                        className="text-lg md:text-2xl font-light text-muted-foreground max-w-3xl mx-auto leading-relaxed text-center"
                     />
                 </div>
             </section>

@@ -60,7 +60,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
 
             {/* Our Story */}
             <section className="py-24 md:py-32 bg-background">
-                <div className="container px-4 md:px-6">
+                <div className="container px-4 md:px-6 text-center">
                     <div className="grid md:grid-cols-2 gap-12 md:gap-24 items-center">
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
