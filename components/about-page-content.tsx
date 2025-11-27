@@ -300,32 +300,32 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                             transition={{ duration: 0.6, delay: 0.6 }}
                             className="flex flex-col sm:flex-row gap-6 justify-center pt-6"
                         >
-                        <Button asChild size="lg" className="min-w-[200px] bg-black text-white hover:bg-black/80 h-14 text-lg rounded-full border-2 border-transparent">
-                            <Link href="/catalog">
-                                <EditableContent
-                                    contentKey="about.cta.primary"
-                                    initialValue={content['about.cta.primary']}
-                                    isEditing={isEditing}
-                                    as="span"
-                                />
-                            </Link>
-                        </Button>
-                        <Button
-                            asChild
-                            size="lg"
-                            variant="outline"
-                            className="min-w-[200px] bg-transparent border-2 border-black/20 text-black hover:bg-black hover:text-white h-14 text-lg rounded-full"
-                        >
-                            <Link href="/contact">
-                                <EditableContent
-                                    contentKey="about.cta.secondary"
-                                    initialValue={content['about.cta.secondary']}
-                                    isEditing={isEditing}
-                                    as="span"
-                                />
-                            </Link>
-                        </Button>
-                    </motion.div>
+                            <Button asChild size="lg" className="min-w-[200px] bg-black text-white hover:bg-black/80 h-14 text-lg rounded-full border-2 border-transparent">
+                                <Link href="/catalog">
+                                    <EditableContent
+                                        contentKey="about.cta.primary"
+                                        initialValue={content['about.cta.primary']}
+                                        isEditing={isEditing}
+                                        as="span"
+                                    />
+                                </Link>
+                            </Button>
+                            <Button
+                                asChild
+                                size="lg"
+                                variant="outline"
+                                className="min-w-[200px] bg-transparent border-2 border-black/20 text-black hover:bg-black hover:text-white h-14 text-lg rounded-full"
+                            >
+                                <Link href="/contact">
+                                    <EditableContent
+                                        contentKey="about.cta.secondary"
+                                        initialValue={content['about.cta.secondary']}
+                                        isEditing={isEditing}
+                                        as="span"
+                                    />
+                                </Link>
+                            </Button>
+                        </motion.div>
                 </div>
             </section>
         </>

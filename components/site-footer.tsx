@@ -48,7 +48,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <h3 className="font-serif text-lg mb-4">Support</h3>
+            <h3 className="font-serif text-lg mb-4">Important Resources</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link href="/contact" className="hover:text-foreground transition-colors">
@@ -58,6 +58,11 @@ export function SiteFooter() {
               <li>
                 <Link href="/faq" className="hover:text-foreground transition-colors">
                   FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/rental-agreement" className="hover:text-foreground transition-colors">
+                  Rental Agreement
                 </Link>
               </li>
               <li>
