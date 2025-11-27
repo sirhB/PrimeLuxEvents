@@ -4,7 +4,7 @@ import { use, useState, useEffect } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, Check, Plus, Minus, Package, Truck, Calendar as CalendarIcon, Info, ShieldCheck, Star } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { useCart } from "@/components/providers/cart-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +22,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import Image from "next/image"
 
 interface ModifierOption {
   id: string
@@ -80,7 +81,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   const { items, addItem, removeItem, updateQuantity: updateCartQuantity } = useCart()
   const [isLoaded, setIsLoaded] = useState(false)
+  const { scrollY } = useScroll()
   const supabase = createClient()
+
+  // Parallax effects for hero
+  const heroY = useTransform(scrollY, [0, 500], [0, 200])
+  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
 
   useEffect(() => {
     async function fetchProduct() {
@@ -216,25 +222,82 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Breadcrumb */}
-      <div className="container mx-auto px-4 md:px-6 py-8 md:py-12">
+      {/* Immersive Hero Section */}
+      <div className="relative h-[50vh] md:h-[60vh] overflow-hidden bg-black">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          style={{ y: heroY, opacity: heroOpacity }}
+          className="absolute inset-0 w-full h-full"
         >
-          <Link
-            href={product.categories?.name ? `/catalog?category=${encodeURIComponent(product.categories.name)}` : "/catalog"}
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-gold transition-colors group font-medium tracking-wide"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Back to {product.categories?.name || 'Collection'}
-          </Link>
+          <Image
+            src={product.image_url}
+            alt={product.name}
+            fill
+            className="object-cover opacity-60"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-background" />
         </motion.div>
+
+        <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="max-w-4xl space-y-4"
+          >
+            <span className="text-gold text-sm md:text-base font-medium tracking-[0.2em] uppercase block">
+              {product.categories?.name || 'Premium Rental'}
+            </span>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif text-white font-medium tracking-tight">
+              {product.name}
+            </h1>
+            <div className="flex items-baseline justify-center gap-3 pt-2">
+              <span className="text-2xl md:text-3xl font-medium text-white">
+                {formatCurrency(basePrice)}
+              </span>
+              <span className="text-base text-gray-200 font-light">/ day</span>
+            </div>
+            <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto font-light leading-relaxed">
+              {product.description.length > 150
+                ? `${product.description.substring(0, 150)}...`
+                : product.description
+              }
+            </p>
+          </motion.div>
+        </div>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 pb-20 md:pb-32">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
+      {/* Enhanced Search & Navigation Bar */}
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/40 shadow-sm">
+        <div className="container mx-auto px-4 md:px-6 py-4">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Link
+              href={product.categories?.name ? `/catalog?category=${encodeURIComponent(product.categories.name)}` : "/catalog"}
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-gold transition-colors group font-medium tracking-wide"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+              Back to {product.categories?.name || 'Collection'}
+            </Link>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="container mx-auto px-4 md:px-6 py-8 md:py-16">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key="product-content"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-12 md:space-y-20"
+          >
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
           {/* Image Gallery */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -275,16 +338,28 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 )}
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-foreground leading-[1.1]">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif text-foreground leading-[1.1]">
                 {product.name}
               </h1>
 
               <div className="flex items-baseline gap-3 pt-2">
-                <span className="text-3xl md:text-4xl font-medium text-foreground">
+                <span className="text-2xl md:text-3xl font-medium text-foreground">
                   {formatCurrency(basePrice)}
                 </span>
                 <span className="text-base text-muted-foreground font-light">/ day</span>
               </div>
+
+              {/* Results Summary */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-left"
+              >
+                <p className="text-muted-foreground text-lg font-light leading-relaxed">
+                  Premium {product.categories?.name.toLowerCase() || 'rental'} piece for extraordinary events.
+                </p>
+                <div className="h-1 w-16 bg-gold mt-4" />
+              </motion.div>
             </motion.div>
 
             <motion.div variants={itemVariants}>
@@ -561,27 +636,33 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           </motion.div>
         </div>
       </div>
-
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       {/* Related Products Section */}
       {
         product && allProducts.length > 0 && (
-          <div className="container mx-auto px-4 md:px-6 pb-20 md:pb-32">
-            <Separator className="mb-16 md:mb-24 bg-border/40" />
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-            >
+          <motion.section
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+            className="bg-secondary/5"
+          >
+            <div className="container mx-auto px-4 md:px-6 py-16 md:py-24">
+              <Separator className="mb-16 md:mb-24 bg-border/40" />
               <div className="mb-16 text-center">
-                <span className="text-gold text-xs font-bold tracking-[0.2em] uppercase mb-4 block">
+                <span className="text-gold text-sm font-medium tracking-widest uppercase mb-3 block">
                   Complete Your Look
                 </span>
-                <h2 className="text-3xl md:text-5xl font-serif mb-6 text-foreground">
+                <h2 className="text-3xl md:text-5xl font-serif mb-4 text-foreground">
                   You May Also Like
                 </h2>
-                <div className="h-0.5 w-24 bg-gold mx-auto" />
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Discover complementary pieces to create the perfect atmosphere for your event.
+                </p>
+                <div className="h-1 w-20 bg-gold mx-auto mt-6" />
               </div>
               <RelatedProducts
                 currentProduct={product}
@@ -590,8 +671,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 isInCart={isProductInCart}
                 maxItems={4}
               />
-            </motion.div>
-          </div>
+            </div>
+          </motion.section>
         )
       }
     </div >
