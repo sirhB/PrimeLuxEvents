@@ -2,8 +2,9 @@
 
 import GalleryGrid from "@/app/gallery/gallery-grid"
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { EditableContent } from "@/components/admin/editable-content"
-import { NonEditableOverlay } from "@/components/admin/non-editable-overlay"
+import { EditableList } from "@/components/admin/editable-list"
 
 interface GalleryPageContentProps {
     content: any
@@ -39,9 +40,34 @@ export function GalleryPageContent({ content, isEditing = false }: GalleryPageCo
                     />
                 </motion.div>
 
-                <NonEditableOverlay isEditing={isEditing} message="Gallery images are managed in the Content tab">
-                    <GalleryGrid images={images} />
-                </NonEditableOverlay>
+                <EditableList
+                    contentKey="gallery.images"
+                    items={images}
+                    isEditing={isEditing}
+                    itemSchema={{
+                        url: { type: 'text', label: 'Image URL', placeholder: '/images/example.jpg' },
+                        alt: { type: 'text', label: 'Alt Text', placeholder: 'Image description' },
+                        category: { type: 'text', label: 'Category', placeholder: 'e.g. Wedding, Corporate' }
+                    }}
+                    renderItem={(image: any, index: number) => (
+                        <div key={index} className="relative aspect-square overflow-hidden rounded-sm bg-secondary group mb-4">
+                            <Image
+                                src={image.url || "/placeholder.svg"}
+                                alt={image.alt || "Gallery image"}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                                <p className="text-white font-medium">{image.category}</p>
+                            </div>
+                        </div>
+                    )}
+                    emptyState={
+                        <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
+                            <p className="text-muted-foreground">No images in gallery</p>
+                        </div>
+                    }
+                />
             </div>
         </div>
     )

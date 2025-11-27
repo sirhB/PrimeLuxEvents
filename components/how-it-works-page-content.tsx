@@ -7,7 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { CheckCircle2, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { EditableContent } from "@/components/admin/editable-content"
-import { NonEditableOverlay } from "@/components/admin/non-editable-overlay"
+import { EditableList } from "@/components/admin/editable-list"
 
 interface HowItWorksPageContentProps {
     content: any
@@ -51,9 +51,18 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
             <section className="py-24 bg-background">
                 <div className="container px-4 md:px-6">
                     <div className="grid gap-20 lg:gap-32">
-                        <NonEditableOverlay isEditing={isEditing} message="Steps are managed in the Content tab">
-                            <div className="grid gap-20 lg:gap-32">
-                                {steps.map((step: any, index: number) => (
+                        <div className="grid gap-20 lg:gap-32">
+                            <EditableList
+                                contentKey="howitworks.steps.list"
+                                items={steps}
+                                isEditing={isEditing}
+                                itemSchema={{
+                                    title: { type: 'text', label: 'Title', placeholder: 'Step Title' },
+                                    description: { type: 'textarea', label: 'Description', placeholder: 'Step Description' },
+                                    image: { type: 'text', label: 'Image URL', placeholder: '/images/example.jpg' },
+                                    details: { type: 'array', label: 'Key Details', placeholder: 'Detail 1\nDetail 2\nDetail 3' }
+                                }}
+                                renderItem={(step: any, index: number) => (
                                     <motion.div
                                         key={index}
                                         initial={{ opacity: 0, y: 40 }}
@@ -89,7 +98,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                                                     Key Details
                                                 </h3>
                                                 <ul className="space-y-4">
-                                                    {step.details.map((detail: string, idx: number) => (
+                                                    {(step.details || []).map((detail: string, idx: number) => (
                                                         <li key={idx} className="text-muted-foreground text-base flex items-start gap-3">
                                                             <span className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 shrink-0" />
                                                             {detail}
@@ -99,9 +108,9 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                                             </div>
                                         </div>
                                     </motion.div>
-                                ))}
-                            </div>
-                        </NonEditableOverlay>
+                                )}
+                            />
+                        </div>
                     </div>
                 </div>
             </section>
@@ -223,16 +232,23 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                         />
                     </motion.div>
 
-                    <NonEditableOverlay isEditing={isEditing} message="FAQs are managed in the Content tab">
-                        <Accordion type="single" collapsible className="w-full space-y-4">
-                            {faqs.map((faq: any, index: number) => (
-                                <AccordionItem key={index} value={`item-${index}`} className="border border-border/50 rounded-lg px-4 data-[state=open]:border-gold/50 transition-colors">
+                    <EditableList
+                        contentKey="howitworks.faq.list"
+                        items={faqs}
+                        isEditing={isEditing}
+                        itemSchema={{
+                            question: { type: 'text', label: 'Question', placeholder: 'Enter question' },
+                            answer: { type: 'textarea', label: 'Answer', placeholder: 'Enter answer' }
+                        }}
+                        renderItem={(faq: any, index: number) => (
+                            <Accordion type="single" collapsible className="w-full mb-4" key={index}>
+                                <AccordionItem value={`item-${index}`} className="border border-border/50 rounded-lg px-4 data-[state=open]:border-gold/50 transition-colors">
                                     <AccordionTrigger className="text-lg font-medium hover:text-gold transition-colors py-6">{faq.question}</AccordionTrigger>
                                     <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">{faq.answer}</AccordionContent>
                                 </AccordionItem>
-                            ))}
-                        </Accordion>
-                    </NonEditableOverlay>
+                            </Accordion>
+                        )}
+                    />
 
                     <div className="mt-16 text-center">
                         <Button asChild variant="outline" size="lg" className="h-12 px-8 rounded-full border-border/50 hover:border-gold hover:text-gold transition-colors">

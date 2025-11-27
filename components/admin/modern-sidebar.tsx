@@ -31,7 +31,6 @@ const sidebarItems = [
     { icon: Box, label: 'Inventory', href: '/admin/inventory' },
     { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },
     { icon: Users, label: 'Customers', href: '/admin/customers' },
-    { icon: FileText, label: 'Content', href: '/admin/content' },
     { icon: Eye, label: 'Visual Editor', href: '/admin/visual-editor' },
     { icon: Settings, label: 'Settings', href: '/admin/settings' },
 ]

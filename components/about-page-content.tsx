@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { EditableContent } from "@/components/admin/editable-content"
-import { NonEditableOverlay } from "@/components/admin/non-editable-overlay"
+import { EditableList } from "@/components/admin/editable-list"
 
 interface AboutPageContentProps {
     content: any
@@ -150,23 +150,28 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                         />
                     </motion.div>
                     <div className="grid md:grid-cols-3 gap-8">
-                        <NonEditableOverlay isEditing={isEditing} message="Values list is managed in the Content tab">
-                            <div className="grid md:grid-cols-3 gap-8 col-span-3">
-                                {values.map((value: any, index: number) => (
-                                    <motion.div
-                                        key={index}
-                                        initial={{ opacity: 0, y: 30 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true }}
-                                        transition={{ duration: 0.6, delay: index * 0.1 }}
-                                        className="bg-background p-10 rounded-sm border border-border/40 hover:border-gold/30 transition-all duration-300 hover:shadow-lg hover:shadow-gold/5 group"
-                                    >
-                                        <h3 className="text-2xl font-serif mb-4 text-foreground group-hover:text-gold transition-colors">{value.title}</h3>
-                                        <p className="text-muted-foreground leading-relaxed">{value.description}</p>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </NonEditableOverlay>
+                        <EditableList
+                            contentKey="about.values.items"
+                            items={values}
+                            isEditing={isEditing}
+                            itemSchema={{
+                                title: { type: 'text', label: 'Title', placeholder: 'Enter value title' },
+                                description: { type: 'textarea', label: 'Description', placeholder: 'Enter value description' }
+                            }}
+                            renderItem={(value: any, index: number) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                                    className="bg-background p-10 rounded-sm border border-border/40 hover:border-gold/30 transition-all duration-300 hover:shadow-lg hover:shadow-gold/5 group"
+                                >
+                                    <h3 className="text-2xl font-serif mb-4 text-foreground group-hover:text-gold transition-colors">{value.title}</h3>
+                                    <p className="text-muted-foreground leading-relaxed">{value.description}</p>
+                                </motion.div>
+                            )}
+                        />
                     </div>
                 </div>
             </section>
