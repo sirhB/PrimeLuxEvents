@@ -13,8 +13,7 @@ import {
     Eye,
     Menu,
     X,
-    Grid,
-    FileText
+    Grid
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -31,7 +30,6 @@ const pages = [
     { id: 'contact', label: 'Contact', icon: Phone },
     { id: 'gallery', label: 'Gallery', icon: ImageIcon },
     { id: 'journal', label: 'Journal', icon: BookOpen },
-    { id: 'rental-agreement', label: 'Rental Agreement', icon: FileText },
 ]
 
 export function VisualEditorNav({ activePage, onPageChange, onNavigateToLanding }: VisualEditorNavProps) {
