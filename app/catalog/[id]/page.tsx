@@ -320,47 +320,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             animate={isLoaded ? "visible" : "hidden"}
             className="flex flex-col gap-10"
           >
-            {/* Header */}
-            <motion.div variants={itemVariants} className="space-y-6">
-              <div className="flex items-center gap-3">
-                {product.categories?.name && (
-                  <span className="text-xs font-bold uppercase tracking-[0.2em] text-gold">
-                    {product.categories.name}
-                  </span>
-                )}
-                {product.sku && (
-                  <>
-                    <span className="h-1 w-1 rounded-full bg-border" />
-                    <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                      SKU: {product.sku}
-                    </span>
-                  </>
-                )}
-              </div>
-
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-serif text-foreground leading-[1.1]">
-                {product.name}
-              </h1>
-
-              <div className="flex items-baseline gap-3 pt-2">
-                <span className="text-2xl md:text-3xl font-medium text-foreground">
-                  {formatCurrency(basePrice)}
-                </span>
-                <span className="text-base text-muted-foreground font-light">/ day</span>
-              </div>
-
-              {/* Results Summary */}
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-left"
-              >
-                <p className="text-muted-foreground text-lg font-light leading-relaxed">
-                  Premium {product.categories?.name.toLowerCase() || 'rental'} piece for extraordinary events.
-                </p>
-                <div className="h-1 w-16 bg-gold mt-4" />
-              </motion.div>
-            </motion.div>
 
             <motion.div variants={itemVariants}>
               <Separator className="bg-border/40" />
@@ -494,71 +453,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <Separator className="bg-border/40" />
             </motion.div>
 
-            {/* Add to Cart - Sticky on Mobile */}
-            <motion.div
-              variants={itemVariants}
-              className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-xl border-t border-border/20 lg:static lg:p-0 lg:bg-transparent lg:border-none z-50"
-            >
-              <div className="container mx-auto lg:px-0 flex flex-col gap-4">
-                <div className="lg:hidden flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium text-muted-foreground">Total Estimate</span>
-                  <span className="text-xl font-bold text-gold">{formatCurrency(totalPrice)}</span>
-                </div>
-
-                <div className="space-y-6">
-                  <Button
-                    size="lg"
-                    className={cn(
-                      "w-full text-lg h-14 rounded-full transition-all duration-500 font-medium tracking-wide",
-                      isInCart && cartItem?.quantity === quantity
-                        ? "border border-gold bg-transparent text-gold hover:bg-gold/5"
-                        : "bg-gold text-black hover:bg-gold/90 shadow-xl shadow-gold/10 hover:shadow-gold/20 hover:scale-[1.01]"
-                    )}
-                    onClick={() => {
-                      if (isInCart) {
-                        if (cartItem?.quantity !== quantity) {
-                          if (cartItem) updateCartQuantity(cartItem.id, quantity)
-                        } else {
-                          if (cartItem) removeItem(cartItem.id)
-                        }
-                      } else {
-                        addItem(product.id, quantity, selectedModifiers)
-                      }
-                    }}
-                    disabled={!canAddToCart}
-                  >
-                    {isInCart ? (
-                      cartItem?.quantity !== quantity ? (
-                        <>
-                          <Package className="mr-2 h-5 w-5" /> Update Quote
-                        </>
-                      ) : (
-                        <>
-                          <Check className="mr-2 h-5 w-5" /> Added to Quote
-                        </>
-                      )
-                    ) : (
-                      <>
-                        <Plus className="mr-2 h-5 w-5" /> Add to Quote
-                      </>
-                    )}
-                  </Button>
-
-                  <div className="hidden lg:flex items-start gap-4 text-sm text-muted-foreground bg-secondary/10 p-5 rounded-xl border border-border/30">
-                    <div className="h-10 w-10 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0 text-gold">
-                      <ShieldCheck className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="font-medium text-foreground text-base">Worry-Free Rental</p>
-                      <p className="leading-relaxed">
-                        Delivery and setup fees calculated at checkout. Damage waiver included.
-                        Professional cleaning included with every rental.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
 
             <motion.div variants={itemVariants}>
               <Separator className="bg-border/40 hidden lg:block" />
