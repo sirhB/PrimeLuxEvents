@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { ConsultationColumn } from '@/components/admin/consultations/consultation-column'
+import { ConsultationCardActions } from '@/components/admin/consultations/consultation-card-actions'
 import { Button } from '@/components/ui/button'
 import {
     Table,
@@ -261,24 +262,34 @@ export default async function ConsultationsPage({
                                                     {consultation.message}
                                                 </p>
                                             )}
-                                            <div className="flex items-center justify-between gap-2">
-                                                <Button variant="ghost" size="sm" asChild>
-                                                    <Link href={`/admin/consultations/${consultation.id}`}>
-                                                        <Eye className="mr-2 h-3.5 w-3.5" />
-                                                        Details
-                                                    </Link>
-                                                </Button>
-                                                {nextStage ? (
-                                                    <form action={updateStatus}>
-                                                        <input type="hidden" name="id" value={consultation.id} />
-                                                        <input type="hidden" name="status" value={nextStage} />
-                                                        <Button size="sm" variant="secondary">
-                                                            Move to {STATUS_LABELS[nextStage]}
-                                                        </Button>
-                                                    </form>
-                                                ) : (
-                                                    <span className="text-xs text-muted-foreground">Awaiting wrap-up</span>
-                                                )}
+                                            <div className="space-y-2">
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <Button variant="ghost" size="sm" asChild>
+                                                        <Link href={`/admin/consultations/${consultation.id}`}>
+                                                            <Eye className="mr-2 h-3.5 w-3.5" />
+                                                            Details
+                                                        </Link>
+                                                    </Button>
+                                                    {nextStage ? (
+                                                        <form action={updateStatus}>
+                                                            <input type="hidden" name="id" value={consultation.id} />
+                                                            <input type="hidden" name="status" value={nextStage} />
+                                                            <Button size="sm" variant="secondary">
+                                                                Move to {STATUS_LABELS[nextStage]}
+                                                            </Button>
+                                                        </form>
+                                                    ) : (
+                                                        <span className="text-xs text-muted-foreground">Awaiting wrap-up</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center justify-between gap-2 pt-1 border-t">
+                                                    <ConsultationCardActions
+                                                        consultationId={consultation.id}
+                                                        customerName={getDisplayName(consultation)}
+                                                        customerEmail={consultation.customer_email}
+                                                        customerPhone={consultation.customer_phone}
+                                                    />
+                                                </div>
                                             </div>
                                         </CardContent>
                                     </Card>

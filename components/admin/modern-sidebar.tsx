@@ -17,7 +17,8 @@ import {
     Box,
     Layers,
     ClipboardList,
-    Eye
+    Eye,
+    CalendarCheck
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -26,6 +27,7 @@ const sidebarItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
     { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
     { icon: FileText, label: 'Consultations', href: '/admin/consultations' },
+    { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments' },
     { icon: Package, label: 'Products', href: '/admin/products' },
     { icon: Layers, label: 'Categories', href: '/admin/categories' },
     { icon: Box, label: 'Inventory', href: '/admin/inventory' },

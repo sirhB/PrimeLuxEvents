@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, FolderTree, ShoppingCart, FileText, LogOut, Users, Calendar, Settings } from 'lucide-react'
+import { LayoutDashboard, Package, FolderTree, ShoppingCart, FileText, LogOut, Users, Calendar, Settings, CalendarCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
@@ -39,6 +39,11 @@ const sidebarItems = [
         title: 'Consultations',
         href: '/admin/consultations',
         icon: FileText,
+    },
+    {
+        title: 'Appointments',
+        href: '/admin/appointments',
+        icon: CalendarCheck,
     },
     {
         title: 'Customers',

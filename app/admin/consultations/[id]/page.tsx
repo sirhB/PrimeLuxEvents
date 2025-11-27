@@ -1,11 +1,16 @@
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, Trash2, Calendar, Users, DollarSign, MapPin, Utensils, User } from 'lucide-react'
+import { ArrowLeft, Calendar, Users, DollarSign, MapPin, Utensils, User, CalendarCheck } from 'lucide-react'
 import Link from 'next/link'
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { formatCents } from '@/lib/format-money'
+import { ConsultationQuickActions } from '@/components/admin/consultations/consultation-quick-actions'
+import { CommunicationLog, type Communication } from '@/components/admin/consultations/communication-log'
+import { DeleteConsultationDialog } from '@/components/admin/consultations/delete-consultation-dialog'
+import { Trash2 } from 'lucide-react'
+import { format } from 'date-fns'
 
 export default async function ConsultationDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -20,13 +25,19 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
         notFound()
     }
 
-    async function deleteConsultation(formData: FormData) {
-        'use server'
-        const id = formData.get('id') as string
-        const supabase = await createClient()
-        await supabase.from('consultations').delete().eq('id', id)
-        redirect('/admin/consultations')
-    }
+    // Fetch communications
+    const { data: communications } = await supabase
+        .from('consultation_communications')
+        .select('*')
+        .eq('consultation_id', id)
+        .order('created_at', { ascending: false })
+
+    // Fetch linked appointment
+    const { data: appointment } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('consultation_id', id)
+        .single()
 
     async function updateStatus(formData: FormData) {
         'use server'
@@ -35,6 +46,13 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
         const supabase = await createClient()
         await supabase.from('consultations').update({ status, updated_at: new Date().toISOString() }).eq('id', id)
         revalidatePath(`/admin/consultations/${id}`)
+    }
+
+    const getDisplayName = () => {
+        if (consultation.first_name && consultation.last_name) {
+            return `${consultation.first_name} ${consultation.last_name}`
+        }
+        return consultation.customer_name || 'Unknown Customer'
     }
 
     const getStatusColor = (status: string) => {
@@ -81,21 +99,40 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
                         ID: {consultation.id.slice(0, 8)}...
                     </p>
                 </div>
-                <div className="flex gap-2">
-                    <span
-                        className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold border ${getStatusColor(consultation.status)}`}
-                    >
-                        {getStatusLabel(consultation.status)}
-                    </span>
-                    <form action={deleteConsultation}>
-                        <input type="hidden" name="id" value={consultation.id} />
-                        <Button variant="destructive" size="sm" type="submit">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                        </Button>
-                    </form>
-                </div>
+                <span
+                    className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold border ${getStatusColor(consultation.status)}`}
+                >
+                    {getStatusLabel(consultation.status)}
+                </span>
             </div>
+
+            {/* Quick Actions */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Quick Actions</CardTitle>
+                    <CardDescription>Contact client or manage this consultation</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ConsultationQuickActions
+                        consultationId={consultation.id}
+                        customerName={getDisplayName()}
+                        customerEmail={consultation.customer_email}
+                        customerPhone={consultation.customer_phone}
+                    />
+                    <div className="mt-4 pt-4 border-t">
+                        <DeleteConsultationDialog
+                            consultationId={consultation.id}
+                            customerName={getDisplayName()}
+                            trigger={
+                                <Button variant="destructive" size="sm" className="gap-2">
+                                    <Trash2 className="h-4 w-4" />
+                                    Delete Consultation
+                                </Button>
+                            }
+                        />
+                    </div>
+                </CardContent>
+            </Card>
 
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Customer Information */}
@@ -256,6 +293,52 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
                         <div className="flex justify-between border-t pt-2 font-bold text-lg">
                             <span>Total</span>
                             <span>{formatCents(consultation.total_amount)}</span>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Communication Log */}
+            <CommunicationLog communications={(communications || []) as Communication[]} />
+
+            {/* Linked Appointment */}
+            {appointment && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <CalendarCheck className="h-5 w-5" />
+                            Linked Appointment
+                        </CardTitle>
+                        <CardDescription>Scheduled in-person meeting for this consultation</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-3">
+                            <div>
+                                <p className="text-sm font-medium text-muted-foreground">Date & Time</p>
+                                <p className="text-lg">
+                                    {format(new Date(appointment.appointment_date), 'EEEE, MMMM d, yyyy')} at{' '}
+                                    {appointment.appointment_time}
+                                </p>
+                            </div>
+                            {appointment.location && (
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Location</p>
+                                    <p>{appointment.location}</p>
+                                </div>
+                            )}
+                            {appointment.notes && (
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Notes</p>
+                                    <p className="whitespace-pre-wrap">{appointment.notes}</p>
+                                </div>
+                            )}
+                            <div>
+                                <Link href={`/admin/appointments/${appointment.id}`}>
+                                    <Button variant="outline" size="sm">
+                                        View Appointment Details
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
