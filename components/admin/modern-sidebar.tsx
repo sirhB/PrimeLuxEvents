@@ -24,7 +24,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { SearchModal } from '@/components/search-modal'
+
 import { createClient } from '@/lib/supabase/client'
 import { useEffect } from 'react'
 
@@ -70,7 +70,7 @@ const sidebarGroups = [
 export function ModernSidebar() {
     const pathname = usePathname()
     const [isMobileOpen, setIsMobileOpen] = useState(false)
-    const [isSearchOpen, setIsSearchOpen] = useState(false)
+
     const [user, setUser] = useState<any>(null)
     const supabase = createClient()
 
@@ -114,7 +114,7 @@ export function ModernSidebar() {
 
                 </div>
 
-                <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
 
                 {/* Navigation */}
                 <nav className="flex-1 overflow-y-auto px-4 pb-4 space-y-6">
@@ -178,17 +178,7 @@ export function ModernSidebar() {
                 </div>
             </aside>
 
-            {/* Floating Search Button */}
-            <motion.button
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setIsSearchOpen(true)}
-                className="fixed bottom-8 right-8 z-50 h-14 w-14 rounded-full bg-[var(--dashboard-accent-gold)] text-white shadow-lg flex items-center justify-center hover:bg-yellow-600 transition-colors"
-            >
-                <Search className="h-6 w-6" />
-            </motion.button>
+
         </>
     )
 }
