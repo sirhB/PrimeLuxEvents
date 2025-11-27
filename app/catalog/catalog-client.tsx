@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { ProductCard } from '@/components/product-card'
-import { SearchBar } from '@/components/catalog/search-bar'
 import { CategoryCard } from '@/components/catalog/category-card'
 import { FeaturedProductCard } from '@/components/catalog/featured-product-card'
 import { DealCard } from '@/components/catalog/deal-card'
@@ -57,7 +56,6 @@ export default function CatalogClient({ heroTitle, products, categories, package
     const pathname = usePathname()
     const { scrollY } = useScroll()
 
-    const [searchQuery, setSearchQuery] = useState('')
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -76,16 +74,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
             filtered = filtered.filter(p => p.categories?.name === selectedCategory)
         }
 
-        if (searchQuery) {
-            const query = searchQuery.toLowerCase()
-            filtered = filtered.filter(p =>
-                p.name.toLowerCase().includes(query) ||
-                p.description?.toLowerCase().includes(query)
-            )
-        }
-
         return filtered
-    }, [products, selectedCategory, searchQuery])
+    }, [products, selectedCategory])
 
     // Featured first then alphabetically
     const orderedCategories = useMemo(() => {
@@ -93,12 +83,6 @@ export default function CatalogClient({ heroTitle, products, categories, package
         const nonFeatured = categories.filter(c => !c.is_featured).sort((a, b) => a.name.localeCompare(b.name))
         return [...featured, ...nonFeatured]
     }, [categories])
-
-    const filteredCategories = useMemo(() => {
-        if (!searchQuery) return orderedCategories
-        const query = searchQuery.toLowerCase()
-        return orderedCategories.filter(c => c.name.toLowerCase().includes(query))
-    }, [orderedCategories, searchQuery])
 
     const featuredPackages = useMemo(() => {
         return packages.filter(p => p.is_featured)
@@ -120,7 +104,6 @@ export default function CatalogClient({ heroTitle, products, categories, package
         const params = new URLSearchParams(searchParams.toString())
         params.delete('category')
         router.push(`${pathname}?${params.toString()}`)
-        setSearchQuery('')
     }
 
     return (
@@ -172,13 +155,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                 <div className="container mx-auto px-4 md:px-6 py-4">
                     <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                         <div className="w-full md:w-auto flex-1 max-w-xl">
-                            <div className="relative">
-                                <SearchBar
-                                    value={searchQuery}
-                                    onChange={setSearchQuery}
-                                    placeholder="Search our collection..."
-                                />
-                            </div>
+                            {/* SearchBar component removed */}
                         </div>
 
                         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
@@ -319,7 +296,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             className="space-y-20 md:space-y-32"
                         >
                             {/* Featured Products Carousel */}
-                            {featuredProducts.length > 0 && !searchQuery && (
+                            {featuredProducts.length > 0 && !searchParams.get('category') && (
                                 <CarouselSection
                                     title="Featured Collection"
                                     subtitle="Hand-picked premium pieces that define luxury and elegance"
@@ -344,7 +321,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     <div className="h-1 w-20 bg-gold mx-auto md:mx-0" />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {filteredCategories.map((category, index) => (
+                                    {orderedCategories.map((category, index) => (
                                         <motion.div
                                             key={category.id}
                                             initial={{ opacity: 0, y: 20 }}
@@ -361,15 +338,15 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     ))}
                                 </div>
 
-                                {filteredCategories.length === 0 && (
+                                {orderedCategories.length === 0 && (
                                     <div className="text-center py-12">
-                                        <p className="text-muted-foreground">No categories found matching your search.</p>
+                                        <p className="text-muted-foreground">No categories found.</p>
                                     </div>
                                 )}
                             </section>
 
                             {/* Deals & Packages Carousel */}
-                            {featuredPackages.length > 0 && !searchQuery && (
+                            {featuredPackages.length > 0 && !searchParams.get('category') && (
                                 <CarouselSection
                                     title="Curated Packages"
                                     subtitle="Complete event solutions for seamless planning"
@@ -392,7 +369,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             )}
 
                             {/* All Products (if searching) */}
-                            {searchQuery && (
+                            {searchParams.get('category') && (
                                 <motion.section
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -403,7 +380,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                             Search Results
                                         </h2>
                                         <p className="text-muted-foreground">
-                                            Found {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'} for "{searchQuery}"
+                                            Found {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'} for "{selectedCategory}"
                                         </p>
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
