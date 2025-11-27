@@ -10,6 +10,7 @@ import { HowItWorksPageContent } from "@/components/how-it-works-page-content"
 import { ContactPageContent } from "@/components/contact-page-content"
 import { GalleryPageContent } from "@/components/gallery-page-content"
 import { JournalPageContent } from "@/components/journal-page-content"
+import { RentalAgreementPageContent } from "@/components/rental-agreement-page-content"
 import { AnimatePresence, motion } from "framer-motion"
 
 export default function VisualEditorPage() {
@@ -77,6 +78,8 @@ export default function VisualEditorPage() {
                 return <GalleryPageContent {...props} />
             case 'journal':
                 return <JournalPageContent {...props} />
+            case 'rental-agreement':
+                return <RentalAgreementPageContent {...props} />
             default:
                 return <div>Page not found</div>
         }
