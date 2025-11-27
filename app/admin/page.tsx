@@ -29,8 +29,17 @@ export default function AdminDashboardPage() {
         recentOrders: []
     })
 
+    const [userName, setUserName] = useState("Admin")
+
     useEffect(() => {
         async function fetchData() {
+            // Fetch user
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) {
+                const name = user.user_metadata?.full_name || user.email?.split('@')[0] || "Admin"
+                setUserName(name)
+            }
+
             // Fetch real data
             const { data: orders } = await supabase
                 .from('orders')
@@ -95,13 +104,19 @@ export default function AdminDashboardPage() {
             {/* Header Section */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-[var(--dashboard-text)] font-serif">Good Morning, Jonathan!</h1>
+                    <h1 className="text-2xl font-bold text-[var(--dashboard-text)] font-serif">Welcome back, {userName}!</h1>
                     <p className="text-[var(--dashboard-text-muted)] font-sans">Here's what's happening with your store today</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
                         <CalendarCheck2 className="h-4 w-4 text-[var(--dashboard-text-muted)]" />
-                        <span className="text-sm font-medium">14 Aug 2023</span>
+                        <span className="text-sm font-medium">
+                            {new Date().toLocaleDateString('en-GB', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                            })}
+                        </span>
                     </div>
                 </div>
             </div>

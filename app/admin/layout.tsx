@@ -1,5 +1,4 @@
 import { ModernSidebar } from '@/components/admin/modern-sidebar'
-import { ModernHeader } from '@/components/admin/modern-header'
 import { AdminToastProvider } from '@/components/admin/toast-provider'
 
 export default function AdminLayout({
@@ -13,7 +12,7 @@ export default function AdminLayout({
                 <ModernSidebar />
             </div>
             <div className="flex flex-1 flex-col md:pl-64 transition-all duration-300">
-                <ModernHeader />
+
                 <main className="flex-1 p-4 md:p-8 pt-0 overflow-y-auto">
                     {children}
                 </main>

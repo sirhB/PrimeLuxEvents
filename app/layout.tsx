@@ -4,8 +4,7 @@ import { Geist, Geist_Mono, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { CartProvider } from "@/components/providers/cart-provider"
-import { SiteHeader } from "@/components/site-header"
-import { SiteFooter } from "@/components/site-footer"
+import { SiteLayout } from "@/components/site-layout"
 import { ThreeBackground } from "@/components/three-background"
 import { Toaster } from "sonner"
 
@@ -47,11 +46,7 @@ export default function RootLayout({
       <body className={`font-sans antialiased ${playfair.variable} ${_geist.variable} ${_geistMono.variable}`}>
         <ThreeBackground />
         <CartProvider>
-          <div className="flex flex-col min-h-screen">
-            <SiteHeader />
-            <main className="flex-1">{children}</main>
-            <SiteFooter />
-          </div>
+          <SiteLayout>{children}</SiteLayout>
         </CartProvider>
         <Analytics />
         <Toaster />

@@ -24,7 +24,9 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { SearchModal } from '@/components/search-modal'
+import { createClient } from '@/lib/supabase/client'
+import { useEffect } from 'react'
 
 const sidebarGroups = [
     {
@@ -68,6 +70,17 @@ const sidebarGroups = [
 export function ModernSidebar() {
     const pathname = usePathname()
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+    const [isSearchOpen, setIsSearchOpen] = useState(false)
+    const [user, setUser] = useState<any>(null)
+    const supabase = createClient()
+
+    useEffect(() => {
+        async function getUser() {
+            const { data: { user } } = await supabase.auth.getUser()
+            setUser(user)
+        }
+        getUser()
+    }, [])
 
     return (
         <>
@@ -100,13 +113,18 @@ export function ModernSidebar() {
                     </div>
 
                     <div className="relative">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-[var(--dashboard-text-muted)]" />
-                        <Input
-                            placeholder="Search"
-                            className="pl-9 bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] h-9 text-sm focus-visible:ring-[var(--dashboard-accent-gold)]"
-                        />
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-card-hover)]"
+                            onClick={() => setIsSearchOpen(true)}
+                        >
+                            <Search className="h-5 w-5" />
+                        </Button>
                     </div>
                 </div>
+
+                <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
                 {/* Navigation */}
                 <nav className="flex-1 overflow-y-auto px-4 pb-4 space-y-6">
@@ -152,10 +170,20 @@ export function ModernSidebar() {
                             <Users className="h-4 w-4" />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[var(--dashboard-text)] truncate">Admin User</p>
-                            <p className="text-xs text-[var(--dashboard-text-muted)] truncate">admin@primelux.com</p>
+                            <p className="text-sm font-medium text-[var(--dashboard-text)] truncate">
+                                {user?.user_metadata?.full_name || "Admin User"}
+                            </p>
+                            <p className="text-xs text-[var(--dashboard-text-muted)] truncate">
+                                {user?.email || "admin@primelux.com"}
+                            </p>
                         </div>
-                        <LogOut className="h-4 w-4 text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]" />
+                        <LogOut
+                            className="h-4 w-4 text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]"
+                            onClick={async () => {
+                                await supabase.auth.signOut()
+                                window.location.href = '/'
+                            }}
+                        />
                     </div>
                 </div>
             </aside>
