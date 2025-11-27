@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,6 +16,7 @@ import { createClient } from "@/lib/supabase/client"
 import { motion, AnimatePresence } from "framer-motion"
 
 export function ContactForm() {
+    const formRef = useRef<HTMLFormElement>(null)
     const [hasVenue, setHasVenue] = useState<string>("")
     const [hasCaterer, setHasCaterer] = useState<string>("")
     const [hasPlanner, setHasPlanner] = useState<string>("")
@@ -30,7 +31,14 @@ export function ContactForm() {
         setSubmitMessage(null)
         setValidationErrors([])
 
-        const formData = new FormData(e.currentTarget)
+        // Capture form element before async operations
+        const formElement = e.currentTarget || formRef.current
+        if (!formElement) {
+            setIsSubmitting(false)
+            return
+        }
+
+        const formData = new FormData(formElement)
 
         const firstName = (formData.get('first-name') as string)?.trim()
         const lastName = (formData.get('last-name') as string)?.trim()
@@ -51,13 +59,17 @@ export function ContactForm() {
             return
         }
 
+        // Normalize event_date - convert empty string to null
+        const eventDateValue = formData.get('event-date') as string
+        const eventDate = eventDateValue && eventDateValue.trim() ? eventDateValue : null
+
         const consultationData = {
             first_name: firstName,
             last_name: lastName,
             customer_name: `${firstName} ${lastName}`.trim(),
             customer_email: email,
             customer_phone: phone,
-            event_date: formData.get('event-date') as string || null,
+            event_date: eventDate,
             number_of_guests: (() => {
                 const guestValue = formData.get('guests') as string
                 if (!guestValue) return null
@@ -66,30 +78,36 @@ export function ContactForm() {
             })(),
             budget_range: budgetRange || null,
             has_venue: hasVenue === 'yes',
-            venue_name: hasVenue === 'yes' ? formData.get('venue') as string : null,
+            venue_name: hasVenue === 'yes' ? (formData.get('venue') as string)?.trim() || null : null,
             has_caterer: hasCaterer === 'yes',
-            caterer_name: hasCaterer === 'yes' ? formData.get('caterer') as string : null,
+            caterer_name: hasCaterer === 'yes' ? (formData.get('caterer') as string)?.trim() || null : null,
             has_planner: hasPlanner === 'yes',
-            planner_name: hasPlanner === 'yes' ? formData.get('planner') as string : null,
+            planner_name: hasPlanner === 'yes' ? (formData.get('planner') as string)?.trim() || null : null,
             message,
             status: 'new_request',
         }
 
         try {
             const supabase = createClient()
-            const { error } = await supabase
+            const { data, error } = await supabase
                 .from('consultations')
                 .insert([consultationData])
+                .select()
 
-            if (error) throw error
+            if (error) {
+                console.error('Supabase error:', error)
+                throw new Error(error.message || 'Failed to submit consultation request')
+            }
 
             setSubmitMessage({
                 type: 'success',
                 text: 'Thank you! Your consultation request has been submitted. We\'ll be in touch soon!'
             })
 
-            // Reset form
-            e.currentTarget.reset()
+            // Reset form using captured form element or ref
+            if (formElement) {
+                formElement.reset()
+            }
             setHasVenue('')
             setHasCaterer('')
             setHasPlanner('')
@@ -101,9 +119,12 @@ export function ContactForm() {
             }, 100)
         } catch (error) {
             console.error('Error submitting consultation:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
             setSubmitMessage({
                 type: 'error',
-                text: 'Sorry, there was an error submitting your request. Please try again or contact us directly.'
+                text: errorMessage.includes('RLS') || errorMessage.includes('policy')
+                    ? 'Sorry, there was an authentication error. Please refresh the page and try again.'
+                    : `Sorry, there was an error: ${errorMessage}. Please try again or contact us directly.`
             })
         } finally {
             setIsSubmitting(false)
@@ -112,6 +133,7 @@ export function ContactForm() {
 
     return (
         <motion.form
+            ref={formRef as React.RefObject<HTMLFormElement>}
             className="space-y-6"
             onSubmit={handleSubmit}
             initial={{ opacity: 0, y: 16 }}
