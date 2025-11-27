@@ -174,15 +174,15 @@ export function CreateAppointmentDialog({
                         <div className="space-y-2">
                             <Label htmlFor="consultation">Link to Consultation (Optional)</Label>
                             <Select
-                                value={consultationId || ''}
-                                onValueChange={(value) => setConsultationId(value || null)}
+                                value={consultationId || 'none'}
+                                onValueChange={(value) => setConsultationId(value === 'none' ? null : value)}
                                 disabled={loadingConsultations}
                             >
                                 <SelectTrigger id="consultation">
                                     <SelectValue placeholder="Select a consultation or leave empty" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">None (Standalone Appointment)</SelectItem>
+                                    <SelectItem value="none">None (Standalone Appointment)</SelectItem>
                                     {consultations.map((consultation) => (
                                         <SelectItem key={consultation.id} value={consultation.id}>
                                             {consultation.customer_name || 'Unnamed Consultation'}
