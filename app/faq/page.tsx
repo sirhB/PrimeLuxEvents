@@ -1,28 +1,41 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { getSiteContent } from "@/lib/content"
 import { motion } from "framer-motion"
 import { HelpCircle, MessageCircle, Clock } from "lucide-react"
 
-export default async function FAQPage() {
-  const content = await getSiteContent()
-  const faqs = content['faq.list'] || [
-    {
-      question: "How far in advance should I book?",
-      answer: "We recommend booking as soon as you have your date and venue secured. For peak seasons (spring and fall), we suggest booking 6-9 months in advance to ensure availability of your desired items."
-    },
-    {
-      question: "How long is the rental period?",
-      answer: "Our standard rental period is 24 hours. We typically deliver on the day of the event and pick up the following day."
-    },
-    {
-      question: "Do you offer delivery and setup?",
-      answer: "We offer professional delivery to your venue. Standard delivery includes drop-off at a designated area. Full setup and installation is available for an additional fee."
-    },
-    {
-      question: "What is your cancellation policy?",
-      answer: "Orders cancelled more than 30 days prior to the event date are eligible for a full refund less a 10% administrative fee. Cancellations made within 30 days of the event are subject to a 50% cancellation fee."
+export default function FAQPage() {
+  const [content, setContent] = useState<any>({})
+  const [faqs, setFaqs] = useState<any[]>([])
+
+  useEffect(() => {
+    const loadContent = async () => {
+      const siteContent = await getSiteContent()
+      setContent(siteContent)
+      setFaqs(siteContent['faq.list'] || [
+        {
+          question: "How far in advance should I book?",
+          answer: "We recommend booking as soon as you have your date and venue secured. For peak seasons (spring and fall), we suggest booking 6-9 months in advance to ensure availability of your desired items."
+        },
+        {
+          question: "How long is the rental period?",
+          answer: "Our standard rental period is 24 hours. We typically deliver on the day of the event and pick up the following day."
+        },
+        {
+          question: "Do you offer delivery and setup?",
+          answer: "We offer professional delivery to your venue. Standard delivery includes drop-off at a designated area. Full setup and installation is available for an additional fee."
+        },
+        {
+          question: "What is your cancellation policy?",
+          answer: "Orders cancelled more than 30 days prior to the event date are eligible for a full refund less a 10% administrative fee. Cancellations made within 30 days of the event are subject to a 50% cancellation fee."
+        }
+      ])
     }
-  ]
+
+    loadContent()
+  }, [])
 
   return (
     <>
