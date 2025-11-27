@@ -1,3 +1,5 @@
+'use client'
+
 import { createClient } from '@/lib/supabase/client'
 import { StatsCard } from '@/components/admin/dashboard/stats-card'
 import { RevenueChart } from '@/components/admin/dashboard/revenue-chart'
