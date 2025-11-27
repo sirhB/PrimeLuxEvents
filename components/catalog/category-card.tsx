@@ -17,7 +17,7 @@ export function CategoryCard({ name, imageUrl, isSelected, onClick }: CategoryCa
             onClick={onClick}
             className={cn(
                 "relative group overflow-hidden rounded-sm aspect-[4/3] w-full text-left border border-transparent transition-all duration-300",
-                isSelected ? "border-gold ring-1 ring-gold" : "hover:border-gold/30"
+                isSelected ? "border-gold ring-1 ring-gold bg-gold/10" : "hover:border-gold/30"
             )}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

@@ -9,7 +9,7 @@ import { FeaturedProductCard } from '@/components/catalog/featured-product-card'
 import { DealCard } from '@/components/catalog/deal-card'
 import { CarouselSection } from '@/components/catalog/carousel-section'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, LayoutGrid, List, Filter, X } from 'lucide-react'
+import { ArrowLeft, LayoutGrid, List, Filter, X, Menu } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { cn, formatCurrency } from '@/lib/utils'
@@ -60,6 +60,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
     const [searchQuery, setSearchQuery] = useState('')
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
     const [isFilterOpen, setIsFilterOpen] = useState(false)
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     const selectedCategory = searchParams.get('category')
 
@@ -86,11 +87,18 @@ export default function CatalogClient({ heroTitle, products, categories, package
         return filtered
     }, [products, selectedCategory, searchQuery])
 
+    // Featured first then alphabetically
+    const orderedCategories = useMemo(() => {
+        const featured = categories.filter(c => c.is_featured).sort((a, b) => a.name.localeCompare(b.name))
+        const nonFeatured = categories.filter(c => !c.is_featured).sort((a, b) => a.name.localeCompare(b.name))
+        return [...featured, ...nonFeatured]
+    }, [categories])
+
     const filteredCategories = useMemo(() => {
-        if (!searchQuery) return categories
+        if (!searchQuery) return orderedCategories
         const query = searchQuery.toLowerCase()
-        return categories.filter(c => c.name.toLowerCase().includes(query))
-    }, [categories, searchQuery])
+        return orderedCategories.filter(c => c.name.toLowerCase().includes(query))
+    }, [orderedCategories, searchQuery])
 
     const featuredPackages = useMemo(() => {
         return packages.filter(p => p.is_featured)
@@ -216,97 +224,91 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
             <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
                 <AnimatePresence mode="wait">
+                    {/* Category sidebar + grid layout for selected category */}
                     {selectedCategory ? (
-                        <motion.div
-                            key="category-view"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.5 }}
-                            className="space-y-12"
-                        >
-                            {/* Mobile Back Button */}
-                            <div className="md:hidden mb-6">
-                                <Button
-                                    variant="ghost"
-                                    onClick={handleBackToCatalog}
-                                    className="gap-2 -ml-4 text-muted-foreground hover:text-foreground"
-                                >
-                                    <ArrowLeft className="h-4 w-4" />
-                                    Back to Catalog
-                                </Button>
-                            </div>
-
-                            <div className={cn(
-                                "grid gap-6 md:gap-8",
-                                viewMode === 'grid'
-                                    ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-                                    : "grid-cols-1"
-                            )}>
-                                {filteredProducts.map((product, index) => (
-                                    viewMode === 'grid' ? (
-                                        <motion.div
-                                            key={product.id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.4, delay: index * 0.05 }}
-                                        >
-                                            <ProductCard product={product} />
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div
-                                            key={product.id}
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ duration: 0.4, delay: index * 0.05 }}
-                                            className="group flex gap-6 border border-transparent hover:border-gold/20 rounded-sm p-4 hover:bg-secondary/30 transition-all duration-300"
-                                        >
-                                            <div className="relative w-32 md:w-48 aspect-[4/3] flex-shrink-0 overflow-hidden rounded-sm bg-secondary">
-                                                {product.image_url ? (
-                                                    <Image
-                                                        src={product.image_url}
-                                                        alt={product.name}
-                                                        fill
-                                                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                                    />
-                                                ) : (
-                                                    <div className="absolute inset-0 flex items-center justify-center bg-neutral-100 text-neutral-400">
-                                                        No Image
-                                                    </div>
+                        <div className="flex flex-col md:flex-row gap-0 md:gap-8">
+                            {/* Sidebar (desktop only) */}
+                            <aside className="hidden md:block w-64 flex-shrink-0 border-r border-border/10 bg-background/90">
+                                <div className="sticky top-24">
+                                    <div className="pb-6 pt-2 pl-2 text-base font-bold text-foreground tracking-wide">Categories</div>
+                                    <nav className="flex flex-col gap-2">
+                                        {orderedCategories.map(category => (
+                                            <button
+                                                key={category.id}
+                                                className={cn(
+                                                    "text-left px-4 py-2 rounded transition-colors",
+                                                    selectedCategory === category.name ? "bg-gold/10 text-gold font-bold border border-gold" : "hover:bg-secondary/20"
                                                 )}
-                                            </div>
-                                            <div className="flex flex-col justify-between flex-grow py-2">
-                                                <div>
-                                                    <h3 className="text-xl md:text-2xl font-serif font-medium mb-2 group-hover:text-gold transition-colors">{product.name}</h3>
-                                                    <p className="text-muted-foreground line-clamp-2 mb-4 text-sm md:text-base">{product.description}</p>
-                                                </div>
-                                                <div className="flex items-center justify-between mt-auto">
-                                                    <div className="flex items-baseline gap-2">
-                                                        <span className="text-xl font-semibold text-foreground">
-                                                            {formatCurrency(product.rental_price_daily || product.price)}
-                                                        </span>
-                                                        <span className="text-sm text-muted-foreground">/ day</span>
-                                                    </div>
-                                                    <Button asChild className="rounded-full bg-gold text-black hover:bg-gold/90 transition-all duration-300 hover:scale-105">
-                                                        <Link href={`/catalog/${product.id}`}>View Details</Link>
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    )
-                                ))}
+                                                onClick={() => handleCategoryClick(category.name)}
+                                            >
+                                                {category.name}
+                                            </button>
+                                        ))}
+                                    </nav>
+                                </div>
+                            </aside>
+                            {/* Drawer (mobile only) */}
+                            <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+                                <SheetTrigger asChild>
+                                    <button
+                                        className="md:hidden flex items-center gap-2 mb-6 mt-1 text-gold px-2 sticky top-20 z-20"
+                                        onClick={() => setIsSidebarOpen(true)}
+                                    >
+                                        <Menu className="h-6 w-6" />
+                                        Categories
+                                    </button>
+                                </SheetTrigger>
+                                <SheetContent side="left" className="w-64 p-0">
+                                    <SheetHeader>
+                                        <SheetTitle className="p-4 pb-0 text-lg">Categories</SheetTitle>
+                                    </SheetHeader>
+                                    <nav className="flex flex-col gap-1 p-4">
+                                        {orderedCategories.map(category => (
+                                            <button
+                                                key={category.id}
+                                                className={cn(
+                                                    "text-left px-4 py-2 rounded",
+                                                    selectedCategory === category.name ? "bg-gold/10 text-gold font-bold border border-gold" : "hover:bg-secondary/20"
+                                                )}
+                                                onClick={() => {
+                                                    handleCategoryClick(category.name)
+                                                    setIsSidebarOpen(false)
+                                                }}
+                                            >
+                                                {category.name}
+                                            </button>
+                                        ))}
+                                    </nav>
+                                </SheetContent>
+                            </Sheet>
+                            {/* Main grid/content */}
+                            <div className="flex-1 px-1 md:px-0">
+                                <div className={cn(
+                                    "grid gap-6 md:gap-8",
+                                    viewMode === 'grid' ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4" : "grid-cols-1"
+                                )}>
+                                    {filteredProducts.map((product, index) => (
+                                        viewMode === 'grid' ? (
+                                            <motion.div
+                                                key={product.id}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ duration: 0.4, delay: index * 0.05 }}
+                                            >
+                                                <ProductCard product={product} />
+                                            </motion.div>
+                                        ) : (
+                                            <motion.div key={product.id} />
+                                        )
+                                    ))}
+                                </div>
+                                {filteredProducts.length === 0 && (
+                                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
+                                        <p className="text-muted-foreground text-lg">No products found in this category.</p>
+                                    </motion.div>
+                                )}
                             </div>
-
-                            {filteredProducts.length === 0 && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="text-center py-20"
-                                >
-                                    <p className="text-muted-foreground text-lg">No products found in this category.</p>
-                                </motion.div>
-                            )}
-                        </motion.div>
+                        </div>
                     ) : (
                         <motion.div
                             key="main-catalog"
