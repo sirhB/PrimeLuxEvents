@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -150,6 +150,9 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
             {/* Lightbox */}
             <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
+                <DialogTitle className="sr-only">
+                    Image Gallery: {productName}
+                </DialogTitle>
                 <DialogContent className="max-w-[95vw] w-full h-[90vh] p-0 border-none bg-black/95">
                     <div className="relative w-full h-full flex items-center justify-center">
                         <AnimatePresence initial={false} custom={direction}>

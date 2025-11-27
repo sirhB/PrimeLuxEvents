@@ -4,7 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { X, Plus, Check, ExternalLink, Calendar, Package } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -60,9 +60,9 @@ export function ProductQuickView({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader className="sr-only">
-                    <h2>Quick View: {product.name}</h2>
-                </DialogHeader>
+                <DialogTitle className="sr-only">
+                    Quick View: {product.name}
+                </DialogTitle>
 
                 <div className="grid md:grid-cols-2 gap-8">
                     {/* Image Section */}
