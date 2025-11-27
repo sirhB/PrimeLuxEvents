@@ -18,7 +18,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
     return (
         <>
             {/* Hero Section */}
-            <section className="relative h-[60vh] flex items-center justify-center overflow-hidden bg-black">
+            <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
                 <div className="absolute inset-0 z-0">
                     <EditableContent
                         contentKey="about.hero.image"
@@ -33,34 +33,96 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
                 </div>
-                <div className="container relative z-10 text-center text-white space-y-6 max-w-4xl px-4">
-                    <EditableContent
-                        contentKey="about.hero.title"
-                        initialValue={content['about.hero.title']}
-                        isEditing={isEditing}
-                        as={motion.h1}
-                        initial={{ opacity: 0, y: 30 }}
+
+                <div className="container relative z-10 px-4 md:px-6 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 60 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="text-5xl md:text-7xl font-serif font-medium tracking-tight"
-                    />
-                    <EditableContent
-                        contentKey="about.hero.description"
-                        initialValue={content['about.hero.description']}
-                        type="textarea"
-                        isEditing={isEditing}
-                        as={motion.p}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                        className="text-lg md:text-2xl font-light text-white/90 max-w-2xl mx-auto leading-relaxed"
-                    />
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className="max-w-4xl mx-auto"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-sm font-medium mb-8"
+                        >
+                            <span>Our Story</span>
+                        </motion.div>
+
+                        <EditableContent
+                            contentKey="about.hero.title"
+                            initialValue={content['about.hero.title']}
+                            isEditing={isEditing}
+                            as={motion.h1}
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                            className="text-6xl md:text-8xl font-serif font-light tracking-tight text-white mb-6"
+                        />
+
+                        <EditableContent
+                            contentKey="about.hero.description"
+                            initialValue={content['about.hero.description']}
+                            type="textarea"
+                            isEditing={isEditing}
+                            as={motion.p}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.6 }}
+                            className="text-xl md:text-2xl font-light text-white/90 max-w-3xl mx-auto leading-relaxed mb-12"
+                        />
+                    </motion.div>
                 </div>
+
+                {/* Scroll Indicator */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 2 }}
+                    className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+                >
+                    <motion.div
+                        animate={{ y: [0, 10, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center"
+                    >
+                        <motion.div
+                            animate={{ y: [0, 12, 0] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="w-1 h-3 bg-white/50 rounded-full mt-2"
+                        />
+                    </motion.div>
+                </motion.div>
             </section>
 
             {/* Our Story */}
             <section className="py-24 md:py-32 bg-background">
-                <div className="container px-4 md:px-6 text-center">
+                <div className="container px-4 md:px-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8 }}
+                        className="text-center max-w-3xl mx-auto mb-20"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            whileInView={{ scale: 1, opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-sm font-medium mb-8"
+                        >
+                            <span>Our Foundation</span>
+                        </motion.div>
+                        <h2 className="text-4xl md:text-5xl font-serif text-foreground mb-6">
+                            Crafting Extraordinary Moments
+                        </h2>
+                        <p className="text-xl text-muted-foreground font-light">
+                            From humble beginnings to industry leaders, our journey is defined by an unwavering commitment to excellence.
+                        </p>
+                    </motion.div>
+
                     <div className="grid md:grid-cols-2 gap-12 md:gap-24 items-center">
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
@@ -124,15 +186,24 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
             </section>
 
             {/* Values */}
-            <section className="py-24 bg-secondary/20 border-y border-border/40">
+            <section className="py-24 md:py-32 bg-secondary/20 border-y border-border/40">
                 <div className="container px-4 md:px-6">
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
+                        transition={{ duration: 0.8 }}
                         className="text-center max-w-3xl mx-auto mb-20"
                     >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            whileInView={{ scale: 1, opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-sm font-medium mb-8"
+                        >
+                            <span>Our Standards</span>
+                        </motion.div>
                         <EditableContent
                             contentKey="about.values.title"
                             initialValue={content['about.values.title']}
@@ -146,7 +217,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                             type="textarea"
                             isEditing={isEditing}
                             as="p"
-                            className="text-xl text-muted-foreground font-light"
+                            className="text-xl text-muted-foreground font-light leading-relaxed"
                         />
                     </motion.div>
                     <div className="grid md:grid-cols-3 gap-8">
@@ -177,39 +248,58 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
             </section>
 
             {/* CTA */}
-            <section className="py-32 bg-gold text-black relative overflow-hidden">
+            <section className="py-24 md:py-32 bg-gradient-to-br from-gold via-gold to-gold/90 text-black relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
-                <div className="container px-4 md:px-6 text-center space-y-10 relative z-10">
-                    <EditableContent
-                        contentKey="about.cta.title"
-                        initialValue={content['about.cta.title']}
-                        isEditing={isEditing}
-                        as={motion.h2}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="text-4xl md:text-6xl font-serif"
-                    />
-                    <EditableContent
-                        contentKey="about.cta.description"
-                        initialValue={content['about.cta.description']}
-                        type="textarea"
-                        isEditing={isEditing}
-                        as={motion.p}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                        className="text-black/80 text-xl max-w-2xl mx-auto font-light"
-                    />
+                <div className="container px-4 md:px-6 text-center relative z-10">
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        className="flex flex-col sm:flex-row gap-6 justify-center pt-6"
+                        transition={{ duration: 0.8 }}
+                        className="max-w-4xl mx-auto space-y-12"
                     >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            whileInView={{ scale: 1, opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/10 border border-black/20 text-black text-sm font-medium"
+                        >
+                            <span>Ready to Begin</span>
+                        </motion.div>
+
+                        <EditableContent
+                            contentKey="about.cta.title"
+                            initialValue={content['about.cta.title']}
+                            isEditing={isEditing}
+                            as={motion.h2}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                            className="text-4xl md:text-6xl font-serif font-light"
+                        />
+
+                        <EditableContent
+                            contentKey="about.cta.description"
+                            initialValue={content['about.cta.description']}
+                            type="textarea"
+                            isEditing={isEditing}
+                            as={motion.p}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.5 }}
+                            className="text-black/80 text-xl max-w-2xl mx-auto font-light leading-relaxed"
+                        />
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: 0.6 }}
+                            className="flex flex-col sm:flex-row gap-6 justify-center pt-6"
+                        >
                         <Button asChild size="lg" className="min-w-[200px] bg-black text-white hover:bg-black/80 h-14 text-lg rounded-full border-2 border-transparent">
                             <Link href="/catalog">
                                 <EditableContent
