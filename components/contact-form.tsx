@@ -13,7 +13,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 
 export function ContactForm() {
     const [hasVenue, setHasVenue] = useState<string>("")
@@ -22,23 +22,48 @@ export function ContactForm() {
     const [budgetRange, setBudgetRange] = useState<string>("")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
-    const router = useRouter()
+    const [validationErrors, setValidationErrors] = useState<string[]>([])
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setIsSubmitting(true)
         setSubmitMessage(null)
+        setValidationErrors([])
 
         const formData = new FormData(e.currentTarget)
 
+        const firstName = (formData.get('first-name') as string)?.trim()
+        const lastName = (formData.get('last-name') as string)?.trim()
+        const email = (formData.get('email') as string)?.trim()
+        const phone = (formData.get('phone') as string)?.trim()
+        const message = (formData.get('message') as string)?.trim()
+        const errors: string[] = []
+
+        if (!firstName) errors.push('First name is required.')
+        if (!lastName) errors.push('Last name is required.')
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('A valid email is required.')
+        if (!phone) errors.push('Phone number is required.')
+        if (!message) errors.push('Please share a short message about your event.')
+
+        if (errors.length > 0) {
+            setValidationErrors(errors)
+            setIsSubmitting(false)
+            return
+        }
+
         const consultationData = {
-            first_name: formData.get('first-name') as string,
-            last_name: formData.get('last-name') as string,
-            customer_name: `${formData.get('first-name')} ${formData.get('last-name')}`,
-            customer_email: formData.get('email') as string,
-            customer_phone: formData.get('phone') as string,
+            first_name: firstName,
+            last_name: lastName,
+            customer_name: `${firstName} ${lastName}`.trim(),
+            customer_email: email,
+            customer_phone: phone,
             event_date: formData.get('event-date') as string || null,
-            number_of_guests: formData.get('guests') ? parseInt(formData.get('guests') as string) : null,
+            number_of_guests: (() => {
+                const guestValue = formData.get('guests') as string
+                if (!guestValue) return null
+                const parsed = parseInt(guestValue, 10)
+                return Number.isFinite(parsed) && parsed > 0 ? parsed : null
+            })(),
             budget_range: budgetRange || null,
             has_venue: hasVenue === 'yes',
             venue_name: hasVenue === 'yes' ? formData.get('venue') as string : null,
@@ -46,7 +71,7 @@ export function ContactForm() {
             caterer_name: hasCaterer === 'yes' ? formData.get('caterer') as string : null,
             has_planner: hasPlanner === 'yes',
             planner_name: hasPlanner === 'yes' ? formData.get('planner') as string : null,
-            message: formData.get('message') as string,
+            message,
             status: 'new_request',
         }
 
@@ -86,12 +111,41 @@ export function ContactForm() {
     }
 
     return (
-        <form className="space-y-6" onSubmit={handleSubmit}>
-            {submitMessage && (
-                <div className={`p-4 rounded-md ${submitMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
-                    {submitMessage.text}
-                </div>
-            )}
+        <motion.form
+            className="space-y-6"
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+        >
+            <AnimatePresence>
+                {submitMessage && (
+                    <motion.div
+                        key={submitMessage.type}
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className={`p-4 rounded-md ${submitMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}
+                    >
+                        {submitMessage.text}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+                {validationErrors.length > 0 && (
+                    <motion.ul
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className="p-4 rounded-md border border-red-200 bg-red-50 text-red-800 space-y-1 text-sm"
+                    >
+                        {validationErrors.map((err) => (
+                            <li key={err}>• {err}</li>
+                        ))}
+                    </motion.ul>
+                )}
+            </AnimatePresence>
 
             <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -167,11 +221,20 @@ export function ContactForm() {
                         <span className="text-sm">No</span>
                     </label>
                 </div>
-                {hasVenue === "yes" && (
-                    <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <Input id="venue" name="venue" placeholder="e.g. The Grand Hotel" />
-                    </div>
-                )}
+                <AnimatePresence>
+                    {hasVenue === "yes" && (
+                        <motion.div
+                            key="venue-input"
+                            initial={{ opacity: 0, y: -8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.2 }}
+                            className="mt-3"
+                        >
+                            <Input id="venue" name="venue" placeholder="e.g. The Grand Hotel" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Caterer Question */}
@@ -201,11 +264,20 @@ export function ContactForm() {
                         <span className="text-sm">No</span>
                     </label>
                 </div>
-                {hasCaterer === "yes" && (
-                    <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <Input id="caterer" name="caterer" placeholder="e.g. Delicious Eats" />
-                    </div>
-                )}
+                <AnimatePresence>
+                    {hasCaterer === "yes" && (
+                        <motion.div
+                            key="caterer-input"
+                            initial={{ opacity: 0, y: -8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.2 }}
+                            className="mt-3"
+                        >
+                            <Input id="caterer" name="caterer" placeholder="e.g. Delicious Eats" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Event Planner Question */}
@@ -235,11 +307,20 @@ export function ContactForm() {
                         <span className="text-sm">No</span>
                     </label>
                 </div>
-                {hasPlanner === "yes" && (
-                    <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <Input id="planner" name="planner" placeholder="Event planner name or company" />
-                    </div>
-                )}
+                <AnimatePresence>
+                    {hasPlanner === "yes" && (
+                        <motion.div
+                            key="planner-input"
+                            initial={{ opacity: 0, y: -8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.2 }}
+                            className="mt-3"
+                        >
+                            <Input id="planner" name="planner" placeholder="Event planner name or company" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             <div className="space-y-2">
@@ -247,9 +328,11 @@ export function ContactForm() {
                 <Textarea id="message" name="message" placeholder="Tell us about your event..." className="min-h-[150px]" />
             </div>
 
-            <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Request Consultation'}
-            </Button>
-        </form>
+            <motion.div whileHover={{ scale: isSubmitting ? 1 : 1.01 }} whileTap={{ scale: isSubmitting ? 1 : 0.99 }}>
+                <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                    {isSubmitting ? 'Submitting...' : 'Request Consultation'}
+                </Button>
+            </motion.div>
+        </motion.form>
     )
 }

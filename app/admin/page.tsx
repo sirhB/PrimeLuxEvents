@@ -6,7 +6,7 @@ import { RevenueChart } from '@/components/admin/dashboard/revenue-chart'
 import { RecentActivityList } from '@/components/admin/dashboard/recent-activity-list'
 import { QuickActionsCard } from '@/components/admin/dashboard/quick-actions-card'
 import { MetricsTrendCard } from '@/components/admin/dashboard/metrics-trend-card'
-import { DollarSign, ShoppingCart, FileText, AlertTriangle } from 'lucide-react'
+import { DollarSign, ShoppingCart, FileText, AlertTriangle, Clock, CalendarCheck2 } from 'lucide-react'
 import { formatCents } from '@/lib/format-money'
 import { useEffect, useState } from 'react'
 
@@ -15,13 +15,17 @@ export default function AdminDashboardPage() {
     const [data, setData] = useState<{
         totalRevenue: number
         orderCount: number
-        newConsultations: number
+        newRequestCount: number
+        pendingResponseCount: number
+        confirmedCount: number
         lowStockProducts: number
         recentOrders: any[]
     }>({
         totalRevenue: 0,
         orderCount: 0,
-        newConsultations: 0,
+        newRequestCount: 0,
+        pendingResponseCount: 0,
+        confirmedCount: 0,
         lowStockProducts: 0,
         recentOrders: []
     })
@@ -51,14 +55,18 @@ export default function AdminDashboardPage() {
             // Calculate metrics
             const totalRevenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0
             const orderCount = orders?.length || 0
-            const newConsultations = consultations?.filter((c) => c.status === 'new_request' || c.status === 'pending_response').length || 0
+            const newRequestCount = consultations?.filter((c) => c.status === 'new_request').length || 0
+            const pendingResponseCount = consultations?.filter((c) => c.status === 'pending_response').length || 0
+            const confirmedCount = consultations?.filter((c) => c.status === 'appointment_confirmed').length || 0
             const lowStockProducts =
                 products?.filter((p) => p.quantity_available - p.quantity_reserved <= 2).length || 0
 
             setData({
                 totalRevenue,
                 orderCount,
-                newConsultations,
+                newRequestCount,
+                pendingResponseCount,
+                confirmedCount,
                 lowStockProducts,
                 recentOrders: recentOrders || []
             })
@@ -90,7 +98,7 @@ export default function AdminDashboardPage() {
     return (
         <div className="flex flex-col gap-6">
             {/* Top Stats Row */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 <StatsCard
                     title="Total Revenue"
                     value={formatCents(data.totalRevenue)}
@@ -106,18 +114,32 @@ export default function AdminDashboardPage() {
                     index={1}
                 />
                 <StatsCard
-                    title="New Consultations"
-                    value={data.newConsultations}
-                    subtitle="Awaiting response"
+                    title="New Requests"
+                    value={data.newRequestCount}
+                    subtitle="Needs team review"
                     icon={FileText}
                     index={2}
+                />
+                <StatsCard
+                    title="Awaiting Client Response"
+                    value={data.pendingResponseCount}
+                    subtitle="Follow up to keep momentum"
+                    icon={Clock}
+                    index={3}
+                />
+                <StatsCard
+                    title="Appointments Confirmed"
+                    value={data.confirmedCount}
+                    subtitle="Locked-in consultations"
+                    icon={CalendarCheck2}
+                    index={4}
                 />
                 <StatsCard
                     title="Low Stock Alerts"
                     value={data.lowStockProducts}
                     subtitle="Products need attention"
                     icon={AlertTriangle}
-                    index={3}
+                    index={5}
                 />
             </div>
 

@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button'
 const sidebarItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
     { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
-    { icon: FileText, label: 'Quotes', href: '/admin/quotes' },
+    { icon: FileText, label: 'Consultations', href: '/admin/consultations' },
     { icon: Package, label: 'Products', href: '/admin/products' },
     { icon: Layers, label: 'Categories', href: '/admin/categories' },
     { icon: Box, label: 'Inventory', href: '/admin/inventory' },

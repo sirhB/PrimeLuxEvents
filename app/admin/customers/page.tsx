@@ -17,7 +17,7 @@ interface Customer {
     name: string
     phone?: string
     orderCount: number
-    quoteCount: number
+    consultationCount: number
     totalSpent: number
     lastOrderDate?: string
 }
@@ -30,13 +30,13 @@ export default async function CustomersPage({
     const { page = '1', search } = await searchParams
     const supabase = await createClient()
 
-    // Aggregate customer data from orders and quotes
+    // Aggregate customer data from orders and consultations
     const { data: orders } = await supabase
         .from('orders')
         .select('customer_name, customer_email, total_amount, created_at')
 
-    const { data: quotes } = await supabase
-        .from('quotes')
+    const { data: consultations } = await supabase
+        .from('consultations')
         .select('customer_name, customer_email, customer_phone, total_amount, created_at')
 
     // Combine and aggregate customer data
@@ -51,7 +51,7 @@ export default async function CustomersPage({
                 email,
                 name: order.customer_name,
                 orderCount: 0,
-                quoteCount: 0,
+                consultationCount: 0,
                 totalSpent: 0,
             })
         }
@@ -65,25 +65,25 @@ export default async function CustomersPage({
         }
     })
 
-    quotes?.forEach((quote) => {
-        const email = quote.customer_email
+    consultations?.forEach((consultation) => {
+        const email = consultation.customer_email
         if (!email) return
 
         if (!customerMap.has(email)) {
             customerMap.set(email, {
                 email,
-                name: quote.customer_name,
-                phone: quote.customer_phone,
+                name: consultation.customer_name,
+                phone: consultation.customer_phone,
                 orderCount: 0,
-                quoteCount: 0,
+                consultationCount: 0,
                 totalSpent: 0,
             })
         }
 
         const customer = customerMap.get(email)!
-        customer.quoteCount++
-        if (quote.customer_phone) {
-            customer.phone = quote.customer_phone
+        customer.consultationCount++
+        if (consultation.customer_phone) {
+            customer.phone = consultation.customer_phone
         }
     })
 
@@ -133,7 +133,7 @@ export default async function CustomersPage({
                                 <TableHead>Email</TableHead>
                                 <TableHead>Phone</TableHead>
                                 <TableHead>Orders</TableHead>
-                                <TableHead>Quotes</TableHead>
+                                <TableHead>Consultations</TableHead>
                                 <TableHead>Total Spent</TableHead>
                                 <TableHead>Last Order</TableHead>
                             </TableRow>
@@ -145,7 +145,7 @@ export default async function CustomersPage({
                                     <TableCell>{customer.email}</TableCell>
                                     <TableCell>{customer.phone || 'N/A'}</TableCell>
                                     <TableCell>{customer.orderCount}</TableCell>
-                                    <TableCell>{customer.quoteCount}</TableCell>
+                                    <TableCell>{customer.consultationCount}</TableCell>
                                     <TableCell className="font-medium">
                                         ${customer.totalSpent.toFixed(2)}
                                     </TableCell>

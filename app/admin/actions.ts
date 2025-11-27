@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { formatCents } from '@/lib/format-money'
 
 export type SearchResult = {
-    type: 'product' | 'order' | 'category' | 'customer' | 'quote' | 'setting' | 'content'
+    type: 'product' | 'order' | 'category' | 'customer' | 'consultation' | 'setting' | 'content'
     id: string
     title: string
     subtitle?: string
@@ -69,21 +69,21 @@ export async function searchAdmin(query: string): Promise<SearchResult[]> {
         )
     }
 
-    // Search Quotes
-    const { data: quotes } = await supabase
-        .from('quotes')
+    // Search Consultations
+    const { data: consultations } = await supabase
+        .from('consultations')
         .select('id, customer_name, customer_email, total_amount, status, created_at')
         .or(`customer_name.ilike.%${query}%,customer_email.ilike.%${query}%`)
         .limit(8)
 
-    if (quotes) {
+    if (consultations) {
         results.push(
-            ...quotes.map((q) => ({
-                type: 'quote' as const,
+            ...consultations.map((q) => ({
+                type: 'consultation' as const,
                 id: q.id,
                 title: `${q.customer_name}`,
                 subtitle: q.customer_email,
-                url: `/admin/quotes/${q.id}`,
+                url: `/admin/consultations/${q.id}`,
                 metadata: {
                     status: q.status,
                     amount: formatCents(q.total_amount),
@@ -112,15 +112,15 @@ export async function searchAdmin(query: string): Promise<SearchResult[]> {
         )
     }
 
-    // Search Customers (aggregate from orders and quotes)
+    // Search Customers (aggregate from orders and consultations)
     const { data: customerOrders } = await supabase
         .from('orders')
         .select('customer_name, customer_email, customer_phone')
         .or(`customer_name.ilike.%${query}%,customer_email.ilike.%${query}%,customer_phone.ilike.%${query}%`)
         .limit(5)
 
-    const { data: customerQuotes } = await supabase
-        .from('quotes')
+    const { data: customerConsultations } = await supabase
+        .from('consultations')
         .select('customer_name, customer_email, customer_phone')
         .or(`customer_name.ilike.%${query}%,customer_email.ilike.%${query}%,customer_phone.ilike.%${query}%`)
         .limit(5)
@@ -138,7 +138,7 @@ export async function searchAdmin(query: string): Promise<SearchResult[]> {
         }
     })
 
-    customerQuotes?.forEach(c => {
+    customerConsultations?.forEach(c => {
         if (c.customer_email && !customerMap.has(c.customer_email)) {
             customerMap.set(c.customer_email, {
                 name: c.customer_name,
