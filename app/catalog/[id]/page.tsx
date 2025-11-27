@@ -284,7 +284,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <span className="text-xl md:text-2xl font-medium text-foreground">
                   {formatCurrency(basePrice)}
                 </span>
-                <span className="text-sm text-muted-foreground font-light">/ day</span>
               </div>
               <p className="text-base text-muted-foreground leading-relaxed">
                 {product.description}
@@ -420,14 +419,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             {/* Pricing Summary */}
             <motion.div variants={itemVariants} className="space-y-6">
               <div className="bg-secondary/5 rounded-xl p-6 space-y-4">
-                <div className="flex justify-between items-center text-lg">
-                  <span className="text-muted-foreground">Daily Rate</span>
-                  <span className="font-medium">{formatCurrency(basePrice)}</span>
-                </div>
                 {modifiersPrice > 0 && (
                   <div className="flex justify-between items-center text-lg">
                     <span className="text-muted-foreground">Customizations</span>
-                    <span className="font-medium text-gold">+{formatCurrency(modifiersPrice)}</span>
+                    <span className="font-medium text-gold">+{formatCurrency(modifiersPrice * quantity)}</span>
                   </div>
                 )}
                 {setupFee > 0 && (
@@ -438,7 +433,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 )}
                 <Separator className="bg-border/40" />
                 <div className="flex justify-between items-center text-xl font-medium">
-                  <span>Total ({quantity} {quantity === 1 ? 'day' : 'days'})</span>
+                  <span>Total</span>
                   <span className="text-gold">{formatCurrency(totalPrice)}</span>
                 </div>
               </div>
