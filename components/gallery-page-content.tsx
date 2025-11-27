@@ -3,6 +3,7 @@
 import GalleryGrid from "@/app/gallery/gallery-grid"
 import { motion } from "framer-motion"
 import { EditableContent } from "@/components/admin/editable-content"
+import { NonEditableOverlay } from "@/components/admin/non-editable-overlay"
 
 interface GalleryPageContentProps {
     content: any
@@ -38,7 +39,9 @@ export function GalleryPageContent({ content, isEditing = false }: GalleryPageCo
                     />
                 </motion.div>
 
-                <GalleryGrid images={images} />
+                <NonEditableOverlay isEditing={isEditing} message="Gallery images are managed in the Content tab">
+                    <GalleryGrid images={images} />
+                </NonEditableOverlay>
             </div>
         </div>
     )

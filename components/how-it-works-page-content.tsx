@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { CheckCircle2, ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { EditableContent } from "@/components/admin/editable-content"
+import { NonEditableOverlay } from "@/components/admin/non-editable-overlay"
 
 interface HowItWorksPageContentProps {
     content: any
@@ -50,53 +51,57 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
             <section className="py-24 bg-background">
                 <div className="container px-4 md:px-6">
                     <div className="grid gap-20 lg:gap-32">
-                        {steps.map((step: any, index: number) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 40 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{ duration: 0.8 }}
-                                className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-center"
-                            >
-                                {/* Image - alternates left/right on desktop */}
-                                <div className={`relative aspect-video lg:aspect-[4/3] bg-secondary rounded-sm overflow-hidden shadow-xl ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
-                                    {step.image && (
-                                        <Image
-                                            src={step.image}
-                                            alt={step.title}
-                                            fill
-                                            className="object-cover hover:scale-105 transition-transform duration-700"
-                                        />
-                                    )}
-                                    <div className="absolute inset-0 border border-white/10 m-4 rounded-sm pointer-events-none" />
-                                </div>
+                        <NonEditableOverlay isEditing={isEditing} message="Steps are managed in the Content tab">
+                            <div className="grid gap-20 lg:gap-32">
+                                {steps.map((step: any, index: number) => (
+                                    <motion.div
+                                        key={index}
+                                        initial={{ opacity: 0, y: 40 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true, margin: "-100px" }}
+                                        transition={{ duration: 0.8 }}
+                                        className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-center"
+                                    >
+                                        {/* Image - alternates left/right on desktop */}
+                                        <div className={`relative aspect-video lg:aspect-[4/3] bg-secondary rounded-sm overflow-hidden shadow-xl ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                                            {step.image && (
+                                                <Image
+                                                    src={step.image}
+                                                    alt={step.title}
+                                                    fill
+                                                    className="object-cover hover:scale-105 transition-transform duration-700"
+                                                />
+                                            )}
+                                            <div className="absolute inset-0 border border-white/10 m-4 rounded-sm pointer-events-none" />
+                                        </div>
 
-                                {/* Content */}
-                                <div className={`space-y-8 ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
-                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gold text-black text-2xl font-serif font-bold shadow-lg shadow-gold/20">
-                                        {index + 1}
-                                    </div>
-                                    <h2 className="text-4xl font-serif text-foreground">{step.title}</h2>
-                                    <p className="text-muted-foreground text-lg leading-relaxed font-light">{step.description}</p>
+                                        {/* Content */}
+                                        <div className={`space-y-8 ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gold text-black text-2xl font-serif font-bold shadow-lg shadow-gold/20">
+                                                {index + 1}
+                                            </div>
+                                            <h2 className="text-4xl font-serif text-foreground">{step.title}</h2>
+                                            <p className="text-muted-foreground text-lg leading-relaxed font-light">{step.description}</p>
 
-                                    <div className="bg-secondary/30 p-8 rounded-sm border border-border/50 hover:border-gold/30 transition-colors">
-                                        <h3 className="font-medium mb-6 flex items-center gap-3 text-lg">
-                                            <CheckCircle2 className="h-6 w-6 text-gold" />
-                                            Key Details
-                                        </h3>
-                                        <ul className="space-y-4">
-                                            {step.details.map((detail: string, idx: number) => (
-                                                <li key={idx} className="text-muted-foreground text-base flex items-start gap-3">
-                                                    <span className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 shrink-0" />
-                                                    {detail}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                            <div className="bg-secondary/30 p-8 rounded-sm border border-border/50 hover:border-gold/30 transition-colors">
+                                                <h3 className="font-medium mb-6 flex items-center gap-3 text-lg">
+                                                    <CheckCircle2 className="h-6 w-6 text-gold" />
+                                                    Key Details
+                                                </h3>
+                                                <ul className="space-y-4">
+                                                    {step.details.map((detail: string, idx: number) => (
+                                                        <li key={idx} className="text-muted-foreground text-base flex items-start gap-3">
+                                                            <span className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 shrink-0" />
+                                                            {detail}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </NonEditableOverlay>
                     </div>
                 </div>
             </section>
@@ -218,14 +223,16 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                         />
                     </motion.div>
 
-                    <Accordion type="single" collapsible className="w-full space-y-4">
-                        {faqs.map((faq: any, index: number) => (
-                            <AccordionItem key={index} value={`item-${index}`} className="border border-border/50 rounded-lg px-4 data-[state=open]:border-gold/50 transition-colors">
-                                <AccordionTrigger className="text-lg font-medium hover:text-gold transition-colors py-6">{faq.question}</AccordionTrigger>
-                                <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">{faq.answer}</AccordionContent>
-                            </AccordionItem>
-                        ))}
-                    </Accordion>
+                    <NonEditableOverlay isEditing={isEditing} message="FAQs are managed in the Content tab">
+                        <Accordion type="single" collapsible className="w-full space-y-4">
+                            {faqs.map((faq: any, index: number) => (
+                                <AccordionItem key={index} value={`item-${index}`} className="border border-border/50 rounded-lg px-4 data-[state=open]:border-gold/50 transition-colors">
+                                    <AccordionTrigger className="text-lg font-medium hover:text-gold transition-colors py-6">{faq.question}</AccordionTrigger>
+                                    <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">{faq.answer}</AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
+                    </NonEditableOverlay>
 
                     <div className="mt-16 text-center">
                         <Button asChild variant="outline" size="lg" className="h-12 px-8 rounded-full border-border/50 hover:border-gold hover:text-gold transition-colors">

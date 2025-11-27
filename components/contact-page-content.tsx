@@ -4,6 +4,7 @@ import { MapPin, Phone, Mail } from "lucide-react"
 import { ContactForm } from "@/components/contact-form"
 import { motion } from "framer-motion"
 import { EditableContent } from "@/components/admin/editable-content"
+import { NonEditableOverlay } from "@/components/admin/non-editable-overlay"
 
 interface ContactPageContentProps {
     content: any
@@ -110,12 +111,14 @@ export function ContactPageContent({ content, isEditing = false }: ContactPageCo
                             </div>
                         </div>
 
-                        <div className="h-64 w-full bg-secondary rounded-sm overflow-hidden relative border border-border/50">
-                            {/* Map Placeholder */}
-                            <div className="absolute inset-0 flex items-center justify-center bg-muted-foreground/5">
-                                <span className="text-muted-foreground font-medium uppercase tracking-widest">Map View</span>
+                        <NonEditableOverlay isEditing={isEditing} message="Map configuration is managed in settings">
+                            <div className="h-64 w-full bg-secondary rounded-sm overflow-hidden relative border border-border/50">
+                                {/* Map Placeholder */}
+                                <div className="absolute inset-0 flex items-center justify-center bg-muted-foreground/5">
+                                    <span className="text-muted-foreground font-medium uppercase tracking-widest">Map View</span>
+                                </div>
                             </div>
-                        </div>
+                        </NonEditableOverlay>
                     </motion.div>
 
                     {/* Contact Form */}
@@ -132,7 +135,9 @@ export function ContactPageContent({ content, isEditing = false }: ContactPageCo
                             as="h2"
                             className="text-3xl font-serif mb-8 text-foreground"
                         />
-                        <ContactForm />
+                        <NonEditableOverlay isEditing={isEditing} message="Contact form fields are managed in settings">
+                            <ContactForm />
+                        </NonEditableOverlay>
                     </motion.div>
                 </div>
             </div>
