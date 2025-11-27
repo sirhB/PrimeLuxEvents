@@ -139,7 +139,7 @@ export function EditableList({
                 <Button
                     onClick={() => setIsAddingNew(true)}
                     variant="outline"
-                    className="w-full border-dashed border-2 border-gold/30 hover:border-gold hover:bg-gold/5 h-16"
+                    className="w-full border-dashed border-2 border-gold/30 hover:border-gold hover:bg-gold/5 h-16 text-black"
                 >
                     <Plus className="w-5 h-5 mr-2" />
                     Add New Item

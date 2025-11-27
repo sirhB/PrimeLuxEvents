@@ -129,16 +129,16 @@ export function EditableContent({
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="bg-background p-4 rounded-lg w-full max-w-md space-y-4">
-                                <h3 className="font-medium">Edit Image URL</h3>
+                                <h3 className="font-medium text-black">Edit Image URL</h3>
                                 <input
                                     type="text"
                                     value={tempValue}
                                     onChange={(e) => setTempValue(e.target.value)}
-                                    className="w-full p-2 border rounded-md bg-background"
+                                    className="w-full p-2 border rounded-md bg-background text-black"
                                     placeholder="Enter image URL"
                                 />
                                 <div className="flex justify-end gap-2">
-                                    <Button size="sm" variant="outline" onClick={handleCancel} disabled={isSaving}>
+                                    <Button size="sm" variant="outline" onClick={handleCancel} disabled={isSaving} className="text-black">
                                         Cancel
                                     </Button>
                                     <Button size="sm" onClick={handleSave} disabled={isSaving}>
@@ -167,7 +167,7 @@ export function EditableContent({
                             value={tempValue}
                             onChange={(e) => setTempValue(e.target.value)}
                             className={cn(
-                                "w-full p-2 border-2 border-primary rounded-md bg-background text-foreground min-h-[100px] outline-none ring-2 ring-primary/20",
+                                "w-full p-2 border-2 border-primary rounded-md bg-background text-black min-h-[100px] outline-none ring-2 ring-primary/20",
                                 className
                             )}
                             onKeyDown={(e) => {
@@ -183,7 +183,7 @@ export function EditableContent({
                             value={tempValue}
                             onChange={(e) => setTempValue(e.target.value)}
                             className={cn(
-                                "w-full p-1 border-2 border-primary rounded-md bg-background text-foreground outline-none ring-2 ring-primary/20",
+                                "w-full p-1 border-2 border-primary rounded-md bg-background text-black outline-none ring-2 ring-primary/20",
                                 className
                             )}
                             onKeyDown={(e) => {

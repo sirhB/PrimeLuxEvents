@@ -58,7 +58,7 @@ export function VisualEditorNav({ activePage, onPageChange, onNavigateToLanding 
                         <Menu className="w-4 h-4" />
                         <span className="text-sm font-medium">Pages</span>
                         <div className="w-px h-4 bg-white/20 mx-1" />
-                        <span className="text-xs text-white/60 uppercase tracking-wider">
+                        <span className="text-xs text-white/90 uppercase tracking-wider">
                             {pages.find(p => p.id === activePage)?.label}
                         </span>
                     </motion.button>
@@ -77,7 +77,7 @@ export function VisualEditorNav({ activePage, onPageChange, onNavigateToLanding 
                                             onNavigateToLanding()
                                             setIsOpen(false)
                                         }}
-                                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/10 transition-colors text-left"
+                                        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-white/80 hover:text-white hover:bg-white/10 transition-colors text-left"
                                     >
                                         <Grid className="w-4 h-4" />
                                         All Pages
@@ -98,7 +98,7 @@ export function VisualEditorNav({ activePage, onPageChange, onNavigateToLanding 
                                                 }}
                                                 className={cn(
                                                     "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left",
-                                                    isActive ? "bg-gold/20 text-gold" : "text-white/60 hover:text-white hover:bg-white/10"
+                                                    isActive ? "bg-gold/20 text-gold" : "text-white/80 hover:text-white hover:bg-white/10"
                                                 )}
                                             >
                                                 <Icon className="w-4 h-4" />

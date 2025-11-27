@@ -70,12 +70,12 @@ export function VisualEditorLanding({ onSelectPage }: VisualEditorLandingProps) 
                 <div className="inline-flex items-center justify-center p-3 rounded-full bg-gold/10 text-gold mb-4 ring-1 ring-gold/20">
                     <LayoutTemplate className="w-6 h-6" />
                 </div>
-                <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-tight">Visual Editor</h1>
-                <p className="text-lg text-muted-foreground max-w-lg mx-auto font-light">
+                <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-tight text-black">Visual Editor</h1>
+                <p className="text-lg text-gray-700 max-w-lg mx-auto font-light">
                     Select a page to start editing content inline. What you see is what you get.
                 </p>
 
-                <Button asChild variant="outline" className="mt-8 border-border/50 hover:bg-secondary/50">
+                <Button asChild variant="outline" className="mt-8 border-border/50 hover:bg-secondary/50 text-black">
                     <Link href="/admin/content">
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         Back to Dashboard
@@ -105,8 +105,8 @@ export function VisualEditorLanding({ onSelectPage }: VisualEditorLandingProps) 
                                 </div>
 
                                 <div>
-                                    <h3 className="text-xl font-serif font-medium mb-2 group-hover:text-gold transition-colors">{page.label}</h3>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                    <h3 className="text-xl font-serif font-medium mb-2 text-black group-hover:text-gold transition-colors">{page.label}</h3>
+                                    <p className="text-sm text-gray-700 leading-relaxed">
                                         {page.description}
                                     </p>
                                 </div>

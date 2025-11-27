@@ -94,7 +94,7 @@ export function EditableListItem({
                         value={value}
                         onChange={(e) => handleFieldChange(key, e.target.value)}
                         placeholder={config.placeholder}
-                        className="min-h-[100px]"
+                        className="min-h-[100px] text-black"
                     />
                 )
             case 'array':
@@ -103,7 +103,7 @@ export function EditableListItem({
                         value={Array.isArray(value) ? value.join('\n') : ''}
                         onChange={(e) => handleFieldChange(key, e.target.value.split('\n').filter(Boolean))}
                         placeholder={config.placeholder || "One item per line"}
-                        className="min-h-[100px] font-mono text-sm"
+                        className="min-h-[100px] font-mono text-sm text-black"
                     />
                 )
             default:
@@ -112,6 +112,7 @@ export function EditableListItem({
                         value={value}
                         onChange={(e) => handleFieldChange(key, e.target.value)}
                         placeholder={config.placeholder}
+                        className="text-black"
                     />
                 )
         }
@@ -127,7 +128,7 @@ export function EditableListItem({
                 className="bg-background border-2 border-gold/50 rounded-lg p-6 space-y-4"
             >
                 <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wider">
+                    <h4 className="font-medium text-sm text-black uppercase tracking-wider">
                         {isNew ? 'New Item' : `Edit Item ${index + 1}`}
                     </h4>
                     <div className="flex gap-2">
@@ -135,7 +136,7 @@ export function EditableListItem({
                             <Check className="w-4 h-4 mr-1" />
                             Save
                         </Button>
-                        <Button onClick={handleCancel} size="sm" variant="outline">
+                        <Button onClick={handleCancel} size="sm" variant="outline" className="text-black border-border/50 hover:bg-secondary/50">
                             <X className="w-4 h-4 mr-1" />
                             Cancel
                         </Button>
@@ -145,7 +146,7 @@ export function EditableListItem({
                 <div className="grid gap-4">
                     {Object.entries(schema).map(([key, config]) => (
                         <div key={key} className="space-y-2">
-                            <Label htmlFor={`${id}-${key}`} className="text-sm font-medium">
+                            <Label htmlFor={`${id}-${key}`} className="text-sm font-medium text-black">
                                 {config.label}
                             </Label>
                             {renderField(key, config)}
