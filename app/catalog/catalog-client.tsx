@@ -360,183 +360,6 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             </motion.div>
                         )}
 
-                        {/* Default Category Browse View */}
-                        {!selectedCategory && !searchQuery && (
-                            <>
-                                {/* Desktop Category Grid */}
-                                <div className="hidden lg:block">
-                                    <div className="mb-8">
-                                        <h2 className="text-2xl md:text-3xl font-serif mb-8 text-foreground">
-                                            Browse Categories
-                                        </h2>
-                                    </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-                                        {orderedCategories.map((category, index) => (
-                                            <motion.div
-                                                    key={category.id}
-                                                initial={{ opacity: 0, scale: 0.9 }}
-                                                whileInView={{ opacity: 1, scale: 1 }}
-                                                viewport={{ once: true, margin: "-50px" }}
-                                                transition={{ duration: 0.5, delay: index * 0.05 }}
-                                            >
-                                                <CategoryCard
-                                                    name={category.name}
-                                                    imageUrl={category.image_url}
-                                                    onClick={() => handleCategoryClick(category.name)}
-                                                />
-                                                </motion.div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Mobile Category Navigation */}
-                                <div className="lg:hidden">
-                                    <div className="mb-8">
-                                        <h2 className="text-xl md:text-2xl font-serif mb-6 text-foreground">
-                                            Browse Categories
-                                        </h2>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {orderedCategories.slice(0, 6).map((category, index) => (
-                                            <motion.div
-                                                key={category.id}
-                                                initial={{ opacity: 0, scale: 0.9 }}
-                                                whileInView={{ opacity: 1, scale: 1 }}
-                                                viewport={{ once: true }}
-                                                transition={{ duration: 0.4, delay: index * 0.1 }}
-                                            >
-                                                <CategoryCard
-                                                    name={category.name}
-                                                    imageUrl={category.image_url}
-                                                    onClick={() => handleCategoryClick(category.name)}
-                                                />
-                                            </motion.div>
-                                        ))}
-                                    </div>
-                                    {orderedCategories.length > 6 && (
-                                        <div className="mt-6 text-center">
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setIsSidebarOpen(true)}
-                                                className="rounded-full border-border/50"
-                                            >
-                                                View All Categories ({orderedCategories.length})
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            </>
-                        )}
-
-                        {/* Products Grid/Masonry with Sidebar */}
-                        {(selectedCategory || searchQuery) && (
-                            <div className="flex gap-8">
-                                {/* Category Sidebar */}
-                                <aside className="hidden lg:block w-64 flex-shrink-0">
-                                    <div className="sticky top-32 space-y-4">
-                                        <h3 className="text-lg font-serif font-medium text-foreground mb-4">
-                                            Browse Categories
-                                        </h3>
-                                        <nav className="space-y-2">
-                                            <button
-                                                className={cn(
-                                                    "w-full text-left px-3 py-2 rounded-lg transition-all duration-200 text-sm",
-                                                    !selectedCategory
-                                                        ? "bg-gold/10 text-gold font-medium"
-                                                        : "hover:bg-secondary/30 hover:text-foreground"
-                                                )}
-                                                onClick={handleBackToCatalog}
-                                            >
-                                                All Categories
-                                            </button>
-                                            {orderedCategories.map((category) => (
-                                                <button
-                                                    key={category.id}
-                                                    className={cn(
-                                                        "w-full text-left px-3 py-2 rounded-lg transition-all duration-200 text-sm",
-                                                        selectedCategory === category.name
-                                                            ? "bg-gold/10 text-gold font-medium"
-                                                            : "hover:bg-secondary/30 hover:text-foreground"
-                                                    )}
-                                                    onClick={() => handleCategoryClick(category.name)}
-                                                >
-                                                    {category.name}
-                                                </button>
-                                            ))}
-                                        </nav>
-                                    </div>
-                                </aside>
-
-                                {/* Products Grid */}
-                                <div className="flex-1">
-                                    {filteredProducts.length > 0 ? (
-                                        <motion.div
-                                            layout
-                                            className={cn(
-                                                "transition-all duration-500",
-                                                viewMode === 'grid'
-                                                    ? "grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
-                                                    : "columns-1 xs:columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 sm:gap-6 md:gap-8 space-y-4 sm:space-y-6 md:space-y-8"
-                                            )}
-                                        >
-                                            {filteredProducts.map((product, index) => (
-                                                <motion.div
-                                                    key={product.id}
-                                                    layout
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{
-                                                        duration: 0.5,
-                                                        delay: Math.min(index * 0.03, 0.2), // Faster, capped delay for better performance
-                                                        layout: { duration: 0.3 }
-                                                    }}
-                                                    className={cn(
-                                                        viewMode === 'masonry' && "break-inside-avoid mb-4 sm:mb-6 md:mb-8",
-                                                        "w-full" // Ensure full width in grid mode
-                                                    )}
-                                                >
-                                                    <ProductCard product={product} />
-                                                </motion.div>
-                                            ))}
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0.9 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            className="text-center py-20 md:py-32"
-                                        >
-                                            <div className="max-w-md mx-auto">
-                                                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                                                    <Search className="h-8 w-8 text-muted-foreground" />
-                                                </div>
-                                                <h3 className="text-xl md:text-2xl font-serif mb-4 text-foreground">
-                                                    No products found
-                                                </h3>
-                                                <p className="text-muted-foreground mb-8">
-                                                    {selectedCategory
-                                                        ? `We don't have any products in the ${selectedCategory} category yet.`
-                                                        : searchQuery
-                                                            ? `No products match your search for "${searchQuery}".`
-                                                            : "No products available at the moment."
-                                                    }
-                                                </p>
-                                                {(selectedCategory || searchQuery) && (
-                                                    <Button
-                                                        onClick={handleBackToCatalog}
-                                                        variant="outline"
-                                                        className="rounded-full"
-                                                    >
-                                                        Browse All Categories
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-
                         {/* Featured Sections (only on main catalog page) */}
                         {!selectedCategory && !searchQuery && (
                             <>
@@ -619,7 +442,185 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 </motion.section>
                                 )}
                             </>
-                            )}
+                        )}
+
+                        {/* Default Category Browse View */}
+                        {!selectedCategory && !searchQuery && (
+                            <>
+                                {/* Desktop Category Grid */}
+                            <div className="hidden lg:block">
+                                <div className="mb-8">
+                                    <h2 className="text-2xl md:text-3xl font-serif mb-8 text-foreground">
+                                        Browse Categories
+                                    </h2>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                                    {orderedCategories.map((category, index) => (
+                                        <motion.div
+                                                key={category.id}
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            whileInView={{ opacity: 1, scale: 1 }}
+                                            viewport={{ once: true, margin: "-50px" }}
+                                            transition={{ duration: 0.5, delay: index * 0.05 }}
+                                        >
+                                            <CategoryCard
+                                                name={category.name}
+                                                imageUrl={category.image_url}
+                                                onClick={() => handleCategoryClick(category.name)}
+                                            />
+                                            </motion.div>
+                                    ))}
+                                </div>
+                            </div>
+
+                        {/* Mobile Category Navigation */}
+                            <div className="lg:hidden">
+                                <div className="mb-8">
+                                    <h2 className="text-xl md:text-2xl font-serif mb-6 text-foreground">
+                                        Browse Categories
+                                    </h2>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {orderedCategories.slice(0, 6).map((category, index) => (
+                                        <motion.div
+                                            key={category.id}
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            whileInView={{ opacity: 1, scale: 1 }}
+                                            viewport={{ once: true }}
+                                            transition={{ duration: 0.4, delay: index * 0.1 }}
+                                        >
+                                            <CategoryCard
+                                                name={category.name}
+                                                imageUrl={category.image_url}
+                                                onClick={() => handleCategoryClick(category.name)}
+                                            />
+                                        </motion.div>
+                                    ))}
+                                </div>
+                                {orderedCategories.length > 6 && (
+                                    <div className="mt-6 text-center">
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setIsSidebarOpen(true)}
+                                            className="rounded-full border-border/50"
+                                        >
+                                            View All Categories ({orderedCategories.length})
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                            </>
+                        )}
+
+                        {/* Products Grid/Masonry with Sidebar */}
+                        {(selectedCategory || searchQuery) && (
+                            <div className="flex gap-8">
+                                {/* Category Sidebar */}
+                                <aside className="hidden lg:block w-64 flex-shrink-0">
+                                    <div className="sticky top-32 space-y-4">
+                                        <h3 className="text-lg font-serif font-medium text-foreground mb-4">
+                                            Browse Categories
+                                        </h3>
+                                        <nav className="space-y-2">
+                                            <button
+                                                className={cn(
+                                                    "w-full text-left px-3 py-2 rounded-lg transition-all duration-200 text-sm",
+                                                    !selectedCategory
+                                                        ? "bg-gold/10 text-gold font-medium"
+                                                        : "hover:bg-secondary/30 hover:text-foreground"
+                                                )}
+                                                onClick={handleBackToCatalog}
+                                            >
+                                                All Categories
+                                            </button>
+                                            {orderedCategories.map((category) => (
+                                                <button
+                                                    key={category.id}
+                                                    className={cn(
+                                                        "w-full text-left px-3 py-2 rounded-lg transition-all duration-200 text-sm",
+                                                        selectedCategory === category.name
+                                                            ? "bg-gold/10 text-gold font-medium"
+                                                            : "hover:bg-secondary/30 hover:text-foreground"
+                                                    )}
+                                                    onClick={() => handleCategoryClick(category.name)}
+                                                >
+                                                    {category.name}
+                                                </button>
+                                            ))}
+                                        </nav>
+                                    </div>
+                                </aside>
+
+                                {/* Products Grid */}
+                                <div className="flex-1">
+                                    {filteredProducts.length > 0 ? (
+                            <motion.div
+                                layout
+                                className={cn(
+                                    "transition-all duration-500",
+                                    viewMode === 'grid'
+                                                    ? "grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
+                                                    : "columns-1 xs:columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 sm:gap-6 md:gap-8 space-y-4 sm:space-y-6 md:space-y-8"
+                                )}
+                            >
+                                {filteredProducts.map((product, index) => (
+                                    <motion.div
+                                        key={product.id}
+                                        layout
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{
+                                            duration: 0.5,
+                                            delay: Math.min(index * 0.03, 0.2), // Faster, capped delay for better performance
+                                            layout: { duration: 0.3 }
+                                        }}
+                                        className={cn(
+                                            viewMode === 'masonry' && "break-inside-avoid mb-4 sm:mb-6 md:mb-8",
+                                            "w-full" // Ensure full width in grid mode
+                                        )}
+                                    >
+                                        <ProductCard product={product} />
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                                    ) : (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="text-center py-20 md:py-32"
+                            >
+                                <div className="max-w-md mx-auto">
+                                    <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <Search className="h-8 w-8 text-muted-foreground" />
+                                    </div>
+                                    <h3 className="text-xl md:text-2xl font-serif mb-4 text-foreground">
+                                        No products found
+                                    </h3>
+                                    <p className="text-muted-foreground mb-8">
+                                        {selectedCategory
+                                            ? `We don't have any products in the ${selectedCategory} category yet.`
+                                            : searchQuery
+                                                ? `No products match your search for "${searchQuery}".`
+                                                : "No products available at the moment."
+                                        }
+                                    </p>
+                                    {(selectedCategory || searchQuery) && (
+                                        <Button
+                                            onClick={handleBackToCatalog}
+                                            variant="outline"
+                                            className="rounded-full"
+                                        >
+                                                        Browse All Categories
+                                        </Button>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+
                         </motion.div>
                 </AnimatePresence>
             </div>
