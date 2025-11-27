@@ -134,14 +134,14 @@ export function EditableContent({
                                     type="text"
                                     value={tempValue}
                                     onChange={(e) => setTempValue(e.target.value)}
-                                    className="w-full p-2 border rounded-md bg-background text-black"
+                                    className="w-full p-2 border rounded-md bg-white text-black"
                                     placeholder="Enter image URL"
                                 />
                                 <div className="flex justify-end gap-2">
                                     <Button size="sm" variant="outline" onClick={handleCancel} disabled={isSaving} className="text-black">
                                         Cancel
                                     </Button>
-                                    <Button size="sm" onClick={handleSave} disabled={isSaving}>
+                                    <Button size="sm" onClick={handleSave} disabled={isSaving} className="bg-gold text-black hover:bg-gold/90">
                                         {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save"}
                                     </Button>
                                 </div>
@@ -167,7 +167,7 @@ export function EditableContent({
                             value={tempValue}
                             onChange={(e) => setTempValue(e.target.value)}
                             className={cn(
-                                "w-full p-2 border-2 border-primary rounded-md bg-background text-black min-h-[100px] outline-none ring-2 ring-primary/20",
+                                "w-full p-2 border-2 border-primary rounded-md bg-white text-black min-h-[100px] outline-none ring-2 ring-primary/20",
                                 className
                             )}
                             onKeyDown={(e) => {
@@ -183,7 +183,7 @@ export function EditableContent({
                             value={tempValue}
                             onChange={(e) => setTempValue(e.target.value)}
                             className={cn(
-                                "w-full p-1 border-2 border-primary rounded-md bg-background text-black outline-none ring-2 ring-primary/20",
+                                "w-full p-1 border-2 border-primary rounded-md bg-white text-black outline-none ring-2 ring-primary/20",
                                 className
                             )}
                             onKeyDown={(e) => {

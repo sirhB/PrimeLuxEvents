@@ -94,7 +94,7 @@ export function EditableListItem({
                         value={value}
                         onChange={(e) => handleFieldChange(key, e.target.value)}
                         placeholder={config.placeholder}
-                        className="min-h-[100px] text-black"
+                        className="min-h-[100px] text-black bg-white"
                     />
                 )
             case 'array':
@@ -103,7 +103,7 @@ export function EditableListItem({
                         value={Array.isArray(value) ? value.join('\n') : ''}
                         onChange={(e) => handleFieldChange(key, e.target.value.split('\n').filter(Boolean))}
                         placeholder={config.placeholder || "One item per line"}
-                        className="min-h-[100px] font-mono text-sm text-black"
+                        className="min-h-[100px] font-mono text-sm text-black bg-white"
                     />
                 )
             default:
@@ -112,7 +112,7 @@ export function EditableListItem({
                         value={value}
                         onChange={(e) => handleFieldChange(key, e.target.value)}
                         placeholder={config.placeholder}
-                        className="text-black"
+                        className="text-black bg-white"
                     />
                 )
         }
@@ -202,13 +202,13 @@ export function EditableListItem({
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Item?</AlertDialogTitle>
+                        <AlertDialogTitle className="text-black">Delete Item?</AlertDialogTitle>
                         <AlertDialogDescription>
                             This action cannot be undone. This will permanently delete this item.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="text-black">Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={onDelete} className="bg-red-600 hover:bg-red-700">
                             Delete
                         </AlertDialogAction>
