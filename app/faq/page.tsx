@@ -2,12 +2,27 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { getSiteContent } from "@/lib/content"
 import { motion } from "framer-motion"
 import { HelpCircle, MessageCircle, Clock } from "lucide-react"
-import { EditableContent } from "@/components/admin/editable-content"
-import { EditableList } from "@/components/admin/editable-list"
 
 export default async function FAQPage() {
   const content = await getSiteContent()
-  const faqs = content['faq.list'] || []
+  const faqs = content['faq.list'] || [
+    {
+      question: "How far in advance should I book?",
+      answer: "We recommend booking as soon as you have your date and venue secured. For peak seasons (spring and fall), we suggest booking 6-9 months in advance to ensure availability of your desired items."
+    },
+    {
+      question: "How long is the rental period?",
+      answer: "Our standard rental period is 24 hours. We typically deliver on the day of the event and pick up the following day."
+    },
+    {
+      question: "Do you offer delivery and setup?",
+      answer: "We offer professional delivery to your venue. Standard delivery includes drop-off at a designated area. Full setup and installation is available for an additional fee."
+    },
+    {
+      question: "What is your cancellation policy?",
+      answer: "Orders cancelled more than 30 days prior to the event date are eligible for a full refund less a 10% administrative fee. Cancellations made within 30 days of the event are subject to a 50% cancellation fee."
+    }
+  ]
 
   return (
     <>
@@ -38,28 +53,23 @@ export default async function FAQPage() {
               Frequently Asked Questions
             </motion.div>
 
-            <EditableContent
-              contentKey="faq.hero.title"
-              initialValue={content['faq.hero.title']}
-              isEditing={false}
-              as={motion.h1}
+            <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-6xl md:text-8xl font-serif font-light tracking-tight text-foreground text-center mb-6"
-            />
+            >
+              {content['faq.hero.title'] || 'Frequently Asked Questions'}
+            </motion.h1>
 
-            <EditableContent
-              contentKey="faq.hero.description"
-              initialValue={content['faq.hero.description']}
-              type="textarea"
-              isEditing={false}
-              as={motion.p}
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
               className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto text-center mb-12"
-            />
+            >
+              {content['faq.hero.description'] || 'Everything you need to know about renting with PrimeLux Events.'}
+            </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -129,15 +139,8 @@ export default async function FAQPage() {
             </p>
           </motion.div>
 
-          <EditableList
-            contentKey="faq.list"
-            items={faqs}
-            isEditing={false}
-            itemSchema={{
-              question: { type: 'text', label: 'Question', placeholder: 'Enter question' },
-              answer: { type: 'textarea', label: 'Answer', placeholder: 'Enter answer' }
-            }}
-            renderItem={(faq: any, index: number) => (
+          {faqs && faqs.length > 0 ? (
+            faqs.map((faq: any, index: number) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -145,7 +148,7 @@ export default async function FAQPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Accordion type="single" collapsible className="w-full" key={index}>
+                <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value={`item-${index}`} className="border border-border/40 rounded-xl px-6 bg-background/50 backdrop-blur-sm shadow-lg hover:shadow-gold/5 mb-6 data-[state=open]:border-gold/30 transition-all duration-300">
                     <AccordionTrigger className="text-lg md:text-xl font-medium hover:text-gold transition-colors py-8 text-left">
                       {faq.question}
@@ -156,21 +159,20 @@ export default async function FAQPage() {
                   </AccordionItem>
                 </Accordion>
               </motion.div>
-            )}
-            emptyState={
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-20"
-              >
-                <div className="max-w-md mx-auto">
-                  <HelpCircle className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
-                  <h3 className="text-xl font-serif mb-2">No FAQs found</h3>
-                  <p className="text-muted-foreground">Check back soon for frequently asked questions.</p>
-                </div>
-              </motion.div>
-            }
-          />
+            ))
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-20"
+            >
+              <div className="max-w-md mx-auto">
+                <HelpCircle className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
+                <h3 className="text-xl font-serif mb-2">No FAQs found</h3>
+                <p className="text-muted-foreground">Check back soon for frequently asked questions.</p>
+              </div>
+            </motion.div>
+          )}
         </div>
       </section>
     </>
