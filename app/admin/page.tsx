@@ -1,12 +1,9 @@
-'use client'
-
 import { createClient } from '@/lib/supabase/client'
 import { StatsCard } from '@/components/admin/dashboard/stats-card'
 import { RevenueChart } from '@/components/admin/dashboard/revenue-chart'
 import { RecentActivityList } from '@/components/admin/dashboard/recent-activity-list'
-import { QuickActionsCard } from '@/components/admin/dashboard/quick-actions-card'
-import { MetricsTrendCard } from '@/components/admin/dashboard/metrics-trend-card'
-import { DollarSign, ShoppingCart, FileText, AlertTriangle, Clock, CalendarCheck2 } from 'lucide-react'
+import { PromoCard } from '@/components/admin/dashboard/promo-card'
+import { Box, ClipboardList, XCircle, Trophy, CalendarCheck2 } from 'lucide-react'
 import { formatCents } from '@/lib/format-money'
 import { useEffect, useState } from 'react'
 
@@ -77,69 +74,65 @@ export default function AdminDashboardPage() {
 
     // Prepare chart data
     const revenueData = [
-        { name: 'Mon', total: data.totalRevenue * 0.1 },
-        { name: 'Tue', total: data.totalRevenue * 0.2 },
-        { name: 'Wed', total: data.totalRevenue * 0.15 },
-        { name: 'Thu', total: data.totalRevenue * 0.3 },
-        { name: 'Fri', total: data.totalRevenue * 0.25 },
-    ]
-
-    const trendData = [
-        { value: 10 },
-        { value: 15 },
-        { value: 12 },
-        { value: 20 },
-        { value: 18 },
-        { value: 25 },
-        { value: 22 },
-        { value: 30 },
+        { name: 'Jan', total: data.totalRevenue * 0.1 },
+        { name: 'Feb', total: data.totalRevenue * 0.15 },
+        { name: 'Mar', total: data.totalRevenue * 0.12 },
+        { name: 'Apr', total: data.totalRevenue * 0.2 },
+        { name: 'May', total: data.totalRevenue * 0.18 },
+        { name: 'Jun', total: data.totalRevenue * 0.25 },
+        { name: 'Jul', total: data.totalRevenue * 0.22 },
+        { name: 'Aug', total: data.totalRevenue * 0.3 },
+        { name: 'Sep', total: data.totalRevenue * 0.28 },
+        { name: 'Oct', total: data.totalRevenue * 0.35 },
+        { name: 'Nov', total: data.totalRevenue * 0.32 },
+        { name: 'Dec', total: data.totalRevenue * 0.4 },
     ]
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 p-6 bg-[var(--dashboard-background)] min-h-screen">
+            {/* Header Section */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold text-[var(--dashboard-text)] font-serif">Good Morning, Jonathan!</h1>
+                    <p className="text-[var(--dashboard-text-muted)] font-sans">Here's what's happening with your store today</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
+                        <CalendarCheck2 className="h-4 w-4 text-[var(--dashboard-text-muted)]" />
+                        <span className="text-sm font-medium">14 Aug 2023</span>
+                    </div>
+                </div>
+            </div>
+
             {/* Top Stats Row */}
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                 <StatsCard
-                    title="Total Revenue"
-                    value={formatCents(data.totalRevenue)}
-                    subtitle="All time"
-                    icon={DollarSign}
+                    title="Total products"
+                    value={data.lowStockProducts + 120} // Mock total
+                    subtitle="+2.5%"
+                    icon={Box}
                     index={0}
                 />
                 <StatsCard
-                    title="Total Orders"
+                    title="Completed order"
                     value={data.orderCount}
-                    subtitle="All time"
-                    icon={ShoppingCart}
+                    subtitle="+2.5%"
+                    icon={ClipboardList}
                     index={1}
                 />
                 <StatsCard
-                    title="New Requests"
-                    value={data.newRequestCount}
-                    subtitle="Needs team review"
-                    icon={FileText}
+                    title="Canceled order"
+                    value={14} // Mock
+                    subtitle="-1.5%"
+                    icon={XCircle}
                     index={2}
                 />
                 <StatsCard
-                    title="Awaiting Client Response"
-                    value={data.pendingResponseCount}
-                    subtitle="Follow up to keep momentum"
-                    icon={Clock}
+                    title="Top products"
+                    value={119} // Mock
+                    subtitle="+2.5%"
+                    icon={Trophy}
                     index={3}
-                />
-                <StatsCard
-                    title="Appointments Confirmed"
-                    value={data.confirmedCount}
-                    subtitle="Locked-in consultations"
-                    icon={CalendarCheck2}
-                    index={4}
-                />
-                <StatsCard
-                    title="Low Stock Alerts"
-                    value={data.lowStockProducts}
-                    subtitle="Products need attention"
-                    icon={AlertTriangle}
-                    index={5}
                 />
             </div>
 
@@ -147,23 +140,19 @@ export default function AdminDashboardPage() {
             <div className="grid gap-6 md:grid-cols-12">
                 {/* Left Column (Charts) */}
                 <div className="md:col-span-8 flex flex-col gap-6">
-                    <div className="h-[300px]">
+                    <div className="h-[400px]">
                         <RevenueChart data={revenueData} />
                     </div>
-                    <div className="grid gap-6 md:grid-cols-2">
-                        <MetricsTrendCard
-                            title="Completed Tasks"
-                            value={data.orderCount}
-                            data={trendData}
-                            trend="+10% today"
-                        />
-                        <QuickActionsCard />
+                    <div className="h-full">
+                        <RecentActivityList orders={data.recentOrders} />
                     </div>
                 </div>
 
-                {/* Right Column (Recent Activity) */}
-                <div className="md:col-span-4">
-                    <RecentActivityList orders={data.recentOrders} />
+                {/* Right Column (Promo & Extra) */}
+                <div className="md:col-span-4 flex flex-col gap-6">
+                    <div className="h-[400px]">
+                        <PromoCard />
+                    </div>
                 </div>
             </div>
         </div>

@@ -18,23 +18,51 @@ import {
     Layers,
     ClipboardList,
     Eye,
-    CalendarCheck
+    CalendarCheck,
+    Search,
+    ChevronRight
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
-const sidebarItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
-    { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
-    { icon: FileText, label: 'Consultations', href: '/admin/consultations' },
-    { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments' },
-    { icon: Package, label: 'Products', href: '/admin/products' },
-    { icon: Layers, label: 'Categories', href: '/admin/categories' },
-    { icon: Box, label: 'Inventory', href: '/admin/inventory' },
-    { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },
-    { icon: Users, label: 'Customers', href: '/admin/customers' },
-    { icon: Eye, label: 'Visual Editor', href: '/admin/visual-editor' },
-    { icon: Settings, label: 'Settings', href: '/admin/settings' },
+const sidebarGroups = [
+    {
+        title: "Overview",
+        items: [
+            { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
+        ]
+    },
+    {
+        title: "Sales & Operations",
+        items: [
+            { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
+            { icon: FileText, label: 'Consultations', href: '/admin/consultations' },
+            { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments' },
+            { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },
+        ]
+    },
+    {
+        title: "Catalog",
+        items: [
+            { icon: Package, label: 'Products', href: '/admin/products' },
+            { icon: Layers, label: 'Categories', href: '/admin/categories' },
+            { icon: Box, label: 'Inventory', href: '/admin/inventory' },
+        ]
+    },
+    {
+        title: "Management",
+        items: [
+            { icon: Users, label: 'Customers', href: '/admin/customers' },
+        ]
+    },
+    {
+        title: "System",
+        items: [
+            { icon: Eye, label: 'Visual Editor', href: '/admin/visual-editor' },
+            { icon: Settings, label: 'Settings', href: '/admin/settings' },
+        ]
+    }
 ]
 
 export function ModernSidebar() {
@@ -56,72 +84,79 @@ export function ModernSidebar() {
             {/* Sidebar Container */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-40 w-20 flex flex-col items-center py-8 bg-[var(--dashboard-background)] border-r border-[var(--dashboard-border)]",
+                    "fixed inset-y-0 left-0 z-40 w-64 flex flex-col bg-[var(--dashboard-background)] border-r border-[var(--dashboard-border)]",
                     "transition-transform duration-300 ease-in-out",
                     "md:translate-x-0",
                     isMobileOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
-                {/* Logo */}
-                <motion.div
-                    className="mb-8"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ type: 'spring', stiffness: 400 }}
-                >
-                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[var(--dashboard-accent-gold)] to-yellow-600 flex items-center justify-center text-black font-bold text-xl shadow-lg shadow-gold/20">
-                        P
+                {/* Header */}
+                <div className="p-6 pb-4">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[var(--dashboard-accent-gold)] to-yellow-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                            P
+                        </div>
+                        <span className="font-semibold text-lg text-[var(--dashboard-text)]">PrimeLux Admin</span>
                     </div>
-                </motion.div>
+
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-[var(--dashboard-text-muted)]" />
+                        <Input
+                            placeholder="Search"
+                            className="pl-9 bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] h-9 text-sm focus-visible:ring-[var(--dashboard-accent-gold)]"
+                        />
+                    </div>
+                </div>
 
                 {/* Navigation */}
-                <nav className="flex-1 flex flex-col gap-4 w-full px-2">
-                    {sidebarItems.map((item, index) => {
-                        const isActive = pathname === item.href
-                        return (
-                            <motion.div
-                                key={item.href}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.05 }}
-                            >
-                                <Link
-                                    href={item.href}
-                                    className={cn(
-                                        "flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-200 group relative",
-                                        isActive
-                                            ? "bg-transparent text-[var(--dashboard-accent-gold)]"
-                                            : "text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)]"
-                                    )}
-                                    title={item.label}
-                                >
-                                    <motion.div
-                                        whileHover={{ scale: 1.1 }}
-                                        whileTap={{ scale: 0.95 }}
-                                    >
-                                        <item.icon className={cn("h-6 w-6", isActive && "text-[var(--dashboard-accent-gold)]")} />
-                                    </motion.div>
-                                    {isActive && (
-                                        <motion.div
-                                            layoutId="activeIndicator"
-                                            className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[var(--dashboard-accent-gold)] rounded-r-full"
-                                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                                        />
-                                    )}
-                                </Link>
-                            </motion.div>
-                        )
-                    })}
+                <nav className="flex-1 overflow-y-auto px-4 pb-4 space-y-6">
+                    {sidebarGroups.map((group, groupIndex) => (
+                        <div key={group.title}>
+                            <h3 className="text-xs font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider mb-2 px-2">
+                                {group.title}
+                            </h3>
+                            <div className="space-y-1">
+                                {group.items.map((item, index) => {
+                                    const isActive = pathname === item.href
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            className={cn(
+                                                "flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium transition-colors relative group",
+                                                isActive
+                                                    ? "bg-[var(--dashboard-card-hover)] text-[var(--dashboard-text)]"
+                                                    : "text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)]"
+                                            )}
+                                        >
+                                            <item.icon className={cn("h-4 w-4", isActive ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]")} />
+                                            <span>{item.label}</span>
+                                            {isActive && (
+                                                <motion.div
+                                                    layoutId="activeIndicator"
+                                                    className="absolute right-2 w-1.5 h-1.5 rounded-full bg-[var(--dashboard-accent-gold)]"
+                                                />
+                                            )}
+                                        </Link>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    ))}
                 </nav>
 
-                {/* Bottom Actions */}
-                <div className="mt-auto flex flex-col gap-4 px-2">
-                    <motion.button
-                        className="flex flex-col items-center justify-center p-3 rounded-2xl text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)] transition-all duration-200"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        <LogOut className="h-6 w-6" />
-                    </motion.button>
+                {/* Footer / User Profile */}
+                <div className="p-4 border-t border-[var(--dashboard-border)]">
+                    <div className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[var(--dashboard-card-hover)] cursor-pointer transition-colors group">
+                        <div className="h-8 w-8 rounded-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] flex items-center justify-center text-[var(--dashboard-text-muted)]">
+                            <Users className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-[var(--dashboard-text)] truncate">Admin User</p>
+                            <p className="text-xs text-[var(--dashboard-text-muted)] truncate">admin@primelux.com</p>
+                        </div>
+                        <LogOut className="h-4 w-4 text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]" />
+                    </div>
                 </div>
             </aside>
         </>

@@ -12,7 +12,7 @@ export default function AdminLayout({
             <div className="print:hidden">
                 <ModernSidebar />
             </div>
-            <div className="flex flex-1 flex-col md:pl-20 transition-all duration-300">
+            <div className="flex flex-1 flex-col md:pl-64 transition-all duration-300">
                 <ModernHeader />
                 <main className="flex-1 p-4 md:p-8 pt-0 overflow-y-auto">
                     {children}

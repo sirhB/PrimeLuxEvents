@@ -23,36 +23,32 @@ export function StatsCard({ title, value, subtitle, icon: Icon, className, index
             <Card
                 animate={false}
                 className={cn(
-                    "bg-[var(--dashboard-card)] border-none text-[var(--dashboard-text)] shadow-lg",
-                    "hover:shadow-xl hover:shadow-[var(--dashboard-accent-gold)]/20 transition-all duration-300",
-                    "relative overflow-hidden",
+                    "bg-[var(--dashboard-card)] border-none text-[var(--dashboard-text)] shadow-sm",
+                    "hover:shadow-md transition-all duration-300",
+                    "flex items-center p-4 gap-4",
                     className
                 )}
             >
-                <div className="absolute inset-0 bg-gradient-to-br from-[var(--dashboard-accent-gold)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                    <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)]">
-                        {title}
-                    </CardTitle>
-                    {Icon && (
-                        <motion.div
-                            whileHover={{ scale: 1.1, rotate: 5 }}
-                            transition={{ type: 'spring', stiffness: 400 }}
-                        >
-                            <Icon className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
-                        </motion.div>
-                    )}
-                </CardHeader>
-                <CardContent className="relative z-10">
-                    <div className="text-2xl font-bold">
-                        {value}
+                {Icon && (
+                    <div className="h-12 w-12 rounded-full bg-[var(--dashboard-accent-gold)]/10 flex items-center justify-center shrink-0">
+                        <Icon className="h-6 w-6 text-[var(--dashboard-accent-gold)]" />
                     </div>
-                    {subtitle && (
-                        <p className="text-xs text-[var(--dashboard-text-muted)] mt-1">
-                            {subtitle}
-                        </p>
-                    )}
-                </CardContent>
+                )}
+                <div className="flex flex-col">
+                    <span className="text-sm text-[var(--dashboard-text-muted)] font-medium font-sans">
+                        {title}
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold text-[var(--dashboard-text)] font-serif">
+                            {value}
+                        </span>
+                        {subtitle && (
+                            <span className="text-xs font-medium text-[var(--dashboard-accent-green)] bg-[var(--dashboard-accent-green)]/10 px-1.5 py-0.5 rounded-full">
+                                {subtitle}
+                            </span>
+                        )}
+                    </div>
+                </div>
             </Card>
         </motion.div>
     )
