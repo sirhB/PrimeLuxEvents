@@ -245,32 +245,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
-            className="space-y-12 md:space-y-20"
+            className="space-y-8 md:space-y-12"
           >
-            {/* Product Header */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center max-w-4xl mx-auto space-y-6"
-            >
-              <span className="text-gold text-sm md:text-base font-medium tracking-[0.2em] uppercase block">
-                {product.categories?.name || 'Premium Rental'}
-              </span>
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif text-foreground font-medium tracking-tight">
-                {product.name}
-              </h1>
-              <div className="flex items-baseline justify-center gap-3 pt-2">
-                <span className="text-2xl md:text-3xl font-medium text-foreground">
-                  {formatCurrency(basePrice)}
-                </span>
-                <span className="text-base text-muted-foreground font-light">/ day</span>
-              </div>
-              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
-                {product.description}
-              </p>
-            </motion.div>
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
           {/* Image Gallery */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -291,8 +268,28 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             variants={containerVariants}
             initial="hidden"
             animate={isLoaded ? "visible" : "hidden"}
-            className="flex flex-col gap-10"
+            className="flex flex-col gap-6"
           >
+            {/* Product Information */}
+            <motion.div variants={itemVariants} className="space-y-4">
+              <div>
+                <span className="text-gold text-sm font-medium tracking-[0.2em] uppercase block mb-2">
+                  {product.categories?.name || 'Premium Rental'}
+                </span>
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif text-foreground font-medium tracking-tight">
+                  {product.name}
+                </h1>
+              </div>
+              <div className="flex items-baseline gap-3">
+                <span className="text-xl md:text-2xl font-medium text-foreground">
+                  {formatCurrency(basePrice)}
+                </span>
+                <span className="text-sm text-muted-foreground font-light">/ day</span>
+              </div>
+              <p className="text-base text-muted-foreground leading-relaxed">
+                {product.description}
+              </p>
+            </motion.div>
 
             <motion.div variants={itemVariants}>
               <Separator className="bg-border/40" />
