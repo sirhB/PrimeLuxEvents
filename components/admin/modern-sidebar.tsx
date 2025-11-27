@@ -112,16 +112,6 @@ export function ModernSidebar() {
                         <span className="font-semibold text-lg text-[var(--dashboard-text)]">PrimeLux Admin</span>
                     </div>
 
-                    <div className="relative">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-9 w-9 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-card-hover)]"
-                            onClick={() => setIsSearchOpen(true)}
-                        >
-                            <Search className="h-5 w-5" />
-                        </Button>
-                    </div>
                 </div>
 
                 <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
@@ -187,6 +177,18 @@ export function ModernSidebar() {
                     </div>
                 </div>
             </aside>
+
+            {/* Floating Search Button */}
+            <motion.button
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setIsSearchOpen(true)}
+                className="fixed bottom-8 right-8 z-50 h-14 w-14 rounded-full bg-[var(--dashboard-accent-gold)] text-white shadow-lg flex items-center justify-center hover:bg-yellow-600 transition-colors"
+            >
+                <Search className="h-6 w-6" />
+            </motion.button>
         </>
     )
 }
