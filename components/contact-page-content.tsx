@@ -126,7 +126,7 @@ export function ContactPageContent({ content, isEditing = false }: ContactPageCo
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
-                        className="bg-secondary/20 p-8 md:p-12 rounded-sm border border-border/50 hover:border-gold/30 transition-colors shadow-xl"
+                        className="bg-white p-8 md:p-12 rounded-sm border border-border shadow-lg hover:shadow-xl transition-shadow"
                     >
                         <EditableContent
                             contentKey="contact.form.title"

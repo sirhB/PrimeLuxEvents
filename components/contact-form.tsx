@@ -78,7 +78,7 @@ export function ContactForm() {
                             value="yes"
                             checked={hasVenue === "yes"}
                             onChange={(e) => setHasVenue(e.target.value)}
-                            className="w-4 h-4 text-primary"
+                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
                         />
                         <span className="text-sm">Yes</span>
                     </label>
@@ -89,7 +89,7 @@ export function ContactForm() {
                             value="no"
                             checked={hasVenue === "no"}
                             onChange={(e) => setHasVenue(e.target.value)}
-                            className="w-4 h-4 text-primary"
+                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
                         />
                         <span className="text-sm">No</span>
                     </label>
@@ -112,7 +112,7 @@ export function ContactForm() {
                             value="yes"
                             checked={hasCaterer === "yes"}
                             onChange={(e) => setHasCaterer(e.target.value)}
-                            className="w-4 h-4 text-primary"
+                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
                         />
                         <span className="text-sm">Yes</span>
                     </label>
@@ -123,7 +123,7 @@ export function ContactForm() {
                             value="no"
                             checked={hasCaterer === "no"}
                             onChange={(e) => setHasCaterer(e.target.value)}
-                            className="w-4 h-4 text-primary"
+                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
                         />
                         <span className="text-sm">No</span>
                     </label>
@@ -146,7 +146,7 @@ export function ContactForm() {
                             value="yes"
                             checked={hasPlanner === "yes"}
                             onChange={(e) => setHasPlanner(e.target.value)}
-                            className="w-4 h-4 text-primary"
+                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
                         />
                         <span className="text-sm">Yes</span>
                     </label>
@@ -157,7 +157,7 @@ export function ContactForm() {
                             value="no"
                             checked={hasPlanner === "no"}
                             onChange={(e) => setHasPlanner(e.target.value)}
-                            className="w-4 h-4 text-primary"
+                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
                         />
                         <span className="text-sm">No</span>
                     </label>
