@@ -635,7 +635,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             </motion.div>
           </motion.div>
         </div>
-      </div>
           </motion.div>
         </AnimatePresence>
       </div>
