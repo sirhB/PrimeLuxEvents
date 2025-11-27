@@ -108,21 +108,32 @@ create table rental_reservations (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- Quotes Table (for saved customer quotes)
-create table quotes (
+-- Consultations Table (for consultation requests from contact form)
+create table consultations (
   id uuid default uuid_generate_v4() primary key,
+  first_name text,
+  last_name text,
   customer_name text,
   customer_email text,
   customer_phone text,
   event_date date,
   event_type text,
+  number_of_guests integer,
+  budget_range text,
+  has_venue boolean,
+  venue_name text,
   venue_address text,
-  cart_data jsonb not null,
-  subtotal integer not null, -- stored in cents
+  has_caterer boolean,
+  caterer_name text,
+  has_planner boolean,
+  planner_name text,
+  message text,
+  cart_data jsonb,
+  subtotal integer, -- stored in cents
   delivery_fee integer default 0, -- stored in cents
   setup_fee integer default 0, -- stored in cents
-  total_amount integer not null, -- stored in cents
-  status text default 'draft',
+  total_amount integer, -- stored in cents
+  status text default 'new_request', -- new_request, pending_response, appointment_confirmed, completed
   expires_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
@@ -158,7 +169,7 @@ alter table orders enable row level security;
 alter table order_items enable row level security;
 alter table content enable row level security;
 alter table rental_reservations enable row level security;
-alter table quotes enable row level security;
+alter table consultations enable row level security;
 
 -- Products: Public read, Admin write
 create policy "Public products are viewable by everyone."
@@ -247,17 +258,21 @@ create policy "Admins can update reservations."
   on rental_reservations for update
   using ( auth.role() = 'authenticated' );
 
--- Quotes: Public insert (customers can create), Admin read/update
-create policy "Anyone can create quotes."
-  on quotes for insert
+-- Consultations: Public insert (customers can create), Admin read/update/delete
+create policy "Anyone can create consultations."
+  on consultations for insert
   with check ( true );
 
-create policy "Admins can view all quotes."
-  on quotes for select
+create policy "Admins can view all consultations."
+  on consultations for select
   using ( auth.role() = 'authenticated' );
 
-create policy "Admins can update quotes."
-  on quotes for update
+create policy "Admins can update consultations."
+  on consultations for update
+  using ( auth.role() = 'authenticated' );
+
+create policy "Admins can delete consultations."
+  on consultations for delete
   using ( auth.role() = 'authenticated' );
 
 -- Packages: Public read, Admin write

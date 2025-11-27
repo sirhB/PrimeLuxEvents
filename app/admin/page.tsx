@@ -15,13 +15,13 @@ export default function AdminDashboardPage() {
     const [data, setData] = useState<{
         totalRevenue: number
         orderCount: number
-        pendingQuotes: number
+        newConsultations: number
         lowStockProducts: number
         recentOrders: any[]
     }>({
         totalRevenue: 0,
         orderCount: 0,
-        pendingQuotes: 0,
+        newConsultations: 0,
         lowStockProducts: 0,
         recentOrders: []
     })
@@ -34,8 +34,8 @@ export default function AdminDashboardPage() {
                 .select('total_amount, created_at')
                 .order('created_at', { ascending: false })
 
-            const { data: quotes } = await supabase
-                .from('quotes')
+            const { data: consultations } = await supabase
+                .from('consultations')
                 .select('status')
 
             const { data: products } = await supabase
@@ -51,14 +51,14 @@ export default function AdminDashboardPage() {
             // Calculate metrics
             const totalRevenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0
             const orderCount = orders?.length || 0
-            const pendingQuotes = quotes?.filter((q) => q.status === 'draft' || q.status === 'sent').length || 0
+            const newConsultations = consultations?.filter((c) => c.status === 'new_request' || c.status === 'pending_response').length || 0
             const lowStockProducts =
                 products?.filter((p) => p.quantity_available - p.quantity_reserved <= 2).length || 0
 
             setData({
                 totalRevenue,
                 orderCount,
-                pendingQuotes,
+                newConsultations,
                 lowStockProducts,
                 recentOrders: recentOrders || []
             })
@@ -106,8 +106,8 @@ export default function AdminDashboardPage() {
                     index={1}
                 />
                 <StatsCard
-                    title="Pending Quotes"
-                    value={data.pendingQuotes}
+                    title="New Consultations"
+                    value={data.newConsultations}
                     subtitle="Awaiting response"
                     icon={FileText}
                     index={2}
