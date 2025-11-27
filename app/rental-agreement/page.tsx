@@ -42,7 +42,7 @@ export default function RentalAgreementPage() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-6xl md:text-8xl font-serif font-light tracking-tight text-foreground mb-6"
             >
-              Terms of Service
+              PrimeLux Events
             </motion.h1>
 
             <motion.p
@@ -51,7 +51,8 @@ export default function RentalAgreementPage() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto mb-12"
             >
-              Please read our rental agreement carefully before proceeding with your booking.
+              This Contract is executed between PrimeLux Events (the "Company") and the Renter.
+              Acceptance of the rental order binds the Renter to the entirety of these terms.
             </motion.p>
 
             <motion.div
@@ -67,7 +68,7 @@ export default function RentalAgreementPage() {
                 className="flex items-center gap-2 text-sm text-muted-foreground"
               >
                 <Shield className="h-4 w-4" />
-                <span>Last updated: December 2024</span>
+                <span>Effective Date: November 2025</span>
               </motion.div>
             </motion.div>
           </motion.div>
@@ -113,105 +114,183 @@ export default function RentalAgreementPage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="bg-secondary/30 p-8 rounded-xl border border-border/40"
               >
-                <h2 className="text-2xl font-serif mb-4 text-foreground">Agreement Overview</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  This Rental Agreement ("Agreement") is between PrimeLux Events ("Company") and the individual or entity
-                  ("Renter") identified in the rental order. By proceeding with a rental, the Renter agrees to be bound by
-                  the terms and conditions set forth herein.
+                  This Contract is executed between PrimeLux Events (the "Company") and the Renter. Acceptance of the rental order binds the Renter to the entirety of these terms.
                 </p>
                 <div className="flex items-center gap-2 text-gold text-sm">
                   <CheckCircle className="h-4 w-4" />
-                  <span>Please read carefully before signing</span>
+                  <span>Please read carefully before proceeding</span>
                 </div>
               </motion.div>
 
-              {/* Key Terms */}
-              <div className="grid md:grid-cols-2 gap-8">
-                <motion.div
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="bg-background/50 p-6 rounded-lg border border-border/40"
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <Clock className="h-6 w-6 text-gold" />
-                    <h3 className="text-xl font-serif text-foreground">Rental Period</h3>
-                  </div>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Standard rental period is 24 hours. Delivery occurs on the event date and pickup the following day.
-                    Extended rentals or custom scheduling may incur additional fees.
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  className="bg-background/50 p-6 rounded-lg border border-border/40"
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <DollarSign className="h-6 w-6 text-gold" />
-                    <h3 className="text-xl font-serif text-foreground">Payment Terms</h3>
-                  </div>
-                  <p className="text-muted-foreground leading-relaxed">
-                    A 50% non-refundable deposit is required to secure items. The remaining balance is due 14 days
-                    prior to the event. Late payments may result in cancellation.
-                  </p>
-                </motion.div>
-              </div>
-
-              {/* Terms and Conditions */}
+              {/* Contract Sections */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
                 className="space-y-8"
               >
-                <h2 className="text-3xl font-serif text-foreground">Terms and Conditions</h2>
-
-                <div className="space-y-6">
-                  <div className="border-l-4 border-gold pl-6">
-                    <h3 className="text-xl font-serif mb-3 text-foreground">1. Rental Items & Condition</h3>
-                    <ul className="text-muted-foreground space-y-2 leading-relaxed">
-                      <li>• All items are inspected and cleaned before delivery</li>
-                      <li>• Normal wear and tear is covered by our damage waiver</li>
-                      <li>• Significant damage, loss, or theft is the responsibility of the Renter</li>
-                      <li>• Replacement costs will be charged for damaged or missing items</li>
-                    </ul>
+                {/* I. Contract Execution & Financial Terms */}
+                <div className="bg-background/50 p-8 rounded-xl border border-border/40">
+                  <h2 className="text-2xl font-serif mb-6 text-foreground border-b border-border/40 pb-2">I. Contract Execution & Financial Terms</h2>
+                  <div className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Showroom Consultations</h3>
+                        <p className="text-muted-foreground text-sm">Located in Shelton, CT. While walk-ins are accommodated, pre-scheduled appointments are strongly recommended to ensure dedicated attention from an Event Consultant.</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Rental Duration</h3>
+                        <p className="text-muted-foreground text-sm">Standard engagements are for 24 hours. Custom or extended periods will incur specific scheduling fees.</p>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Pricing & Inventory</h3>
+                        <p className="text-muted-foreground text-sm">All pricing, item selection, and availability are subject to immediate revision.</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Reservation Deposit</h3>
+                        <p className="text-muted-foreground text-sm">A non-refundable 50% deposit is required to secure all items.</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-gold">Final Settlement</h3>
+                      <p className="text-muted-foreground text-sm">The remaining balance is due in full seven (7) days prior to the delivery date. Failure to remit payment by this deadline grants the Company the right to cancel the order without deposit refund or apply late charges at the maximum lawful rate per Connecticut statute.</p>
+                    </div>
                   </div>
+                </div>
 
-                  <div className="border-l-4 border-gold pl-6">
-                    <h3 className="text-xl font-serif mb-3 text-foreground">2. Delivery & Setup</h3>
-                    <ul className="text-muted-foreground space-y-2 leading-relaxed">
-                      <li>• Professional delivery within our service area</li>
-                      <li>• Drop-off at designated location unless setup services are purchased</li>
-                      <li>• Setup services include placement and basic styling</li>
-                      <li>• Additional fees apply for setup and long-distance delivery</li>
-                    </ul>
+                {/* II. Equipment Condition & Accountability */}
+                <div className="bg-background/50 p-8 rounded-xl border border-border/40">
+                  <h2 className="text-2xl font-serif mb-6 text-foreground border-b border-border/40 pb-2">II. Equipment Condition & Accountability</h2>
+                  <div className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Inspection & Care</h3>
+                        <p className="text-muted-foreground text-sm">All equipment is rigorously inspected and sanitized before dispatch. The mandatory damage waiver covers minor, expected wear and tear only.</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Renter Accountability</h3>
+                        <p className="text-muted-foreground text-sm">The Renter assumes full financial responsibility for significant damage, theft, or loss (including Acts of God). Replacement costs will be charged directly.</p>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Condition Assessment</h3>
+                        <p className="text-muted-foreground text-sm">The Company reserves 72 hours following possession retrieval to formally assess the equipment's condition and determine liability for damages incurred during the rental period.</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Aesthetic Quality (Linens)</h3>
+                        <p className="text-muted-foreground text-sm">Due to inherent material variances and digital display effects, exact color matching is not guaranteed. On-site inspection at the showroom is advised.</p>
+                      </div>
+                    </div>
                   </div>
+                </div>
 
-                  <div className="border-l-4 border-gold pl-6">
-                    <h3 className="text-xl font-serif mb-3 text-foreground">3. Cancellation Policy</h3>
-                    <ul className="text-muted-foreground space-y-2 leading-relaxed">
-                      <li>• Cancellations more than 30 days prior: Full deposit refund minus 10% administrative fee</li>
-                      <li>• Cancellations 7-30 days prior: 50% cancellation fee</li>
-                      <li>• Cancellations within 7 days: No refund</li>
-                      <li>• Weather-related cancellations are handled on a case-by-case basis</li>
-                    </ul>
+                {/* III. Logistics: Delivery, Pickup, & Will-Call */}
+                <div className="bg-background/50 p-8 rounded-xl border border-border/40">
+                  <h2 className="text-2xl font-serif mb-6 text-foreground border-b border-border/40 pb-2">III. Logistics: Delivery, Pickup, & Will-Call</h2>
+                  <div className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Standard Scheduling</h3>
+                        <p className="text-muted-foreground text-sm">Deliveries typically occur 1–2 days before the event, with pickup 1–2 days following. Standard service hours are M–F, 9:00 AM–5:00 PM (in-season) or 9:00 AM–4:00 PM (off-season).</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Non-Standard Fees</h3>
+                        <p className="text-muted-foreground text-sm">Additional fees apply for service outside standard hours, precise time windows, weekend logistics, or late-night retrievals.</p>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Minimum Order</h3>
+                        <p className="text-muted-foreground text-sm">Delivery service requires a minimum equipment rental cost of $250.00 (excluding labor and fees).</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Delivery Window</h3>
+                        <p className="text-muted-foreground text-sm">A minimum two (2) hour window is required. The Renter may contact us on the delivery morning for an estimated 2–3 hour arrival window.</p>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Renter Presence</h3>
+                        <p className="text-muted-foreground text-sm">The Renter must be available for the entire window. After a 15-minute grace period, a waiting fee of up to $120.00 per hour will be assessed.</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Curbside Standard</h3>
+                        <p className="text-muted-foreground text-sm">Delivery is to a ground-level, hard surface, obstruction-free location within 25 feet of the loading area. Equipment will be securely stacked.</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-gold">Excess Labor Charges</h3>
+                      <p className="text-muted-foreground text-sm">Additional fees (up to $120.00/hour) apply for conditions that impede standard delivery (e.g., stairs, uneven terrain, rush orders, or inaccurate directions).</p>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Will-Call Location</h3>
+                        <p className="text-muted-foreground text-sm">Customer pickup and return are available at our Shelton, CT warehouse for select, smaller orders.</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Will-Call Liability</h3>
+                        <p className="text-muted-foreground text-sm">The Renter assumes all liability for will-call items from the moment they leave the facility. The Renter is responsible for securing, loading, and unloading all items. Failure to pick up the order may result in a minimum 50% rental fee charge.</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-gold">Setup & Breakdown</h3>
+                      <p className="text-muted-foreground text-sm">Available for an additional fee. If the Renter is unavailable, the Company may setup as deemed appropriate or leave items curbside; no refund is issued, and the Renter assumes full liability for unsupervised equipment.</p>
+                    </div>
                   </div>
+                </div>
 
-                  <div className="border-l-4 border-gold pl-6">
-                    <h3 className="text-xl font-serif mb-3 text-foreground">4. Insurance & Liability</h3>
-                    <ul className="text-muted-foreground space-y-2 leading-relaxed">
-                      <li>• Mandatory damage waiver covers minor wear and tear</li>
-                      <li>• Renter assumes responsibility for gross negligence or misuse</li>
-                      <li>• Additional event insurance is recommended</li>
-                      <li>• Company is not liable for indirect or consequential damages</li>
-                    </ul>
+                {/* IV. Post-Use Protocols */}
+                <div className="bg-background/50 p-8 rounded-xl border border-border/40">
+                  <h2 className="text-2xl font-serif mb-6 text-foreground border-b border-border/40 pb-2">IV. Post-Use Protocols</h2>
+                  <p className="text-muted-foreground leading-relaxed">The Renter is responsible for basic preparation prior to pickup:</p>
+                  <div className="mt-4 space-y-3">
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-gold">China/Flatware/Glassware:</h3>
+                      <p className="text-muted-foreground text-sm">All food debris must be scraped/rinsed, and liquids emptied. Return to designated crates.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-gold">Linens:</h3>
+                      <p className="text-muted-foreground text-sm">Shake clear of debris and ensure dryness. Return in clear plastic bags.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-gold">Furniture:</h3>
+                      <p className="text-muted-foreground text-sm">Tables and chairs must be broken down and stacked for driver retrieval in the same manner as delivered.</p>
+                    </div>
                   </div>
+                </div>
+
+                {/* V. Cancellation & Adjustments */}
+                <div className="bg-background/50 p-8 rounded-xl border border-border/40">
+                  <h2 className="text-2xl font-serif mb-6 text-foreground border-b border-border/40 pb-2">V. Cancellation & Adjustments</h2>
+                  <div className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Deposit Forfeiture</h3>
+                        <p className="text-muted-foreground text-sm">The 50% reservation deposit is non-refundable regardless of the cancellation reason or timing.</p>
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-gold">Order Adjustments</h3>
+                        <p className="text-muted-foreground text-sm">Reductions to non-specialty items are permitted up to seven (7) days before delivery, provided the contract price does not fall below the forfeited 50% deposit amount.</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-gold">Specialty Items</h3>
+                      <p className="text-muted-foreground text-sm">Items requiring custom manufacturing, sub-rental, or purchase (including heaters) are fully non-refundable once ordered or production commences.</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* VI. Indemnification & Liability */}
+                <div className="bg-background/50 p-8 rounded-xl border border-border/40">
+                  <h2 className="text-2xl font-serif mb-6 text-foreground border-b border-border/40 pb-2">VI. Indemnification & Liability</h2>
+                  <p className="text-muted-foreground leading-relaxed">
+                    The Renter shall take all necessary precautions for the rented items and protect all persons and property from harm. The Renter agrees to indemnify and hold PrimeLux Events harmless from and against all liability, claims, losses, or costs (including legal fees) arising from the use, installation, operation, or possession of the rented equipment, regardless of cause.
+                  </p>
                 </div>
               </motion.div>
 
@@ -220,7 +299,7 @@ export default function RentalAgreementPage() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.6 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
                 className="bg-gold/5 p-8 rounded-xl border border-gold/20"
               >
                 <div className="flex items-start gap-4">
@@ -228,7 +307,7 @@ export default function RentalAgreementPage() {
                   <div>
                     <h3 className="text-xl font-serif mb-3 text-foreground">Important Notice</h3>
                     <p className="text-muted-foreground leading-relaxed mb-4">
-                      By proceeding with your rental, you acknowledge that you have read, understood, and agree to
+                      By proceeding with your rental order, you acknowledge that you have read, understood, and agree to
                       be bound by all terms and conditions outlined in this agreement. If you have any questions
                       about these terms, please contact us before placing your order.
                     </p>
@@ -245,7 +324,7 @@ export default function RentalAgreementPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.7 }}
+                transition={{ duration: 0.6, delay: 0.9 }}
                 className="text-center pt-8"
               >
                 <h3 className="text-xl font-serif mb-4 text-foreground">Questions About This Agreement?</h3>
