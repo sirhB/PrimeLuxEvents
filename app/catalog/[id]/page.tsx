@@ -4,7 +4,7 @@ import { use, useState, useEffect } from "react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, Check, Plus, Minus, Package, Truck, Calendar as CalendarIcon, Info, ShieldCheck, Star } from "lucide-react"
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { useCart } from "@/components/providers/cart-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -81,12 +81,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   const { items, addItem, removeItem, updateQuantity: updateCartQuantity } = useCart()
   const [isLoaded, setIsLoaded] = useState(false)
-  const { scrollY } = useScroll()
   const supabase = createClient()
-
-  // Parallax effects for hero
-  const heroY = useTransform(scrollY, [0, 500], [0, 200])
-  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
 
   useEffect(() => {
     async function fetchProduct() {
@@ -222,52 +217,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Immersive Hero Section */}
-      <div className="relative h-[50vh] md:h-[60vh] overflow-hidden bg-black">
-        <motion.div
-          style={{ y: heroY, opacity: heroOpacity }}
-          className="absolute inset-0 w-full h-full"
-        >
-          <Image
-            src={product.image_url}
-            alt={product.name}
-            fill
-            className="object-cover opacity-60"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-background" />
-        </motion.div>
-
-        <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="max-w-4xl space-y-4"
-          >
-            <span className="text-gold text-sm md:text-base font-medium tracking-[0.2em] uppercase block">
-              {product.categories?.name || 'Premium Rental'}
-            </span>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif text-white font-medium tracking-tight">
-              {product.name}
-            </h1>
-            <div className="flex items-baseline justify-center gap-3 pt-2">
-              <span className="text-2xl md:text-3xl font-medium text-white">
-                {formatCurrency(basePrice)}
-              </span>
-              <span className="text-base text-gray-200 font-light">/ day</span>
-            </div>
-            <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto font-light leading-relaxed">
-              {product.description.length > 150
-                ? `${product.description.substring(0, 150)}...`
-                : product.description
-              }
-            </p>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Enhanced Search & Navigation Bar */}
+      {/* Navigation Bar */}
       <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/40 shadow-sm">
         <div className="container mx-auto px-4 md:px-6 py-4">
           <motion.div
@@ -297,6 +247,29 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             transition={{ duration: 0.5 }}
             className="space-y-12 md:space-y-20"
           >
+            {/* Product Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center max-w-4xl mx-auto space-y-6"
+            >
+              <span className="text-gold text-sm md:text-base font-medium tracking-[0.2em] uppercase block">
+                {product.categories?.name || 'Premium Rental'}
+              </span>
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif text-foreground font-medium tracking-tight">
+                {product.name}
+              </h1>
+              <div className="flex items-baseline justify-center gap-3 pt-2">
+                <span className="text-2xl md:text-3xl font-medium text-foreground">
+                  {formatCurrency(basePrice)}
+                </span>
+                <span className="text-base text-muted-foreground font-light">/ day</span>
+              </div>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed">
+                {product.description}
+              </p>
+            </motion.div>
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
           {/* Image Gallery */}
           <motion.div
@@ -325,12 +298,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <Separator className="bg-border/40" />
             </motion.div>
 
-            {/* Description */}
-            <motion.div variants={itemVariants} className="prose prose-stone max-w-none">
-              <p className="text-lg leading-relaxed text-muted-foreground/90 font-light">
-                {product.description}
-              </p>
-            </motion.div>
 
             {/* Features */}
             {product.features && product.features.length > 0 && (
@@ -453,6 +420,68 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <Separator className="bg-border/40" />
             </motion.div>
 
+            {/* Pricing Summary */}
+            <motion.div variants={itemVariants} className="space-y-6">
+              <div className="bg-secondary/5 rounded-xl p-6 space-y-4">
+                <div className="flex justify-between items-center text-lg">
+                  <span className="text-muted-foreground">Daily Rate</span>
+                  <span className="font-medium">{formatCurrency(basePrice)}</span>
+                </div>
+                {modifiersPrice > 0 && (
+                  <div className="flex justify-between items-center text-lg">
+                    <span className="text-muted-foreground">Customizations</span>
+                    <span className="font-medium text-gold">+{formatCurrency(modifiersPrice)}</span>
+                  </div>
+                )}
+                {setupFee > 0 && (
+                  <div className="flex justify-between items-center text-lg">
+                    <span className="text-muted-foreground">Setup Fee</span>
+                    <span className="font-medium">+{formatCurrency(setupFee)}</span>
+                  </div>
+                )}
+                <Separator className="bg-border/40" />
+                <div className="flex justify-between items-center text-xl font-medium">
+                  <span>Total ({quantity} {quantity === 1 ? 'day' : 'days'})</span>
+                  <span className="text-gold">{formatCurrency(totalPrice)}</span>
+                </div>
+              </div>
+
+              {/* Add to Cart Button */}
+              <Button
+                onClick={toggleCart}
+                disabled={!canAddToCart}
+                className={cn(
+                  "w-full h-12 text-lg font-medium rounded-full transition-all duration-300",
+                  isInCart
+                    ? "bg-green-600 hover:bg-green-700 text-white"
+                    : "bg-gold hover:bg-gold/90 text-black shadow-lg hover:shadow-xl"
+                )}
+              >
+                {isInCart ? (
+                  <div className="flex items-center gap-2">
+                    <Check className="h-5 w-5" />
+                    Added to Cart
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Plus className="h-5 w-5" />
+                    Add to Cart
+                  </div>
+                )}
+              </Button>
+
+              {/* Stock Information */}
+              <div className="text-center text-sm text-muted-foreground">
+                {product.stock > 0 ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-green-600" />
+                    <span>In Stock • Ships within 24 hours</span>
+                  </div>
+                ) : (
+                  <span className="text-red-600">Out of Stock</span>
+                )}
+              </div>
+            </motion.div>
 
             <motion.div variants={itemVariants}>
               <Separator className="bg-border/40 hidden lg:block" />
