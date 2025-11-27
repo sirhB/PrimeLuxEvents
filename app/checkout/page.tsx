@@ -38,6 +38,7 @@ export default function CheckoutPage() {
     const [cartProducts, setCartProducts] = useState<any[]>([])
     const [totals, setTotals] = useState<any>(null)
     const [isCalculating, setIsCalculating] = useState(false)
+    const [agreesToRentalAgreement, setAgreesToRentalAgreement] = useState(false)
 
     // Form Data
     const [formData, setFormData] = useState<CheckoutFormData>({
@@ -310,6 +311,13 @@ export default function CheckoutPage() {
     const handleSubmit = async () => {
         setIsLoading(true)
         setError(null)
+
+        // Validate rental agreement agreement
+        if (!agreesToRentalAgreement) {
+            setError("Please agree to the rental agreement terms before placing your order.")
+            setIsLoading(false)
+            return
+        }
 
         try {
             const cartItems: CartItem[] = items.map((item) => ({
@@ -1011,10 +1019,41 @@ export default function CheckoutPage() {
                                         </div>
                                     )}
 
+                                    {/* Rental Agreement Agreement */}
+                                    <div className="space-y-4 p-6 bg-secondary/10 rounded-xl border border-border/40">
+                                        <div className="flex items-start space-x-3">
+                                            <Checkbox
+                                                id="rental-agreement"
+                                                checked={agreesToRentalAgreement}
+                                                onCheckedChange={(checked) => setAgreesToRentalAgreement(checked as boolean)}
+                                                className="mt-1 border-gold/50 data-[state=checked]:bg-gold data-[state=checked]:text-black"
+                                            />
+                                            <div className="space-y-2">
+                                                <Label
+                                                    htmlFor="rental-agreement"
+                                                    className="text-sm font-medium cursor-pointer leading-relaxed"
+                                                >
+                                                    I agree to the{' '}
+                                                    <Link
+                                                        href="/rental-agreement"
+                                                        target="_blank"
+                                                        className="text-gold hover:text-gold/80 underline font-medium"
+                                                    >
+                                                        PrimeLux Events Rental Agreement
+                                                    </Link>
+                                                    {' '}terms and conditions
+                                                </Label>
+                                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                                    By checking this box, you acknowledge that you have read, understood, and agree to be bound by all terms and conditions in our rental agreement. This is required to complete your order.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <Button
                                         className="w-full h-14 text-lg bg-gold text-black hover:bg-gold/90 rounded-full font-medium shadow-lg hover:shadow-gold/20 transition-all duration-300"
                                         onClick={handleSubmit}
-                                        disabled={isLoading || isCalculating || !totals}
+                                        disabled={isLoading || isCalculating || !totals || !agreesToRentalAgreement}
                                     >
                                         {isLoading ? (
                                             <>
