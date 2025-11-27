@@ -326,6 +326,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                                 </Link>
                             </Button>
                         </motion.div>
+                    </motion.div>
                 </div>
             </section>
         </>
