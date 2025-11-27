@@ -253,7 +253,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
             transition={{ duration: 0.6 }}
-            className="sticky top-24"
+            className="lg:sticky lg:top-24"
           >
             <ProductGallery
               images={uniqueGalleryImages}
