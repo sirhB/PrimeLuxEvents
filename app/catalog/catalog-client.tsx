@@ -28,6 +28,7 @@ interface Product {
     categories?: { name: string } | null
     is_featured?: boolean
     rental_price_daily?: number
+    created_at?: string
 }
 
 interface Category {
@@ -383,7 +384,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                             </p>
                                             <div className="h-1 w-20 bg-gold mx-auto mt-6" />
                                         </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+                                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
                                             {featuredProducts.slice(0, 4).map((product, index) => (
                                                 <motion.div
                                                     key={product.id}
@@ -419,7 +420,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                             </p>
                                             <div className="h-1 w-20 bg-gold mx-auto mt-6" />
                                         </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
                                             {featuredPackages.slice(0, 3).map((pkg, index) => (
                                                 <motion.div
                                                     key={pkg.id}
@@ -612,12 +613,12 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                         >
                                                         Browse All Categories
                                         </Button>
-                                                )}
-                                            </div>
-                                        </motion.div>
                                     )}
                                 </div>
-                            </div>
+                            </motion.div>
+                        )}
+                                        </div>
+                                        </div>
                         )}
 
 
