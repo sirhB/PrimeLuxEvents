@@ -9,18 +9,19 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
-import { revalidatePath } from 'next/cache'
+import { Plus, Pencil } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
+import { ProductFilters } from '@/components/admin/product-filters'
+import { DeleteProductButton } from '@/components/admin/delete-product-button'
 
 export default async function ProductsPage({
     searchParams,
 }: {
-    searchParams: Promise<{ category_id?: string; page?: string; search?: string }>
+    searchParams: Promise<{ category_id?: string; page?: string; search?: string; sort?: string }>
 }) {
-    const { category_id, page = '1', search } = await searchParams
+    const { category_id, page = '1', search, sort = 'newest' } = await searchParams
     const supabase = await createClient()
 
     const currentPage = parseInt(page)
@@ -28,11 +29,17 @@ export default async function ProductsPage({
     const start = (currentPage - 1) * pageSize
     const end = start + pageSize - 1
 
+    // Fetch categories for filter
+    const { data: categories } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name')
+
     let query = supabase
         .from('products')
         .select('*, categories(name)', { count: 'exact' })
-        .order('created_at', { ascending: false })
 
+    // Apply filters
     if (category_id) {
         query = query.eq('category_id', category_id)
     }
@@ -41,15 +48,30 @@ export default async function ProductsPage({
         query = query.ilike('name', `%${search}%`)
     }
 
-    const { data: products, count } = await query.range(start, end)
-
-    async function deleteProduct(formData: FormData) {
-        'use server'
-        const id = formData.get('id') as string
-        const supabase = await createClient()
-        await supabase.from('products').delete().eq('id', id)
-        revalidatePath('/admin/products')
+    // Apply sorting
+    switch (sort) {
+        case 'oldest':
+            query = query.order('created_at', { ascending: true })
+            break
+        case 'price_asc':
+            query = query.order('price', { ascending: true })
+            break
+        case 'price_desc':
+            query = query.order('price', { ascending: false })
+            break
+        case 'name_asc':
+            query = query.order('name', { ascending: true })
+            break
+        case 'name_desc':
+            query = query.order('name', { ascending: false })
+            break
+        case 'newest':
+        default:
+            query = query.order('created_at', { ascending: false })
+            break
     }
+
+    const { data: products, count } = await query.range(start, end)
 
     return (
         <div className="flex flex-col gap-6">
@@ -57,13 +79,8 @@ export default async function ProductsPage({
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Products</h1>
                     <p className="text-muted-foreground mt-1">
-                        {category_id ? 'Viewing products in selected category' : 'Manage your product catalog and inventory'}
+                        Manage your product catalog and inventory
                     </p>
-                    {category_id && (
-                        <Button variant="link" asChild className="p-0 h-auto text-[var(--dashboard-accent-gold)]">
-                            <Link href="/admin/products">Clear Filter</Link>
-                        </Button>
-                    )}
                 </div>
                 <Button asChild>
                     <Link href="/admin/products/new">
@@ -73,8 +90,9 @@ export default async function ProductsPage({
                 </Button>
             </div>
 
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                 <SearchInput placeholder="Search products..." />
+                <ProductFilters categories={categories || []} />
             </div>
 
             <Card>
@@ -109,13 +127,7 @@ export default async function ProductsPage({
                                                     <span className="sr-only">Edit</span>
                                                 </Link>
                                             </Button>
-                                            <form action={deleteProduct}>
-                                                <input type="hidden" name="id" value={product.id} />
-                                                <Button variant="ghost" size="icon" type="submit">
-                                                    <Trash2 className="h-4 w-4 text-red-500" />
-                                                    <span className="sr-only">Delete</span>
-                                                </Button>
-                                            </form>
+                                            <DeleteProductButton id={product.id} productName={product.name} />
                                         </div>
                                     </TableCell>
                                 </TableRow>
