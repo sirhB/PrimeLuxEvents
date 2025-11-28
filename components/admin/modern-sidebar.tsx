@@ -39,6 +39,7 @@ const sidebarGroups = [
         title: "Sales & Operations",
         items: [
             { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
+            { icon: CalendarCheck, label: 'Events', href: '/admin/events' },
             { icon: FileText, label: 'Consultations', href: '/admin/consultations' },
             { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments' },
             { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },
@@ -97,84 +98,134 @@ export function ModernSidebar() {
             {/* Sidebar Container */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-40 w-64 flex flex-col bg-[var(--dashboard-background)] border-r border-[var(--dashboard-border)]",
+                    "fixed inset-y-0 left-0 z-40 w-64 flex flex-col relative overflow-hidden",
+                    "bg-gradient-to-b from-card via-card to-secondary/30",
+                    "border-r border-border/40 shadow-2xl shadow-black/5",
+                    "backdrop-blur-sm",
                     "transition-transform duration-300 ease-in-out",
                     "md:translate-x-0",
                     isMobileOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
+                {/* Premium background effects */}
+                <div className="absolute inset-0 bg-noise opacity-20" />
+                <div className="absolute inset-0 bg-gradient-to-b from-gold/[0.02] via-transparent to-gold/[0.01]" />
+                <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-gold/[0.03] to-transparent" />
                 {/* Header */}
-                <div className="p-6 pb-4">
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[var(--dashboard-accent-gold)] to-yellow-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                <div className="p-8 pb-6 border-b border-border/20">
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="flex items-center gap-4 mb-8"
+                    >
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="h-10 w-10 rounded-xl bg-gradient-to-br from-gold via-yellow-500 to-gold flex items-center justify-center text-black font-serif font-bold text-xl shadow-lg shadow-gold/25"
+                        >
                             P
+                        </motion.div>
+                        <div>
+                            <h1 className="font-serif font-light text-xl text-foreground tracking-tight">PrimeLux</h1>
+                            <p className="text-sm text-muted-foreground font-light">Admin Panel</p>
                         </div>
-                        <span className="font-semibold text-lg text-[var(--dashboard-text)]">PrimeLux Admin</span>
-                    </div>
-
+                    </motion.div>
                 </div>
 
 
 
                 {/* Navigation */}
-                <nav className="flex-1 overflow-y-auto px-4 pb-4 space-y-6">
+                <nav className="flex-1 overflow-y-auto px-6 pb-6 space-y-8">
                     {sidebarGroups.map((group, groupIndex) => (
-                        <div key={group.title}>
-                            <h3 className="text-xs font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider mb-2 px-2">
+                        <motion.div
+                            key={group.title}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: groupIndex * 0.1 }}
+                        >
+                            <div className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-xs font-medium uppercase tracking-wider mb-4">
                                 {group.title}
-                            </h3>
-                            <div className="space-y-1">
+                            </div>
+                            <div className="space-y-2">
                                 {group.items.map((item, index) => {
                                     const isActive = pathname === item.href
                                     return (
-                                        <Link
+                                        <motion.div
                                             key={item.href}
-                                            href={item.href}
-                                            className={cn(
-                                                "flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium transition-colors relative group",
-                                                isActive
-                                                    ? "bg-[var(--dashboard-card-hover)] text-[var(--dashboard-text)]"
-                                                    : "text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)]"
-                                            )}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: (groupIndex * 0.1) + (index * 0.05) }}
                                         >
-                                            <item.icon className={cn("h-4 w-4", isActive ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]")} />
-                                            <span>{item.label}</span>
-                                            {isActive && (
+                                            <Link
+                                                href={item.href}
+                                                className={cn(
+                                                    "flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 relative group",
+                                                    "hover:shadow-lg hover:shadow-gold/10",
+                                                    isActive
+                                                        ? "bg-gradient-to-r from-gold/20 to-gold/10 text-foreground border border-gold/30 shadow-md shadow-gold/20"
+                                                        : "text-muted-foreground hover:bg-background/50 hover:text-foreground hover:border hover:border-border/40"
+                                                )}
+                                            >
                                                 <motion.div
-                                                    layoutId="activeIndicator"
-                                                    className="absolute right-2 w-1.5 h-1.5 rounded-full bg-[var(--dashboard-accent-gold)]"
-                                                />
-                                            )}
-                                        </Link>
+                                                    whileHover={{ scale: 1.1 }}
+                                                    className={cn(
+                                                        "h-5 w-5 transition-colors duration-300",
+                                                        isActive ? "text-gold" : "text-muted-foreground group-hover:text-gold"
+                                                    )}
+                                                >
+                                                    <item.icon className="h-5 w-5" />
+                                                </motion.div>
+                                                <span className="font-light">{item.label}</span>
+                                                {isActive && (
+                                                    <motion.div
+                                                        layoutId="activeIndicator"
+                                                        className="absolute right-4 w-2 h-2 rounded-full bg-gold shadow-lg shadow-gold/50"
+                                                    />
+                                                )}
+                                            </Link>
+                                        </motion.div>
                                     )
                                 })}
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </nav>
 
                 {/* Footer / User Profile */}
-                <div className="p-4 border-t border-[var(--dashboard-border)]">
-                    <div className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-[var(--dashboard-card-hover)] cursor-pointer transition-colors group">
-                        <div className="h-8 w-8 rounded-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] flex items-center justify-center text-[var(--dashboard-text-muted)]">
-                            <Users className="h-4 w-4" />
-                        </div>
+                <div className="p-6 border-t border-border/20 bg-secondary/20 backdrop-blur-sm">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.8 }}
+                        className="flex items-center gap-4 px-4 py-3 rounded-xl bg-background/50 backdrop-blur-sm border border-border/40 hover:border-gold/30 cursor-pointer transition-all duration-300 group hover:shadow-lg hover:shadow-gold/10"
+                    >
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="h-10 w-10 rounded-full bg-gradient-to-br from-gold/20 to-gold/10 border-2 border-gold/30 flex items-center justify-center text-gold shadow-md shadow-gold/20"
+                        >
+                            <Users className="h-5 w-5" />
+                        </motion.div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-[var(--dashboard-text)] truncate">
+                            <p className="text-sm font-medium text-foreground truncate font-light">
                                 {user?.user_metadata?.full_name || "Admin User"}
                             </p>
-                            <p className="text-xs text-[var(--dashboard-text-muted)] truncate">
+                            <p className="text-xs text-muted-foreground truncate font-light">
                                 {user?.email || "admin@primelux.com"}
                             </p>
                         </div>
-                        <LogOut
-                            className="h-4 w-4 text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]"
-                            onClick={async () => {
-                                await supabase.auth.signOut()
-                                window.location.href = '/'
-                            }}
-                        />
-                    </div>
+                        <motion.div
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <LogOut
+                                className="h-5 w-5 text-muted-foreground group-hover:text-gold transition-colors duration-300"
+                                onClick={async () => {
+                                    await supabase.auth.signOut()
+                                    window.location.href = '/'
+                                }}
+                            />
+                        </motion.div>
+                    </motion.div>
                 </div>
             </aside>
 
