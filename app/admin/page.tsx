@@ -1,5 +1,6 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { QuickActionsBar } from '@/components/admin/dashboard/quick-actions-bar'
 import { TasksCard } from '@/components/admin/dashboard/tasks-card'
 import { MeetingsCard } from '@/components/admin/dashboard/meetings-card'
