@@ -7,10 +7,18 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { Users } from 'lucide-react'
+import { Users, MoreVertical, Eye, Mail, Phone } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 interface Customer {
     email: string
@@ -110,58 +118,115 @@ export default async function CustomersPage({
     const paginatedCustomers = filteredCustomers.slice(start, start + pageSize)
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-                    <p className="text-muted-foreground mt-1">
+                    <h1 className="text-2xl font-bold text-gray-900">Customer Management</h1>
+                    <p className="text-gray-600 mt-1 text-sm">
                         View customer information and order history
                     </p>
                 </div>
             </div>
 
             <div className="flex items-center justify-between gap-4">
-                <SearchInput placeholder="Search customers..." />
+                <SearchInput placeholder="Search" />
+                <Button>Add new</Button>
             </div>
 
             <Card>
                 <CardContent className="p-0">
+                    <div className="px-6 py-4 border-b border-gray-100">
+                        <h2 className="text-base font-semibold text-gray-900">Customers</h2>
+                    </div>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Phone</TableHead>
-                                <TableHead>Orders</TableHead>
-                                <TableHead>Consultations</TableHead>
-                                <TableHead>Total Spent</TableHead>
-                                <TableHead>Last Order</TableHead>
+                                <TableHead className="w-12">
+                                    <Checkbox />
+                                </TableHead>
+                                <TableHead sortable>Name</TableHead>
+                                <TableHead sortable>Email</TableHead>
+                                <TableHead sortable>Phone</TableHead>
+                                <TableHead sortable>Orders</TableHead>
+                                <TableHead sortable>Consultations</TableHead>
+                                <TableHead sortable>Total Spent</TableHead>
+                                <TableHead sortable>Last Order</TableHead>
+                                <TableHead className="w-12"></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {paginatedCustomers.map((customer) => (
                                 <TableRow key={customer.email}>
-                                    <TableCell className="font-medium">{customer.name}</TableCell>
-                                    <TableCell>{customer.email}</TableCell>
-                                    <TableCell>{customer.phone || 'N/A'}</TableCell>
-                                    <TableCell>{customer.orderCount}</TableCell>
-                                    <TableCell>{customer.consultationCount}</TableCell>
-                                    <TableCell className="font-medium">
+                                    <TableCell>
+                                        <Checkbox />
+                                    </TableCell>
+                                    <TableCell className="font-medium text-gray-900">{customer.name}</TableCell>
+                                    <TableCell className="text-gray-600">
+                                        <div className="flex items-center gap-2">
+                                            <Mail className="h-3.5 w-3.5 text-gray-400" />
+                                            {customer.email}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-gray-600">
+                                        {customer.phone ? (
+                                            <div className="flex items-center gap-2">
+                                                <Phone className="h-3.5 w-3.5 text-gray-400" />
+                                                {customer.phone}
+                                            </div>
+                                        ) : (
+                                            <span className="text-gray-400">N/A</span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-gray-900">
+                                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 text-sm font-medium">
+                                            {customer.orderCount}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="text-gray-900">
+                                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-50 text-purple-700 text-sm font-medium">
+                                            {customer.consultationCount}
+                                        </span>
+                                    </TableCell>
+                                    <TableCell className="font-semibold text-gray-900">
                                         ${customer.totalSpent.toFixed(2)}
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="text-gray-600">
                                         {customer.lastOrderDate
-                                            ? new Date(customer.lastOrderDate).toLocaleDateString()
-                                            : 'N/A'}
+                                            ? new Date(customer.lastOrderDate).toLocaleDateString('en-US', {
+                                                month: 'short',
+                                                day: 'numeric',
+                                                year: 'numeric'
+                                            })
+                                            : <span className="text-gray-400">N/A</span>}
+                                    </TableCell>
+                                    <TableCell>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon-sm">
+                                                    <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                    <span className="sr-only">Actions</span>
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem className="flex items-center gap-2">
+                                                    <Eye className="h-4 w-4" />
+                                                    View Details
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="flex items-center gap-2">
+                                                    <Mail className="h-4 w-4" />
+                                                    Send Email
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </TableCell>
                                 </TableRow>
                             ))}
                             {paginatedCustomers.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center h-24">
+                                    <TableCell colSpan={9} className="text-center h-32">
                                         <div className="flex flex-col items-center gap-2">
-                                            <Users className="h-8 w-8 text-muted-foreground" />
-                                            <p className="text-muted-foreground">No customers found.</p>
+                                            <Users className="h-8 w-8 text-gray-400" />
+                                            <p className="text-gray-500">No customers found.</p>
                                         </div>
                                     </TableCell>
                                 </TableRow>

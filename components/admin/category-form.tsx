@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 
 interface CategoryFormProps {
@@ -55,53 +56,65 @@ export function CategoryForm({ category }: CategoryFormProps) {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-8 max-w-2xl">
-            <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                    id="name"
-                    name="name"
-                    defaultValue={category?.name}
-                    required
-                />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Category Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="name">Category Name</Label>
+                            <Input
+                                id="name"
+                                name="name"
+                                defaultValue={category?.name}
+                                placeholder="Enter category name"
+                                required
+                            />
+                        </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="slug">Slug</Label>
-                <Input
-                    id="slug"
-                    name="slug"
-                    defaultValue={category?.slug}
-                    required
-                />
-            </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="slug">URL Slug</Label>
+                            <Input
+                                id="slug"
+                                name="slug"
+                                defaultValue={category?.slug}
+                                placeholder="category-url-slug"
+                                required
+                            />
+                        </div>
+                    </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                    id="description"
-                    name="description"
-                    defaultValue={category?.description}
-                />
-            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                            id="description"
+                            name="description"
+                            defaultValue={category?.description}
+                            placeholder="Describe this category..."
+                        />
+                    </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="image_url">Image URL</Label>
-                <Input
-                    id="image_url"
-                    name="image_url"
-                    defaultValue={category?.image_url}
-                    placeholder="https://..."
-                />
-            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="image_url">Image URL</Label>
+                        <Input
+                            id="image_url"
+                            name="image_url"
+                            defaultValue={category?.image_url}
+                            placeholder="https://example.com/image.jpg"
+                        />
+                    </div>
 
-            <div className="flex items-center space-x-2">
-                <Checkbox id="is_featured" name="is_featured" defaultChecked={category?.is_featured} />
-                <Label htmlFor="is_featured">Featured Category</Label>
-            </div>
+                    <div className="flex items-center space-x-2 pt-2">
+                        <Checkbox id="is_featured" name="is_featured" defaultChecked={category?.is_featured} />
+                        <Label htmlFor="is_featured" className="!mb-0">Featured Category</Label>
+                    </div>
+                </CardContent>
+            </Card>
 
-            <div className="flex gap-4">
-                <Button type="submit" disabled={loading}>
+            <div className="flex gap-4 sticky bottom-4 bg-white p-4 rounded-xl border shadow-lg">
+                <Button type="submit" disabled={loading} className="flex-1">
                     {loading ? 'Saving...' : category ? 'Update Category' : 'Create Category'}
                 </Button>
                 <Button

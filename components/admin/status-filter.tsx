@@ -8,13 +8,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { Filter } from 'lucide-react'
 
 interface StatusFilterProps {
     statuses: { value: string; label: string }[]
     placeholder?: string
 }
 
-export function StatusFilter({ statuses, placeholder = 'All Statuses' }: StatusFilterProps) {
+export function StatusFilter({ statuses, placeholder = 'Filter by' }: StatusFilterProps) {
     const router = useRouter()
     const searchParams = useSearchParams()
 
@@ -35,7 +36,8 @@ export function StatusFilter({ statuses, placeholder = 'All Statuses' }: StatusF
             value={searchParams.get('status') || 'all'}
             onValueChange={handleStatusChange}
         >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-auto gap-2 h-10 border-gray-300 rounded-lg hover:border-gray-400">
+                <Filter className="h-4 w-4 text-gray-500" />
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>

@@ -5,20 +5,20 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent-gold)]/20",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20",
   {
     variants: {
       variant: {
-        default: 'bg-[var(--dashboard-accent-gold)] text-black hover:bg-[var(--dashboard-accent-gold)]/90 shadow-sm hover:shadow-md',
+        default: 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md',
         destructive:
-          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20',
+          'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500/20',
         outline:
-          'border border-[var(--dashboard-border)] bg-transparent hover:bg-[var(--dashboard-card-hover)] hover:border-[var(--dashboard-accent-gold)]/50',
+          'border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400',
         secondary:
-          'bg-[var(--dashboard-card)] text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)] border border-[var(--dashboard-border)]',
+          'bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-200',
         ghost:
-          'hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)]',
-        link: 'text-[var(--dashboard-accent-gold)] underline-offset-4 hover:underline',
+          'hover:bg-gray-100 hover:text-gray-900',
+        link: 'text-blue-600 underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

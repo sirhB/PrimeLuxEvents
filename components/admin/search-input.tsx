@@ -26,12 +26,12 @@ export function SearchInput({ placeholder }: { placeholder?: string }) {
     }, 300)
 
     return (
-        <div className="relative flex-1 md:max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="relative flex-1 md:max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
                 type="search"
                 placeholder={placeholder || 'Search...'}
-                className="pl-8"
+                className="pl-9 h-10 bg-white border-gray-300 rounded-lg focus:border-blue-500 focus:ring-blue-500"
                 onChange={(e) => handleSearch(e.target.value)}
                 defaultValue={searchParams.get('search')?.toString()}
             />

@@ -9,7 +9,7 @@ const Table = React.forwardRef<
     HTMLTableElement,
     React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-    <div className="relative w-full overflow-auto">
+    <div className="relative w-full overflow-auto rounded-xl bg-white">
         <table
             ref={ref}
             className={cn("w-full caption-bottom text-sm", className)}
@@ -23,7 +23,14 @@ const TableHeader = React.forwardRef<
     HTMLTableSectionElement,
     React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-    <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
+    <thead
+        ref={ref}
+        className={cn(
+            "bg-gray-50/50 border-b border-gray-100",
+            className
+        )}
+        {...props}
+    />
 ))
 TableHeader.displayName = "TableHeader"
 
@@ -46,7 +53,7 @@ const TableFooter = React.forwardRef<
     <tfoot
         ref={ref}
         className={cn(
-            "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+            "border-t bg-gray-50/30 font-medium [&>tr]:last:border-b-0",
             className
         )}
         {...props}
@@ -67,9 +74,9 @@ const TableRow = React.forwardRef<
             <tr
                 ref={ref}
                 className={cn(
-                    "border-b border-[var(--dashboard-border)] transition-all duration-200",
-                    "hover:bg-[var(--dashboard-card-hover)]",
-                    "data-[state=selected]:bg-[var(--dashboard-card-hover)]",
+                    "border-b border-gray-100 transition-all duration-150",
+                    "hover:bg-gray-50/50",
+                    "data-[state=selected]:bg-blue-50/30",
                     className
                 )}
                 {...restProps}
@@ -80,13 +87,13 @@ const TableRow = React.forwardRef<
     return (
         <motion.tr
             ref={ref}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
             className={cn(
-                "border-b border-[var(--dashboard-border)] transition-all duration-200",
-                "hover:bg-[var(--dashboard-card-hover)]",
-                "data-[state=selected]:bg-[var(--dashboard-card-hover)]",
+                "border-b border-gray-100 transition-all duration-150",
+                "hover:bg-gray-50/50",
+                "data-[state=selected]:bg-blue-50/30",
                 className
             )}
             {...restProps}
@@ -97,17 +104,22 @@ TableRow.displayName = "TableRow"
 
 const TableHead = React.forwardRef<
     HTMLTableCellElement,
-    React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+    React.ThHTMLAttributes<HTMLTableCellElement> & {
+        sortable?: boolean
+    }
+>(({ className, sortable = false, children, ...props }, ref) => (
     <th
         ref={ref}
         className={cn(
-            "h-12 px-4 text-left align-middle font-semibold text-[var(--dashboard-text)] uppercase text-xs tracking-wider",
+            "h-14 px-6 text-left align-middle font-medium text-gray-600 text-xs uppercase tracking-wide",
             "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+            sortable && "cursor-pointer select-none hover:text-gray-900",
             className
         )}
         {...props}
-    />
+    >
+        {children}
+    </th>
 ))
 TableHead.displayName = "TableHead"
 
@@ -118,7 +130,8 @@ const TableCell = React.forwardRef<
     <td
         ref={ref}
         className={cn(
-            "p-4 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+            "px-6 py-4 align-middle text-gray-900",
+            "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
             className
         )}
         {...props}
@@ -132,7 +145,7 @@ const TableCaption = React.forwardRef<
 >(({ className, ...props }, ref) => (
     <caption
         ref={ref}
-        className={cn("mt-4 text-sm text-muted-foreground", className)}
+        className={cn("mt-4 text-sm text-gray-500", className)}
         {...props}
     />
 ))

@@ -356,7 +356,7 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
                         <select
                             name="status"
                             defaultValue={consultation.status}
-                            className="flex h-10 w-full max-w-xs rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            className="flex h-11 w-full max-w-xs rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 focus:bg-white focus-visible:outline-none hover:border-gray-300 hover:bg-white"
                         >
                             <option value="new_request">New Request</option>
                             <option value="pending_response">Pending Client Response</option>

@@ -9,12 +9,34 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { Eye } from 'lucide-react'
+import { Eye, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatCents } from '@/lib/format-money'
 import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
 import { StatusFilter } from '@/components/admin/status-filter'
+import { Checkbox } from '@/components/ui/checkbox'
+import { StatusBadge } from '@/components/ui/status-badge'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+// Helper function to map order status to badge variant
+function getStatusVariant(status: string): 'success' | 'pending' | 'cancelled' | 'on-hold' | 'default' {
+    const statusMap: Record<string, 'success' | 'pending' | 'cancelled' | 'on-hold' | 'default'> = {
+        'delivered': 'success',
+        'confirmed': 'success',
+        'pending': 'pending',
+        'processing': 'pending',
+        'cancelled': 'cancelled',
+        'on-hold': 'on-hold',
+    }
+    return statusMap[status.toLowerCase()] || 'default'
+}
 
 export default async function OrdersPage({
     searchParams,
@@ -45,83 +67,127 @@ export default async function OrdersPage({
     const { data: orders, count } = await query.range(start, end)
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
-                    <p className="text-muted-foreground mt-1">
+                    <h1 className="text-2xl font-bold text-gray-900">Order Management</h1>
+                    <p className="text-gray-600 mt-1 text-sm">
                         View and manage customer orders
                     </p>
                 </div>
             </div>
 
             <div className="flex items-center justify-between gap-4">
-                <SearchInput placeholder="Search orders..." />
-                <StatusFilter
-                    statuses={[
-                        { value: 'pending', label: 'Pending' },
-                        { value: 'confirmed', label: 'Confirmed' },
-                        { value: 'processing', label: 'Processing' },
-                        { value: 'delivered', label: 'Delivered' },
-                        { value: 'cancelled', label: 'Cancelled' },
-                    ]}
-                />
+                <SearchInput placeholder="Search" />
+                <div className="flex items-center gap-2">
+                    <StatusFilter
+                        statuses={[
+                            { value: 'pending', label: 'Pending' },
+                            { value: 'confirmed', label: 'Confirmed' },
+                            { value: 'processing', label: 'Processing' },
+                            { value: 'delivered', label: 'Delivered' },
+                            { value: 'cancelled', label: 'Cancelled' },
+                        ]}
+                    />
+                    <Button>Add new</Button>
+                </div>
             </div>
 
             <Card>
                 <CardContent className="p-0">
+                    <div className="px-6 py-4 border-b border-gray-100">
+                        <h2 className="text-base font-semibold text-gray-900">Orders</h2>
+                    </div>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Order ID</TableHead>
-                                <TableHead>Customer</TableHead>
-                                <TableHead>Total</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Alerts</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="w-12">
+                                    <Checkbox />
+                                </TableHead>
+                                <TableHead sortable>Invoice</TableHead>
+                                <TableHead sortable>Customer</TableHead>
+                                <TableHead sortable>Date</TableHead>
+                                <TableHead sortable>Amount</TableHead>
+                                <TableHead>Order Status</TableHead>
+                                <TableHead>Payment Status</TableHead>
+                                <TableHead className="w-12"></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {orders?.map((order) => (
                                 <TableRow key={order.id}>
-                                    <TableCell className="font-medium">{order.id.slice(0, 8)}...</TableCell>
+                                    <TableCell>
+                                        <Checkbox />
+                                    </TableCell>
+                                    <TableCell className="font-semibold text-blue-600">
+                                        #{order.id.slice(0, 8)}
+                                    </TableCell>
                                     <TableCell>
                                         <div className="flex flex-col">
-                                            <span>{order.customer_name}</span>
-                                            <span className="text-xs text-muted-foreground">
+                                            <span className="font-medium text-gray-900">{order.customer_name}</span>
+                                            <span className="text-xs text-gray-500">
                                                 {order.customer_email}
                                             </span>
                                         </div>
                                     </TableCell>
-                                    <TableCell>{formatCents(order.total_amount)}</TableCell>
-                                    <TableCell>
-                                        <span className="capitalize">{order.status}</span>
+                                    <TableCell className="text-gray-600">
+                                        {new Date(order.created_at).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric'
+                                        })}
+                                    </TableCell>
+                                    <TableCell className="font-medium text-gray-900">
+                                        {formatCents(order.total_amount)}
                                     </TableCell>
                                     <TableCell>
-                                        {new Date(order.created_at).toLocaleDateString()}
+                                        <StatusBadge
+                                            status={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                            variant={getStatusVariant(order.status)}
+                                        />
                                     </TableCell>
                                     <TableCell>
-                                        {order.is_overbooked && (
-                                            <span className="inline-flex items-center rounded-full border border-red-500 px-2.5 py-0.5 text-xs font-semibold text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                                Overbooked
-                                            </span>
+                                        {order.is_overbooked ? (
+                                            <StatusBadge status="Overbooked" variant="cancelled" />
+                                        ) : (
+                                            <StatusBadge status="Paid" variant="paid" />
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon" asChild>
-                                            <Link href={`/admin/orders/${order.id}`}>
-                                                <Eye className="h-4 w-4" />
-                                                <span className="sr-only">View</span>
-                                            </Link>
-                                        </Button>
+                                    <TableCell>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon-sm">
+                                                    <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                    <span className="sr-only">Actions</span>
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem asChild>
+                                                    <Link href={`/admin/orders/${order.id}`} className="flex items-center gap-2">
+                                                        <Eye className="h-4 w-4" />
+                                                        View Details
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="flex items-center gap-2">
+                                                    <Pencil className="h-4 w-4" />
+                                                    Edit Order
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                <DropdownMenuItem className="flex items-center gap-2 text-red-600">
+                                                    <Trash2 className="h-4 w-4" />
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </TableCell>
                                 </TableRow>
                             ))}
                             {orders?.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center">
-                                        No orders found.
+                                    <TableCell colSpan={8} className="text-center h-32">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <p className="text-gray-500">No orders found.</p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             )}

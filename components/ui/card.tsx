@@ -18,9 +18,8 @@ const Card = React.forwardRef<
             <div
                 ref={ref}
                 className={cn(
-                    "rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300",
-                    "hover:shadow-lg hover:shadow-[var(--dashboard-accent-gold)]/10",
-                    "border-[var(--dashboard-border)]",
+                    "rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200",
+                    "hover:shadow-md",
                     "group",
                     className
                 )}
@@ -32,13 +31,12 @@ const Card = React.forwardRef<
     return (
         <motion.div
             ref={ref}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             className={cn(
-                "rounded-lg border bg-card text-card-foreground shadow-sm transition-all duration-300",
-                "hover:shadow-lg hover:shadow-[var(--dashboard-accent-gold)]/10",
-                "border-[var(--dashboard-border)]",
+                "rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200",
+                "hover:shadow-md",
                 "group",
                 className
             )}

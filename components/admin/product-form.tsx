@@ -214,94 +214,107 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-8 max-w-2xl">
-            <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                    id="name"
-                    name="name"
-                    defaultValue={product?.name}
-                    required
-                />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
+            {/* Basic Information */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Basic Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="name">Product Name</Label>
+                        <Input
+                            id="name"
+                            name="name"
+                            defaultValue={product?.name}
+                            placeholder="Enter product name"
+                            required
+                        />
+                    </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                    id="description"
-                    name="description"
-                    defaultValue={product?.description}
-                />
-            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                            id="description"
+                            name="description"
+                            defaultValue={product?.description}
+                            placeholder="Describe the product..."
+                        />
+                    </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label htmlFor="price">Price ($)</Label>
-                    <Input
-                        id="price"
-                        name="price"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        defaultValue={product?.price ? (product.price / 100).toFixed(2) : ''}
-                        placeholder="0.00"
-                        required
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="stock">Stock</Label>
-                    <Input
-                        id="stock"
-                        name="stock"
-                        type="number"
-                        defaultValue={product?.stock ?? 0}
-                        required
-                    />
-                </div>
-            </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="price">Price ($)</Label>
+                            <Input
+                                id="price"
+                                name="price"
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                defaultValue={product?.price ? (product.price / 100).toFixed(2) : ''}
+                                placeholder="0.00"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="stock">Stock</Label>
+                            <Input
+                                id="stock"
+                                name="stock"
+                                type="number"
+                                defaultValue={product?.stock ?? 0}
+                                placeholder="0"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="category_id">Category</Label>
+                            <Select name="category_id" defaultValue={product?.category_id}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {categories.map((category) => (
+                                        <SelectItem key={category.id} value={category.id}>
+                                            {category.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="category_id">Category</Label>
-                <Select name="category_id" defaultValue={product?.category_id}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                                {category.name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="image_url">Image URL</Label>
+                        <Input
+                            id="image_url"
+                            name="image_url"
+                            defaultValue={product?.image_url}
+                            placeholder="https://example.com/image.jpg"
+                        />
+                    </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="image_url">Image URL</Label>
-                <Input
-                    id="image_url"
-                    name="image_url"
-                    defaultValue={product?.image_url}
-                    placeholder="https://..."
-                />
-            </div>
+                    <div className="flex items-center space-x-2 pt-2">
+                        <Checkbox id="is_featured" name="is_featured" defaultChecked={product?.is_featured} />
+                        <Label htmlFor="is_featured" className="!mb-0">Featured Product</Label>
+                    </div>
+                </CardContent>
+            </Card>
 
-            <div className="flex items-center space-x-2">
-                <Checkbox id="is_featured" name="is_featured" defaultChecked={product?.is_featured} />
-                <Label htmlFor="is_featured">Featured Product</Label>
-            </div>
-
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <Label className="text-base">Assembly Items</Label>
-                    <Button type="button" variant="outline" size="sm" onClick={addAssemblyItem}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Item
-                    </Button>
-                </div>
-                <div className="space-y-2">
+            {/* Assembly Items */}
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <CardTitle>Assembly Items</CardTitle>
+                        <Button type="button" variant="outline" size="sm" onClick={addAssemblyItem}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Item
+                        </Button>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
                     {assemblyItems.map((item, index) => (
-                        <div key={index} className="flex items-center gap-2">
+                        <div key={index} className="flex items-center gap-3">
                             <Input
                                 value={item.name}
                                 onChange={(e) => updateAssemblyItem(index, 'name', e.target.value)}
@@ -309,7 +322,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                                 className="flex-1"
                             />
                             <div className="flex items-center gap-2">
-                                <span className="text-sm text-muted-foreground">Qty</span>
+                                <span className="text-sm text-muted-foreground whitespace-nowrap">Qty</span>
                                 <Input
                                     type="number"
                                     value={item.quantity}
@@ -329,101 +342,109 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                         </div>
                     ))}
                     {assemblyItems.length === 0 && (
-                        <p className="text-sm text-muted-foreground italic">No assembly items added.</p>
+                        <p className="text-sm text-muted-foreground italic text-center py-4">No assembly items added.</p>
                     )}
-                </div>
-            </div>
+                </CardContent>
+            </Card>
 
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <Label className="text-base">Modifiers</Label>
-                    <Button type="button" variant="outline" size="sm" onClick={addModifier}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Modifier
-                    </Button>
-                </div>
-
-                {modifiers.map((modifier, index) => (
-                    <Card key={modifier.id}>
-                        <CardHeader className="pb-3">
-                            <div className="flex items-center gap-4">
-                                <div className="grid flex-1 gap-2">
-                                    <Label htmlFor={`modifier-${index}-name`}>Modifier Name</Label>
-                                    <Input
-                                        id={`modifier-${index}-name`}
-                                        value={modifier.name}
-                                        onChange={(e) => updateModifier(modifier.id, 'name', e.target.value)}
-                                        placeholder="e.g. Size, Color"
-                                    />
+            {/* Modifiers */}
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center justify-between">
+                        <CardTitle>Product Modifiers</CardTitle>
+                        <Button type="button" variant="outline" size="sm" onClick={addModifier}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Modifier
+                        </Button>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {modifiers.map((modifier, index) => (
+                        <Card key={modifier.id} className="border-2">
+                            <CardHeader className="pb-3">
+                                <div className="flex items-center gap-4">
+                                    <div className="grid flex-1 gap-2">
+                                        <Label htmlFor={`modifier-${index}-name`}>Modifier Name</Label>
+                                        <Input
+                                            id={`modifier-${index}-name`}
+                                            value={modifier.name}
+                                            onChange={(e) => updateModifier(modifier.id, 'name', e.target.value)}
+                                            placeholder="e.g. Size, Color"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="mt-6"
+                                        onClick={() => removeModifier(modifier.id)}
+                                    >
+                                        <Trash className="h-4 w-4 text-destructive" />
+                                    </Button>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    {modifier.options?.map((option, optIndex) => (
+                                        <div key={option.id} className="flex items-center gap-2">
+                                            <Input
+                                                placeholder="Option Label"
+                                                value={option.label}
+                                                onChange={(e) =>
+                                                    updateOption(modifier.id, option.id, 'label', e.target.value)
+                                                }
+                                                className="flex-1"
+                                            />
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-muted-foreground">+$</span>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="0.00"
+                                                    value={option.priceAdjustment}
+                                                    onChange={(e) =>
+                                                        updateOption(
+                                                            modifier.id,
+                                                            option.id,
+                                                            'priceAdjustment',
+                                                            parseFloat(e.target.value) || 0
+                                                        )
+                                                    }
+                                                    className="w-24"
+                                                />
+                                            </div>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => removeOption(modifier.id, option.id)}
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    ))}
                                 </div>
                                 <Button
                                     type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className="mt-6"
-                                    onClick={() => removeModifier(modifier.id)}
+                                    variant="secondary"
+                                    size="sm"
+                                    className="w-full"
+                                    onClick={() => addOption(modifier.id)}
                                 >
-                                    <Trash className="h-4 w-4 text-destructive" />
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Add Option
                                 </Button>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                {modifier.options?.map((option, optIndex) => (
-                                    <div key={option.id} className="flex items-center gap-2">
-                                        <Input
-                                            placeholder="Option Label"
-                                            value={option.label}
-                                            onChange={(e) =>
-                                                updateOption(modifier.id, option.id, 'label', e.target.value)
-                                            }
-                                            className="flex-1"
-                                        />
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm text-muted-foreground">+$</span>
-                                            <Input
-                                                type="number"
-                                                placeholder="0.00"
-                                                value={option.priceAdjustment}
-                                                onChange={(e) =>
-                                                    updateOption(
-                                                        modifier.id,
-                                                        option.id,
-                                                        'priceAdjustment',
-                                                        parseFloat(e.target.value) || 0
-                                                    )
-                                                }
-                                                className="w-24"
-                                            />
-                                        </div>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => removeOption(modifier.id, option.id)}
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                size="sm"
-                                className="w-full"
-                                onClick={() => addOption(modifier.id)}
-                            >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add Option
-                            </Button>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                    {modifiers.length === 0 && (
+                        <p className="text-sm text-muted-foreground italic text-center py-4">No modifiers added.</p>
+                    )}
+                </CardContent>
+            </Card>
 
-            <div className="flex gap-4">
-                <Button type="submit" disabled={loading}>
+            {/* Form Actions */}
+            <div className="flex gap-4 sticky bottom-4 bg-white p-4 rounded-xl border shadow-lg">
+                <Button type="submit" disabled={loading} className="flex-1">
                     {loading ? 'Saving...' : product ? 'Update Product' : 'Create Product'}
                 </Button>
                 <Button
