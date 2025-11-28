@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { formatCents } from '@/lib/format-money'
 
 export type SearchResult = {
-    type: 'product' | 'order' | 'category' | 'customer' | 'consultation' | 'setting' | 'content' | 'event'
+    type: 'product' | 'order' | 'category' | 'customer' | 'consultation' | 'setting' | 'content'
     id: string
     title: string
     subtitle?: string
@@ -88,30 +88,6 @@ export async function searchAdmin(query: string): Promise<SearchResult[]> {
                     status: q.status,
                     amount: formatCents(q.total_amount),
                     date: new Date(q.created_at).toLocaleDateString(),
-                }
-            }))
-        )
-    }
-
-    // Search Events
-    const { data: events } = await supabase
-        .from('events')
-        .select('id, event_id, name, customer_name, customer_email, event_date, status, budget, manager_name')
-        .or(`name.ilike.%${query}%,customer_name.ilike.%${query}%,customer_email.ilike.%${query}%,event_id.ilike.%${query}%`)
-        .limit(8)
-
-    if (events) {
-        results.push(
-            ...events.map((e) => ({
-                type: 'event' as const,
-                id: e.id,
-                title: e.name,
-                subtitle: `${e.event_id} - ${e.customer_name}`,
-                url: `/admin/events/${e.id}`,
-                metadata: {
-                    status: e.status,
-                    date: new Date(e.event_date).toLocaleDateString(),
-                    amount: formatCents(e.budget || 0),
                 }
             }))
         )

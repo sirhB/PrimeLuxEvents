@@ -8,27 +8,14 @@ export default function AdminLayout({
     children: React.ReactNode
 }) {
     return (
-        <div className="flex min-h-screen w-full bg-gradient-to-br from-secondary/20 via-background to-secondary/10 text-foreground font-sans relative overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 bg-noise opacity-40" />
-
-            {/* Subtle gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
-
-            {/* Premium light rays effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-gold/[0.02] via-transparent to-gold/[0.01] pointer-events-none" />
-
-            {/* Subtle vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background/20 via-transparent to-transparent pointer-events-none" />
-
-            <div className="print:hidden relative z-10">
+        <div className="flex min-h-screen w-full bg-[var(--dashboard-background)] text-[var(--dashboard-text)] font-sans">
+            <div className="print:hidden">
                 <ModernSidebar />
             </div>
-            <div className="flex flex-1 flex-col md:pl-64 transition-all duration-500 relative z-10">
-                <main className="flex-1 py-8 md:py-12 px-6 md:px-8 overflow-y-auto">
-                    <div className="container mx-auto max-w-7xl">
-                        {children}
-                    </div>
+            <div className="flex flex-1 flex-col md:pl-64 transition-all duration-300">
+
+                <main className="flex-1 p-4 md:p-8 pt-0 overflow-y-auto">
+                    {children}
                 </main>
             </div>
             <AdminToastProvider />
