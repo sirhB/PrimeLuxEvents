@@ -129,6 +129,8 @@ export async function getCurrentUserFromRequest(request: NextRequest): Promise<U
 // Helper to get user profile using an existing Supabase client (avoids creating a new one in middleware)
 export async function getUserProfileForMiddleware(supabase: any, userId: string): Promise<UserProfile | null> {
     try {
+        console.log('Middleware: Fetching profile for user:', userId)
+
         // Get user profile with roles and permissions
         const { data: profile, error: profileError } = await supabase
             .from('user_profiles')
@@ -149,10 +151,17 @@ export async function getUserProfileForMiddleware(supabase: any, userId: string)
             .eq('is_active', true)
             .single()
 
-        if (profileError || !profile) {
-            console.error('Error fetching profile in middleware:', profileError)
+        if (profileError) {
+            console.error('Middleware: Error fetching profile:', profileError)
             return null
         }
+
+        if (!profile) {
+            console.error('Middleware: No profile found for user:', userId)
+            return null
+        }
+
+        console.log('Middleware: Profile found, roles:', profile.user_roles?.length)
 
         // Get permissions for user's roles
         const roleIds = profile.user_roles.map((ur: any) => ur.roles.id)
@@ -171,7 +180,7 @@ export async function getUserProfileForMiddleware(supabase: any, userId: string)
             .in('role_id', roleIds)
 
         if (permissionsError) {
-            console.error('Error fetching permissions in middleware:', permissionsError)
+            console.error('Middleware: Error fetching permissions:', permissionsError)
             return null
         }
 
