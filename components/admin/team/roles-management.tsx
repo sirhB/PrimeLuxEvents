@@ -1,29 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Shield, Users, Settings, Plus } from 'lucide-react'
-
-interface Role {
-    id: string
-    name: string
-    display_name: string
-    description: string | null
-    color: string
-    is_system_role: boolean
-}
-
-interface Permission {
-    id: string
-    name: string
-    display_name: string
-    description: string | null
-    resource: string
-    action: string
-}
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Shield, Users, Settings, Plus, Edit, Trash2, Save, X } from 'lucide-react'
+import { getRolesWithPermissions, getAllPermissions, getRoleStats, updateRolePermissions, createRole, updateRole, deleteRole, type Role, type Permission, type RoleWithStats } from '@/app/admin/actions'
+import { toast } from 'sonner'
 
 interface RolesManagementProps {
     roles: Role[]
@@ -43,17 +31,56 @@ const resourceGroups = {
     reports: ['view', 'create', 'manage']
 }
 
-export function RolesManagement({ roles, canManage }: RolesManagementProps) {
-    const [selectedRole, setSelectedRole] = useState<Role | null>(null)
+export function RolesManagement({ roles: initialRoles, canManage }: RolesManagementProps) {
+    const [rolesData, setRolesData] = useState<RoleWithStats[]>([])
+    const [allPermissions, setAllPermissions] = useState<Permission[]>([])
+    const [selectedRole, setSelectedRole] = useState<RoleWithStats | null>(null)
+    const [editingRole, setEditingRole] = useState<RoleWithStats | null>(null)
+    const [permissionStates, setPermissionStates] = useState<Record<string, boolean>>({})
+    const [loading, setLoading] = useState(true)
+    const [editDialogOpen, setEditDialogOpen] = useState(false)
+    const [createDialogOpen, setCreateDialogOpen] = useState(false)
 
-    const getRoleStats = (role: Role) => {
-        // This would normally fetch from the database
-        // For now, return mock data
-        return {
-            memberCount: Math.floor(Math.random() * 10),
-            permissionCount: Object.keys(resourceGroups).length * 2 // Rough estimate
+    const fetchRolesData = async () => {
+        setLoading(true)
+        try {
+            const [rolesResult, permissionsResult] = await Promise.all([
+                getRolesWithPermissions(),
+                getAllPermissions()
+            ])
+
+            if (rolesResult.success && rolesResult.data) {
+                setRolesData(rolesResult.data)
+            }
+
+            if (permissionsResult.success && permissionsResult.data) {
+                setAllPermissions(permissionsResult.data)
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error)
+        } finally {
+            setLoading(false)
         }
     }
+
+    const handleRoleClick = (role: RoleWithStats) => {
+        setSelectedRole(role)
+        // Initialize permission states for this role
+        const permStates: Record<string, boolean> = {}
+        role.permissions?.forEach(perm => {
+            permStates[perm.id] = true
+        })
+        setPermissionStates(permStates)
+    }
+
+    const handleEditRole = (role: RoleWithStats) => {
+        setEditingRole(role)
+        setEditDialogOpen(true)
+    }
+
+    useEffect(() => {
+        fetchRolesData()
+    }, [])
 
     return (
         <div className="space-y-6">
@@ -70,46 +97,58 @@ export function RolesManagement({ roles, canManage }: RolesManagementProps) {
                 </CardHeader>
                 <CardContent>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        {roles.map((role) => {
-                            const stats = getRoleStats(role)
-                            return (
-                                <Card
-                                    key={role.id}
-                                    className={`cursor-pointer transition-colors hover:shadow-md ${
-                                        selectedRole?.id === role.id ? 'ring-2 ring-blue-500' : ''
-                                    }`}
-                                    onClick={() => setSelectedRole(role)}
-                                >
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle className="text-lg">{role.display_name}</CardTitle>
+                        {rolesData.map((role) => (
+                            <Card
+                                key={role.id}
+                                className={`cursor-pointer transition-colors hover:shadow-md ${
+                                    selectedRole?.id === role.id ? 'ring-2 ring-blue-500' : ''
+                                }`}
+                                onClick={() => handleRoleClick(role)}
+                            >
+                                <CardHeader className="pb-3">
+                                    <div className="flex items-center justify-between">
+                                        <CardTitle className="text-lg">{role.display_name}</CardTitle>
+                                        <div className="flex items-center gap-2">
                                             {role.is_system_role && (
                                                 <Badge variant="secondary" className="text-xs">
                                                     System
                                                 </Badge>
                                             )}
+                                            {canManage && !role.is_system_role && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleEditRole(role)
+                                                    }}
+                                                >
+                                                    <Edit className="h-3 w-3" />
+                                                </Button>
+                                            )}
                                         </div>
-                                        {role.description && (
-                                            <CardDescription className="text-sm">
-                                                {role.description}
-                                            </CardDescription>
-                                        )}
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="space-y-2">
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <Users className="h-4 w-4" />
-                                                {stats.memberCount} members
-                                            </div>
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <Settings className="h-4 w-4" />
-                                                {stats.permissionCount} permissions
-                                            </div>
+                                    </div>
+                                    {role.description && (
+                                        <CardDescription className="text-sm">
+                                            {role.description}
+                                        </CardDescription>
+                                    )}
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                                            <Users className="h-4 w-4" />
+                                            {role.memberCount || 0} members
                                         </div>
-                                    </CardContent>
-                                </Card>
-                            )
-                        })}
+                                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                                            <Settings className="h-4 w-4" />
+                                            {role.permissions?.length || 0} permissions
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
 
                     {canManage && (
@@ -150,12 +189,12 @@ export function RolesManagement({ roles, canManage }: RolesManagementProps) {
                                 <div className="grid gap-4 md:grid-cols-3">
                                     <div className="text-center p-4 border rounded-lg">
                                         <Users className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                                        <div className="text-2xl font-bold">{getRoleStats(selectedRole).memberCount}</div>
+                                        <div className="text-2xl font-bold">{selectedRole.memberCount || 0}</div>
                                         <div className="text-sm text-gray-500">Active Members</div>
                                     </div>
                                     <div className="text-center p-4 border rounded-lg">
                                         <Settings className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                                        <div className="text-2xl font-bold">{getRoleStats(selectedRole).permissionCount}</div>
+                                        <div className="text-2xl font-bold">{selectedRole.permissions?.length || 0}</div>
                                         <div className="text-sm text-gray-500">Permissions</div>
                                     </div>
                                     <div className="text-center p-4 border rounded-lg">
@@ -168,31 +207,43 @@ export function RolesManagement({ roles, canManage }: RolesManagementProps) {
 
                             <TabsContent value="permissions" className="space-y-4">
                                 <div className="space-y-6">
-                                    {Object.entries(resourceGroups).map(([resource, actions]) => (
-                                        <div key={resource} className="border rounded-lg p-4">
-                                            <h3 className="font-medium text-lg mb-3 capitalize">
-                                                {resource.replace('_', ' ')} Management
-                                            </h3>
-                                            <div className="grid gap-2 md:grid-cols-5">
-                                                {actions.map((action) => (
-                                                    <div key={action} className="flex items-center gap-2">
-                                                        <input
-                                                            type="checkbox"
-                                                            id={`${resource}.${action}`}
-                                                            className="rounded"
-                                                            defaultChecked={Math.random() > 0.5} // Mock data
-                                                        />
-                                                        <label
-                                                            htmlFor={`${resource}.${action}`}
-                                                            className="text-sm capitalize cursor-pointer"
-                                                        >
-                                                            {action}
-                                                        </label>
-                                                    </div>
-                                                ))}
+                                    {Object.entries(resourceGroups).map(([resource, actions]) => {
+                                        const resourcePermissions = allPermissions.filter(p => p.resource === resource)
+                                        if (resourcePermissions.length === 0) return null
+
+                                        return (
+                                            <div key={resource} className="border rounded-lg p-4">
+                                                <h3 className="font-medium text-lg mb-3 capitalize">
+                                                    {resource.replace('_', ' ')} Management
+                                                </h3>
+                                                <div className="grid gap-2 md:grid-cols-5">
+                                                    {resourcePermissions.map((permission) => (
+                                                        <div key={permission.id} className="flex items-center gap-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                id={permission.id}
+                                                                className="rounded"
+                                                                checked={permissionStates[permission.id] || false}
+                                                                onChange={(e) => {
+                                                                    setPermissionStates(prev => ({
+                                                                        ...prev,
+                                                                        [permission.id]: e.target.checked
+                                                                    }))
+                                                                }}
+                                                            />
+                                                            <label
+                                                                htmlFor={permission.id}
+                                                                className="text-sm capitalize cursor-pointer"
+                                                                title={permission.description || permission.display_name}
+                                                            >
+                                                                {permission.action}
+                                                            </label>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        )
+                                    })}
                                 </div>
                             </TabsContent>
 

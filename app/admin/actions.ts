@@ -1,207 +1,311 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { formatCents } from '@/lib/format-money'
+import { requirePermission } from '@/lib/auth/authorization'
+import { revalidatePath } from 'next/cache'
 
-export type SearchResult = {
-    type: 'product' | 'order' | 'category' | 'customer' | 'consultation' | 'setting' | 'content'
+export interface Role {
     id: string
-    title: string
-    subtitle?: string
-    url: string
-    metadata?: {
-        status?: string
-        date?: string
-        amount?: string
-        [key: string]: any
-    }
+    name: string
+    display_name: string
+    description: string | null
+    color: string
+    is_system_role: boolean
+    created_at: string
+    updated_at: string
 }
 
-export async function searchAdmin(query: string): Promise<SearchResult[]> {
-    if (!query || query.length < 2) return []
+export interface Permission {
+    id: string
+    name: string
+    display_name: string
+    description: string | null
+    resource: string
+    action: string
+    created_at: string
+}
 
-    const supabase = await createClient()
-    const results: SearchResult[] = []
+export interface RoleWithStats extends Role {
+    permissions?: Permission[]
+    memberCount?: number
+}
 
-    // Search Products
-    const { data: products } = await supabase
-        .from('products')
-        .select('id, name, description, price')
-        .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
-        .limit(8)
+// Get all roles with their permissions and member counts
+export async function getRolesWithPermissions(): Promise<{ success: boolean; data?: RoleWithStats[]; error?: string }> {
+    try {
+        const supabase = await createClient()
 
-    if (products) {
-        results.push(
-            ...products.map((p) => ({
-                type: 'product' as const,
-                id: p.id,
-                title: p.name,
-                subtitle: p.description?.substring(0, 60) + (p.description?.length > 60 ? '...' : ''),
-                url: `/admin/products/${p.id}`,
-                metadata: {
-                    amount: formatCents(p.price),
-                }
-            }))
-        )
-    }
+        // Get all roles
+        const { data: roles, error: rolesError } = await supabase
+            .from('roles')
+            .select('*')
+            .order('display_name')
 
-    // Search Orders
-    const { data: orders } = await supabase
-        .from('orders')
-        .select('id, customer_name, customer_email, total_amount, status, created_at')
-        .or(`customer_name.ilike.%${query}%,customer_email.ilike.%${query}%`)
-        .limit(8)
-
-    if (orders) {
-        results.push(
-            ...orders.map((o) => ({
-                type: 'order' as const,
-                id: o.id,
-                title: `${o.customer_name}`,
-                subtitle: o.customer_email,
-                url: `/admin/orders/${o.id}`,
-                metadata: {
-                    status: o.status,
-                    amount: formatCents(o.total_amount),
-                    date: new Date(o.created_at).toLocaleDateString(),
-                }
-            }))
-        )
-    }
-
-    // Search Consultations
-    const { data: consultations } = await supabase
-        .from('consultations')
-        .select('id, customer_name, customer_email, total_amount, status, created_at')
-        .or(`customer_name.ilike.%${query}%,customer_email.ilike.%${query}%`)
-        .limit(8)
-
-    if (consultations) {
-        results.push(
-            ...consultations.map((q) => ({
-                type: 'consultation' as const,
-                id: q.id,
-                title: `${q.customer_name}`,
-                subtitle: q.customer_email,
-                url: `/admin/consultations/${q.id}`,
-                metadata: {
-                    status: q.status,
-                    amount: formatCents(q.total_amount),
-                    date: new Date(q.created_at).toLocaleDateString(),
-                }
-            }))
-        )
-    }
-
-    // Search Categories
-    const { data: categories } = await supabase
-        .from('categories')
-        .select('id, name, description')
-        .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
-        .limit(8)
-
-    if (categories) {
-        results.push(
-            ...categories.map((c) => ({
-                type: 'category' as const,
-                id: c.id,
-                title: c.name,
-                subtitle: c.description?.substring(0, 60),
-                url: `/admin/categories/${c.id}`,
-            }))
-        )
-    }
-
-    // Search Customers (aggregate from orders and consultations)
-    const { data: customerOrders } = await supabase
-        .from('orders')
-        .select('customer_name, customer_email, customer_phone')
-        .or(`customer_name.ilike.%${query}%,customer_email.ilike.%${query}%,customer_phone.ilike.%${query}%`)
-        .limit(5)
-
-    const { data: customerConsultations } = await supabase
-        .from('consultations')
-        .select('customer_name, customer_email, customer_phone')
-        .or(`customer_name.ilike.%${query}%,customer_email.ilike.%${query}%,customer_phone.ilike.%${query}%`)
-        .limit(5)
-
-    // Combine and deduplicate customers by email
-    const customerMap = new Map<string, { name: string; email: string; phone?: string }>()
-
-    customerOrders?.forEach(c => {
-        if (c.customer_email && !customerMap.has(c.customer_email)) {
-            customerMap.set(c.customer_email, {
-                name: c.customer_name,
-                email: c.customer_email,
-                phone: c.customer_phone || undefined
-            })
+        if (rolesError) {
+            return { success: false, error: rolesError.message }
         }
-    })
 
-    customerConsultations?.forEach(c => {
-        if (c.customer_email && !customerMap.has(c.customer_email)) {
-            customerMap.set(c.customer_email, {
-                name: c.customer_name,
-                email: c.customer_email,
-                phone: c.customer_phone || undefined
-            })
+        // Get all role permissions
+        const { data: rolePermissions, error: rpError } = await supabase
+            .from('role_permissions')
+            .select(`
+                role_id,
+                permissions (
+                    id,
+                    name,
+                    display_name,
+                    description,
+                    resource,
+                    action
+                )
+            `)
+
+        if (rpError) {
+            return { success: false, error: rpError.message }
         }
-    })
 
-    customerMap.forEach((customer, email) => {
-        results.push({
-            type: 'customer' as const,
-            id: email,
-            title: customer.name,
-            subtitle: customer.email,
-            url: `/admin/customers`,
-            metadata: {
-                phone: customer.phone,
+        // Get member counts
+        const { data: memberCounts, error: countsError } = await supabase
+            .from('user_roles')
+            .select('role_id')
+
+        if (countsError) {
+            return { success: false, error: countsError.message }
+        }
+
+        // Group permissions by role
+        const permissionsByRole: Record<string, Permission[]> = {}
+        rolePermissions?.forEach((rp: any) => {
+            if (!permissionsByRole[rp.role_id]) {
+                permissionsByRole[rp.role_id] = []
+            }
+            if (rp.permissions) {
+                permissionsByRole[rp.role_id].push(rp.permissions)
             }
         })
-    })
 
-    // Search Settings
-    const { data: settings } = await supabase
-        .from('settings')
-        .select('id, key, value, description')
-        .or(`key.ilike.%${query}%,description.ilike.%${query}%,value.ilike.%${query}%`)
-        .limit(8)
+        // Count members by role
+        const memberCountByRole: Record<string, number> = {}
+        memberCounts?.forEach((ur: any) => {
+            memberCountByRole[ur.role_id] = (memberCountByRole[ur.role_id] || 0) + 1
+        })
 
-    if (settings) {
-        results.push(
-            ...settings.map((s) => ({
-                type: 'setting' as const,
-                id: s.id,
-                title: s.key,
-                subtitle: s.description || s.value?.substring(0, 60),
-                url: `/admin/settings`,
-            }))
-        )
+        // Combine data
+        const rolesWithStats: RoleWithStats[] = roles.map(role => ({
+            ...role,
+            permissions: permissionsByRole[role.id] || [],
+            memberCount: memberCountByRole[role.id] || 0
+        }))
+
+        return { success: true, data: rolesWithStats }
+    } catch (error) {
+        console.error('Error fetching roles with permissions:', error)
+        return { success: false, error: 'Failed to fetch roles data' }
     }
-
-    // Search CMS Content
-    const { data: content } = await supabase
-        .from('content')
-        .select('id, key, value, type')
-        .or(`key.ilike.%${query}%,value.ilike.%${query}%`)
-        .limit(8)
-
-    if (content) {
-        results.push(
-            ...content.map((c) => ({
-                type: 'content' as const,
-                id: c.id,
-                title: c.key,
-                subtitle: c.value?.substring(0, 60) + (c.value?.length > 60 ? '...' : ''),
-                url: `/admin/cms`,
-                metadata: {
-                    type: c.type,
-                }
-            }))
-        )
-    }
-
-    return results
 }
 
+// Get all permissions
+export async function getAllPermissions(): Promise<{ success: boolean; data?: Permission[]; error?: string }> {
+    try {
+        const supabase = await createClient()
+
+        const { data: permissions, error } = await supabase
+            .from('permissions')
+            .select('*')
+            .order('resource', { ascending: true })
+            .order('action', { ascending: true })
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        return { success: true, data: permissions }
+    } catch (error) {
+        console.error('Error fetching permissions:', error)
+        return { success: false, error: 'Failed to fetch permissions' }
+    }
+}
+
+// Update role permissions
+export async function updateRolePermissions(roleId: string, permissionIds: string[]): Promise<{ success: boolean; error?: string }> {
+    try {
+        await requirePermission('users.manage')
+
+        const supabase = await createClient()
+
+        // Delete existing permissions for this role
+        const { error: deleteError } = await supabase
+            .from('role_permissions')
+            .delete()
+            .eq('role_id', roleId)
+
+        if (deleteError) {
+            return { success: false, error: deleteError.message }
+        }
+
+        // Insert new permissions if any
+        if (permissionIds.length > 0) {
+            const permissionInserts = permissionIds.map(permissionId => ({
+                role_id: roleId,
+                permission_id: permissionId
+            }))
+
+            const { error: insertError } = await supabase
+                .from('role_permissions')
+                .insert(permissionInserts)
+
+            if (insertError) {
+                return { success: false, error: insertError.message }
+            }
+        }
+
+        revalidatePath('/admin/team')
+        return { success: true }
+    } catch (error) {
+        console.error('Error updating role permissions:', error)
+        return { success: false, error: 'Failed to update role permissions' }
+    }
+}
+
+// Create new role
+export async function createRole(roleData: { name: string; display_name: string; description?: string; color: string }): Promise<{ success: boolean; data?: Role; error?: string }> {
+    try {
+        await requirePermission('users.manage')
+
+        const supabase = await createClient()
+
+        const { data, error } = await supabase
+            .from('roles')
+            .insert({
+                name: roleData.name,
+                display_name: roleData.display_name,
+                description: roleData.description || null,
+                color: roleData.color,
+                is_system_role: false
+            })
+            .select()
+            .single()
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/admin/team')
+        return { success: true, data }
+    } catch (error) {
+        console.error('Error creating role:', error)
+        return { success: false, error: 'Failed to create role' }
+    }
+}
+
+// Update role
+export async function updateRole(roleId: string, roleData: { display_name?: string; description?: string; color?: string }): Promise<{ success: boolean; error?: string }> {
+    try {
+        await requirePermission('users.manage')
+
+        const supabase = await createClient()
+
+        const { error } = await supabase
+            .from('roles')
+            .update({
+                display_name: roleData.display_name,
+                description: roleData.description,
+                color: roleData.color,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', roleId)
+            .eq('is_system_role', false) // Only allow updating non-system roles
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/admin/team')
+        return { success: true }
+    } catch (error) {
+        console.error('Error updating role:', error)
+        return { success: false, error: 'Failed to update role' }
+    }
+}
+
+// Delete role
+export async function deleteRole(roleId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+        await requirePermission('users.manage')
+
+        const supabase = await createClient()
+
+        // Check if role has members
+        const { data: members, error: membersError } = await supabase
+            .from('user_roles')
+            .select('id')
+            .eq('role_id', roleId)
+            .limit(1)
+
+        if (membersError) {
+            return { success: false, error: membersError.message }
+        }
+
+        if (members && members.length > 0) {
+            return { success: false, error: 'Cannot delete role that has assigned members' }
+        }
+
+        // Check if it's a system role
+        const { data: role, error: roleError } = await supabase
+            .from('roles')
+            .select('is_system_role')
+            .eq('id', roleId)
+            .single()
+
+        if (roleError) {
+            return { success: false, error: roleError.message }
+        }
+
+        if (role?.is_system_role) {
+            return { success: false, error: 'Cannot delete system roles' }
+        }
+
+        // Delete the role (this will cascade to role_permissions)
+        const { error: deleteError } = await supabase
+            .from('roles')
+            .delete()
+            .eq('id', roleId)
+
+        if (deleteError) {
+            return { success: false, error: deleteError.message }
+        }
+
+        revalidatePath('/admin/team')
+        return { success: true }
+    } catch (error) {
+        console.error('Error deleting role:', error)
+        return { success: false, error: 'Failed to delete role' }
+    }
+}
+
+// Get role stats (member count and permission count)
+export async function getRoleStats(roleId: string): Promise<{ memberCount: number; permissionCount: number }> {
+    try {
+        const supabase = await createClient()
+
+        // Get member count
+        const { count: memberCount, error: memberError } = await supabase
+            .from('user_roles')
+            .select('*', { count: 'exact', head: true })
+            .eq('role_id', roleId)
+
+        // Get permission count
+        const { count: permissionCount, error: permissionError } = await supabase
+            .from('role_permissions')
+            .select('*', { count: 'exact', head: true })
+            .eq('role_id', roleId)
+
+        return {
+            memberCount: memberCount || 0,
+            permissionCount: permissionCount || 0
+        }
+    } catch (error) {
+        console.error('Error getting role stats:', error)
+        return { memberCount: 0, permissionCount: 0 }
+    }
+}
