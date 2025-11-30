@@ -89,6 +89,90 @@ export async function scheduleAppointment(
     revalidatePath('/admin/appointments')
 }
 
+export async function createConsultation(data: {
+    customerName: string
+    customerEmail: string
+    customerPhone?: string
+    numberOfGuests?: number
+    eventDate?: string
+    budgetRange?: string
+    message?: string
+    status?: string
+}) {
+    try {
+        const supabase = await createClient()
+
+        const { data: newConsultation, error } = await supabase
+            .from('consultations')
+            .insert({
+                customer_name: data.customerName,
+                customer_email: data.customerEmail,
+                customer_phone: data.customerPhone || null,
+                number_of_guests: data.numberOfGuests || null,
+                event_date: data.eventDate || null,
+                budget_range: data.budgetRange || null,
+                message: data.message || null,
+                status: data.status || 'new_request',
+            })
+            .select()
+            .single()
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/admin/consultations')
+        return { success: true, data: newConsultation }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        return { success: false, error: message }
+    }
+}
+
+export async function updateConsultation(
+    consultationId: string,
+    data: {
+        customerName?: string
+        customerEmail?: string
+        customerPhone?: string
+        numberOfGuests?: number
+        eventDate?: string
+        budgetRange?: string
+        message?: string
+        status?: string
+    }
+) {
+    try {
+        const supabase = await createClient()
+
+        const updateData: Record<string, unknown> = {
+            updated_at: new Date().toISOString(),
+        }
+
+        if (data.customerName !== undefined) updateData.customer_name = data.customerName
+        if (data.customerEmail !== undefined) updateData.customer_email = data.customerEmail
+        if (data.customerPhone !== undefined) updateData.customer_phone = data.customerPhone
+        if (data.numberOfGuests !== undefined) updateData.number_of_guests = data.numberOfGuests
+        if (data.eventDate !== undefined) updateData.event_date = data.eventDate
+        if (data.budgetRange !== undefined) updateData.budget_range = data.budgetRange
+        if (data.message !== undefined) updateData.message = data.message
+        if (data.status !== undefined) updateData.status = data.status
+
+        const { error } = await supabase.from('consultations').update(updateData).eq('id', consultationId)
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/admin/consultations')
+        revalidatePath(`/admin/consultations/${consultationId}`)
+        return { success: true }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        return { success: false, error: message }
+    }
+}
+
 export async function deleteConsultation(consultationId: string) {
     const supabase = await createClient()
 
@@ -104,5 +188,26 @@ export async function deleteConsultation(consultationId: string) {
 
     revalidatePath('/admin/consultations')
     redirect('/admin/consultations')
+}
+
+export async function updateConsultationStatus(consultationId: string, status: string) {
+    try {
+        const supabase = await createClient()
+
+        const { error } = await supabase
+            .from('consultations')
+            .update({ status, updated_at: new Date().toISOString() })
+            .eq('id', consultationId)
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/admin/consultations')
+        return { success: true }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        return { success: false, error: message }
+    }
 }
 

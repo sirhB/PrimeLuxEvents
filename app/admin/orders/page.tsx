@@ -9,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { Eye, MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { Eye, MoreVertical, Pencil, Trash2, Plus } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatCents } from '@/lib/format-money'
@@ -76,6 +76,12 @@ export default async function OrdersPage({
                         View and manage customer orders
                     </p>
                 </div>
+                <Button asChild>
+                    <Link href="/admin/orders/new">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Order
+                    </Link>
+                </Button>
             </div>
 
             <Tabs defaultValue="all" className="w-full">
@@ -89,18 +95,15 @@ export default async function OrdersPage({
                 <TabsContent value="all" className="space-y-6 mt-6">
                     <div className="flex items-center justify-between gap-4">
                         <SearchInput placeholder="Search" />
-                        <div className="flex items-center gap-2">
-                            <StatusFilter
-                                statuses={[
-                                    { value: 'pending', label: 'Pending' },
-                                    { value: 'confirmed', label: 'Confirmed' },
-                                    { value: 'processing', label: 'Processing' },
-                                    { value: 'delivered', label: 'Delivered' },
-                                    { value: 'cancelled', label: 'Cancelled' },
-                                ]}
-                            />
-                            <Button>Add new</Button>
-                        </div>
+                        <StatusFilter
+                            statuses={[
+                                { value: 'pending', label: 'Pending' },
+                                { value: 'confirmed', label: 'Confirmed' },
+                                { value: 'processing', label: 'Processing' },
+                                { value: 'delivered', label: 'Delivered' },
+                                { value: 'cancelled', label: 'Cancelled' },
+                            ]}
+                        />
                     </div>
 
                     <Card>
