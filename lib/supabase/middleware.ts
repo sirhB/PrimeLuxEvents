@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { getCurrentUserFromRequest } from '@/lib/auth/middleware-auth'
+import { getUserProfileForMiddleware } from '@/lib/auth/middleware-auth'
 
 export async function updateSession(request: NextRequest) {
     let supabaseResponse = NextResponse.next({
@@ -50,7 +50,7 @@ export async function updateSession(request: NextRequest) {
         } else {
             // User is authenticated, check if they have access to admin
             try {
-                const userProfile = await getCurrentUserFromRequest(request)
+                const userProfile = await getUserProfileForMiddleware(supabase, user.id)
                 if (!userProfile || !userProfile.is_active) {
                     // User profile not found or inactive, redirect to login
                     const url = request.nextUrl.clone()
