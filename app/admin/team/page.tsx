@@ -9,6 +9,8 @@ import { RolesManagement } from '@/components/admin/team/roles-management'
 import { InvitationsList } from '@/components/admin/team/invitations-list'
 import { InviteUserDialog } from '@/components/admin/team/invite-user-dialog'
 
+export const dynamic = 'force-dynamic'
+
 export default async function TeamManagementPage() {
     // Require admin permission to access this page
     await requirePermission('users.view')

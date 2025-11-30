@@ -2,6 +2,8 @@ import { ModernSidebar } from '@/components/admin/modern-sidebar'
 import { AdminToastProvider } from '@/components/admin/toast-provider'
 import { AdminSearchFab } from '@/components/admin/admin-search-fab'
 
+export const dynamic = 'force-dynamic'
+
 export default function AdminLayout({
     children,
 }: {

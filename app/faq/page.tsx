@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { getSiteContent } from "@/lib/content"
+import { getSiteContentClient } from "@/lib/content-client"
 import { motion } from "framer-motion"
 import { HelpCircle, MessageCircle, Clock } from "lucide-react"
 
@@ -12,7 +12,7 @@ export default function FAQPage() {
 
   useEffect(() => {
     const loadContent = async () => {
-      const siteContent = await getSiteContent()
+      const siteContent = await getSiteContentClient()
       setContent(siteContent)
       setFaqs(siteContent['faq.list'] || [
         {

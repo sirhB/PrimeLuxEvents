@@ -6,6 +6,8 @@ import { BrandValuesSection } from "@/components/brand-values-section"
 import { TestimonialsSection } from "@/components/testimonials-section"
 import { getSiteContent } from "@/lib/content"
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   const content = await getSiteContent()
 

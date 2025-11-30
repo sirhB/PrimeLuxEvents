@@ -1,9 +1,9 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/client'
 
 export type ContentMap = Record<string, any>
 
-export async function getSiteContent() {
-    const supabase = await createClient()
+export async function getSiteContentClient() {
+    const supabase = createClient()
 
     try {
         const { data, error } = await supabase
@@ -31,7 +31,7 @@ export async function getSiteContent() {
 
         return contentMap
     } catch (error) {
-        console.error('Error in getSiteContent:', error)
+        console.error('Error in getSiteContentClient:', error)
         return {}
     }
 }

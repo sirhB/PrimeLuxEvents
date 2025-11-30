@@ -4,6 +4,8 @@ import Link from "next/link"
 import { PencilRuler, Truck, Armchair, Sparkles } from "lucide-react"
 import { getSiteContent } from "@/lib/content"
 
+export const dynamic = 'force-dynamic'
+
 export default async function ServicesPage() {
   const content = await getSiteContent()
 

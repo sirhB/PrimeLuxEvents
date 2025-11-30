@@ -1,5 +1,3 @@
-'use client'
-
 import { DashboardHeader } from '@/components/admin/dashboard/dashboard-header'
 import { TasksCard } from '@/components/admin/dashboard/tasks-card'
 import { MeetingsCard } from '@/components/admin/dashboard/meetings-card'
@@ -7,6 +5,8 @@ import { ProjectsWorkedCard } from '@/components/admin/dashboard/projects-worked
 import { UpcomingEvents } from '@/components/admin/dashboard/upcoming-events'
 import { AlertsCard } from '@/components/admin/dashboard/alerts-card'
 import { RecentTemplates } from '@/components/admin/dashboard/recent-templates'
+
+export const dynamic = 'force-dynamic'
 
 export default function AdminDashboardPage() {
     return (

@@ -2,6 +2,8 @@ import { getSiteContent } from "@/lib/content"
 import CatalogClient from "./catalog-client"
 import { createClient } from "@/lib/supabase/server"
 
+export const dynamic = 'force-dynamic'
+
 export default async function CatalogPage() {
   const content = await getSiteContent()
   const supabase = await createClient()
