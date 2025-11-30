@@ -1,15 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Printer, Calendar as CalendarIcon, Package, Truck, Wrench, MapPin, Clock, FileText } from "lucide-react"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { Printer, Calendar as CalendarIcon, Package, Wrench, MapPin, Clock, FileText, Eye } from "lucide-react"
 import { format } from "date-fns"
+import Link from "next/link"
 
 interface AssemblyItem {
     name: string
@@ -34,6 +43,11 @@ interface OrderPack {
     assemblySummary: Record<string, number>
 }
 
+interface UpcomingDate {
+    date: string
+    orderCount: number
+}
+
 export default function PackSlipPage() {
     const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0])
     const [loading, setLoading] = useState(false)
@@ -43,8 +57,42 @@ export default function PackSlipPage() {
     const [orderCount, setOrderCount] = useState(0)
     const [hasSearched, setHasSearched] = useState(false)
     const [viewMode, setViewMode] = useState<"aggregate" | "by-order">("aggregate")
+    const [upcomingDates, setUpcomingDates] = useState<UpcomingDate[]>([])
 
     const supabase = createClient()
+
+    useEffect(() => {
+        fetchUpcomingDates()
+    }, [])
+
+    async function fetchUpcomingDates() {
+        try {
+            const today = new Date().toISOString().split('T')[0]
+            const { data, error } = await supabase
+                .from('orders')
+                .select('delivery_date')
+                .gte('delivery_date', today)
+                .order('delivery_date', { ascending: true })
+
+            if (error) throw error
+
+            // Group by date and count
+            const dateMap = new Map<string, number>()
+            data?.forEach((order: any) => {
+                if (order.delivery_date) {
+                    dateMap.set(order.delivery_date, (dateMap.get(order.delivery_date) || 0) + 1)
+                }
+            })
+
+            const dates = Array.from(dateMap.entries())
+                .map(([date, count]) => ({ date, orderCount: count }))
+                .slice(0, 10) // Show next 10 dates
+
+            setUpcomingDates(dates)
+        } catch (error) {
+            console.error('Error fetching upcoming dates:', error)
+        }
+    }
 
     async function generatePackSlip() {
         setLoading(true)
@@ -192,38 +240,107 @@ export default function PackSlipPage() {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
             <div className="flex items-center justify-between print:hidden">
                 <div>
-                    <h1 className="text-3xl font-serif">Pack Slip Generator</h1>
-                    <p className="text-muted-foreground mt-1">
+                    <h1 className="text-2xl font-bold text-gray-900">Pack Slip Generator</h1>
+                    <p className="text-gray-600 mt-1 text-sm">
                         Generate daily packing lists for deliveries.
                     </p>
                 </div>
             </div>
 
-            <Card className="print:hidden">
-                <CardContent className="pt-6">
-                    <div className="flex items-end gap-4">
-                        <div className="space-y-2 flex-1">
-                            <Label htmlFor="date">Delivery Date</Label>
-                            <div className="relative">
-                                <CalendarIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="date"
-                                    type="date"
-                                    className="pl-9"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                />
+            <Tabs defaultValue="upcoming" className="w-full print:hidden">
+                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+                    <TabsTrigger value="upcoming">Upcoming Dates</TabsTrigger>
+                    <TabsTrigger value="generate">Generate Slip</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="upcoming" className="space-y-6 mt-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Upcoming Delivery Dates</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Delivery Date</TableHead>
+                                        <TableHead>Orders</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {upcomingDates.length > 0 ? (
+                                        upcomingDates.map((item) => (
+                                            <TableRow key={item.date}>
+                                                <TableCell className="font-medium">
+                                                    <div className="flex items-center gap-2">
+                                                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                                        {format(new Date(item.date), 'EEEE, MMMM d, yyyy')}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800">
+                                                        {item.orderCount} {item.orderCount === 1 ? 'order' : 'orders'}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setDate(item.date)
+                                                            generatePackSlip()
+                                                        }}
+                                                    >
+                                                        <Eye className="h-4 w-4 mr-2" />
+                                                        View Slip
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={3} className="text-center h-24">
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <Package className="h-8 w-8 text-muted-foreground" />
+                                                    <p className="text-muted-foreground">No upcoming deliveries found.</p>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="generate" className="space-y-6 mt-6">
+                    <Card>
+                        <CardContent className="pt-6">
+                            <div className="flex items-end gap-4">
+                                <div className="space-y-2 flex-1">
+                                    <Label htmlFor="date">Delivery Date</Label>
+                                    <div className="relative">
+                                        <CalendarIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                                        <Input
+                                            id="date"
+                                            type="date"
+                                            className="pl-9"
+                                            value={date}
+                                            onChange={(e) => setDate(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <Button onClick={generatePackSlip} disabled={loading}>
+                                    {loading ? "Generating..." : "Generate Slip"}
+                                </Button>
                             </div>
-                        </div>
-                        <Button onClick={generatePackSlip} disabled={loading}>
-                            {loading ? "Generating..." : "Generate Slip"}
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
 
             {hasSearched && (
                 <Card className="print:shadow-none">

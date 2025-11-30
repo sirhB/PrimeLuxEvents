@@ -10,7 +10,14 @@ export const dynamic = 'force-dynamic'
 
 export default function AdminDashboardPage() {
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
+            <div>
+                <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+                <p className="text-gray-600 mt-1 text-sm">
+                    Welcome back! Here's what's happening today.
+                </p>
+            </div>
+
             <DashboardHeader />
 
             {/* Row 1 */}
