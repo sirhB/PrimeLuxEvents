@@ -192,10 +192,10 @@ export default async function ConsultationsPage({
     }
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Consultations</h1>
-                <p className="text-muted-foreground mt-1">
+                <h1 className="text-2xl font-bold text-gray-900">Consultations</h1>
+                <p className="text-gray-600 mt-1 text-sm">
                     Track every consultation request through a clear, kanban-style workflow.
                 </p>
             </div>

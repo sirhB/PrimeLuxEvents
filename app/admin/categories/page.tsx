@@ -12,6 +12,7 @@ import {
 import { Plus, Pencil, Trash2, Eye } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { Card, CardContent } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
 
@@ -48,11 +49,11 @@ export default async function CategoriesPage({
     }
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Categories</h1>
-                    <p className="text-muted-foreground mt-1">
+                    <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
+                    <p className="text-gray-600 mt-1 text-sm">
                         Organize your products with categories
                     </p>
                 </div>
@@ -64,73 +65,88 @@ export default async function CategoriesPage({
                 </Button>
             </div>
 
-            <div className="flex items-center justify-between gap-4">
-                <SearchInput placeholder="Search categories..." />
-            </div>
+            <Tabs defaultValue="all" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+                    <TabsTrigger value="all">All Categories</TabsTrigger>
+                    <TabsTrigger value="active">Active</TabsTrigger>
+                </TabsList>
 
-            <Card>
-                <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Slug</TableHead>
-                                <TableHead>Description</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {categories?.map((category) => (
-                                <TableRow key={category.id}>
-                                    <TableCell className="font-medium">{category.name}</TableCell>
-                                    <TableCell>{category.slug}</TableCell>
-                                    <TableCell>{category.description}</TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="icon" asChild title="View Products">
-                                                <Link href={`/admin/products?category_id=${category.id}`}>
-                                                    <Eye className="h-4 w-4" />
-                                                    <span className="sr-only">View Products</span>
-                                                </Link>
-                                            </Button>
-                                            <Button variant="ghost" size="icon" asChild title="Edit Category">
-                                                <Link href={`/admin/categories/${category.id}`}>
-                                                    <Pencil className="h-4 w-4" />
-                                                    <span className="sr-only">Edit</span>
-                                                </Link>
-                                            </Button>
-                                            <form action={deleteCategory}>
-                                                <input type="hidden" name="id" value={category.id} />
-                                                <Button variant="ghost" size="icon" type="submit" title="Delete Category">
-                                                    <Trash2 className="h-4 w-4 text-red-500" />
-                                                    <span className="sr-only">Delete</span>
-                                                </Button>
-                                            </form>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {categories?.length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={4} className="text-center">
-                                        No categories found.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+                <TabsContent value="all" className="space-y-6 mt-6">
+                    <div className="flex items-center justify-between gap-4">
+                        <SearchInput placeholder="Search categories..." />
+                    </div>
 
-            {count !== null && count > 0 && (
-                <PaginationControls
-                    hasNextPage={end < count}
-                    hasPrevPage={start > 0}
-                    totalCount={count}
-                    currentPage={currentPage}
-                    pageSize={pageSize}
-                />
-            )}
+                    <Card>
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Slug</TableHead>
+                                        <TableHead>Description</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {categories?.map((category) => (
+                                        <TableRow key={category.id}>
+                                            <TableCell className="font-medium">{category.name}</TableCell>
+                                            <TableCell>{category.slug}</TableCell>
+                                            <TableCell>{category.description}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button variant="ghost" size="icon" asChild title="View Products">
+                                                        <Link href={`/admin/products?category_id=${category.id}`}>
+                                                            <Eye className="h-4 w-4" />
+                                                            <span className="sr-only">View Products</span>
+                                                        </Link>
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" asChild title="Edit Category">
+                                                        <Link href={`/admin/categories/${category.id}`}>
+                                                            <Pencil className="h-4 w-4" />
+                                                            <span className="sr-only">Edit</span>
+                                                        </Link>
+                                                    </Button>
+                                                    <form action={deleteCategory}>
+                                                        <input type="hidden" name="id" value={category.id} />
+                                                        <Button variant="ghost" size="icon" type="submit" title="Delete Category">
+                                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                                            <span className="sr-only">Delete</span>
+                                                        </Button>
+                                                    </form>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {categories?.length === 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={4} className="text-center">
+                                                No categories found.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+
+                    {count !== null && count > 0 && (
+                        <PaginationControls
+                            hasNextPage={end < count}
+                            hasPrevPage={start > 0}
+                            totalCount={count}
+                            currentPage={currentPage}
+                            pageSize={pageSize}
+                        />
+                    )}
+                </TabsContent>
+
+                <TabsContent value="active" className="space-y-6 mt-6">
+                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                        <p className="text-muted-foreground">Active categories view coming soon</p>
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }

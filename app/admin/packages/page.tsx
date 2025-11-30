@@ -12,6 +12,7 @@ import {
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { Card, CardContent } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatCurrency } from '@/lib/utils'
 
 export default async function PackagesPage() {
@@ -30,11 +31,11 @@ export default async function PackagesPage() {
     }
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Packages</h1>
-                    <p className="text-muted-foreground mt-1">
+                    <h1 className="text-2xl font-bold text-gray-900">Packages</h1>
+                    <p className="text-gray-600 mt-1 text-sm">
                         Manage your rental packages and deals
                     </p>
                 </div>
@@ -45,53 +46,69 @@ export default async function PackagesPage() {
                     </Link>
                 </Button>
             </div>
-            <Card>
-                <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead>Featured</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {packages?.map((pkg) => (
-                                <TableRow key={pkg.id}>
-                                    <TableCell className="font-medium">{pkg.name}</TableCell>
-                                    <TableCell>{formatCurrency(pkg.price)}</TableCell>
-                                    <TableCell>{pkg.is_featured ? 'Yes' : 'No'}</TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex justify-end gap-2">
-                                            <Button variant="ghost" size="icon" asChild>
-                                                <Link href={`/admin/packages/${pkg.id}`}>
-                                                    <Pencil className="h-4 w-4" />
-                                                    <span className="sr-only">Edit</span>
-                                                </Link>
-                                            </Button>
-                                            <form action={deletePackage}>
-                                                <input type="hidden" name="id" value={pkg.id} />
-                                                <Button variant="ghost" size="icon" type="submit">
-                                                    <Trash2 className="h-4 w-4 text-red-500" />
-                                                    <span className="sr-only">Delete</span>
-                                                </Button>
-                                            </form>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {packages?.length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={4} className="text-center">
-                                        No packages found.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+
+            <Tabs defaultValue="all" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+                    <TabsTrigger value="all">All Packages</TabsTrigger>
+                    <TabsTrigger value="featured">Featured</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="all" className="space-y-6 mt-6">
+                    <Card>
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Price</TableHead>
+                                        <TableHead>Featured</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {packages?.map((pkg) => (
+                                        <TableRow key={pkg.id}>
+                                            <TableCell className="font-medium">{pkg.name}</TableCell>
+                                            <TableCell>{formatCurrency(pkg.price)}</TableCell>
+                                            <TableCell>{pkg.is_featured ? 'Yes' : 'No'}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button variant="ghost" size="icon" asChild>
+                                                        <Link href={`/admin/packages/${pkg.id}`}>
+                                                            <Pencil className="h-4 w-4" />
+                                                            <span className="sr-only">Edit</span>
+                                                        </Link>
+                                                    </Button>
+                                                    <form action={deletePackage}>
+                                                        <input type="hidden" name="id" value={pkg.id} />
+                                                        <Button variant="ghost" size="icon" type="submit">
+                                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                                            <span className="sr-only">Delete</span>
+                                                        </Button>
+                                                    </form>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {packages?.length === 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={4} className="text-center">
+                                                No packages found.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="featured" className="space-y-6 mt-6">
+                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                        <p className="text-muted-foreground">Featured packages view coming soon</p>
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }
