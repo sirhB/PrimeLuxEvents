@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { createClient } from '@/lib/supabase/client'
-import { Calendar, User, Flag } from 'lucide-react'
+import { Calendar, User, Flag, Truck, Briefcase, Home, Building } from 'lucide-react'
 
 interface TaskFormData {
     title: string
@@ -19,8 +19,8 @@ interface TaskFormData {
     task_type: string
 }
 
-interface EventTaskFormProps {
-    eventId: string
+interface TaskFormProps {
+    eventId?: string
     task?: TaskFormData & { id: string }
     onSuccess?: () => void
     onCancel?: () => void
@@ -40,7 +40,19 @@ const priorities = [
     { value: 'urgent', label: 'Urgent' }
 ]
 
-export function EventTaskForm({ eventId, task, onSuccess, onCancel }: EventTaskFormProps) {
+const taskTypes = [
+    { value: 'general', label: 'General', icon: Briefcase },
+    { value: 'event', label: 'Event', icon: Calendar },
+    { value: 'delivery', label: 'Delivery', icon: Truck },
+    { value: 'warehouse', label: 'Warehouse', icon: Home }, // Using Home as generic building
+    { value: 'office', label: 'Office', icon: Building },
+    { value: 'venue', label: 'Venue', icon: MapPin },
+    { value: 'return_trip', label: 'Return Trip', icon: Truck }
+]
+
+import { MapPin } from 'lucide-react'
+
+export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) {
     const [formData, setFormData] = useState<TaskFormData>({
         title: task?.title || '',
         description: task?.description || '',
@@ -48,7 +60,7 @@ export function EventTaskForm({ eventId, task, onSuccess, onCancel }: EventTaskF
         priority: task?.priority || 'medium',
         assigned_to: task?.assigned_to || '',
         due_date: task?.due_date || '',
-        task_type: 'event'
+        task_type: task?.task_type || (eventId ? 'event' : 'general')
     })
 
     const [loading, setLoading] = useState(false)
@@ -74,7 +86,7 @@ export function EventTaskForm({ eventId, task, onSuccess, onCancel }: EventTaskF
         try {
             const taskData = {
                 ...formData,
-                event_id: eventId,
+                event_id: eventId || null,
                 updated_at: new Date().toISOString()
             }
 
@@ -127,7 +139,7 @@ export function EventTaskForm({ eventId, task, onSuccess, onCancel }: EventTaskF
                     id="title"
                     value={formData.title}
                     onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="Venue walkthrough and final confirmation"
+                    placeholder="e.g., Deliver catering equipment"
                     required
                 />
                 {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title}</p>}
@@ -146,15 +158,18 @@ export function EventTaskForm({ eventId, task, onSuccess, onCancel }: EventTaskF
 
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                    <Label htmlFor="status">Status</Label>
-                    <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                    <Label htmlFor="task_type">Task Type</Label>
+                    <Select value={formData.task_type} onValueChange={(value) => handleInputChange('task_type', value)}>
                         <SelectTrigger>
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                            {statuses.map((status) => (
-                                <SelectItem key={status.value} value={status.value}>
-                                    {status.label}
+                            {taskTypes.map((type) => (
+                                <SelectItem key={type.value} value={type.value}>
+                                    <div className="flex items-center gap-2">
+                                        <type.icon className="h-4 w-4 text-muted-foreground" />
+                                        {type.label}
+                                    </div>
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -187,13 +202,19 @@ export function EventTaskForm({ eventId, task, onSuccess, onCancel }: EventTaskF
 
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                    <Label htmlFor="assigned_to">Assigned To</Label>
-                    <Input
-                        id="assigned_to"
-                        value={formData.assigned_to}
-                        onChange={(e) => handleInputChange('assigned_to', e.target.value)}
-                        placeholder="Maya Brooks"
-                    />
+                    <Label htmlFor="status">Status</Label>
+                    <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {statuses.map((status) => (
+                                <SelectItem key={status.value} value={status.value}>
+                                    {status.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 <div>
@@ -205,6 +226,16 @@ export function EventTaskForm({ eventId, task, onSuccess, onCancel }: EventTaskF
                         onChange={(e) => handleInputChange('due_date', e.target.value)}
                     />
                 </div>
+            </div>
+
+            <div>
+                <Label htmlFor="assigned_to">Assigned To</Label>
+                <Input
+                    id="assigned_to"
+                    value={formData.assigned_to}
+                    onChange={(e) => handleInputChange('assigned_to', e.target.value)}
+                    placeholder="Enter team member name"
+                />
             </div>
 
             {errors.submit && (

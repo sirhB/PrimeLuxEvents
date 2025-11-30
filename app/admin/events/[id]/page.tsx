@@ -76,7 +76,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         .limit(5)
 
     const { data: eventTasks } = await supabase
-        .from('event_tasks')
+        .from('tasks')
         .select('*')
         .eq('event_id', id)
         .order('created_at', { ascending: false })
@@ -364,20 +364,18 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <h4 className="font-medium">{task.title}</h4>
-                                                    <span className={`px-2 py-1 text-xs rounded-full ${
-                                                        task.priority === 'urgent' ? 'bg-red-100 text-red-800' :
+                                                    <span className={`px-2 py-1 text-xs rounded-full ${task.priority === 'urgent' ? 'bg-red-100 text-red-800' :
                                                         task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
-                                                        task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                                        'bg-gray-100 text-gray-800'
-                                                    }`}>
+                                                            task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                                                'bg-gray-100 text-gray-800'
+                                                        }`}>
                                                         {task.priority}
                                                     </span>
-                                                    <span className={`px-2 py-1 text-xs rounded-full ${
-                                                        task.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                                    <span className={`px-2 py-1 text-xs rounded-full ${task.status === 'completed' ? 'bg-green-100 text-green-800' :
                                                         task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                                                        task.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                                        'bg-gray-100 text-gray-800'
-                                                    }`}>
+                                                            task.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                                                'bg-gray-100 text-gray-800'
+                                                        }`}>
                                                         {task.status.replace('_', ' ')}
                                                     </span>
                                                 </div>
@@ -385,7 +383,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                                                     <p className="text-sm text-muted-foreground mb-2">{task.description}</p>
                                                 )}
                                                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                                    {task.assigned_to && <span>Assigned to: {task.assigned_to}</span>}
+                                                    {(task.assigned_to_text || task.assigned_to) && <span>Assigned to: {task.assigned_to_text || task.assigned_to}</span>}
                                                     {task.due_date && <span>Due: {new Date(task.due_date).toLocaleDateString()}</span>}
                                                 </div>
                                             </div>

@@ -1,109 +1,100 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Checkbox } from '@/components/ui/checkbox'
-import Link from 'next/link'
+import PackageBuilderForm from '../new/PackageBuilderForm'
+import { PackageItemGroup } from '@/components/admin/PackageItemGroupBuilder'
 
 export default async function EditPackagePage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
-    const { data: pkg } = await supabase
+
+    // 1. Fetch Package Details with Groups and Options
+    const { data: pkg, error } = await supabase
         .from('packages')
-        .select('*')
+        .select(`
+            *,
+            package_item_groups (
+                id,
+                name,
+                description,
+                min_selections,
+                max_selections,
+                display_order,
+                package_item_options (
+                    id,
+                    product_id,
+                    is_default,
+                    quantity,
+                    display_order,
+                    products (
+                        name
+                    )
+                )
+            )
+        `)
         .eq('id', params.id)
         .single()
 
-    if (!pkg) {
+    if (error || !pkg) {
+        console.error('Error fetching package:', error)
         redirect('/admin/packages')
     }
 
-    async function updatePackage(formData: FormData) {
-        'use server'
+    // 2. Fetch All Products for the picker
+    const { data: products } = await supabase
+        .from('products')
+        .select('id, name, price, image_url, category')
+        .order('name')
 
-        const name = formData.get('name') as string
-        const description = formData.get('description') as string
-        const price = parseFloat(formData.get('price') as string) * 100 // Convert to cents
-        const image_url = formData.get('image_url') as string
-        const is_featured = formData.get('is_featured') === 'on'
+    // 3. Transform data for the form
+    // We need to sort groups and options by display_order
+    const groups: PackageItemGroup[] = pkg.package_item_groups
+        .sort((a: any, b: any) => a.display_order - b.display_order)
+        .map((g: any) => ({
+            id: g.id,
+            name: g.name,
+            description: g.description,
+            min_selections: g.min_selections,
+            max_selections: g.max_selections,
+            display_order: g.display_order,
+            options: g.package_item_options
+                .sort((a: any, b: any) => a.display_order - b.display_order)
+                .map((o: any) => ({
+                    id: o.id,
+                    product_id: o.product_id,
+                    product_name: o.products?.name || 'Unknown Product',
+                    is_default: o.is_default,
+                    quantity: o.quantity
+                }))
+        }))
 
-        const supabase = await createClient()
-
-        const { error } = await supabase
-            .from('packages')
-            .update({
-                name,
-                description,
-                price,
-                image_url,
-                is_featured
-            })
-            .eq('id', params.id)
-
-        if (error) {
-            console.error('Error updating package:', error)
-            return
-        }
-
-        redirect('/admin/packages')
+    const initialData = {
+        id: pkg.id,
+        package: {
+            name: pkg.name,
+            description: pkg.description,
+            price: pkg.price,
+            image_url: pkg.image_url,
+            is_featured: pkg.is_featured,
+            discount_type: pkg.discount_type,
+            discount_value: pkg.discount_value,
+            original_price: pkg.original_price,
+            savings_amount: pkg.savings_amount
+        },
+        groups
     }
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold tracking-tight">Edit Package</h1>
-                <Button variant="outline" asChild>
-                    <Link href="/admin/packages">Cancel</Link>
-                </Button>
+        <div className="max-w-5xl mx-auto p-6">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900">Edit Package</h1>
+                <p className="text-gray-600 mt-2">
+                    Update package details, configurable items, and pricing.
+                </p>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Package Details</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form action={updatePackage} className="space-y-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Name</Label>
-                            <Input id="name" name="name" defaultValue={pkg.name} required />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="description">Description</Label>
-                            <Textarea id="description" name="description" defaultValue={pkg.description || ''} />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="price">Price ($)</Label>
-                            <Input
-                                id="price"
-                                name="price"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                defaultValue={(pkg.price / 100).toFixed(2)}
-                                required
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="image_url">Image URL</Label>
-                            <Input id="image_url" name="image_url" defaultValue={pkg.image_url || ''} placeholder="https://..." />
-                        </div>
-
-                        <div className="flex items-center space-x-2">
-                            <Checkbox id="is_featured" name="is_featured" defaultChecked={pkg.is_featured} />
-                            <Label htmlFor="is_featured">Featured Package</Label>
-                        </div>
-
-                        <div className="flex justify-end">
-                            <Button type="submit">Save Changes</Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
+            <PackageBuilderForm
+                products={products || []}
+                initialData={initialData}
+            />
         </div>
     )
 }
