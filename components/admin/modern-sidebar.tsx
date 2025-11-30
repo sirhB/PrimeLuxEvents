@@ -20,7 +20,9 @@ import {
     Eye,
     CalendarCheck,
     Search,
-    ChevronRight
+    ChevronRight,
+    Calendar,
+    UserCog
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -40,6 +42,7 @@ const sidebarGroups = [
         items: [
             { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
             { icon: FileText, label: 'Consultations', href: '/admin/consultations' },
+            { icon: Calendar, label: 'Events', href: '/admin/events' },
             { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments' },
             { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },
         ]
@@ -56,6 +59,7 @@ const sidebarGroups = [
         title: "Management",
         items: [
             { icon: Users, label: 'Customers', href: '/admin/customers' },
+            { icon: UserCog, label: 'Team', href: '/admin/team' },
         ]
     },
     {
