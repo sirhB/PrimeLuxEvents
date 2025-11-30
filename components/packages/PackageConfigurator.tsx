@@ -58,6 +58,7 @@ interface PackageConfiguratorProps {
 export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
     const [currentStep, setCurrentStep] = useState(0)
     const [selections, setSelections] = useState<Record<string, string[]>>({}) // group_id -> [option_ids]
+    const { addPackageItem } = useCart()
 
     // Initialize default selections
     useEffect(() => {

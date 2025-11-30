@@ -5,14 +5,23 @@ import { type EventDetails, EventDetailsDialog } from "@/components/event-detail
 
 export type CartItem = {
   id: string
-  productId: string
+  productId?: string // Optional for package items
   quantity: number
   modifiers?: Record<string, any>
+  packageId?: string // For package items
+  packageSelections?: Record<string, string[]> // For package items
+  packageData?: { // For package items
+    name: string
+    price: number
+    original_price: number
+    savings_amount: number
+  }
 }
 
 type CartContextType = {
   items: CartItem[]
   addItem: (productId: string, quantity?: number, modifiers?: Record<string, any>) => void
+  addPackageItem: (packageId: string, packageSelections: Record<string, string[]>, packageData: { name: string; price: number; original_price: number; savings_amount: number }, quantity?: number) => void
   removeItem: (cartItemId: string) => void
   updateQuantity: (cartItemId: string, quantity: number) => void
   clearCart: () => void
@@ -73,29 +82,60 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [eventDetails, isLoaded])
 
   const addItem = (productId: string, quantity: number = 1, modifiers: Record<string, any> = {}) => {
-    setItems((prev) => {
-      // Check if item with same product ID AND same modifiers exists
-      const existing = prev.find((item) =>
-        item.productId === productId &&
-        JSON.stringify(item.modifiers || {}) === JSON.stringify(modifiers)
-      )
+     setItems((prev) => {
+       // Check if item with same product ID AND same modifiers exists
+       const existing = prev.find((item) =>
+         item.productId === productId &&
+         JSON.stringify(item.modifiers || {}) === JSON.stringify(modifiers)
+       )
 
-      if (existing) {
-        return prev.map((item) =>
-          item.id === existing.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        )
-      }
+       if (existing) {
+         return prev.map((item) =>
+           item.id === existing.id
+             ? { ...item, quantity: item.quantity + quantity }
+             : item
+         )
+       }
 
-      return [...prev, {
-        id: crypto.randomUUID(),
-        productId,
-        quantity,
-        modifiers
-      }]
-    })
-  }
+       return [...prev, {
+         id: crypto.randomUUID(),
+         productId,
+         quantity,
+         modifiers
+       }]
+     })
+   }
+
+   const addPackageItem = (
+     packageId: string,
+     packageSelections: Record<string, string[]>,
+     packageData: { name: string; price: number; original_price: number; savings_amount: number },
+     quantity: number = 1
+   ) => {
+     setItems((prev) => {
+       // Check if package with same selections exists
+       const existing = prev.find((item) =>
+         item.packageId === packageId &&
+         JSON.stringify(item.packageSelections || {}) === JSON.stringify(packageSelections)
+       )
+
+       if (existing) {
+         return prev.map((item) =>
+           item.id === existing.id
+             ? { ...item, quantity: item.quantity + quantity }
+             : item
+         )
+       }
+
+       return [...prev, {
+         id: crypto.randomUUID(),
+         packageId,
+         quantity,
+         packageSelections,
+         packageData
+       }]
+     })
+   }
 
   const removeItem = (cartItemId: string) => {
     setItems((prev) => prev.filter((item) => item.id !== cartItemId))

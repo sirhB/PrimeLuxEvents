@@ -54,6 +54,7 @@ const sidebarGroups = [
         items: [
             { icon: Package, label: 'Products', href: '/admin/products' },
             { icon: Layers, label: 'Categories', href: '/admin/categories' },
+            { icon: Box, label: 'Packages', href: '/admin/packages' },
             { icon: Box, label: 'Inventory', href: '/admin/inventory' },
         ]
     },
