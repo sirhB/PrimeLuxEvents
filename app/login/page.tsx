@@ -20,22 +20,32 @@ export default function LoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
+        console.log('Attempting login for:', email)
         const supabase = createClient()
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             })
 
             if (error) {
+                console.error('Login error:', error)
                 toast.error(error.message)
                 return
             }
 
-            router.push('/admin')
-            router.refresh()
+            console.log('Login successful:', data)
+            toast.success('Login successful! Redirecting...')
+
+            // Wait a moment before redirecting to ensure cookies are set
+            setTimeout(() => {
+                console.log('Redirecting to /admin...')
+                router.push('/admin')
+                router.refresh()
+            }, 1000)
         } catch (error) {
+            console.error('Unexpected error:', error)
             toast.error('An unexpected error occurred')
         } finally {
             setLoading(false)
