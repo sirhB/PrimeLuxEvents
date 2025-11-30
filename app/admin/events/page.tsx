@@ -117,7 +117,7 @@ export default function EventsPage() {
                                     { value: 'cancelled', label: 'Cancelled' },
                                 ]}
                             />
-                            <CreateEventDialog onSuccess={() => window.location.reload()} />
+                            <CreateEventDialog />
                         </div>
                     </div>
 

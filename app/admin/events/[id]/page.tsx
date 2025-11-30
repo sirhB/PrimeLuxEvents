@@ -396,7 +396,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                                     <div className="pt-4">
                                         <CreateEventTaskDialog
                                             eventId={id}
-                                            onSuccess={() => window.location.reload()}
                                         />
                                     </div>
                                 </div>

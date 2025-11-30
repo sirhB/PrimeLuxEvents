@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { EventForm } from './event-form'
@@ -13,10 +14,16 @@ interface CreateEventDialogProps {
 
 export function CreateEventDialog({ trigger, onSuccess }: CreateEventDialogProps) {
     const [open, setOpen] = useState(false)
+    const router = useRouter()
 
     const handleSuccess = () => {
         setOpen(false)
-        onSuccess?.()
+        if (onSuccess) {
+            onSuccess()
+        } else {
+            // If no onSuccess callback provided, refresh the page
+            router.refresh()
+        }
     }
 
     const handleCancel = () => {

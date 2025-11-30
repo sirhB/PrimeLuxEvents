@@ -67,6 +67,13 @@ export function SiteHeader() {
                     Rental Catalog
                   </Link>
                   <Link
+                    href="/packages"
+                    onClick={() => setIsOpen(false)}
+                    className="text-2xl font-serif hover:text-muted-foreground transition-colors"
+                  >
+                    Packages
+                  </Link>
+                  <Link
                     href="/gallery"
                     onClick={() => setIsOpen(false)}
                     className="text-2xl font-serif hover:text-muted-foreground transition-colors"
@@ -115,6 +122,12 @@ export function SiteHeader() {
               className="text-sm font-medium uppercase tracking-widest hover:text-muted-foreground transition-colors"
             >
               Rental Catalog
+            </Link>
+            <Link
+              href="/packages"
+              className="text-sm font-medium uppercase tracking-widest hover:text-muted-foreground transition-colors"
+            >
+              Packages
             </Link>
             <Link
               href="/gallery"

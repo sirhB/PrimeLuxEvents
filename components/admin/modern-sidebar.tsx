@@ -22,7 +22,8 @@ import {
     Search,
     ChevronRight,
     Calendar,
-    UserCog
+    UserCog,
+    CheckSquare
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -44,6 +45,7 @@ const sidebarGroups = [
             { icon: FileText, label: 'Consultations', href: '/admin/consultations' },
             { icon: Calendar, label: 'Events', href: '/admin/events' },
             { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments' },
+            { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks' },
             { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },
         ]
     },
