@@ -42,55 +42,66 @@ export const getCurrentUser = cache(async (): Promise<UserProfile | null> => {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) return null
 
-    // Get user profile with roles and permissions
+    // 1. Get user profile (simple query, no joins)
     const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
-      .select(`
-        *,
-        user_roles!inner (
-          roles (
-            id,
-            name,
-            display_name,
-            description,
-            color,
-            is_system_role
-          )
-        )
-      `)
+      .select('*')
       .eq('id', user.id)
       .eq('is_active', true)
       .single()
 
     if (profileError || !profile) return null
 
-    // Get permissions for user's roles
-    const roleIds = profile.user_roles.map((ur: any) => ur.roles.id)
-    const { data: rolePermissions, error: permissionsError } = await supabase
-      .from('role_permissions')
+    // 2. Get user roles
+    const { data: userRoles, error: rolesError } = await supabase
+      .from('user_roles')
       .select(`
-        permissions (
+        roles (
           id,
           name,
           display_name,
           description,
-          resource,
-          action
+          color,
+          is_system_role
         )
       `)
-      .in('role_id', roleIds)
+      .eq('user_id', user.id)
 
-    if (permissionsError) return null
+    if (rolesError) {
+      console.error('Error fetching roles:', rolesError)
+    }
 
-    // Flatten and deduplicate permissions
-    const permissionsMap = new Map<string, Permission>()
-    rolePermissions?.forEach((rp: any) => {
-      if (rp.permissions) {
-        permissionsMap.set(rp.permissions.name, rp.permissions)
+    const roles = userRoles?.map((ur: any) => ur.roles) || []
+
+    // 3. Get permissions for these roles
+    let permissions: Permission[] = []
+    if (roles.length > 0) {
+      const roleIds = roles.map((r: any) => r.id)
+      const { data: rolePermissions, error: permissionsError } = await supabase
+        .from('role_permissions')
+        .select(`
+            permissions (
+              id,
+              name,
+              display_name,
+              description,
+              resource,
+              action
+            )
+          `)
+        .in('role_id', roleIds)
+
+      if (!permissionsError && rolePermissions) {
+        // Flatten and deduplicate permissions
+        const permissionsMap = new Map<string, Permission>()
+        rolePermissions.forEach((rp: any) => {
+          if (rp.permissions) {
+            permissionsMap.set(rp.permissions.name, rp.permissions)
+          }
+        })
+        permissions = Array.from(permissionsMap.values())
       }
-    })
-
-    const permissions = Array.from(permissionsMap.values())
+    }
 
     return {
       id: profile.id,
@@ -103,11 +114,11 @@ export const getCurrentUser = cache(async (): Promise<UserProfile | null> => {
       hire_date: profile.hire_date,
       is_active: profile.is_active,
       last_login_at: profile.last_login_at,
-      roles: profile.user_roles.map((ur: any) => ur.roles),
+      roles: roles,
       permissions
     }
   } catch (error) {
-    console.error('Error fetching current user:', error)
+    console.error('Error in getCurrentUser:', error)
     return null
   }
 })
