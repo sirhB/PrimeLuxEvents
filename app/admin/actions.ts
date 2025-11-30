@@ -309,3 +309,110 @@ export async function getRoleStats(roleId: string): Promise<{ memberCount: numbe
         return { memberCount: 0, permissionCount: 0 }
     }
 }
+
+// Assign role to user
+export async function assignUserRole(userId: string, roleId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+        await requirePermission('users.manage')
+
+        const supabase = await createClient()
+        const { data: { user: currentUser } } = await supabase.auth.getUser()
+
+        if (!currentUser) {
+            return { success: false, error: 'Not authenticated' }
+        }
+
+        // Check if user already has this role
+        const { data: existing } = await supabase
+            .from('user_roles')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('role_id', roleId)
+            .single()
+
+        if (existing) {
+            return { success: false, error: 'User already has this role' }
+        }
+
+        const { error } = await supabase
+            .from('user_roles')
+            .insert({
+                user_id: userId,
+                role_id: roleId,
+                assigned_by: currentUser.id
+            })
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/admin/team')
+        return { success: true }
+    } catch (error) {
+        console.error('Error assigning role:', error)
+        return { success: false, error: 'Failed to assign role' }
+    }
+}
+
+// Remove role from user
+export async function removeUserRole(userId: string, roleId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+        await requirePermission('users.manage')
+
+        const supabase = await createClient()
+
+        const { error } = await supabase
+            .from('user_roles')
+            .delete()
+            .eq('user_id', userId)
+            .eq('role_id', roleId)
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/admin/team')
+        return { success: true }
+    } catch (error) {
+        console.error('Error removing role:', error)
+        return { success: false, error: 'Failed to remove role' }
+    }
+}
+
+// Update user profile
+export async function updateUserProfile(
+    userId: string,
+    profileData: {
+        full_name?: string
+        phone?: string
+        job_title?: string
+        department?: string
+        hire_date?: string
+        is_active?: boolean
+    }
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        await requirePermission('users.manage')
+
+        const supabase = await createClient()
+
+        const { error } = await supabase
+            .from('user_profiles')
+            .update({
+                ...profileData,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', userId)
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/admin/team')
+        return { success: true }
+    } catch (error) {
+        console.error('Error updating user profile:', error)
+        return { success: false, error: 'Failed to update user profile' }
+    }
+}
+

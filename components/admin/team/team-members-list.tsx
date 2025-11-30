@@ -8,6 +8,10 @@ import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { MoreVertical, Mail, Phone, Calendar, Edit, Trash2, Shield, User } from 'lucide-react'
 import { format } from 'date-fns'
+import { EditMemberDialog } from './edit-member-dialog'
+import { updateUserProfile } from '@/app/admin/actions'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 interface TeamMember {
     id: string
@@ -44,7 +48,9 @@ interface TeamMembersListProps {
 }
 
 export function TeamMembersList({ members, roles, canManage }: TeamMembersListProps) {
+    const router = useRouter()
     const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
+    const [editDialogOpen, setEditDialogOpen] = useState(false)
 
     const getInitials = (name: string | null, email: string) => {
         if (name) {
@@ -56,6 +62,33 @@ export function TeamMembersList({ members, roles, canManage }: TeamMembersListPr
     const formatLastLogin = (lastLogin: string | null) => {
         if (!lastLogin) return 'Never'
         return format(new Date(lastLogin), 'MMM d, yyyy')
+    }
+
+    const handleEditMember = (member: TeamMember) => {
+        setSelectedMember(member)
+        setEditDialogOpen(true)
+    }
+
+    const handleToggleActive = async (member: TeamMember) => {
+        try {
+            const result = await updateUserProfile(member.id, {
+                is_active: !member.is_active
+            })
+
+            if (result.success) {
+                toast.success(`Member ${member.is_active ? 'deactivated' : 'activated'} successfully`)
+                router.refresh()
+            } else {
+                toast.error(result.error || 'Failed to update member status')
+            }
+        } catch (error) {
+            console.error('Error toggling member status:', error)
+            toast.error('An error occurred')
+        }
+    }
+
+    const handleDialogSuccess = () => {
+        router.refresh()
     }
 
     return (
@@ -128,10 +161,10 @@ export function TeamMembersList({ members, roles, canManage }: TeamMembersListPr
                                                     {userRole.roles.display_name}
                                                 </Badge>
                                             )) || (
-                                                <Badge variant="outline" className="text-xs text-gray-400">
-                                                    No roles assigned
-                                                </Badge>
-                                            )}
+                                                    <Badge variant="outline" className="text-xs text-gray-400">
+                                                        No roles assigned
+                                                    </Badge>
+                                                )}
                                         </div>
                                     </div>
                                 </div>
@@ -145,7 +178,10 @@ export function TeamMembersList({ members, roles, canManage }: TeamMembersListPr
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem className="flex items-center gap-2">
+                                            <DropdownMenuItem
+                                                className="flex items-center gap-2"
+                                                onClick={() => handleEditMember(member)}
+                                            >
                                                 <Edit className="h-4 w-4" />
                                                 Edit Member
                                             </DropdownMenuItem>
@@ -154,7 +190,10 @@ export function TeamMembersList({ members, roles, canManage }: TeamMembersListPr
                                                 Send Email
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem className="flex items-center gap-2 text-red-600">
+                                            <DropdownMenuItem
+                                                className="flex items-center gap-2 text-red-600"
+                                                onClick={() => handleToggleActive(member)}
+                                            >
                                                 <Trash2 className="h-4 w-4" />
                                                 {member.is_active ? 'Deactivate' : 'Activate'}
                                             </DropdownMenuItem>
@@ -166,6 +205,17 @@ export function TeamMembersList({ members, roles, canManage }: TeamMembersListPr
                     </div>
                 )}
             </CardContent>
+
+            {/* Edit Member Dialog */}
+            {selectedMember && (
+                <EditMemberDialog
+                    member={selectedMember}
+                    roles={roles}
+                    open={editDialogOpen}
+                    onOpenChange={setEditDialogOpen}
+                    onSuccess={handleDialogSuccess}
+                />
+            )}
         </Card>
     )
 }

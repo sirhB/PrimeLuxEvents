@@ -78,6 +78,62 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
         setEditDialogOpen(true)
     }
 
+    const handleSavePermissions = async () => {
+        if (!selectedRole) return
+
+        setLoading(true)
+        try {
+            const selectedPermissionIds = Object.entries(permissionStates)
+                .filter(([_, isSelected]) => isSelected)
+                .map(([permId]) => permId)
+
+            const result = await updateRolePermissions(selectedRole.id, selectedPermissionIds)
+
+            if (result.success) {
+                toast.success('Permissions updated successfully')
+                await fetchRolesData()
+                // Re-select the role to refresh the data
+                const updatedRole = rolesData.find(r => r.id === selectedRole.id)
+                if (updatedRole) {
+                    handleRoleClick(updatedRole)
+                }
+            } else {
+                toast.error(result.error || 'Failed to update permissions')
+            }
+        } catch (error) {
+            console.error('Error saving permissions:', error)
+            toast.error('An error occurred while saving permissions')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleCancelPermissions = () => {
+        if (selectedRole) {
+            // Reset to original permissions
+            const permStates: Record<string, boolean> = {}
+            selectedRole.permissions?.forEach(perm => {
+                permStates[perm.id] = true
+            })
+            setPermissionStates(permStates)
+        }
+    }
+
+    const hasPermissionChanges = () => {
+        if (!selectedRole) return false
+
+        const currentPermissionIds = Object.entries(permissionStates)
+            .filter(([_, isSelected]) => isSelected)
+            .map(([permId]) => permId)
+            .sort()
+
+        const originalPermissionIds = (selectedRole.permissions || [])
+            .map(p => p.id)
+            .sort()
+
+        return JSON.stringify(currentPermissionIds) !== JSON.stringify(originalPermissionIds)
+    }
+
     useEffect(() => {
         fetchRolesData()
     }, [])
@@ -100,9 +156,8 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
                         {rolesData.map((role) => (
                             <Card
                                 key={role.id}
-                                className={`cursor-pointer transition-colors hover:shadow-md ${
-                                    selectedRole?.id === role.id ? 'ring-2 ring-blue-500' : ''
-                                }`}
+                                className={`cursor-pointer transition-colors hover:shadow-md ${selectedRole?.id === role.id ? 'ring-2 ring-blue-500' : ''
+                                    }`}
                                 onClick={() => handleRoleClick(role)}
                             >
                                 <CardHeader className="pb-3">
@@ -224,6 +279,7 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
                                                                 id={permission.id}
                                                                 className="rounded"
                                                                 checked={permissionStates[permission.id] || false}
+                                                                disabled={!canManage || selectedRole?.is_system_role}
                                                                 onChange={(e) => {
                                                                     setPermissionStates(prev => ({
                                                                         ...prev,
@@ -245,6 +301,33 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
                                         )
                                     })}
                                 </div>
+
+                                {/* Save/Cancel Buttons */}
+                                {canManage && !selectedRole?.is_system_role && hasPermissionChanges() && (
+                                    <div className="flex items-center gap-2 pt-4 border-t">
+                                        <Button
+                                            onClick={handleSavePermissions}
+                                            disabled={loading}
+                                        >
+                                            <Save className="h-4 w-4 mr-2" />
+                                            {loading ? 'Saving...' : 'Save Changes'}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={handleCancelPermissions}
+                                            disabled={loading}
+                                        >
+                                            <X className="h-4 w-4 mr-2" />
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {selectedRole?.is_system_role && (
+                                    <div className="text-sm text-gray-500 italic pt-4 border-t">
+                                        System roles cannot be modified
+                                    </div>
+                                )}
                             </TabsContent>
 
                             <TabsContent value="members" className="space-y-4">
