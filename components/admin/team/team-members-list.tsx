@@ -1,0 +1,171 @@
+'use client'
+
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { MoreVertical, Mail, Phone, Calendar, Edit, Trash2, Shield, User } from 'lucide-react'
+import { format } from 'date-fns'
+
+interface TeamMember {
+    id: string
+    email: string
+    full_name: string | null
+    avatar_url: string | null
+    phone: string | null
+    job_title: string | null
+    department: string | null
+    hire_date: string | null
+    is_active: boolean
+    last_login_at: string | null
+    user_roles: Array<{
+        roles: {
+            id: string
+            name: string
+            display_name: string
+            color: string
+        }
+    }>
+}
+
+interface Role {
+    id: string
+    name: string
+    display_name: string
+    color: string
+}
+
+interface TeamMembersListProps {
+    members: TeamMember[]
+    roles: Role[]
+    canManage: boolean
+}
+
+export function TeamMembersList({ members, roles, canManage }: TeamMembersListProps) {
+    const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null)
+
+    const getInitials = (name: string | null, email: string) => {
+        if (name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase()
+        }
+        return email[0].toUpperCase()
+    }
+
+    const formatLastLogin = (lastLogin: string | null) => {
+        if (!lastLogin) return 'Never'
+        return format(new Date(lastLogin), 'MMM d, yyyy')
+    }
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Team Members</CardTitle>
+                <CardDescription>
+                    Manage your team members and their roles
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                {members.length === 0 ? (
+                    <div className="text-center py-8">
+                        <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-500">No team members found.</p>
+                        <p className="text-sm text-gray-400 mt-1">
+                            Invite your first team member to get started.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {members.map((member) => (
+                            <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                <div className="flex items-center space-x-4">
+                                    <Avatar className="h-12 w-12">
+                                        <AvatarImage src={member.avatar_url || undefined} />
+                                        <AvatarFallback>
+                                            {getInitials(member.full_name, member.email)}
+                                        </AvatarFallback>
+                                    </Avatar>
+
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <h3 className="font-medium text-gray-900 truncate">
+                                                {member.full_name || 'Unnamed User'}
+                                            </h3>
+                                            {!member.is_active && (
+                                                <Badge variant="secondary" className="text-xs">
+                                                    Inactive
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        <p className="text-sm text-gray-500 truncate">{member.email}</p>
+
+                                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                            {member.job_title && (
+                                                <span className="flex items-center gap-1">
+                                                    <Shield className="h-3 w-3" />
+                                                    {member.job_title}
+                                                </span>
+                                            )}
+                                            {member.last_login_at && (
+                                                <span className="flex items-center gap-1">
+                                                    <Calendar className="h-3 w-3" />
+                                                    Last login: {formatLastLogin(member.last_login_at)}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Roles */}
+                                        <div className="flex flex-wrap gap-1 mt-2">
+                                            {member.user_roles?.map((userRole) => (
+                                                <Badge
+                                                    key={userRole.roles.id}
+                                                    variant="outline"
+                                                    className="text-xs"
+                                                    style={{ borderColor: userRole.roles.color, color: userRole.roles.color }}
+                                                >
+                                                    {userRole.roles.display_name}
+                                                </Badge>
+                                            )) || (
+                                                <Badge variant="outline" className="text-xs text-gray-400">
+                                                    No roles assigned
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {canManage && (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="icon">
+                                                <MoreVertical className="h-4 w-4" />
+                                                <span className="sr-only">Actions</span>
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem className="flex items-center gap-2">
+                                                <Edit className="h-4 w-4" />
+                                                Edit Member
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="flex items-center gap-2">
+                                                <Mail className="h-4 w-4" />
+                                                Send Email
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem className="flex items-center gap-2 text-red-600">
+                                                <Trash2 className="h-4 w-4" />
+                                                {member.is_active ? 'Deactivate' : 'Activate'}
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    )
+}

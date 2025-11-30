@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { getCurrentUser } from '@/lib/auth/authorization'
 
 export async function updateSession(request: NextRequest) {
     let supabaseResponse = NextResponse.next({
@@ -37,15 +38,56 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    if (
-        !user &&
-        request.nextUrl.pathname.startsWith('/admin') &&
-        !request.nextUrl.pathname.startsWith('/admin/login')
-    ) {
-        // no user, potentially respond by redirecting the user to the login page
-        const url = request.nextUrl.clone()
-        url.pathname = '/login'
-        return NextResponse.redirect(url)
+    // Check if user is accessing admin routes
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+        if (!user) {
+            // No authenticated user, redirect to login
+            if (!request.nextUrl.pathname.startsWith('/admin/login')) {
+                const url = request.nextUrl.clone()
+                url.pathname = '/login'
+                return NextResponse.redirect(url)
+            }
+        } else {
+            // User is authenticated, check if they have access to admin
+            try {
+                const userProfile = await getCurrentUser()
+                if (!userProfile || !userProfile.is_active) {
+                    // User profile not found or inactive, redirect to login
+                    const url = request.nextUrl.clone()
+                    url.pathname = '/login'
+                    return NextResponse.redirect(url)
+                }
+
+                // Check if user has permission to access admin
+                const hasAdminAccess = userProfile.roles.some(role =>
+                    role.name === 'admin' || role.name === 'manager' || role.name === 'staff'
+                )
+
+                if (!hasAdminAccess) {
+                    // User doesn't have admin access, redirect to unauthorized page
+                    const url = request.nextUrl.clone()
+                    url.pathname = '/unauthorized'
+                    return NextResponse.redirect(url)
+                }
+
+                // Update last login time
+                try {
+                    await supabase
+                        .from('user_profiles')
+                        .update({ last_login_at: new Date().toISOString() })
+                        .eq('id', user.id)
+                } catch (error) {
+                    // Non-critical error, continue
+                    console.error('Error updating last login:', error)
+                }
+            } catch (error) {
+                console.error('Error checking user permissions:', error)
+                // On error, redirect to login for safety
+                const url = request.nextUrl.clone()
+                url.pathname = '/login'
+                return NextResponse.redirect(url)
+            }
+        }
     }
 
     return supabaseResponse
