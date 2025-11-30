@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/table'
 import { Users, MoreVertical, Eye, Mail, Phone } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -128,123 +129,138 @@ export default async function CustomersPage({
                 </div>
             </div>
 
-            <div className="flex items-center justify-between gap-4">
-                <SearchInput placeholder="Search" />
-                <Button>Add new</Button>
-            </div>
+            <Tabs defaultValue="all" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+                    <TabsTrigger value="all">All Customers</TabsTrigger>
+                    <TabsTrigger value="active">Active</TabsTrigger>
+                </TabsList>
 
-            <Card>
-                <CardContent className="p-0">
-                    <div className="px-6 py-4 border-b border-gray-100">
-                        <h2 className="text-base font-semibold text-gray-900">Customers</h2>
+                <TabsContent value="all" className="space-y-6 mt-6">
+                    <div className="flex items-center justify-between gap-4">
+                        <SearchInput placeholder="Search" />
+                        <Button>Add new</Button>
                     </div>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-12">
-                                    <Checkbox />
-                                </TableHead>
-                                <TableHead sortable>Name</TableHead>
-                                <TableHead sortable>Email</TableHead>
-                                <TableHead sortable>Phone</TableHead>
-                                <TableHead sortable>Orders</TableHead>
-                                <TableHead sortable>Consultations</TableHead>
-                                <TableHead sortable>Total Spent</TableHead>
-                                <TableHead sortable>Last Order</TableHead>
-                                <TableHead className="w-12"></TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {paginatedCustomers.map((customer) => (
-                                <TableRow key={customer.email}>
-                                    <TableCell>
-                                        <Checkbox />
-                                    </TableCell>
-                                    <TableCell className="font-medium text-gray-900">{customer.name}</TableCell>
-                                    <TableCell className="text-gray-600">
-                                        <div className="flex items-center gap-2">
-                                            <Mail className="h-3.5 w-3.5 text-gray-400" />
-                                            {customer.email}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="text-gray-600">
-                                        {customer.phone ? (
-                                            <div className="flex items-center gap-2">
-                                                <Phone className="h-3.5 w-3.5 text-gray-400" />
-                                                {customer.phone}
-                                            </div>
-                                        ) : (
-                                            <span className="text-gray-400">N/A</span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-gray-900">
-                                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 text-sm font-medium">
-                                            {customer.orderCount}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="text-gray-900">
-                                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-50 text-purple-700 text-sm font-medium">
-                                            {customer.consultationCount}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="font-semibold text-gray-900">
-                                        ${customer.totalSpent.toFixed(2)}
-                                    </TableCell>
-                                    <TableCell className="text-gray-600">
-                                        {customer.lastOrderDate
-                                            ? new Date(customer.lastOrderDate).toLocaleDateString('en-US', {
-                                                month: 'short',
-                                                day: 'numeric',
-                                                year: 'numeric'
-                                            })
-                                            : <span className="text-gray-400">N/A</span>}
-                                    </TableCell>
-                                    <TableCell>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon-sm">
-                                                    <MoreVertical className="h-4 w-4 text-gray-500" />
-                                                    <span className="sr-only">Actions</span>
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem className="flex items-center gap-2">
-                                                    <Eye className="h-4 w-4" />
-                                                    View Details
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem className="flex items-center gap-2">
-                                                    <Mail className="h-4 w-4" />
-                                                    Send Email
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {paginatedCustomers.length === 0 && (
-                                <TableRow>
-                                    <TableCell colSpan={9} className="text-center h-32">
-                                        <div className="flex flex-col items-center gap-2">
-                                            <Users className="h-8 w-8 text-gray-400" />
-                                            <p className="text-gray-500">No customers found.</p>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
 
-            {totalCount > 0 && (
-                <PaginationControls
-                    hasNextPage={start + pageSize < totalCount}
-                    hasPrevPage={start > 0}
-                    totalCount={totalCount}
-                    currentPage={currentPage}
-                    pageSize={pageSize}
-                />
-            )}
+                    <Card>
+                        <CardContent className="p-0">
+                            <div className="px-6 py-4 border-b border-gray-100">
+                                <h2 className="text-base font-semibold text-gray-900">Customers</h2>
+                            </div>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-12">
+                                            <Checkbox />
+                                        </TableHead>
+                                        <TableHead sortable>Name</TableHead>
+                                        <TableHead sortable>Email</TableHead>
+                                        <TableHead sortable>Phone</TableHead>
+                                        <TableHead sortable>Orders</TableHead>
+                                        <TableHead sortable>Consultations</TableHead>
+                                        <TableHead sortable>Total Spent</TableHead>
+                                        <TableHead sortable>Last Order</TableHead>
+                                        <TableHead className="w-12"></TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {paginatedCustomers.map((customer) => (
+                                        <TableRow key={customer.email}>
+                                            <TableCell>
+                                                <Checkbox />
+                                            </TableCell>
+                                            <TableCell className="font-medium text-gray-900">{customer.name}</TableCell>
+                                            <TableCell className="text-gray-600">
+                                                <div className="flex items-center gap-2">
+                                                    <Mail className="h-3.5 w-3.5 text-gray-400" />
+                                                    {customer.email}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-gray-600">
+                                                {customer.phone ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <Phone className="h-3.5 w-3.5 text-gray-400" />
+                                                        {customer.phone}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-gray-400">N/A</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-gray-900">
+                                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 text-sm font-medium">
+                                                    {customer.orderCount}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className="text-gray-900">
+                                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-50 text-purple-700 text-sm font-medium">
+                                                    {customer.consultationCount}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className="font-semibold text-gray-900">
+                                                ${customer.totalSpent.toFixed(2)}
+                                            </TableCell>
+                                            <TableCell className="text-gray-600">
+                                                {customer.lastOrderDate
+                                                    ? new Date(customer.lastOrderDate).toLocaleDateString('en-US', {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        year: 'numeric'
+                                                    })
+                                                    : <span className="text-gray-400">N/A</span>}
+                                            </TableCell>
+                                            <TableCell>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon-sm">
+                                                            <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                            <span className="sr-only">Actions</span>
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem className="flex items-center gap-2">
+                                                            <Eye className="h-4 w-4" />
+                                                            View Details
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem className="flex items-center gap-2">
+                                                            <Mail className="h-4 w-4" />
+                                                            Send Email
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {paginatedCustomers.length === 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={9} className="text-center h-32">
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <Users className="h-8 w-8 text-gray-400" />
+                                                    <p className="text-gray-500">No customers found.</p>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+
+                    {totalCount > 0 && (
+                        <PaginationControls
+                            hasNextPage={start + pageSize < totalCount}
+                            hasPrevPage={start > 0}
+                            totalCount={totalCount}
+                            currentPage={currentPage}
+                            pageSize={pageSize}
+                        />
+                    )}
+                </TabsContent>
+
+                <TabsContent value="active" className="space-y-6 mt-6">
+                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                        <p className="text-muted-foreground">Active customers view coming soon</p>
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }

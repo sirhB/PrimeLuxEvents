@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table'
 import { Eye, Calendar as CalendarIcon } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SearchInput } from '@/components/admin/search-input'
 import { StatusFilter } from '@/components/admin/status-filter'
 import { PaginationControls } from '@/components/admin/pagination-controls'
@@ -77,122 +78,137 @@ export default async function AppointmentsPage({
     }
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Appointments</h1>
-                    <p className="text-muted-foreground mt-1">
+                    <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
+                    <p className="text-gray-600 mt-1 text-sm">
                         Manage all scheduled appointments and in-person meetings
                     </p>
                 </div>
                 <CreateAppointmentButton />
             </div>
 
-            <div className="flex items-center justify-between gap-4">
-                <SearchInput placeholder="Search appointments..." />
-                <StatusFilter statuses={statusOptions} />
-            </div>
+            <Tabs defaultValue="all" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+                    <TabsTrigger value="all">All Appointments</TabsTrigger>
+                    <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+                </TabsList>
 
-            <Card>
-                <CardContent className="p-0">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Date & Time</TableHead>
-                                <TableHead>Client</TableHead>
-                                <TableHead>Location</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Linked Consultation</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {appointments && appointments.length > 0 ? (
-                                appointments.map((appointment) => (
-                                    <TableRow key={appointment.id}>
-                                        <TableCell>
-                                            <div className="flex flex-col">
-                                                <span className="font-medium">
-                                                    {formatDate(appointment.appointment_date)}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground">
-                                                    {appointment.appointment_time}
-                                                </span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-col">
-                                                <span>{appointment.client_name || 'N/A'}</span>
-                                                {appointment.client_email && (
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {appointment.client_email}
-                                                    </span>
-                                                )}
-                                                {appointment.client_phone && (
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {appointment.client_phone}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>{appointment.location || 'N/A'}</TableCell>
-                                        <TableCell>
-                                            <span
-                                                className={cn(
-                                                    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border',
-                                                    getStatusColor(appointment.status)
-                                                )}
-                                            >
-                                                {appointment.status.charAt(0).toUpperCase() +
-                                                    appointment.status.slice(1)}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            {appointment.consultation_id ? (
-                                                <Link
-                                                    href={`/admin/consultations/${appointment.consultation_id}`}
-                                                    className="text-blue-600 hover:underline text-sm"
-                                                >
-                                                    View Consultation
-                                                </Link>
-                                            ) : (
-                                                <span className="text-muted-foreground text-sm">None</span>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <Button variant="ghost" size="icon" asChild>
-                                                <Link href={`/admin/appointments/${appointment.id}`}>
-                                                    <Eye className="h-4 w-4" />
-                                                    <span className="sr-only">View</span>
-                                                </Link>
-                                            </Button>
-                                        </TableCell>
+                <TabsContent value="all" className="space-y-6 mt-6">
+                    <div className="flex items-center justify-between gap-4">
+                        <SearchInput placeholder="Search appointments..." />
+                        <StatusFilter statuses={statusOptions} />
+                    </div>
+
+                    <Card>
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Date & Time</TableHead>
+                                        <TableHead>Client</TableHead>
+                                        <TableHead>Location</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Linked Consultation</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={6} className="text-center h-24">
-                                        <div className="flex flex-col items-center gap-2">
-                                            <CalendarIcon className="h-8 w-8 text-muted-foreground" />
-                                            <p className="text-muted-foreground">No appointments found.</p>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+                                </TableHeader>
+                                <TableBody>
+                                    {appointments && appointments.length > 0 ? (
+                                        appointments.map((appointment) => (
+                                            <TableRow key={appointment.id}>
+                                                <TableCell>
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium">
+                                                            {formatDate(appointment.appointment_date)}
+                                                        </span>
+                                                        <span className="text-xs text-muted-foreground">
+                                                            {appointment.appointment_time}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col">
+                                                        <span>{appointment.client_name || 'N/A'}</span>
+                                                        {appointment.client_email && (
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {appointment.client_email}
+                                                            </span>
+                                                        )}
+                                                        {appointment.client_phone && (
+                                                            <span className="text-xs text-muted-foreground">
+                                                                {appointment.client_phone}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>{appointment.location || 'N/A'}</TableCell>
+                                                <TableCell>
+                                                    <span
+                                                        className={cn(
+                                                            'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border',
+                                                            getStatusColor(appointment.status)
+                                                        )}
+                                                    >
+                                                        {appointment.status.charAt(0).toUpperCase() +
+                                                            appointment.status.slice(1)}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {appointment.consultation_id ? (
+                                                        <Link
+                                                            href={`/admin/consultations/${appointment.consultation_id}`}
+                                                            className="text-blue-600 hover:underline text-sm"
+                                                        >
+                                                            View Consultation
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="text-muted-foreground text-sm">None</span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button variant="ghost" size="icon" asChild>
+                                                        <Link href={`/admin/appointments/${appointment.id}`}>
+                                                            <Eye className="h-4 w-4" />
+                                                            <span className="sr-only">View</span>
+                                                        </Link>
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="text-center h-24">
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <CalendarIcon className="h-8 w-8 text-muted-foreground" />
+                                                    <p className="text-muted-foreground">No appointments found.</p>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
 
-            {count && count > 0 && (
-                <PaginationControls
-                    hasNextPage={end < count - 1}
-                    hasPrevPage={start > 0}
-                    totalCount={count}
-                    currentPage={currentPage}
-                    pageSize={pageSize}
-                />
-            )}
+                    {count && count > 0 && (
+                        <PaginationControls
+                            hasNextPage={end < count - 1}
+                            hasPrevPage={start > 0}
+                            totalCount={count}
+                            currentPage={currentPage}
+                            pageSize={pageSize}
+                        />
+                    )}
+                </TabsContent>
+
+                <TabsContent value="calendar" className="space-y-6 mt-6">
+                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                        <p className="text-muted-foreground">Calendar view coming soon</p>
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     )
 }
