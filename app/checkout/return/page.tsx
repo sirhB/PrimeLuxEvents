@@ -12,7 +12,7 @@ import Link from 'next/link'
 function CheckoutReturnContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
-    const { items, clearCart } = useCart()
+    const { items, clearCart, isLoaded } = useCart()
 
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
     const [message, setMessage] = useState('Processing your payment...')
@@ -21,9 +21,17 @@ function CheckoutReturnContent() {
     const redirectStatus = searchParams.get('redirect_status')
 
     useEffect(() => {
+        if (!isLoaded) return
+
         if (!paymentIntentId || !redirectStatus) {
             setStatus('error')
             setMessage('Invalid payment information received.')
+            return
+        }
+
+        if (items.length === 0) {
+            setStatus('error')
+            setMessage('Your cart is empty. If you believe this is an error, please contact support.')
             return
         }
 
@@ -50,18 +58,6 @@ function CheckoutReturnContent() {
                         pickupTime: parsedData.pickupTime,
                         pickupNotes: parsedData.pickupNotes,
                         sameDayPickup: parsedData.sameDayPickup,
-                    }
-
-                    // Reconstruct cart items
-                    // We rely on useCart to have restored items from localStorage
-                    if (items.length === 0) {
-                        // Wait a bit? useCart might be hydrating.
-                        // But useEffect dependency on items should handle updates.
-                        // If it's truly empty after hydration, we have a problem.
-                        // For now, let's assume if it's empty, we wait or it's an error.
-                        // But since we are in useEffect[items], if it updates it will run again.
-                        // We should check if we already processed to avoid double submission.
-                        return
                     }
 
                     const cartItems: CartItem[] = items
@@ -95,14 +91,11 @@ function CheckoutReturnContent() {
             }
         }
 
-        // Only run if we have items (wait for hydration)
-        if (items.length > 0) {
-            handleReturn()
-        } else {
-            // Optional: Timeout if items never load?
-        }
+        handleReturn()
 
-    }, [paymentIntentId, redirectStatus, items, router, clearCart])
+    }, [paymentIntentId, redirectStatus, items, router, clearCart, isLoaded])
+
+
 
     if (status === 'error') {
         return (

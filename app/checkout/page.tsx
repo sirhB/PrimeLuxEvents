@@ -385,9 +385,9 @@ export default function CheckoutPage() {
                 setIsSuccess(true)
                 clearCart()
                 localStorage.removeItem('checkout_form_data')
-                setTimeout(() => {
-                    router.push(`/order-confirmation?orderId=${result.orderId}`)
-                }, 2000)
+                // Don't set loading to false here, let the redirect happen
+                router.push(`/order-confirmation?orderId=${result.orderId}`)
+                return // Exit function to keep loading state true
             } else {
                 setError(result.error || 'Failed to create order')
             }
@@ -395,8 +395,12 @@ export default function CheckoutPage() {
             setError('An unexpected error occurred')
             console.error(err)
         } finally {
-            setIsLoading(false)
+            // Only set loading to false if we didn't succeed (and thus didn't return early)
+            if (!isSuccess) {
+                setIsLoading(false)
+            }
         }
+
     }
 
     const handleSubmit = async () => {

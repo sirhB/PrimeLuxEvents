@@ -148,9 +148,10 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         const totals = await calculateOrderTotal(items, formData.deliveryAddress)
 
         // Validate that all items exist
-        if (totals.products.length !== items.length) {
-            const foundIds = totals.products.map(p => p.id)
-            const missingItems = items.filter(i => !foundIds.includes(i.productId))
+        const foundIds = totals.products.map(p => p.id)
+        const missingItems = items.filter(i => !foundIds.includes(i.productId))
+
+        if (missingItems.length > 0) {
             console.error('Missing products:', missingItems)
             throw new Error('Some items in your cart are no longer available. Please refresh the page.')
         }

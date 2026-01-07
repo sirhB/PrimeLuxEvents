@@ -42,7 +42,13 @@ export function StripePaymentForm({ onSuccess, amount }: StripePaymentFormProps)
                 description: error.message
             })
         } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-            onSuccess(paymentIntent.id)
+            try {
+                await onSuccess(paymentIntent.id)
+            } catch (err) {
+                console.error('Error in onSuccess callback:', err)
+                setErrorMessage('Payment succeeded, but order creation failed. Please contact support.')
+                setIsProcessing(false)
+            }
         } else {
             setErrorMessage('Payment status: ' + (paymentIntent?.status || 'unknown'))
             setIsProcessing(false)
