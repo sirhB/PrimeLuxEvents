@@ -158,11 +158,11 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
         }
     }
 
-    const galleryImages = product.product_images && product.product_images.length > 0
-        ? [product.image_url, ...product.product_images.sort((a, b) => a.display_order - b.display_order).map(img => img.image_url)]
-        : product.images && product.images.length > 0
-            ? product.images
-            : [product.image_url]
+    const galleryImages = [
+        product.image_url,
+        ...(Array.isArray(product.images) ? product.images : []),
+        ...(product.product_images?.sort((a, b) => a.display_order - b.display_order).map(img => img.image_url) || [])
+    ].filter(Boolean) as string[]
 
     const uniqueGalleryImages = Array.from(new Set(galleryImages))
 
