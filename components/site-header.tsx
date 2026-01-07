@@ -38,6 +38,9 @@ export function SiteHeader() {
     { href: "/about", label: "About" },
   ]
 
+  const isDarkPage = true // All public pages are now dark themed luxury experience
+  const headerTheme = scrolled || isDarkPage ? 'dark' : 'light'
+
   return (
     <>
       {/* Top Bar */}
@@ -65,12 +68,24 @@ export function SiteHeader() {
             : "bg-transparent py-6 border-b border-transparent"
         )}
       >
+        {/* Subtle gradient for legibility on bright backgrounds */}
+        {!scrolled && isDarkPage && (
+          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent pointer-events-none -z-10" />
+        )}
+
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
           {/* Mobile Menu Trigger */}
           <div className="flex lg:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="hover:bg-gold/10 text-white">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    "hover:bg-gold/10 transition-colors",
+                    headerTheme === 'dark' ? "text-white" : "text-black"
+                  )}
+                >
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
@@ -111,7 +126,10 @@ export function SiteHeader() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <span className="font-serif text-2xl md:text-3xl font-light tracking-tighter text-white transition-colors group-hover:text-gold">
+            <span className={cn(
+              "font-serif text-2xl md:text-3xl font-light tracking-tighter transition-colors group-hover:text-gold",
+              headerTheme === 'dark' ? "text-white" : "text-black"
+            )}>
               PrimeLux<span className="text-gold">.</span>
             </span>
           </Link>
@@ -124,7 +142,9 @@ export function SiteHeader() {
                 href={link.href}
                 className={cn(
                   "text-[11px] font-bold uppercase tracking-[0.2em] transition-all relative group",
-                  pathname === link.href ? "text-gold" : "text-gray-400 hover:text-white"
+                  pathname === link.href
+                    ? "text-gold"
+                    : headerTheme === 'dark' ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-black"
                 )}
               >
                 {link.label}
@@ -138,18 +158,29 @@ export function SiteHeader() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 md:gap-6">
-            <div className="hidden sm:block text-white">
+            <div className={cn(
+              "hidden sm:block",
+              headerTheme === 'dark' ? "text-white" : "text-black"
+            )}>
               <SearchTrigger onClick={() => setIsSearchOpen(true)} />
             </div>
 
             <Link
               href="/contact"
-              className="hidden md:block text-[11px] font-bold uppercase tracking-[0.2em] px-6 py-3 bg-gold text-black rounded-full hover:bg-white transition-all duration-500 hover:scale-105"
+              className={cn(
+                "hidden md:block text-[11px] font-bold uppercase tracking-[0.2em] px-6 py-3 rounded-full transition-all duration-500 hover:scale-105",
+                headerTheme === 'dark'
+                  ? "bg-gold text-black hover:bg-white"
+                  : "bg-black text-white hover:bg-gold hover:text-black"
+              )}
             >
               Inquire
             </Link>
 
-            <div className="relative text-white">
+            <div className={cn(
+              "relative",
+              headerTheme === 'dark' ? "text-white" : "text-black"
+            )}>
               <CartSheet />
             </div>
           </div>

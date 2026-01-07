@@ -40,40 +40,47 @@ interface TestimonialsSectionProps {
 }
 
 export function TestimonialsSection({
-  title = "Client Stories",
-  description = "Hear from those who have experienced the PrimeLux difference.",
+  title = "Affirmations of Excellence",
+  description = "Reflections from those who have entrusted PrimeLux with their most significant milestones.",
   items = testimonials,
 }: TestimonialsSectionProps) {
   return (
-    <section className="py-24 md:py-40 bg-[#FDFBF7] relative overflow-hidden">
-      {/* Decorative background element */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-24 bg-gradient-to-b from-gold/50 to-transparent" />
+    <section className="py-24 md:py-48 bg-[#1A1A1A] relative overflow-hidden">
+      <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
+
+      {/* Background Orbs */}
+      <div className="absolute top-1/4 right-0 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 left-0 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-24">
-          <motion.span
+        <div className="text-center max-w-3xl mx-auto mb-32">
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-4 block"
+            className="flex items-center justify-center gap-4 mb-8"
           >
-            Testimonials
-          </motion.span>
+            <span className="h-px w-8 bg-gold/50" />
+            <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Testimonials</span>
+            <span className="h-px w-8 bg-gold/50" />
+          </motion.div>
+
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl md:text-6xl font-serif font-light mb-8 tracking-tight"
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-4xl md:text-7xl font-serif font-light mb-10 tracking-tight text-white leading-[1.1]"
           >
             {title}
           </motion.h2>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-lg text-gray-500 font-light leading-relaxed"
+            transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-lg text-gray-400 font-light leading-relaxed max-w-2xl mx-auto"
           >
             {description}
           </motion.p>
@@ -83,38 +90,38 @@ export function TestimonialsSection({
           {items.map((testimonial, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 + 0.3 }}
-              className="relative bg-white p-12 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-border/5 group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-500"
+              transition={{ duration: 1, delay: index * 0.1 + 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="relative bg-white/5 backdrop-blur-sm p-12 rounded-[2.5rem] border border-white/5 group hover:border-gold/20 transition-all duration-700 shadow-2xl"
             >
-              <div className="absolute -top-6 left-12 w-12 h-12 bg-gold rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
-                <Quote className="h-5 w-5 text-black fill-black" />
+              <div className="absolute -top-6 left-12 w-14 h-14 bg-gold rounded-full flex items-center justify-center shadow-[0_10px_30px_rgba(212,175,55,0.3)] group-hover:scale-110 group-hover:bg-white transition-all duration-700">
+                <Quote className="h-6 w-6 text-black fill-black" />
               </div>
 
-              <div className="flex gap-1 mb-8">
+              <div className="flex gap-1.5 mb-10">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-3 w-3 fill-gold text-gold" />
+                  <Star key={i} className="h-3.5 w-3.5 fill-gold text-gold opacity-80" />
                 ))}
               </div>
 
-              <blockquote className="text-xl font-serif font-light leading-relaxed mb-10 text-gray-800 italic">
+              <blockquote className="text-2xl font-serif font-light leading-relaxed mb-12 text-white italic selection:bg-gold selection:text-black">
                 &ldquo;{testimonial.quote}&rdquo;
               </blockquote>
 
-              <div className="flex items-center gap-4 pt-8 border-t border-gray-50">
-                <div className="relative h-14 w-14 overflow-hidden rounded-full bg-gray-100 border-2 border-white shadow-sm">
+              <div className="flex items-center gap-5 pt-10 border-t border-white/10">
+                <div className="relative h-16 w-16 overflow-hidden rounded-full border border-white/10 shadow-inner">
                   <Image
                     src={testimonial.image || "/placeholder.svg"}
                     alt={testimonial.author}
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                 </div>
                 <div>
-                  <div className="font-serif font-bold text-gray-900">{testimonial.author}</div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-gold">{testimonial.role}</div>
+                  <div className="font-serif text-lg font-light text-white tracking-wide">{testimonial.author}</div>
+                  <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-gold mt-1">{testimonial.role}</div>
                 </div>
               </div>
             </motion.div>

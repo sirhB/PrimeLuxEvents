@@ -38,10 +38,10 @@ export function HeroSection({
           src="/images/luxury-event-hero.png"
           alt="Luxury Event Setup"
           fill
-          className="object-cover opacity-60"
+          className="object-cover opacity-50 contrast-125"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#FDFBF7]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[#1A1A1A]" />
       </motion.div>
 
       {/* Content */}

@@ -44,11 +44,12 @@ export function FeaturedCollection() {
 
   if (loading) {
     return (
-      <section className="py-24 md:py-40 bg-[#FDFBF7]">
-        <div className="container mx-auto px-4 md:px-6 text-center">
+      <section className="py-24 md:py-40 bg-[#1A1A1A] relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
+        <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
           <div className="flex flex-col items-center gap-6">
-            <div className="h-16 w-16 rounded-full border-2 border-gold/20 border-t-gold animate-spin" />
-            <div className="text-gold font-serif text-xl font-light tracking-widest uppercase">Curating Collection...</div>
+            <div className="h-16 w-16 rounded-full border-2 border-gold/10 border-t-gold animate-spin" />
+            <div className="text-gold/40 text-[10px] font-bold tracking-[0.4em] uppercase">Curating the gallery</div>
           </div>
         </div>
       </section>
@@ -60,34 +61,40 @@ export function FeaturedCollection() {
   }
 
   return (
-    <section className="py-24 md:py-40 bg-[#FDFBF7] overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6 mb-20">
+    <section className="py-24 md:py-40 bg-[#1A1A1A] overflow-hidden relative">
+      <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
+
+      <div className="container mx-auto px-4 md:px-6 mb-24 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col md:flex-row justify-between items-end gap-8"
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col md:flex-row justify-between items-end gap-10"
         >
           <div className="max-w-2xl">
-            <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-4 block">The Gallery</span>
-            <h2 className="text-4xl md:text-6xl font-serif font-light text-gray-900 tracking-tight">Trending in the Catalog</h2>
+            <div className="flex items-center gap-4 mb-6">
+              <span className="h-px w-8 bg-gold/50" />
+              <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">The Gallery</span>
+            </div>
+            <h2 className="text-4xl md:text-7xl font-serif font-light text-white tracking-tight leading-[1.1]">Trending Masterpieces</h2>
           </div>
           <Link
             href="/catalog"
-            className="group inline-flex items-center text-[11px] font-bold uppercase tracking-[0.2em] text-gray-900 hover:text-gold transition-colors"
+            className="group inline-flex items-center text-[10px] font-bold uppercase tracking-[0.4em] text-white hover:text-gold transition-all duration-500 pb-2 border-b border-white/10 hover:border-gold"
           >
-            View Full Collection
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            Explore Full Collection
+            <ArrowRight className="ml-3 h-3 w-3 transition-transform group-hover:translate-x-2" />
           </Link>
         </motion.div>
       </div>
 
-      <div className="relative w-full">
-        <div className="absolute left-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-r from-[#FDFBF7] to-transparent pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-32 z-10 bg-gradient-to-l from-[#FDFBF7] to-transparent pointer-events-none" />
+      <div className="relative w-full z-10">
+        {/* Subtle masks for the scroll */}
+        <div className="absolute left-0 top-0 bottom-0 w-48 z-10 bg-gradient-to-r from-[#1A1A1A] to-transparent pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-48 z-10 bg-gradient-to-l from-[#1A1A1A] to-transparent pointer-events-none" />
 
-        <InfiniteScrollRow products={featuredProducts} direction="left" speed={40} />
+        <InfiniteScrollRow products={featuredProducts} direction="left" speed={60} />
       </div>
     </section>
   )
@@ -97,7 +104,7 @@ function InfiniteScrollRow({ products, direction, speed }: { products: Product[]
   return (
     <div className="flex overflow-hidden py-10">
       <motion.div
-        className="flex gap-10 px-5"
+        className="flex gap-16 px-8"
         initial={{ x: direction === "left" ? 0 : -1000 }}
         animate={{ x: direction === "left" ? "-50%" : "0%" }}
         transition={{
@@ -120,37 +127,35 @@ function ProductCard({ product }: { product: Product }) {
 
   return (
     <motion.div
-      className="flex-shrink-0 w-[350px] group relative"
-      whileHover={{ y: -15 }}
-      transition={{ type: "spring", stiffness: 200, damping: 25 }}
+      className="flex-shrink-0 w-[420px] group relative"
+      whileHover={{ y: -20 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
       <Link href={`/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden bg-white mb-8 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.04)] group-hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] transition-all duration-500 border border-border/5">
+        <div className="relative aspect-[3/4] overflow-hidden bg-[#1E1E1E] mb-10 rounded-[2.5rem] shadow-[0_30px_60px_rgba(0,0,0,0.3)] group-hover:shadow-[0_40px_100px_rgba(0,0,0,0.5)] transition-all duration-700 border border-white/5">
           <Image
             src={product.image_url || "/placeholder.svg"}
             alt={product.name}
             fill
-            className="object-cover transition-transform duration-1000 group-hover:scale-110"
+            className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 opacity-90 group-hover:opacity-100"
           />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-700" />
 
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-            <div className="flex gap-3 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500">
-              <span className="bg-white text-black px-6 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 shadow-xl">
-                <Eye className="w-3 h-3" /> Quick View
-              </span>
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-3 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-700">
+              <Eye className="w-3.5 h-3.5" /> Discovery Details
             </div>
           </div>
         </div>
 
-        <div className="text-center space-y-2">
-          <h3 className="font-serif text-xl font-bold text-gray-900 group-hover:text-gold transition-colors tracking-tight">
+        <div className="text-center space-y-3 px-4">
+          <h3 className="font-serif text-2xl font-light text-white group-hover:text-gold transition-colors tracking-tight leading-tight">
             {product.name}
           </h3>
-          <div className="flex items-center justify-center gap-3">
-            <span className="w-8 h-px bg-border/50" />
-            <p className="text-[11px] font-bold uppercase tracking-widest text-gold">{formatCurrency(price)} / Day</p>
-            <span className="w-8 h-px bg-border/50" />
+          <div className="flex items-center justify-center gap-4">
+            <span className="h-px w-6 bg-white/10" />
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold decoration-gold/30 underline underline-offset-4">{formatCurrency(price)} <span className="text-[8px] opacity-50 font-normal">/ day</span></p>
+            <span className="h-px w-6 bg-white/10" />
           </div>
         </div>
       </Link>

@@ -110,49 +110,52 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                 stiffness: 300,
                                 duration: 0.3
                             }}
-                            className="w-full max-w-2xl bg-background rounded-xl shadow-2xl overflow-hidden pointer-events-auto flex flex-col max-h-[80vh]"
+                            className="w-full max-w-2xl bg-[#1A1A1A] border border-white/5 rounded-2xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden pointer-events-auto flex flex-col max-h-[80vh] relative"
                         >
-                            <div className="flex items-center p-4 border-b border-border">
-                                <Search className="w-5 h-5 text-muted-foreground mr-3" />
+                            <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
+
+                            <div className="flex items-center p-6 border-b border-white/5 bg-white/5 backdrop-blur-xl relative z-10">
+                                <Search className="w-5 h-5 text-gold/40 mr-4" />
                                 <Input
                                     ref={inputRef}
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
-                                    placeholder="Search for products, categories..."
-                                    className="flex-1 border-none shadow-none focus-visible:ring-0 text-lg bg-transparent h-auto p-0"
+                                    placeholder="Search the collection..."
+                                    className="flex-1 border-none shadow-none focus-visible:ring-0 text-xl font-light bg-transparent h-auto p-0 text-white placeholder:text-gray-600"
                                 />
                                 <button
                                     onClick={onClose}
-                                    className="p-2 hover:bg-muted rounded-full transition-colors ml-2"
+                                    className="p-2 hover:bg-white/5 rounded-full transition-all duration-300 ml-2 group"
                                 >
-                                    <X className="w-5 h-5 text-muted-foreground" />
+                                    <X className="w-5 h-5 text-gray-400 group-hover:text-white" />
                                 </button>
                             </div>
 
-                            <div className="overflow-y-auto p-4">
+                            <div className="overflow-y-auto p-6 relative z-10 custom-scrollbar">
                                 {isLoading ? (
-                                    <div className="flex justify-center py-8">
-                                        <Loader2 className="w-8 h-8 animate-spin text-gold" />
+                                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                                        <Loader2 className="w-10 h-10 animate-spin text-gold" />
+                                        <p className="text-[10px] uppercase tracking-[0.4em] text-gold/40 font-bold">Consulting the archives</p>
                                     </div>
                                 ) : (results.products.length > 0 || results.categories.length > 0) ? (
-                                    <div className="grid gap-4">
+                                    <div className="grid gap-8">
                                         {/* Category Results */}
                                         {results.categories.length > 0 && (
-                                            <div className="mb-4">
-                                                <h3 className="text-sm font-medium text-muted-foreground mb-2 uppercase tracking-wider">Categories</h3>
-                                                <div className="grid gap-2">
+                                            <div>
+                                                <h3 className="text-[10px] font-bold text-gold/40 mb-4 uppercase tracking-[0.4em]">Collections</h3>
+                                                <div className="grid gap-3">
                                                     {results.categories.map((category) => (
                                                         <Link
                                                             key={category.id}
                                                             href={`/catalog?category=${encodeURIComponent(category.name)}`}
                                                             onClick={onClose}
-                                                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors group"
+                                                            className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all duration-500 group"
                                                         >
-                                                            <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center text-gold">
-                                                                <Search className="w-5 h-5" />
+                                                            <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center text-gold group-hover:bg-gold group-hover:text-black transition-all duration-500">
+                                                                <Search className="w-4 h-4" />
                                                             </div>
-                                                            <span className="font-medium text-foreground group-hover:text-gold transition-colors">
-                                                                View all in "{category.name}"
+                                                            <span className="font-serif text-lg text-white font-light group-hover:translate-x-1 transition-transform">
+                                                                Explore <span className="italic text-gold">{category.name}</span>
                                                             </span>
                                                         </Link>
                                                     ))}
@@ -163,45 +166,40 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                         {/* Product Results */}
                                         {results.products.length > 0 && (
                                             <div>
-                                                {results.categories.length > 0 && (
-                                                    <h3 className="text-sm font-medium text-muted-foreground mb-2 uppercase tracking-wider">Products</h3>
-                                                )}
+                                                <h3 className="text-[10px] font-bold text-gold/40 mb-4 uppercase tracking-[0.4em]">Masterpieces</h3>
                                                 <div className="grid gap-4">
                                                     {results.products.map((product) => (
                                                         <Link
                                                             key={product.id}
                                                             href={`/catalog/${(Array.isArray(product.categories) ? product.categories[0]?.slug : product.categories?.slug) || "uncategorized"}/${product.slug || product.id}`}
                                                             onClick={onClose}
-                                                            className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                                                            className="flex items-center gap-5 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all duration-500 group"
                                                         >
-                                                            <div className="relative w-16 h-16 rounded-md overflow-hidden bg-secondary flex-shrink-0">
+                                                            <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-white/5 flex-shrink-0 border border-white/5">
                                                                 {product.image_url ? (
                                                                     <Image
                                                                         src={product.image_url}
                                                                         alt={product.name}
                                                                         fill
-                                                                        className="object-cover"
+                                                                        className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                                                                     />
                                                                 ) : (
-                                                                    <div className="w-full h-full flex items-center justify-center bg-neutral-100 text-neutral-400 text-xs">
-                                                                        No Img
+                                                                    <div className="w-full h-full flex items-center justify-center text-gray-700">
+                                                                        <Search className="w-6 h-6" />
                                                                     </div>
                                                                 )}
                                                             </div>
-                                                            <div className="flex-1 min-w-0">
-                                                                <h4 className="font-medium text-foreground group-hover:text-gold transition-colors truncate">
+                                                            <div className="flex-1 min-w-0 py-1">
+                                                                <h4 className="font-serif text-lg text-white font-light group-hover:text-gold transition-colors truncate mb-1">
                                                                     {product.name}
                                                                 </h4>
-                                                                <p className="text-sm text-muted-foreground line-clamp-1">
-                                                                    {product.description}
-                                                                </p>
-                                                                <div className="flex items-center gap-2 mt-1">
-                                                                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
-                                                                        {(Array.isArray(product.categories) ? product.categories[0]?.name : product.categories?.name) || "Uncategorized"}
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">
+                                                                        {(Array.isArray(product.categories) ? product.categories[0]?.name : product.categories?.name) || "Curated"}
                                                                     </span>
-                                                                    <span className="text-sm font-semibold text-gold">
+                                                                    <span className="w-1 h-1 rounded-full bg-white/10" />
+                                                                    <span className="text-sm font-serif text-gold">
                                                                         {formatCurrency(product.rental_price_daily || product.price)}
-                                                                        <span className="text-xs text-muted-foreground font-normal">/day</span>
                                                                     </span>
                                                                 </div>
                                                             </div>
@@ -212,12 +210,24 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                         )}
                                     </div>
                                 ) : query.length >= 2 ? (
-                                    <div className="text-center py-12 text-muted-foreground">
-                                        No results found for "{query}"
+                                    <div className="text-center py-20 flex flex-col items-center gap-6">
+                                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/5">
+                                            <Search className="w-8 h-8 text-gold/20" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <p className="text-white font-serif text-xl font-light">The search continues</p>
+                                            <p className="text-sm text-gray-500 font-light">No results found for "{query}"</p>
+                                        </div>
                                     </div>
                                 ) : (
-                                    <div className="text-center py-12 text-muted-foreground">
-                                        Start typing to search our catalog...
+                                    <div className="text-center py-20 flex flex-col items-center gap-6">
+                                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/5">
+                                            <Search className="w-8 h-8 text-gold/20" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <p className="text-white font-serif text-xl font-light">Discovery Awaits</p>
+                                            <p className="text-sm text-gray-500 font-light">Begin typing to browse our curated collection.</p>
+                                        </div>
                                     </div>
                                 )}
                             </div>
