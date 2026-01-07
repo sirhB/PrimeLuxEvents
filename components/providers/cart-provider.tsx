@@ -82,60 +82,60 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [eventDetails, isLoaded])
 
   const addItem = (productId: string, quantity: number = 1, modifiers: Record<string, any> = {}) => {
-     setItems((prev) => {
-       // Check if item with same product ID AND same modifiers exists
-       const existing = prev.find((item) =>
-         item.productId === productId &&
-         JSON.stringify(item.modifiers || {}) === JSON.stringify(modifiers)
-       )
+    setItems((prev) => {
+      // Check if item with same product ID AND same modifiers exists
+      const existing = prev.find((item) =>
+        item.productId === productId &&
+        JSON.stringify(item.modifiers || {}) === JSON.stringify(modifiers)
+      )
 
-       if (existing) {
-         return prev.map((item) =>
-           item.id === existing.id
-             ? { ...item, quantity: item.quantity + quantity }
-             : item
-         )
-       }
+      if (existing) {
+        return prev.map((item) =>
+          item.id === existing.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        )
+      }
 
-       return [...prev, {
-         id: crypto.randomUUID(),
-         productId,
-         quantity,
-         modifiers
-       }]
-     })
-   }
+      return [...prev, {
+        id: crypto.randomUUID(),
+        productId,
+        quantity,
+        modifiers
+      }]
+    })
+  }
 
-   const addPackageItem = (
-     packageId: string,
-     packageSelections: Record<string, string[]>,
-     packageData: { name: string; price: number; original_price: number; savings_amount: number },
-     quantity: number = 1
-   ) => {
-     setItems((prev) => {
-       // Check if package with same selections exists
-       const existing = prev.find((item) =>
-         item.packageId === packageId &&
-         JSON.stringify(item.packageSelections || {}) === JSON.stringify(packageSelections)
-       )
+  const addPackageItem = (
+    packageId: string,
+    packageSelections: Record<string, string[]>,
+    packageData: { name: string; price: number; original_price: number; savings_amount: number },
+    quantity: number = 1
+  ) => {
+    setItems((prev) => {
+      // Check if package with same selections exists
+      const existing = prev.find((item) =>
+        item.packageId === packageId &&
+        JSON.stringify(item.packageSelections || {}) === JSON.stringify(packageSelections)
+      )
 
-       if (existing) {
-         return prev.map((item) =>
-           item.id === existing.id
-             ? { ...item, quantity: item.quantity + quantity }
-             : item
-         )
-       }
+      if (existing) {
+        return prev.map((item) =>
+          item.id === existing.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        )
+      }
 
-       return [...prev, {
-         id: crypto.randomUUID(),
-         packageId,
-         quantity,
-         packageSelections,
-         packageData
-       }]
-     })
-   }
+      return [...prev, {
+        id: crypto.randomUUID(),
+        packageId,
+        quantity,
+        packageSelections,
+        packageData
+      }]
+    })
+  }
 
   const removeItem = (cartItemId: string) => {
     setItems((prev) => prev.filter((item) => item.id !== cartItemId))
@@ -165,6 +165,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       value={{
         items,
         addItem,
+        addPackageItem,
         removeItem,
         updateQuantity,
         clearCart,
