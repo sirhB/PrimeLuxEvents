@@ -98,6 +98,10 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
     // Transform data for the client component
     const transformedPkg = {
         ...pkg,
+        staticItems: (pkg.package_items || []).map((item: any) => ({
+            ...item,
+            product: productMap.get(item.product_id) || { name: 'Unknown Product', price: 0, image_url: '' }
+        })),
         groups: pkg.package_item_groups
             .sort((a: any, b: any) => a.display_order - b.display_order)
             .map((g: any) => ({

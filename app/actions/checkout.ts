@@ -183,14 +183,32 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         // Fetch Package Data for validation and decomposition
         const packageIds = [...new Set(items.filter(i => i.packageId).map(i => i.packageId))]
         let packages: any[] = []
+        let allOptions: any[] = []
+
         if (packageIds.length > 0) {
-            const { data, error } = await supabase
+            // Fetch packages and their static items
+            const { data: pkgData, error: pkgError } = await supabase
                 .from('packages')
-                .select('*, package_items(product_id)')
+                .select('*, package_items(product_id, quantity)')
                 .in('id', packageIds)
 
-            if (error) throw new Error('Failed to fetch package details')
-            packages = data || []
+            if (pkgError) throw new Error('Failed to fetch package details')
+            packages = pkgData || []
+
+            // Fetch ALL options for these packages to map selections to products
+            const { data: optData, error: optError } = await supabase
+                .from('package_item_options')
+                .select('id, product_id, quantity')
+                .in('package_item_group_id',
+                    // We need to get group IDs first or just query by package_id if available
+                    // Let's query by product_id if we don't have package_id on options, 
+                    // but wait, we have packages.
+                    // Actually, let's just fetch all options for the groups belonging to these packages.
+                    (await supabase.from('package_item_groups').select('id').in('package_id', packageIds)).data?.map(g => g.id) || []
+                )
+
+            if (optError) console.error('Error fetching package options:', optError)
+            allOptions = optData || []
         }
 
         const missingPackages = items.filter(i => i.packageId && !packages.find(p => p.id === i.packageId))
@@ -238,8 +256,12 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                     })
                     // Configurable items (Selections)
                     if (item.packageSelections) {
-                        Object.values(item.packageSelections).flat().forEach(selectedProductId => {
-                            requiredQuantities[selectedProductId] = (requiredQuantities[selectedProductId] || 0) + item.quantity
+                        const optionIds = Object.values(item.packageSelections).flat()
+                        optionIds.forEach(optId => {
+                            const option = allOptions.find(o => o.id === optId)
+                            if (option) {
+                                requiredQuantities[option.product_id] = (requiredQuantities[option.product_id] || 0) + (item.quantity * (option.quantity || 1))
+                            }
                         })
                     }
                 }
@@ -326,25 +348,36 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 })
             } else if (item.packageId && item.packageData) {
                 const pkg = packages.find(p => p.id === item.packageId)
-                const constituentIds: string[] = []
+                const packageContents: { productId: string, quantity: number }[] = []
 
                 if (pkg) {
-                    pkg.package_items?.forEach((pi: any) => constituentIds.push(pi.product_id))
+                    pkg.package_items?.forEach((pi: any) => {
+                        packageContents.push({ productId: pi.product_id, quantity: pi.quantity || 1 })
+                    })
                 }
                 if (item.packageSelections) {
-                    Object.values(item.packageSelections).flat().forEach(id => constituentIds.push(id))
+                    const optionIds = Object.values(item.packageSelections).flat()
+                    optionIds.forEach(optId => {
+                        const option = allOptions.find(o => o.id === optId)
+                        if (option) {
+                            packageContents.push({ productId: option.product_id, quantity: option.quantity || 1 })
+                        }
+                    })
                 }
 
-                if (constituentIds.length > 0) {
+                if (packageContents.length > 0) {
                     const packagePrice = item.packageData.price
 
-                    constituentIds.forEach((prodId, index) => {
-                        orderItems.push({
-                            order_id: order.id,
-                            product_id: prodId,
-                            quantity: item.quantity,
-                            price_at_time: index === 0 ? packagePrice : 0,
-                        })
+                    packageContents.forEach((content, index) => {
+                        if (content.productId) {
+                            orderItems.push({
+                                order_id: order.id,
+                                product_id: content.productId,
+                                quantity: item.quantity * content.quantity,
+                                price_at_time: index === 0 ? packagePrice : 0,
+                                modifiers: {}
+                            })
+                        }
                     })
                 }
             }

@@ -20,6 +20,13 @@ type Product = {
     image_url: string
 }
 
+type StaticItem = {
+    id: string
+    product_id: string
+    quantity: number
+    product: Product
+}
+
 type Option = {
     id: string
     product_id: string
@@ -48,6 +55,7 @@ type Package = {
     discount_value: number
     original_price: number
     savings_amount: number
+    staticItems: StaticItem[]
     groups: Group[]
 }
 
@@ -131,7 +139,21 @@ export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
         })
 
         // Generate summary of selections for display
-        const selectionsSummary = Object.entries(selections).map(([groupId, optionIds]) => {
+        const selectionsSummary = []
+
+        // Add static items first
+        if (pkg.staticItems && pkg.staticItems.length > 0) {
+            selectionsSummary.push({
+                groupName: 'Included Items',
+                items: pkg.staticItems.map(item => ({
+                    name: item.product.name,
+                    quantity: item.quantity
+                }))
+            })
+        }
+
+        // Add configurable selections
+        const groupSummaries = Object.entries(selections).map(([groupId, optionIds]) => {
             const group = pkg.groups.find(g => g.id === groupId)
             const selectedOptions = optionIds.map(optId => {
                 const opt = group?.options.find(o => o.id === optId)
@@ -146,12 +168,15 @@ export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
             }
         })
 
+        selectionsSummary.push(...groupSummaries)
+
         addPackageItem(
             pkg.id,
             packageSelections,
             {
                 name: pkg.name,
                 price: pkg.price,
+                image_url: pkg.image_url,
                 original_price: pkg.original_price,
                 savings_amount: pkg.savings_amount,
                 selectionsSummary

@@ -992,9 +992,17 @@ export default function CheckoutPage() {
                                                     transition={{ duration: 0.5, delay: index * 0.1 }}
                                                 >
                                                     <div className="h-32 w-32 rounded-[2rem] border border-border/5 bg-gray-50 overflow-hidden flex-shrink-0 shadow-sm relative">
-                                                        <div className="absolute inset-0 bg-gold/5 flex items-center justify-center">
-                                                            <span className="text-xs text-gold font-bold uppercase tracking-widest">Package</span>
-                                                        </div>
+                                                        {item.packageData.image_url ? (
+                                                            <img
+                                                                src={item.packageData.image_url}
+                                                                alt={name}
+                                                                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                            />
+                                                        ) : (
+                                                            <div className="absolute inset-0 bg-gold/5 flex items-center justify-center">
+                                                                <span className="text-xs text-gold font-bold uppercase tracking-widest">Package</span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className="flex-1 flex flex-col justify-between">
                                                         <div>

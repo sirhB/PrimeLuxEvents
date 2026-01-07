@@ -13,6 +13,7 @@ export type CartItem = {
   packageData?: { // For package items
     name: string
     price: number
+    image_url?: string
     original_price: number
     savings_amount: number
     selectionsSummary?: {
@@ -25,7 +26,7 @@ export type CartItem = {
 type CartContextType = {
   items: CartItem[]
   addItem: (productId: string, quantity?: number, modifiers?: Record<string, any>) => void
-  addPackageItem: (packageId: string, packageSelections: Record<string, string[]>, packageData: { name: string; price: number; original_price: number; savings_amount: number; selectionsSummary?: any[] }, quantity?: number) => void
+  addPackageItem: (packageId: string, packageSelections: Record<string, string[]>, packageData: { name: string; price: number; image_url?: string; original_price: number; savings_amount: number; selectionsSummary?: any[] }, quantity?: number) => void
   removeItem: (cartItemId: string) => void
   updateQuantity: (cartItemId: string, quantity: number) => void
   clearCart: () => void
@@ -113,7 +114,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addPackageItem = (
     packageId: string,
     packageSelections: Record<string, string[]>,
-    packageData: { name: string; price: number; original_price: number; savings_amount: number },
+    packageData: any,
     quantity: number = 1
   ) => {
     setItems((prev) => {

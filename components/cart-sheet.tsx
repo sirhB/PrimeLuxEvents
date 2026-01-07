@@ -128,6 +128,22 @@ export function CartSheet() {
                             <div className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
                               Package Deal
                             </div>
+
+                            {/* Compact Selection Summary */}
+                            {item.packageData.selectionsSummary && (
+                              <div className="flex flex-wrap gap-1.5 mt-2">
+                                {item.packageData.selectionsSummary.flatMap((g: any) => g.items).slice(0, 4).map((sel: any, sIdx: number) => (
+                                  <span key={sIdx} className="text-[9px] text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                                    {sel.name}
+                                  </span>
+                                ))}
+                                {item.packageData.selectionsSummary.flatMap((g: any) => g.items).length > 4 && (
+                                  <span className="text-[9px] text-gray-400 px-1 italic">
+                                    +{item.packageData.selectionsSummary.flatMap((g: any) => g.items).length - 4} more
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
 
                           <div className="flex items-center justify-between mt-4">
