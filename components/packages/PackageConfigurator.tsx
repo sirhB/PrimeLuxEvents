@@ -10,6 +10,7 @@ import { Check, ChevronRight, ShoppingBag, Info, ArrowLeft, ArrowRight } from 'l
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useCart } from '@/components/providers/cart-provider'
 
 // Types (should match what we fetch)
 type Product = {
@@ -121,9 +122,27 @@ export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
     }
 
     const handleAddToQuote = () => {
-        // Here you would typically call a server action or context to add to cart/quote
-        toast.success('Package added to your quote request!')
-        // Redirect or show confirmation
+        // Prepare selection data
+        const packageSelections: Record<string, string[]> = {}
+        Object.entries(selections).forEach(([groupId, optionIds]) => {
+            if (optionIds.length > 0) {
+                packageSelections[groupId] = optionIds
+            }
+        })
+
+        addPackageItem(
+            pkg.id,
+            packageSelections,
+            {
+                name: pkg.name,
+                price: pkg.price,
+                original_price: pkg.original_price,
+                savings_amount: pkg.savings_amount
+            }
+        )
+
+        toast.success(`'${pkg.name}' added to your quote request!`)
+        // Optional: Redirect to cart or keep exploring
     }
 
     return (
