@@ -14,6 +14,7 @@ interface Product {
   description: string | null
   price: number
   image_url: string | null
+  categories?: { name: string, slug?: string } | null
   rental_price_daily?: number
   is_featured?: boolean
   slug?: string
@@ -28,7 +29,7 @@ export function FeaturedCollection() {
     async function fetchFeaturedProducts() {
       const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select('*, categories(name, slug)')
         .eq('is_featured', true)
         .limit(8)
 
@@ -123,7 +124,7 @@ function ProductCard({ product }: { product: Product }) {
       whileHover={{ y: -15 }}
       transition={{ type: "spring", stiffness: 200, damping: 25 }}
     >
-      <Link href={`/catalog/${product.slug || product.id}`} className="block">
+      <Link href={`/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`} className="block">
         <div className="relative aspect-[4/5] overflow-hidden bg-white mb-8 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.04)] group-hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] transition-all duration-500 border border-border/5">
           <Image
             src={product.image_url || "/placeholder.svg"}

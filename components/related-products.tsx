@@ -13,7 +13,7 @@ interface Product {
     rental_price_daily?: number
     image_url: string | null
     category_id: string | null
-    categories?: { name: string } | null
+    categories?: { name: string, slug?: string } | null
     quantity_available?: number
     features?: string[]
     slug?: string

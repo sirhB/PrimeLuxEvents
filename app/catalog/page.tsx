@@ -19,12 +19,12 @@ export default async function CatalogPage() {
   const categories = categoriesRes.data || []
   const packages = packagesRes.data || []
 
-  // Manually map category names to products to avoid joins
+  // Manually map category names and slugs to products to avoid joins
   const productsWithCategories = products.map(product => {
     const category = categories.find(c => c.id === product.category_id)
     return {
       ...product,
-      categories: category ? { name: category.name } : null
+      categories: category ? { name: category.name, slug: category.slug } : null
     }
   })
 

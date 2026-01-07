@@ -21,7 +21,8 @@ export async function searchProducts(query: string) {
       category_id,
       slug,
       categories (
-        name
+        name,
+        slug
       )
     `)
     .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
@@ -56,7 +57,8 @@ export async function searchProducts(query: string) {
       category_id,
       slug,
       categories!inner (
-        name
+        name,
+        slug
       )
     `)
     .ilike('categories.name', `%${query}%`)

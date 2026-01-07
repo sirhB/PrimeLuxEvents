@@ -16,7 +16,7 @@ interface Product {
     price: number
     image_url: string | null
     category_id: string | null
-    categories?: { name: string } | null
+    categories?: { name: string, slug?: string } | null
     rental_price_daily?: number
     images?: string[]
     quantity_available?: number
@@ -123,7 +123,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 {/* Content */}
                 <div className="flex flex-col gap-4 p-6 flex-grow">
                     <div className="space-y-2">
-                        <Link href={`/catalog/${product.slug || product.id}`} className="block">
+                        <Link href={`/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`} className="block">
                             <h3 className="font-serif text-xl font-light text-foreground hover:text-gold transition-colors duration-300 line-clamp-1 tracking-tight">
                                 {product.name}
                             </h3>
@@ -142,7 +142,7 @@ export function ProductCard({ product }: ProductCardProps) {
                             </span>
                             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">per day</span>
                         </div>
-                        <Link href={`/catalog/${product.slug || product.id}`}>
+                        <Link href={`/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`}>
                             <Button variant="ghost" size="sm" className="rounded-full px-0 hover:bg-transparent text-gold hover:text-gold/80 font-semibold group/btn">
                                 Details
                                 <motion.span

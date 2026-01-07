@@ -266,7 +266,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                             placeholder="category-product-name"
                             required
                         />
-                        <p className="text-xs text-muted-foreground">This will be used in the URL: /catalog/category-product-name</p>
+                        <p className="text-xs text-muted-foreground">This will be used in the URL: /catalog/category-slug/product-slug</p>
                     </div>
 
                     <div className="space-y-2">

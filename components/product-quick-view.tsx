@@ -21,7 +21,7 @@ interface Product {
     image_url: string | null
     images?: string[]
     category_id: string | null
-    categories?: { name: string } | null
+    categories?: { name: string, slug?: string } | null
     quantity_available?: number
     features?: string[]
     sku?: string
@@ -203,7 +203,7 @@ export function ProductQuickView({
                                 )}
                             </Button>
                             <Button variant="outline" asChild>
-                                <Link href={`/catalog/${product.slug || product.id}`}>
+                                <Link href={`/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`}>
                                     <ExternalLink className="mr-2 h-4 w-4" />
                                     Full Details
                                 </Link>

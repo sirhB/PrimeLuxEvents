@@ -65,7 +65,8 @@ interface Product {
     sku?: string
     weight?: number
     product_images?: ProductImage[]
-    categories?: { name: string }
+    categories?: { name: string, slug?: string }
+    slug?: string
 }
 
 interface ProductDetailClientProps {
@@ -223,7 +224,9 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                     images={uniqueGalleryImages}
                                     productName={product.name}
                                     className="shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-2xl overflow-hidden"
-                                />
+                                >
+                                    {/* Product Gallery renders its own content */}
+                                </ProductGallery>
                             </motion.div>
 
                             {/* Details Section */}

@@ -30,7 +30,7 @@ export function CartSheet() {
       const supabase = createClient()
       const { data } = await supabase
         .from('products')
-        .select('*')
+        .select('*, categories(name, slug)')
         .in('id', productIds)
 
       if (data) {
@@ -190,7 +190,7 @@ export function CartSheet() {
                       className="flex gap-6 group"
                     >
                       <div className="h-28 w-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-border/5 bg-white">
-                        <Link href={`/catalog/${product.slug || product.id}`} onClick={() => setIsOpen(false)}>
+                        <Link href={`/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`} onClick={() => setIsOpen(false)}>
                           <img
                             src={product.image_url || "/placeholder.svg"}
                             alt={product.name}
@@ -201,7 +201,7 @@ export function CartSheet() {
                       <div className="flex-1 flex flex-col justify-between py-1">
                         <div className="space-y-1">
                           <div className="flex justify-between items-start gap-4">
-                            <Link href={`/catalog/${product.slug || product.id}`} onClick={() => setIsOpen(false)} className="flex-1">
+                            <Link href={`/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`} onClick={() => setIsOpen(false)} className="flex-1">
                               <h3 className="font-serif text-lg font-bold text-gray-900 group-hover:text-gold transition-colors leading-tight">{product.name}</h3>
                             </Link>
                             <button
