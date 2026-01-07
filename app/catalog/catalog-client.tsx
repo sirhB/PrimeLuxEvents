@@ -160,9 +160,9 @@ export default function CatalogClient({ heroTitle, products, categories, package
     }, [searchParams])
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-[#FDFBF7]">
             {/* Immersive Hero Section */}
-            <div className="relative h-[60vh] md:h-[70vh] overflow-hidden bg-black">
+            <div className="relative h-[50vh] md:h-[60vh] overflow-hidden bg-black">
                 <motion.div
                     style={{ y: heroY, opacity: heroOpacity }}
                     className="absolute inset-0 w-full h-full"
@@ -174,10 +174,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
                         }
                         alt="Catalog Hero"
                         fill
-                        className="object-cover opacity-60"
+                        className="object-cover opacity-50 scale-105"
                         priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-background" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[#FDFBF7]" />
                 </motion.div>
 
                 <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 z-10">
@@ -187,10 +187,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="max-w-4xl space-y-6"
                     >
-                        <span className="text-gold text-sm md:text-base font-medium tracking-[0.2em] uppercase block">
+                        <span className="text-gold text-xs md:text-sm font-semibold tracking-[0.4em] uppercase block opacity-90">
                             {selectedCategory ? 'Collection' : (searchQuery ? 'Search Results' : 'Premium Rentals')}
                         </span>
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white font-medium tracking-tight">
+                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white font-light tracking-tight leading-[1.1]">
                             {selectedCategory
                                 ? selectedCategory
                                 : searchQuery
@@ -198,7 +198,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     : (heroTitle || "The Collection")
                             }
                         </h1>
-                        <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto font-light leading-relaxed">
+                        <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto font-light leading-relaxed opacity-80">
                             {selectedCategory
                                 ? `Curated selection of premium ${selectedCategory.toLowerCase()} for your extraordinary events.`
                                 : searchQuery
@@ -211,28 +211,28 @@ export default function CatalogClient({ heroTitle, products, categories, package
             </div>
 
             {/* Enhanced Sticky Search & Filter Bar */}
-            <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/40 shadow-sm">
-                <div className="container mx-auto px-4 md:px-6 py-4">
-                    <div className="flex flex-col lg:flex-row gap-4 items-center">
+            <div className="sticky top-0 z-40 bg-[#FDFBF7]/80 backdrop-blur-xl border-b border-border/10">
+                <div className="container mx-auto px-4 md:px-6 py-6">
+                    <div className="flex flex-col lg:flex-row gap-6 items-center">
                         {/* Search Input */}
                         <div className="relative flex-1 max-w-md w-full">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
                             <Input
-                                placeholder="Search products, categories..."
+                                placeholder="Search the collection..."
                                 value={searchQuery}
                                 onChange={(e) => handleSearchChange(e.target.value)}
-                                className="pl-10 pr-4 h-11 border-border/50 focus:border-gold/50 rounded-full bg-background/50 transition-all duration-200 focus:bg-background"
+                                className="pl-11 pr-4 h-12 border-border/20 focus:border-gold/30 rounded-full bg-white/50 transition-all duration-300 focus:bg-white shadow-sm font-light"
                             />
                         </div>
 
                         {/* Filters and Controls */}
-                        <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+                        <div className="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-end">
                             {/* Category Navigation */}
                             {selectedCategory && (
                                 <Button
-                                    variant="outline"
+                                    variant="ghost"
                                     onClick={handleBackToCatalog}
-                                    className="flex gap-2 rounded-full border-border/50 hover:bg-secondary hover:text-foreground"
+                                    className="flex gap-2 rounded-full hover:bg-gold/10 hover:text-gold transition-colors font-medium"
                                 >
                                     <ArrowLeft className="h-4 w-4" />
                                     <span className="hidden sm:inline">All Categories</span>
@@ -242,7 +242,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
                             {/* Sort Dropdown */}
                             <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                                <SelectTrigger className="w-40 h-11 rounded-full border-border/50 bg-background/50">
+                                <SelectTrigger className="w-44 h-12 rounded-full border-border/20 bg-white/50 font-light shadow-sm">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -254,14 +254,14 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             </Select>
 
                             {/* View Mode Toggle */}
-                            <div className="flex items-center gap-1 border border-border/50 rounded-full p-1 bg-background/50">
+                            <div className="flex items-center gap-1 border border-border/10 rounded-full p-1 bg-white/50 shadow-sm">
                                 <Button
                                     variant={viewMode === 'grid' ? 'default' : 'ghost'}
                                     size="icon"
                                     onClick={() => setViewMode('grid')}
                                     className={cn(
-                                        "h-9 w-9 rounded-full transition-all duration-300",
-                                        viewMode === 'grid' && "bg-gold text-black hover:bg-gold/90 shadow-sm"
+                                        "h-10 w-10 rounded-full transition-all duration-300",
+                                        viewMode === 'grid' && "bg-gold text-black hover:bg-gold/90 shadow-md"
                                     )}
                                 >
                                     <Grid3X3 className="h-4 w-4" />
@@ -271,8 +271,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     size="icon"
                                     onClick={() => setViewMode('masonry')}
                                     className={cn(
-                                        "h-9 w-9 rounded-full transition-all duration-300",
-                                        viewMode === 'masonry' && "bg-gold text-black hover:bg-gold/90 shadow-sm"
+                                        "h-10 w-10 rounded-full transition-all duration-300",
+                                        viewMode === 'masonry' && "bg-gold text-black hover:bg-gold/90 shadow-md"
                                     )}
                                 >
                                     <Columns className="h-4 w-4" />
@@ -284,7 +284,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 variant="outline"
                                 size="icon"
                                 onClick={() => setIsSidebarOpen(true)}
-                                className="lg:hidden h-11 w-11 rounded-full border-border/50"
+                                className="lg:hidden h-12 w-12 rounded-full border-border/20 bg-white/50 shadow-sm"
                             >
                                 <SlidersHorizontal className="h-4 w-4" />
                             </Button>
@@ -297,10 +297,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border/20"
+                            className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border/10"
                         >
                             {selectedCategory && (
-                                <Badge variant="secondary" className="bg-gold/10 text-gold border-gold/20">
+                                <Badge variant="secondary" className="bg-gold/10 text-gold border-gold/20 px-4 py-1.5 rounded-full font-medium">
                                     Category: {selectedCategory}
                                     <Button
                                         variant="ghost"
@@ -313,7 +313,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 </Badge>
                             )}
                             {searchQuery && (
-                                <Badge variant="secondary" className="bg-gold/10 text-gold border-gold/20">
+                                <Badge variant="secondary" className="bg-gold/10 text-gold border-gold/20 px-4 py-1.5 rounded-full font-medium">
                                     Search: "{searchQuery}"
                                     <Button
                                         variant="ghost"
@@ -331,7 +331,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
             </div>
 
             {/* Main Content Area */}
-            <div className="container mx-auto px-4 md:px-6 py-8 md:py-16">
+            <div className="container mx-auto px-4 md:px-6 py-12 md:py-24">
                 <AnimatePresence mode="wait">
                     {/* Unified Content Layout */}
                     <motion.div
@@ -340,7 +340,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.5 }}
-                        className="space-y-12 md:space-y-20"
+                        className="space-y-16 md:space-y-32"
                     >
                         {/* Results Summary */}
                         {(selectedCategory || searchQuery) && (
@@ -349,16 +349,16 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 animate={{ opacity: 1, y: 0 }}
                                 className="text-center md:text-left"
                             >
-                                <h2 className="text-2xl md:text-4xl font-serif mb-2 text-foreground">
+                                <h2 className="text-4xl md:text-5xl font-serif font-light mb-4 text-foreground tracking-tight">
                                     {selectedCategory ? selectedCategory : 'Search Results'}
                                 </h2>
-                                <p className="text-muted-foreground text-lg">
+                                <p className="text-muted-foreground/70 text-lg font-light">
                                     {selectedCategory
                                         ? `Discover our premium ${selectedCategory.toLowerCase()} collection`
                                         : `Found ${filteredProducts.length} ${filteredProducts.length === 1 ? 'product' : 'products'} for "${searchQuery}"`
                                     }
                                 </p>
-                                <div className="h-1 w-16 bg-gold mx-auto md:mx-0 mt-4" />
+                                <div className="h-0.5 w-16 bg-gold mx-auto md:mx-0 mt-6 opacity-40" />
                             </motion.div>
                         )}
 
@@ -373,19 +373,19 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                         viewport={{ once: true, margin: "-100px" }}
                                         transition={{ duration: 0.8 }}
                                     >
-                                        <div className="mb-12 text-center">
-                                            <span className="text-gold text-sm font-medium tracking-widest uppercase mb-3 block">
+                                        <div className="mb-16 text-center">
+                                            <span className="text-gold text-xs font-semibold tracking-[0.3em] uppercase mb-4 block opacity-80">
                                                 Premium Selection
                                             </span>
-                                            <h2 className="text-3xl md:text-5xl font-serif mb-4 text-foreground">
+                                            <h2 className="text-4xl md:text-6xl font-serif font-light mb-6 text-foreground tracking-tight">
                                                 Featured Collection
                                             </h2>
-                                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                                            <p className="text-lg text-muted-foreground/70 max-w-2xl mx-auto font-light">
                                                 Hand-picked premium pieces that define luxury and elegance for extraordinary events.
                                             </p>
-                                            <div className="h-1 w-20 bg-gold mx-auto mt-6" />
+                                            <div className="h-0.5 w-20 bg-gold mx-auto mt-8 opacity-40" />
                                         </div>
-                                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+                                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8 lg:gap-10">
                                             {featuredProducts.slice(0, 4).map((product, index) => (
                                                 <motion.div
                                                     key={product.id}
@@ -409,23 +409,23 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                         viewport={{ once: true, margin: "-100px" }}
                                         transition={{ duration: 0.8, delay: 0.2 }}
                                     >
-                                        <div className="mb-12 text-center">
-                                            <span className="text-gold text-sm font-medium tracking-widest uppercase mb-3 block">
+                                        <div className="mb-16 text-center">
+                                            <span className="text-gold text-xs font-semibold tracking-[0.3em] uppercase mb-4 block opacity-80">
                                                 Complete Solutions
                                             </span>
-                                            <h2 className="text-3xl md:text-5xl font-serif mb-4 text-foreground">
+                                            <h2 className="text-4xl md:text-6xl font-serif font-light mb-6 text-foreground tracking-tight">
                                                 Curated Packages
                                             </h2>
-                                            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                                            <p className="text-lg text-muted-foreground/70 max-w-2xl mx-auto font-light">
                                                 Complete event solutions designed for seamless planning and execution.
                                             </p>
-                                            <div className="h-1 w-20 bg-gold mx-auto mt-6" />
+                                            <div className="h-0.5 w-20 bg-gold mx-auto mt-8 opacity-40" />
                                         </div>
-                                        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
                                             {featuredPackages.slice(0, 3).map((pkg, index) => (
                                                 <motion.div
                                                     key={pkg.id}
-                                                    initial={{ opacity: 0, scale: 0.9 }}
+                                                    initial={{ opacity: 0, scale: 0.95 }}
                                                     whileInView={{ opacity: 1, scale: 1 }}
                                                     viewport={{ once: true }}
                                                     transition={{ duration: 0.6, delay: index * 0.15 }}
@@ -435,7 +435,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                                         description={pkg.description}
                                                         price={pkg.price}
                                                         imageUrl={pkg.image_url}
-                                                        onViewDetails={() => console.log('View package', pkg.id)}
+                                                        onViewDetails={() => router.push(`/packages/${pkg.id}`)}
                                                         dealBadge="PACKAGE"
                                                     />
                                                 </motion.div>
@@ -451,16 +451,16 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             <>
                                 {/* Desktop Category Grid */}
                                 <div className="hidden lg:block">
-                                    <div className="mb-8">
-                                        <h2 className="text-2xl md:text-3xl font-serif mb-8 text-foreground">
+                                    <div className="mb-12">
+                                        <h2 className="text-3xl md:text-4xl font-serif font-light mb-12 text-foreground tracking-tight">
                                             Browse Categories
                                         </h2>
                                     </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8">
                                         {orderedCategories.map((category, index) => (
                                             <motion.div
                                                 key={category.id}
-                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                initial={{ opacity: 0, scale: 0.95 }}
                                                 whileInView={{ opacity: 1, scale: 1 }}
                                                 viewport={{ once: true, margin: "-50px" }}
                                                 transition={{ duration: 0.5, delay: index * 0.05 }}
@@ -478,7 +478,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 {/* Mobile Category Navigation */}
                                 <div className="lg:hidden">
                                     <div className="mb-8">
-                                        <h2 className="text-xl md:text-2xl font-serif mb-6 text-foreground">
+                                        <h2 className="text-2xl md:text-3xl font-serif font-light mb-8 text-foreground tracking-tight">
                                             Browse Categories
                                         </h2>
                                     </div>
@@ -486,7 +486,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                         {orderedCategories.slice(0, 6).map((category, index) => (
                                             <motion.div
                                                 key={category.id}
-                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                initial={{ opacity: 0, scale: 0.95 }}
                                                 whileInView={{ opacity: 1, scale: 1 }}
                                                 viewport={{ once: true }}
                                                 transition={{ duration: 0.4, delay: index * 0.1 }}
@@ -500,11 +500,11 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                         ))}
                                     </div>
                                     {orderedCategories.length > 6 && (
-                                        <div className="mt-6 text-center">
+                                        <div className="mt-10 text-center">
                                             <Button
                                                 variant="outline"
                                                 onClick={() => setIsSidebarOpen(true)}
-                                                className="rounded-full border-border/50"
+                                                className="rounded-full border-border/20 px-8 py-6 text-base font-light hover:bg-gold hover:text-black transition-all duration-300"
                                             >
                                                 View All Categories ({orderedCategories.length})
                                             </Button>
@@ -516,33 +516,33 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
                         {/* Products Grid/Masonry with Sidebar */}
                         {(selectedCategory || searchQuery) && (
-                            <div className="flex gap-8">
+                            <div className="flex gap-12">
                                 {/* Category Sidebar */}
-                                <aside className="hidden lg:block w-64 flex-shrink-0">
-                                    <div className="sticky top-32 space-y-4">
-                                        <h3 className="text-lg font-serif font-medium text-foreground mb-4">
-                                            Browse Categories
+                                <aside className="hidden lg:block w-72 flex-shrink-0">
+                                    <div className="sticky top-40 space-y-8">
+                                        <h3 className="text-xl font-serif font-light text-foreground mb-6 tracking-tight">
+                                            Browse Collections
                                         </h3>
-                                        <nav className="space-y-2">
+                                        <nav className="space-y-1">
                                             <button
                                                 className={cn(
-                                                    "w-full text-left px-3 py-2 rounded-lg transition-all duration-200 text-sm",
+                                                    "w-full text-left px-4 py-3 rounded-xl transition-all duration-300 text-sm font-light",
                                                     !selectedCategory
-                                                        ? "bg-gold/10 text-gold font-medium"
-                                                        : "hover:bg-secondary/30 hover:text-foreground"
+                                                        ? "bg-gold text-black font-medium shadow-lg shadow-gold/20"
+                                                        : "hover:bg-white hover:shadow-sm text-muted-foreground hover:text-foreground"
                                                 )}
                                                 onClick={handleBackToCatalog}
                                             >
-                                                All Categories
+                                                All Collections
                                             </button>
                                             {orderedCategories.map((category) => (
                                                 <button
                                                     key={category.id}
                                                     className={cn(
-                                                        "w-full text-left px-3 py-2 rounded-lg transition-all duration-200 text-sm",
+                                                        "w-full text-left px-4 py-3 rounded-xl transition-all duration-300 text-sm font-light",
                                                         selectedCategory === category.name
-                                                            ? "bg-gold/10 text-gold font-medium"
-                                                            : "hover:bg-secondary/30 hover:text-foreground"
+                                                            ? "bg-gold text-black font-medium shadow-lg shadow-gold/20"
+                                                            : "hover:bg-white hover:shadow-sm text-muted-foreground hover:text-foreground"
                                                     )}
                                                     onClick={() => handleCategoryClick(category.name)}
                                                 >
@@ -561,8 +561,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                             className={cn(
                                                 "transition-all duration-500",
                                                 viewMode === 'grid'
-                                                    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8"
-                                                    : "columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8"
+                                                    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 md:gap-10"
+                                                    : "columns-2 sm:columns-2 lg:columns-3 xl:columns-3 gap-6 md:gap-10 space-y-6 md:space-y-10"
                                             )}
                                         >
                                             {filteredProducts.map((product, index) => (
@@ -573,12 +573,12 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{
                                                         duration: 0.5,
-                                                        delay: Math.min(index * 0.03, 0.2), // Faster, capped delay for better performance
+                                                        delay: Math.min(index * 0.03, 0.2),
                                                         layout: { duration: 0.3 }
                                                     }}
                                                     className={cn(
-                                                        viewMode === 'masonry' && "break-inside-avoid mb-4 sm:mb-6 md:mb-8",
-                                                        "w-full" // Ensure full width in grid mode
+                                                        viewMode === 'masonry' && "break-inside-avoid mb-6 md:mb-10",
+                                                        "w-full"
                                                     )}
                                                 >
                                                     <ProductCard product={product} />
@@ -587,18 +587,18 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                         </motion.div>
                                     ) : (
                                         <motion.div
-                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            initial={{ opacity: 0, scale: 0.95 }}
                                             animate={{ opacity: 1, scale: 1 }}
-                                            className="text-center py-20 md:py-32"
+                                            className="text-center py-32 md:py-48 bg-white/40 rounded-3xl border border-border/10"
                                         >
                                             <div className="max-w-md mx-auto">
-                                                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-                                                    <Search className="h-8 w-8 text-muted-foreground" />
+                                                <div className="w-20 h-20 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                                                    <Search className="h-10 w-10 text-gold" />
                                                 </div>
-                                                <h3 className="text-xl md:text-2xl font-serif mb-4 text-foreground">
+                                                <h3 className="text-2xl md:text-3xl font-serif font-light mb-4 text-foreground tracking-tight">
                                                     No products found
                                                 </h3>
-                                                <p className="text-muted-foreground mb-8">
+                                                <p className="text-muted-foreground/70 mb-10 font-light">
                                                     {selectedCategory
                                                         ? `We don't have any products in the ${selectedCategory} category yet.`
                                                         : searchQuery
@@ -610,9 +610,9 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                                     <Button
                                                         onClick={handleBackToCatalog}
                                                         variant="outline"
-                                                        className="rounded-full"
+                                                        className="rounded-full border-border/20 px-8 py-6 font-light hover:bg-gold hover:text-black transition-all duration-300"
                                                     >
-                                                        Browse All Categories
+                                                        Browse All Collections
                                                     </Button>
                                                 )}
                                             </div>
@@ -629,39 +629,42 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
             {/* Mobile Category Drawer */}
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-                <SheetContent side="left" className="w-80 p-0 sm:w-96">
-                    <SheetHeader className="p-6 pb-4 border-b border-border/10">
-                        <SheetTitle className="text-xl font-serif flex items-center gap-2">
-                            <Menu className="h-5 w-5" />
-                            Browse Categories
+                <SheetContent side="left" className="w-80 p-0 sm:w-96 bg-[#FDFBF7] border-r-border/10">
+                    <SheetHeader className="p-8 pb-6 border-b border-border/10">
+                        <SheetTitle className="text-2xl font-serif font-light flex items-center gap-3">
+                            <Menu className="h-6 w-6 text-gold" />
+                            Collections
                         </SheetTitle>
-                        <p className="text-sm text-muted-foreground mt-1">
-                            Explore our premium collections
+                        <p className="text-sm text-muted-foreground/70 mt-2 font-light">
+                            Explore our premium rental catalog
                         </p>
                     </SheetHeader>
                     <div className="flex-1 overflow-y-auto">
-                        <nav className="px-4 py-4">
-                            <div className="space-y-1">
+                        <nav className="px-6 py-6">
+                            <div className="space-y-2">
                                 {/* All Categories Option */}
                                 <button
                                     className={cn(
-                                        "w-full text-left px-4 py-4 rounded-xl transition-all duration-200 border-2",
+                                        "w-full text-left px-5 py-5 rounded-2xl transition-all duration-300 border border-transparent",
                                         !selectedCategory && !searchQuery
-                                            ? "bg-gold/10 text-gold border-gold font-medium shadow-sm"
-                                            : "hover:bg-secondary/30 border-transparent hover:border-border/50"
+                                            ? "bg-gold text-black shadow-lg shadow-gold/20"
+                                            : "hover:bg-white hover:border-border/10 text-muted-foreground hover:text-foreground"
                                     )}
                                     onClick={() => {
                                         handleBackToCatalog()
                                         setIsSidebarOpen(false)
                                     }}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 rounded-lg bg-gold/10 flex items-center justify-center flex-shrink-0">
-                                            <LayoutGrid className="h-6 w-6 text-gold" />
+                                    <div className="flex items-center gap-4">
+                                        <div className={cn(
+                                            "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors",
+                                            !selectedCategory && !searchQuery ? "bg-black/10" : "bg-gold/10"
+                                        )}>
+                                            <LayoutGrid className={cn("h-6 w-6", !selectedCategory && !searchQuery ? "text-black" : "text-gold")} />
                                         </div>
                                         <div>
-                                            <span className="font-medium block">All Categories</span>
-                                            <span className="text-sm text-muted-foreground">Browse everything</span>
+                                            <span className="font-medium block">All Collections</span>
+                                            <span className="text-xs opacity-70 font-light">Browse everything</span>
                                         </div>
                                     </div>
                                 </button>
@@ -671,19 +674,19 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     <button
                                         key={category.id}
                                         className={cn(
-                                            "w-full text-left px-4 py-4 rounded-xl transition-all duration-200 border-2",
+                                            "w-full text-left px-5 py-5 rounded-2xl transition-all duration-300 border border-transparent",
                                             selectedCategory === category.name
-                                                ? "bg-gold/10 text-gold border-gold font-medium shadow-sm"
-                                                : "hover:bg-secondary/30 border-transparent hover:border-border/50"
+                                                ? "bg-gold text-black shadow-lg shadow-gold/20"
+                                                : "hover:bg-white hover:border-border/10 text-muted-foreground hover:text-foreground"
                                         )}
                                         onClick={() => {
                                             handleCategoryClick(category.name)
                                             setIsSidebarOpen(false)
                                         }}
                                     >
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-4">
                                             {category.image_url ? (
-                                                <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
+                                                <div className="w-12 h-12 rounded-xl overflow-hidden bg-secondary flex-shrink-0">
                                                     <Image
                                                         src={category.image_url}
                                                         alt=""
@@ -693,19 +696,15 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                                     />
                                                 </div>
                                             ) : (
-                                                <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
-                                                    <div className="w-6 h-6 opacity-50">
-                                                        <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
-                                                            <path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM4 7v10h16V7H4zm8 2l5 4H7l5-4z" />
-                                                        </svg>
-                                                    </div>
+                                                <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center flex-shrink-0">
+                                                    <LayoutGrid className="h-5 w-5 opacity-30" />
                                                 </div>
                                             )}
                                             <div className="flex-1 min-w-0">
                                                 <span className="font-medium block truncate">{category.name}</span>
-                                                <span className="text-sm text-muted-foreground">Premium collection</span>
+                                                <span className="text-xs opacity-70 font-light">Premium pieces</span>
                                             </div>
-                                            <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                            <ArrowRight className="h-4 w-4 opacity-40 flex-shrink-0" />
                                         </div>
                                     </button>
                                 ))}
