@@ -34,27 +34,37 @@ export default async function Home() {
       />
 
       {/* CTA Section */}
-      <section className="py-20 md:py-32 bg-primary text-primary-foreground text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-noise opacity-30" />
+      <section className="py-24 md:py-40 bg-[#1A1A1A] text-white text-center relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay" />
         <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <h2 className="text-3xl md:text-5xl font-serif mb-6">Ready to plan your event?</h2>
-          <p className="text-primary-foreground/80 max-w-2xl mx-auto mb-10 text-lg">
-            Browse our full catalog, check availability, and secure your rentals instantly online.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <a
-              href="/catalog"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-background px-8 text-sm font-medium text-primary transition-all duration-300 hover:bg-background/90 hover:scale-105 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-            >
-              Start Your Quote
-            </a>
-            <a
-              href="/contact"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-primary-foreground/20 bg-transparent px-8 text-sm font-medium text-primary-foreground transition-all duration-300 hover:bg-primary-foreground/10 hover:scale-105 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
-            >
-              Contact Support
-            </a>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl mx-auto"
+          >
+            <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-6 block">Start Your Journey</span>
+            <h2 className="text-4xl md:text-6xl font-serif font-light mb-8 tracking-tight">Ready to plan your next extraordinary event?</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto mb-12 text-lg font-light leading-relaxed">
+              Browse our full catalog, check availability, and secure your rentals instantly online. Our team is here to help you every step of the way.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-6">
+              <Link
+                href="/catalog"
+                className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-full bg-gold px-12 text-[11px] font-bold uppercase tracking-[0.2em] text-black transition-all duration-500 hover:scale-105 active:scale-95"
+              >
+                <span className="relative z-10">Start Your Quote</span>
+                <div className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
+              </Link>
+              <Link
+                href="/contact"
+                className="group inline-flex h-16 items-center justify-center rounded-full border border-white/20 bg-transparent px-12 text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all duration-500 hover:bg-white/10 hover:border-white hover:scale-105 active:scale-95"
+              >
+                Contact Support
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
     </main>

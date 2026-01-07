@@ -9,9 +9,9 @@ const categories = [
     {
         id: "seating",
         name: "Luxury Seating",
-        description: "Velvet sofas, gold chivari chairs, and lounge sets.",
-        image: "/luxury-seating.jpg", // Placeholder, user should replace
-        size: "large", // spans 2 columns
+        description: "Velvet sofas, gold chivari chairs, and bespoke lounge sets.",
+        image: "/luxury-seating.jpg",
+        size: "large",
     },
     {
         id: "tables",
@@ -38,31 +38,37 @@ const categories = [
 
 export function FeaturedCategories() {
     return (
-        <section className="py-24 bg-background relative overflow-hidden">
+        <section className="py-24 md:py-40 bg-[#FDFBF7] relative overflow-hidden">
             <div className="container mx-auto px-4 md:px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
-                    className="mb-16 flex flex-col md:flex-row justify-between items-end gap-6"
+                    className="mb-20 flex flex-col md:flex-row justify-between items-end gap-8"
                 >
                     <div className="max-w-2xl">
-                        <span className="text-primary text-sm font-medium tracking-widest uppercase mb-2 block">Curated Collections</span>
-                        <h2 className="text-4xl md:text-5xl font-serif text-foreground">Explore by Category</h2>
+                        <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-4 block">Curated Collections</span>
+                        <h2 className="text-4xl md:text-6xl font-serif font-light text-gray-900 tracking-tight">Explore by Category</h2>
                     </div>
-                    <ButtonLink href="/catalog" text="View Full Catalog" />
+                    <Link
+                        href="/catalog"
+                        className="group inline-flex items-center justify-center px-10 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-white bg-[#1A1A1A] rounded-full hover:bg-gold hover:text-black transition-all duration-500"
+                    >
+                        View Full Catalog
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[400px]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-rows-[450px]">
                     {categories.map((category, index) => (
                         <motion.div
                             key={category.id}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: index * 0.1 }}
-                            className={`relative group overflow-hidden rounded-sm cursor-pointer ${category.size === "large" ? "md:col-span-2" : ""
+                            transition={{ duration: 0.6, delay: index * 0.1 }}
+                            className={`relative group overflow-hidden rounded-3xl cursor-pointer shadow-[0_10px_40px_rgba(0,0,0,0.04)] ${category.size === "large" ? "md:col-span-2" : ""
                                 }`}
                         >
                             <Link href={`/catalog?category=${category.id}`} className="block w-full h-full">
@@ -70,23 +76,26 @@ export function FeaturedCategories() {
                                     src={category.image}
                                     alt={category.name}
                                     fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
                                 />
-                                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-500" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
 
-                                <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                                <div className="absolute inset-0 p-10 flex flex-col justify-end">
                                     <motion.div
                                         initial={{ y: 20, opacity: 0 }}
                                         whileInView={{ y: 0, opacity: 1 }}
                                         transition={{ delay: 0.2 }}
+                                        className="space-y-4"
                                     >
-                                        <h3 className="text-3xl font-serif text-white mb-2">{category.name}</h3>
-                                        <p className="text-white/80 max-w-md mb-6 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
+                                        <h3 className="text-3xl md:text-4xl font-serif text-white font-light tracking-tight">{category.name}</h3>
+                                        <p className="text-white/70 max-w-md text-sm font-light leading-relaxed opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                                             {category.description}
                                         </p>
-                                        <span className="inline-flex items-center text-white text-sm font-medium tracking-widest uppercase group-hover:text-primary transition-colors">
-                                            Explore <ArrowRight className="ml-2 h-4 w-4" />
-                                        </span>
+                                        <div className="pt-2">
+                                            <span className="inline-flex items-center text-gold text-[10px] font-bold uppercase tracking-[0.3em] group-hover:text-white transition-colors">
+                                                Discover Collection <ArrowRight className="ml-2 h-3 w-3" />
+                                            </span>
+                                        </div>
                                     </motion.div>
                                 </div>
                             </Link>
@@ -95,17 +104,5 @@ export function FeaturedCategories() {
                 </div>
             </div>
         </section>
-    )
-}
-
-function ButtonLink({ href, text }: { href: string; text: string }) {
-    return (
-        <Link
-            href={href}
-            className="group inline-flex items-center justify-center px-8 py-3 text-sm font-medium text-primary-foreground bg-primary rounded-full hover:bg-primary/90 transition-all duration-300"
-        >
-            {text}
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </Link>
     )
 }

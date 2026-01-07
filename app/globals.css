@@ -6,9 +6,9 @@
 
 :root {
   /* Warm, luxury cream palette inspired by the reference images */
-  --background: oklch(0.98 0.01 90);
+  --background: #FDFBF7;
   /* Warm Cream */
-  --foreground: oklch(0.15 0.02 85);
+  --foreground: #1A1A1A;
   /* Dark Warm Grey */
 
   --card: oklch(0.99 0.005 90);
