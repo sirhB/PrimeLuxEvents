@@ -9,20 +9,21 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { Plus, Pencil } from 'lucide-react'
+import { Eye, MoreVertical, Pencil, Trash2, Plus, Package } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
 import { ProductFilters } from '@/components/admin/product-filters'
 import { DeleteProductButton } from '@/components/admin/delete-product-button'
+import { ProductsTable } from '@/components/admin/products-table'
 
 export default async function ProductsPage({
     searchParams,
 }: {
-    searchParams: Promise<{ category_id?: string; page?: string; search?: string; sort?: string }>
+    searchParams: Promise<{ category_id?: string; page?: string; search?: string; sort?: string; stock_status?: string }>
 }) {
-    const { category_id, page = '1', search, sort = 'newest' } = await searchParams
+    const { category_id, page = '1', search, sort = 'newest', stock_status } = await searchParams
     const supabase = await createClient()
 
     const currentPage = parseInt(page)
@@ -47,6 +48,15 @@ export default async function ProductsPage({
 
     if (search) {
         query = query.ilike('name', `%${search}%`)
+    }
+
+    // Apply stock filtering
+    if (stock_status === 'in_stock') {
+        query = query.gt('stock', 0)
+    } else if (stock_status === 'low_stock') {
+        query = query.gt('stock', 0).lte('stock', 5)
+    } else if (stock_status === 'out_of_stock') {
+        query = query.eq('stock', 0)
     }
 
     // Apply sorting
@@ -76,19 +86,21 @@ export default async function ProductsPage({
 
     return (
         <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="space-y-2">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                <div className="space-y-4">
                     <div className="flex items-center gap-2">
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
                             Inventory
                         </span>
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                        Products
-                    </h1>
-                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
-                        Manage your product catalog, pricing, and inventory levels.
-                    </p>
+                    <div>
+                        <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
+                            Products
+                        </h1>
+                        <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md mt-2">
+                            Manage your product catalog, pricing, and inventory levels.
+                        </p>
+                    </div>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button asChild className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium px-6">
@@ -107,74 +119,34 @@ export default async function ProductsPage({
                 </TabsList>
 
                 <TabsContent value="all" className="space-y-6 mt-6">
-                    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                        <SearchInput placeholder="Search products..." />
+                    <div className="flex flex-col xxl:flex-row gap-6 items-start xxl:items-center justify-between glass-morphism p-6 rounded-3xl border border-border/50">
+                        <div className="w-full max-w-md">
+                            <SearchInput placeholder="Search products..." />
+                        </div>
                         <ProductFilters categories={categories || []} />
                     </div>
 
-                    <Card>
-                        <CardContent className="p-0">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Category</TableHead>
-                                        <TableHead>Price</TableHead>
-                                        <TableHead>Stock</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {products?.map((product) => (
-                                        <TableRow key={product.id}>
-                                            <TableCell className="font-medium">{product.name}</TableCell>
-                                            <TableCell>{product.categories?.name || 'Uncategorized'}</TableCell>
-                                            <TableCell>
-                                                {new Intl.NumberFormat('en-US', {
-                                                    style: 'currency',
-                                                    currency: 'USD',
-                                                }).format(product.price / 100)}
-                                            </TableCell>
-                                            <TableCell>{product.stock}</TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <Button variant="ghost" size="icon" asChild title="Edit Product">
-                                                        <Link href={`/admin/products/${product.id}`}>
-                                                            <Pencil className="h-4 w-4" />
-                                                            <span className="sr-only">Edit</span>
-                                                        </Link>
-                                                    </Button>
-                                                    <DeleteProductButton id={product.id} productName={product.name} />
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    {products?.length === 0 && (
-                                        <TableRow>
-                                            <TableCell colSpan={5} className="text-center">
-                                                No products found.
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
+                    <ProductsTable products={products || []} />
 
                     {count !== null && count > 0 && (
-                        <PaginationControls
-                            hasNextPage={end < count}
-                            hasPrevPage={start > 0}
-                            totalCount={count}
-                            currentPage={currentPage}
-                            pageSize={pageSize}
-                        />
+                        <div className="mt-8 flex justify-center">
+                            <PaginationControls
+                                hasNextPage={end < count}
+                                hasPrevPage={start > 0}
+                                totalCount={count}
+                                currentPage={currentPage}
+                                pageSize={pageSize}
+                            />
+                        </div>
                     )}
                 </TabsContent>
 
                 <TabsContent value="inventory" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-40 bg-card rounded-lg border border-dashed">
-                        <p className="text-muted-foreground">Inventory management view coming soon</p>
+                    <div className="flex items-center justify-center h-60 bg-card/30 rounded-3xl border border-dashed border-border/50 backdrop-blur-sm">
+                        <div className="text-center">
+                            <Package className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
+                            <p className="text-muted-foreground font-light">Inventory management view coming soon</p>
+                        </div>
                     </div>
                 </TabsContent>
             </Tabs>

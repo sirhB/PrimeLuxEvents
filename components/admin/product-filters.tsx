@@ -24,26 +24,38 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
 
     const currentCategory = searchParams.get('category_id') || 'all'
     const currentSort = searchParams.get('sort') || 'newest'
+    const currentStock = searchParams.get('stock_status') || 'all'
 
     const handleCategoryChange = (value: string) => {
-        const params = new URLSearchParams(searchParams)
+        const params = new URLSearchParams(searchParams.toString())
         if (value === 'all') {
             params.delete('category_id')
         } else {
             params.set('category_id', value)
         }
-        params.set('page', '1') // Reset to first page
+        params.set('page', '1')
         router.push(`?${params.toString()}`)
     }
 
     const handleSortChange = (value: string) => {
-        const params = new URLSearchParams(searchParams)
+        const params = new URLSearchParams(searchParams.toString())
         params.set('sort', value)
         router.push(`?${params.toString()}`)
     }
 
+    const handleStockChange = (value: string) => {
+        const params = new URLSearchParams(searchParams.toString())
+        if (value === 'all') {
+            params.delete('stock_status')
+        } else {
+            params.set('stock_status', value)
+        }
+        params.set('page', '1')
+        router.push(`?${params.toString()}`)
+    }
+
     return (
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
             <Select value={currentCategory} onValueChange={handleCategoryChange}>
                 <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Category" />
@@ -55,6 +67,18 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
                             {category.name}
                         </SelectItem>
                     ))}
+                </SelectContent>
+            </Select>
+
+            <Select value={currentStock} onValueChange={handleStockChange}>
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Stock Status" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">All Stock Status</SelectItem>
+                    <SelectItem value="in_stock">In Stock</SelectItem>
+                    <SelectItem value="low_stock">Low Stock (≤ 5)</SelectItem>
+                    <SelectItem value="out_of_stock">Out of Stock</SelectItem>
                 </SelectContent>
             </Select>
 
