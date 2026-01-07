@@ -52,34 +52,34 @@ export default function CheckoutPage() {
 
     // Form Data
     const [formData, setFormData] = useState<CheckoutFormData>({
-        customerName: '',
-        customerEmail: '',
-        customerPhone: '',
-        deliveryAddress: eventDetails?.venueAddress || '',
+        customerName: 'Test User',
+        customerEmail: 'test@example.com',
+        customerPhone: '(555) 123-4567',
+        deliveryAddress: eventDetails?.venueAddress || '123 Test Avenue, New York, NY',
         deliveryDate: eventDetails?.date ? new Date(eventDetails.date).toISOString().split('T')[0] : '',
-        deliveryTime: eventDetails?.startTime || '',
-        deliveryNotes: eventDetails?.logistics?.notes || '',
+        deliveryTime: eventDetails?.startTime || '09:00',
+        deliveryNotes: eventDetails?.logistics?.notes || 'Gate code: 1234',
         eventDate: eventDetails?.date ? new Date(eventDetails.date).toISOString().split('T')[0] : '',
-        eventType: eventDetails?.eventType || '',
-        venueAddress: eventDetails?.venueAddress || '',
+        eventType: eventDetails?.eventType || 'Test Event',
+        venueAddress: eventDetails?.venueAddress || '123 Test Avenue, New York, NY',
         pickupDate: '',
-        pickupTime: '',
+        pickupTime: '10:00',
         pickupNotes: '',
         sameDayPickup: false,
     })
 
     // Additional Event Details State (not directly in CheckoutFormData but needed for UI/Logic)
-    const [date, setDate] = useState<Date | undefined>(eventDetails?.date)
-    const [startTime, setStartTime] = useState(eventDetails?.startTime || "")
-    const [endTime, setEndTime] = useState(eventDetails?.endTime || "")
-    const [venueType, setVenueType] = useState(eventDetails?.venueType || "")
+    const [date, setDate] = useState<Date | undefined>(eventDetails?.date || new Date(new Date().setDate(new Date().getDate() + 7)))
+    const [startTime, setStartTime] = useState(eventDetails?.startTime || "14:00")
+    const [endTime, setEndTime] = useState(eventDetails?.endTime || "18:00")
+    const [venueType, setVenueType] = useState(eventDetails?.venueType || "private_residence")
     const [hasElevator, setHasElevator] = useState(eventDetails?.logistics?.hasElevator || false)
     const [hasStairs, setHasStairs] = useState(eventDetails?.logistics?.hasStairs || false)
     const [hasLoadingDock, setHasLoadingDock] = useState(eventDetails?.logistics?.hasLoadingDock || false)
 
     // Pickup Details State
-    const [pickupDate, setPickupDate] = useState<Date | undefined>()
-    const [pickupTime, setPickupTime] = useState("")
+    const [pickupDate, setPickupDate] = useState<Date | undefined>(new Date(new Date().setDate(new Date().getDate() + 8)))
+    const [pickupTime, setPickupTime] = useState("10:00")
     const [sameDayPickup, setSameDayPickup] = useState(false)
     const [pickupNotes, setPickupNotes] = useState("")
 
