@@ -16,7 +16,7 @@ import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DeleteProductButton } from '@/components/admin/delete-product-button'
 import { SortableHeader } from '@/components/admin/sortable-header'
-import { formatCents } from '@/lib/format-money'
+import { formatCents, formatCentsWithCommas } from '@/lib/format-money'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -145,7 +145,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
                                         </span>
                                     </TableCell>
                                     <TableCell className="font-mono font-bold text-[var(--dashboard-text)]">
-                                        {formatCents(product.price)}
+                                        {formatCentsWithCommas(product.price)}
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-2">

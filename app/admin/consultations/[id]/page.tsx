@@ -5,7 +5,7 @@ import { ArrowLeft, Calendar, Users, DollarSign, MapPin, Utensils, User, Calenda
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { formatCents } from '@/lib/format-money'
+import { formatCents, formatCentsWithCommas } from '@/lib/format-money'
 import { ConsultationQuickActions } from '@/components/admin/consultations/consultation-quick-actions'
 import { CommunicationLog, type Communication } from '@/components/admin/consultations/communication-log'
 import { format } from 'date-fns'
@@ -227,15 +227,15 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
                                 <>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-muted-foreground">Subtotal</span>
-                                        <span>{formatCents(consultation.subtotal || 0)}</span>
+                                        <span>{formatCentsWithCommas(consultation.subtotal || 0)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-muted-foreground">Fees</span>
-                                        <span>{formatCents((consultation.delivery_fee || 0) + (consultation.setup_fee || 0))}</span>
+                                        <span>{formatCentsWithCommas((consultation.delivery_fee || 0) + (consultation.setup_fee || 0))}</span>
                                     </div>
                                     <div className="flex justify-between border-t pt-2 font-serif text-xl">
                                         <span>Total</span>
-                                        <span>{formatCents(consultation.total_amount)}</span>
+                                        <span>{formatCentsWithCommas(consultation.total_amount)}</span>
                                     </div>
                                 </>
                             ) : (

@@ -16,7 +16,7 @@ import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SortableHeader } from '@/components/admin/sortable-header'
 import { StatusBadge } from '@/components/ui/status-badge'
-import { formatCents } from '@/lib/format-money'
+import { formatCents, formatCentsWithCommas } from '@/lib/format-money'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
     DropdownMenu,
@@ -154,7 +154,7 @@ export function OrdersTable({ orders, getStatusVariant }: OrdersTableProps) {
                                     })}
                                 </TableCell>
                                 <TableCell className="font-mono font-bold text-[var(--dashboard-text)] text-base">
-                                    {formatCents(order.total_amount)}
+                                    {formatCentsWithCommas(order.total_amount)}
                                 </TableCell>
                                 <TableCell>
                                     <StatusBadge

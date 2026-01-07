@@ -31,7 +31,7 @@ import Link from 'next/link'
 import { PrintButton } from '@/components/admin/print-button'
 import { OrderStatusForm } from '@/components/admin/order-status-form'
 import { OrderInvoice } from '@/components/admin/order-invoice'
-import { formatCents } from '@/lib/format-money'
+import { formatCents, formatCentsWithCommas } from '@/lib/format-money'
 
 export default async function OrderDetailsPage({
     params,
@@ -188,7 +188,7 @@ export default async function OrderDetailsPage({
                                                     <TableCell className="text-[var(--dashboard-text)]">{item.quantity}</TableCell>
                                                     <TableCell className="text-[var(--dashboard-text)]">{formatCents(item.price_at_time)}</TableCell>
                                                     <TableCell className="text-right text-[var(--dashboard-text)]">
-                                                        {formatCents(item.quantity * item.price_at_time)}
+                                                        {formatCentsWithCommas(item.quantity * item.price_at_time)}
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
@@ -204,7 +204,7 @@ export default async function OrderDetailsPage({
                                                         <TableCell className="text-[var(--dashboard-text)]">-</TableCell>
                                                         <TableCell className="text-[var(--dashboard-text)]">{formatCents(bundle.price)}</TableCell>
                                                         <TableCell className="text-right text-[var(--dashboard-accent-gold)] font-bold">
-                                                            {formatCents(bundle.price)}
+                                                            {formatCentsWithCommas(bundle.price)}
                                                         </TableCell>
                                                     </TableRow>
                                                     {bundle.groups.map((group: any, gIdx: number) => (
@@ -222,7 +222,7 @@ export default async function OrderDetailsPage({
                                                                     <TableCell className="text-[var(--dashboard-text)] text-xs">{subItem.quantity}</TableCell>
                                                                     <TableCell className="text-[var(--dashboard-text)] text-xs">{formatCents(subItem.price_at_time)}</TableCell>
                                                                     <TableCell className="text-right text-[var(--dashboard-text)] text-xs">
-                                                                        {formatCents(subItem.quantity * subItem.price_at_time)}
+                                                                        {formatCentsWithCommas(subItem.quantity * subItem.price_at_time)}
                                                                     </TableCell>
                                                                 </TableRow>
                                                             ))}
@@ -238,7 +238,7 @@ export default async function OrderDetailsPage({
                                         Total Amount
                                     </TableCell>
                                     <TableCell className="font-bold text-right text-[var(--dashboard-accent-gold)] text-lg">
-                                        {formatCents(order.total_amount)}
+                                        {formatCentsWithCommas(order.total_amount)}
                                     </TableCell>
                                 </TableRow>
                             </TableBody>

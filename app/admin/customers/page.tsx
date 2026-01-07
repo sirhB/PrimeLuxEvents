@@ -20,6 +20,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { formatCentsWithCommas } from '@/lib/format-money'
 
 interface Customer {
     email: string
@@ -207,7 +208,7 @@ export default async function CustomersPage({
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <span className="font-mono font-bold text-[var(--dashboard-text)]">
-                                                    ${customer.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                    {formatCentsWithCommas(customer.totalSpent)}
                                                 </span>
                                             </TableCell>
                                             <TableCell>

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Calendar, MapPin, Package, ArrowRight, TrendingUp, DollarSign } from 'lucide-react'
-import { formatCents } from '@/lib/format-money'
+import { formatCents, formatCentsWithCommas } from '@/lib/format-money'
 import { cn } from '@/lib/utils'
 
 interface Order {
@@ -76,7 +76,7 @@ export async function UpcomingOrdersCard() {
                             </div>
                             <span className="text-[10px] text-[var(--dashboard-accent-blue)] font-bold uppercase tracking-wider">Revenue</span>
                         </div>
-                        <p className="text-2xl font-serif font-bold text-[var(--dashboard-text)]">{formatCents(totalRevenue)}</p>
+                        <p className="text-2xl font-serif font-bold text-[var(--dashboard-text)]">{formatCentsWithCommas(totalRevenue)}</p>
                     </div>
                 </div>
 
@@ -124,7 +124,7 @@ export async function UpcomingOrdersCard() {
                                         </div>
                                         <div className="text-right ml-4">
                                             <p className="text-sm font-bold text-[var(--dashboard-text)]">
-                                                {formatCents(order.total_amount)}
+                                                {formatCentsWithCommas(order.total_amount)}
                                             </p>
                                             <span className={cn(
                                                 "inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border",
