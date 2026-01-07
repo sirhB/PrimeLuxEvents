@@ -106,8 +106,8 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
         } else {
             addItem(product.id, quantity, selectedModifiers)
             toast.custom((t) => (
-                <div className="flex items-center gap-4 bg-background border border-border p-4 rounded-lg shadow-lg w-full max-w-md">
-                    <div className="relative h-16 w-16 rounded-md overflow-hidden bg-secondary flex-shrink-0">
+                <div className="flex items-center gap-4 bg-white border border-border/40 p-4 rounded-xl shadow-2xl w-full max-w-md">
+                    <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
                         <Image
                             src={selectedGalleryImage || product.image_url}
                             alt={product.name}
@@ -116,7 +116,7 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                         />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-foreground truncate">{product.name}</h4>
+                        <h4 className="font-serif font-medium text-foreground truncate">{product.name}</h4>
                         <p className="text-sm text-muted-foreground">
                             Added to quote • {quantity} {quantity === 1 ? 'unit' : 'units'}
                         </p>
@@ -181,9 +181,9 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-[#FDFBF7]">
             {/* Navigation Bar */}
-            <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-lg border-b border-border/40 shadow-sm">
+            <div className="sticky top-0 z-40 bg-[#FDFBF7]/80 backdrop-blur-xl border-b border-border/10">
                 <div className="container mx-auto px-4 md:px-6 py-4">
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
@@ -192,7 +192,7 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                     >
                         <Link
                             href={product.categories?.name ? `/catalog?category=${encodeURIComponent(product.categories.name)}` : "/catalog"}
-                            className="inline-flex items-center text-sm text-muted-foreground hover:text-gold transition-colors group font-medium tracking-wide"
+                            className="inline-flex items-center text-sm text-muted-foreground hover:text-gold transition-colors group font-medium"
                         >
                             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
                             Back to {product.categories?.name || 'Collection'}
@@ -202,7 +202,7 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
             </div>
 
             {/* Main Content Area */}
-            <div className="container mx-auto px-4 md:px-6 py-8 md:py-16">
+            <div className="container mx-auto px-4 md:px-6 py-12 md:py-20">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key="product-content"
@@ -210,21 +210,19 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.5 }}
-                        className="space-y-8 md:space-y-12"
                     >
-                        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
+                        <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
                             {/* Image Gallery */}
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
                                 transition={{ duration: 0.6 }}
-                                className="lg:sticky lg:top-24"
+                                className="lg:sticky lg:top-32"
                             >
                                 <ProductGallery
                                     images={uniqueGalleryImages}
                                     productName={product.name}
-                                    selectedImage={selectedGalleryImage}
-                                    className="shadow-2xl shadow-black/5"
+                                    className="shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-2xl overflow-hidden"
                                 />
                             </motion.div>
 
@@ -233,59 +231,59 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                 variants={containerVariants}
                                 initial="hidden"
                                 animate={isLoaded ? "visible" : "hidden"}
-                                className="flex flex-col gap-6"
+                                className="flex flex-col gap-8"
                             >
                                 {/* Product Information */}
-                                <motion.div variants={itemVariants} className="space-y-4">
+                                <motion.div variants={itemVariants} className="space-y-6">
                                     <div>
-                                        <span className="text-gold text-sm font-medium tracking-[0.2em] uppercase block mb-2">
+                                        <span className="text-gold text-xs font-semibold tracking-[0.3em] uppercase block mb-3 opacity-80">
                                             {product.categories?.name || 'Premium Rental'}
                                         </span>
-                                        <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif text-foreground font-medium tracking-tight">
+                                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-foreground font-light tracking-tight leading-[1.1]">
                                             {product.name}
                                         </h1>
                                     </div>
+
                                     <div className="flex items-baseline gap-3">
-                                        <span className="text-xl md:text-2xl font-medium text-foreground">
+                                        <span className="text-3xl font-light text-foreground">
                                             {formatCurrency(basePrice)}
                                         </span>
+                                        <span className="text-sm text-muted-foreground uppercase tracking-widest">per day</span>
                                     </div>
-                                    <p className="text-base text-muted-foreground leading-relaxed">
-                                        {product.description}
-                                    </p>
+
+                                    <div className="max-w-xl">
+                                        <p className="text-lg text-muted-foreground/80 leading-relaxed font-light">
+                                            {product.description}
+                                        </p>
+                                    </div>
                                 </motion.div>
 
                                 <motion.div variants={itemVariants}>
-                                    <Separator className="bg-border/40" />
+                                    <Separator className="bg-border/20" />
                                 </motion.div>
 
                                 {/* Features */}
                                 {product.features && product.features.length > 0 && (
-                                    <motion.div variants={itemVariants} className="flex flex-wrap gap-3">
+                                    <motion.div variants={itemVariants} className="flex flex-wrap gap-2">
                                         {product.features.map((feature, idx) => (
-                                            <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/60 bg-secondary/20 text-sm text-foreground/80">
-                                                <Star className="h-3 w-3 text-gold fill-gold" />
-                                                <span>{feature}</span>
-                                            </div>
+                                            <Badge key={idx} variant="outline" className="px-4 py-1.5 rounded-full border-border/40 bg-white/50 text-xs font-medium tracking-wide">
+                                                {feature}
+                                            </Badge>
                                         ))}
                                     </motion.div>
                                 )}
 
-                                <motion.div variants={itemVariants}>
-                                    <Separator className="bg-border/40" />
-                                </motion.div>
-
                                 {/* Quantity Selector */}
                                 <motion.div variants={itemVariants} className="space-y-4">
-                                    <Label className="text-base font-medium">Quantity</Label>
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex items-center border border-border/50 rounded-full p-1 bg-secondary/10">
+                                    <Label className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Quantity</Label>
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex items-center border border-border/20 rounded-full p-1 bg-white shadow-sm">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={decrementQuantity}
                                                 disabled={quantity <= 1}
-                                                className="h-10 w-10 rounded-full hover:bg-gold/10 hover:text-gold transition-colors"
+                                                className="h-12 w-12 rounded-full hover:bg-gold/10 hover:text-gold transition-colors"
                                             >
                                                 <Minus className="h-4 w-4" />
                                             </Button>
@@ -300,14 +298,14 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                                         setQuantity(val)
                                                     }
                                                 }}
-                                                className="w-16 text-center h-10 text-lg bg-transparent border-none focus-visible:ring-0 p-0"
+                                                className="w-16 text-center h-12 text-xl bg-transparent border-none focus-visible:ring-0 p-0 font-light"
                                             />
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={incrementQuantity}
                                                 disabled={quantity >= maxQuantity}
-                                                className="h-10 w-10 rounded-full hover:bg-gold/10 hover:text-gold transition-colors"
+                                                className="h-12 w-12 rounded-full hover:bg-gold/10 hover:text-gold transition-colors"
                                             >
                                                 <Plus className="h-4 w-4" />
                                             </Button>
@@ -318,16 +316,10 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                 {/* Modifiers Section */}
                                 {product.modifiers && product.modifiers.length > 0 && (
                                     <motion.div variants={itemVariants} className="space-y-8">
-                                        <div className="space-y-6">
-                                            <div className="flex items-center gap-4">
-                                                <Separator className="flex-1 bg-border/40" />
-                                                <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Customization</span>
-                                                <Separator className="flex-1 bg-border/40" />
-                                            </div>
-
+                                        <div className="space-y-8">
                                             {product.modifiers.map((modifier) => (
                                                 <div key={modifier.id} className="space-y-4">
-                                                    <Label className="text-base font-medium text-foreground">
+                                                    <Label className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
                                                         {modifier.name}
                                                     </Label>
                                                     <RadioGroup
@@ -339,24 +331,19 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                                                 <div
                                                                     key={option.id}
                                                                     className={cn(
-                                                                        "relative flex items-center space-x-3 border rounded-xl p-4 transition-all duration-300 cursor-pointer overflow-hidden group",
+                                                                        "relative flex items-center space-x-3 border rounded-2xl p-5 transition-all duration-500 cursor-pointer overflow-hidden group",
                                                                         selectedModifiers[modifier.id]?.id === option.id
-                                                                            ? "border-gold bg-gold/5 shadow-lg shadow-gold/5"
-                                                                            : "border-border/40 hover:border-gold/30 hover:bg-secondary/20"
+                                                                            ? "border-gold bg-white shadow-xl shadow-gold/5"
+                                                                            : "border-border/10 bg-white/40 hover:border-gold/30 hover:bg-white"
                                                                     )}
                                                                     onClick={() => handleModifierChange(modifier.id, option.id)}
                                                                 >
-                                                                    <div className={cn(
-                                                                        "absolute inset-0 bg-gradient-to-r from-gold/10 to-transparent opacity-0 transition-opacity duration-300",
-                                                                        selectedModifiers[modifier.id]?.id === option.id ? "opacity-100" : "group-hover:opacity-50"
-                                                                    )} />
-
-                                                                    <RadioGroupItem value={option.id} id={option.id} className="text-gold border-muted-foreground/40 data-[state=checked]:border-gold z-10" />
+                                                                    <RadioGroupItem value={option.id} id={option.id} className="text-gold border-muted-foreground/20 data-[state=checked]:border-gold z-10" />
                                                                     <Label htmlFor={option.id} className="cursor-pointer flex-1 font-medium z-10 text-base">
                                                                         <div className="flex justify-between items-center w-full">
-                                                                            <span>{option.label}</span>
+                                                                            <span className="font-light">{option.label}</span>
                                                                             {option.priceAdjustment > 0 && (
-                                                                                <span className="text-gold text-sm font-medium bg-gold/10 px-2 py-0.5 rounded-full">
+                                                                                <span className="text-gold text-sm font-medium">
                                                                                     +{formatCurrency(option.priceAdjustment)}
                                                                                 </span>
                                                                             )}
@@ -373,28 +360,15 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                 )}
 
                                 <motion.div variants={itemVariants}>
-                                    <Separator className="bg-border/40" />
+                                    <Separator className="bg-border/20" />
                                 </motion.div>
 
                                 {/* Pricing Summary */}
-                                <motion.div variants={itemVariants} className="space-y-6">
-                                    <div className="bg-secondary/5 rounded-xl p-6 space-y-4">
-                                        {modifiersPrice > 0 && (
-                                            <div className="flex justify-between items-center text-lg">
-                                                <span className="text-muted-foreground">Customizations</span>
-                                                <span className="font-medium text-gold">+{formatCurrency(modifiersPrice * quantity)}</span>
-                                            </div>
-                                        )}
-                                        {setupFee > 0 && (
-                                            <div className="flex justify-between items-center text-lg">
-                                                <span className="text-muted-foreground">Setup Fee</span>
-                                                <span className="font-medium">+{formatCurrency(setupFee)}</span>
-                                            </div>
-                                        )}
-                                        <Separator className="bg-border/40" />
-                                        <div className="flex justify-between items-center text-xl font-medium">
-                                            <span>Total</span>
-                                            <span className="text-gold">{formatCurrency(totalPrice)}</span>
+                                <motion.div variants={itemVariants} className="space-y-8">
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center text-xl font-light">
+                                            <span className="text-muted-foreground">Total</span>
+                                            <span className="text-3xl text-foreground">{formatCurrency(totalPrice)}</span>
                                         </div>
                                     </div>
 
@@ -402,48 +376,42 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                     <Button
                                         onClick={toggleCart}
                                         className={cn(
-                                            "w-full h-12 text-lg font-medium rounded-full transition-all duration-300",
+                                            "w-full h-16 text-lg font-medium rounded-full transition-all duration-500 shadow-lg",
                                             isInCart
                                                 ? "bg-green-600 hover:bg-green-700 text-white"
-                                                : "bg-gold hover:bg-gold/90 text-black shadow-lg hover:shadow-xl"
+                                                : "bg-gold hover:bg-gold/90 text-black hover:shadow-gold/20 hover:-translate-y-1"
                                         )}
                                     >
                                         {isInCart ? (
-                                            <div className="flex items-center gap-2">
-                                                <Check className="h-5 w-5" />
-                                                Added to Cart
+                                            <div className="flex items-center gap-3">
+                                                <Check className="h-6 w-6" />
+                                                Added to Quote
                                             </div>
                                         ) : (
-                                            <div className="flex items-center gap-2">
-                                                <Plus className="h-5 w-5" />
-                                                Add to Cart
+                                            <div className="flex items-center gap-3">
+                                                <Plus className="h-6 w-6" />
+                                                Add to Quote
                                             </div>
                                         )}
                                     </Button>
-
-
-                                </motion.div>
-
-                                <motion.div variants={itemVariants}>
-                                    <Separator className="bg-border/40 hidden lg:block" />
                                 </motion.div>
 
                                 {/* Additional Information */}
-                                <motion.div variants={itemVariants}>
+                                <motion.div variants={itemVariants} className="pt-8">
                                     <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value="details" className="border-border/40">
-                                            <AccordionTrigger className="text-lg font-serif hover:text-gold transition-colors py-6">
+                                        <AccordionItem value="details" className="border-border/10">
+                                            <AccordionTrigger className="text-lg font-serif font-light hover:text-gold transition-colors py-6">
                                                 Product Details
                                             </AccordionTrigger>
-                                            <AccordionContent className="space-y-4 text-base text-muted-foreground pb-6">
+                                            <AccordionContent className="space-y-4 text-base text-muted-foreground/80 pb-6 font-light">
                                                 {product.sku && (
-                                                    <div className="flex justify-between py-2 border-b border-border/20 border-dashed">
+                                                    <div className="flex justify-between py-2 border-b border-border/10 border-dashed">
                                                         <span>SKU</span>
                                                         <span className="font-medium text-foreground">{product.sku}</span>
                                                     </div>
                                                 )}
                                                 {product.weight && (
-                                                    <div className="flex justify-between py-2 border-b border-border/20 border-dashed">
+                                                    <div className="flex justify-between py-2 border-b border-border/10 border-dashed">
                                                         <span>Weight</span>
                                                         <span className="font-medium text-foreground">{product.weight} lbs</span>
                                                     </div>
@@ -458,40 +426,34 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                         </AccordionItem>
 
                                         {product.care_instructions && (
-                                            <AccordionItem value="care" className="border-border/40">
-                                                <AccordionTrigger className="text-lg font-serif hover:text-gold transition-colors py-6">
+                                            <AccordionItem value="care" className="border-border/10">
+                                                <AccordionTrigger className="text-lg font-serif font-light hover:text-gold transition-colors py-6">
                                                     Care Instructions
                                                 </AccordionTrigger>
-                                                <AccordionContent className="text-base text-muted-foreground leading-relaxed pb-6">
+                                                <AccordionContent className="text-base text-muted-foreground/80 leading-relaxed pb-6 font-light">
                                                     {product.care_instructions}
                                                 </AccordionContent>
                                             </AccordionItem>
                                         )}
 
-                                        <AccordionItem value="rental" className="border-border/40">
-                                            <AccordionTrigger className="text-lg font-serif hover:text-gold transition-colors py-6">
+                                        <AccordionItem value="rental" className="border-border/10">
+                                            <AccordionTrigger className="text-lg font-serif font-light hover:text-gold transition-colors py-6">
                                                 Rental Information
                                             </AccordionTrigger>
-                                            <AccordionContent className="space-y-4 text-base text-muted-foreground pb-6">
-                                                <div className="flex gap-4 items-start">
-                                                    <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
-                                                    <p>Standard rental period includes 24-hour use</p>
-                                                </div>
-                                                <div className="flex gap-4 items-start">
-                                                    <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
-                                                    <p>Delivery typically occurs the day before your event</p>
-                                                </div>
-                                                <div className="flex gap-4 items-start">
-                                                    <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
-                                                    <p>Pickup scheduled for the day after your event</p>
-                                                </div>
-                                                <div className="flex gap-4 items-start">
-                                                    <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
-                                                    <p>Setup and installation available for additional fee</p>
-                                                </div>
-                                                <div className="flex gap-4 items-start">
-                                                    <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
-                                                    <p>Damage waiver included with all rentals</p>
+                                            <AccordionContent className="space-y-6 text-base text-muted-foreground/80 pb-6 font-light">
+                                                <div className="grid gap-4">
+                                                    <div className="flex gap-4 items-start">
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0" />
+                                                        <p>Standard rental period includes 24-hour use</p>
+                                                    </div>
+                                                    <div className="flex gap-4 items-start">
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0" />
+                                                        <p>Delivery typically occurs the day before your event</p>
+                                                    </div>
+                                                    <div className="flex gap-4 items-start">
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0" />
+                                                        <p>Pickup scheduled for the day after your event</p>
+                                                    </div>
                                                 </div>
                                             </AccordionContent>
                                         </AccordionItem>
@@ -504,40 +466,36 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
             </div>
 
             {/* Related Products Section */}
-            {
-                product && allProducts.length > 0 && (
-                    <motion.section
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.8 }}
-                        className="bg-secondary/5"
-                    >
-                        <div className="container mx-auto px-4 md:px-6 py-16 md:py-24">
-                            <Separator className="mb-16 md:mb-24 bg-border/40" />
-                            <div className="mb-16 text-center">
-                                <span className="text-gold text-sm font-medium tracking-widest uppercase mb-3 block">
-                                    Complete Your Look
-                                </span>
-                                <h2 className="text-3xl md:text-5xl font-serif mb-4 text-foreground">
-                                    You May Also Like
-                                </h2>
-                                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                                    Discover complementary pieces to create the perfect atmosphere for your event.
-                                </p>
-                                <div className="h-1 w-20 bg-gold mx-auto mt-6" />
-                            </div>
-                            <RelatedProducts
-                                currentProduct={product}
-                                allProducts={allProducts}
-                                onAddToCart={toggleCart}
-                                isInCart={isProductInCart}
-                                maxItems={4}
-                            />
+            {product && allProducts.length > 0 && (
+                <motion.section
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.8 }}
+                    className="bg-white/30 border-t border-border/10"
+                >
+                    <div className="container mx-auto px-4 md:px-6 py-24 md:py-32">
+                        <div className="mb-20 text-center">
+                            <span className="text-gold text-xs font-semibold tracking-[0.3em] uppercase mb-4 block opacity-80">
+                                Complete Your Look
+                            </span>
+                            <h2 className="text-4xl md:text-5xl font-serif font-light mb-6 text-foreground tracking-tight">
+                                You May Also Like
+                            </h2>
+                            <p className="text-lg text-muted-foreground/70 max-w-2xl mx-auto font-light">
+                                Discover complementary pieces to create the perfect atmosphere for your event.
+                            </p>
                         </div>
-                    </motion.section>
-                )
-            }
-        </div >
+                        <RelatedProducts
+                            currentProduct={product}
+                            allProducts={allProducts}
+                            onAddToCart={toggleCart}
+                            isInCart={isProductInCart}
+                            maxItems={4}
+                        />
+                    </div>
+                </motion.section>
+            )}
+        </div>
     )
 }

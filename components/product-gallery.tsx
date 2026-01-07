@@ -58,9 +58,9 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
     return (
         <>
-            <div className={cn("space-y-6", className)}>
+            <div className={cn("space-y-8", className)}>
                 {/* Main Image Container */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-secondary group border border-border/20">
+                <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white group border border-border/5 shadow-inner">
                     <AnimatePresence initial={false} custom={direction}>
                         <motion.div
                             key={selectedImage}
@@ -71,7 +71,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                             exit="exit"
                             transition={{
                                 x: { type: "spring", stiffness: 300, damping: 30 },
-                                opacity: { duration: 0.2 }
+                                opacity: { duration: 0.3 }
                             }}
                             className="absolute inset-0 w-full h-full"
                         >
@@ -79,7 +79,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                                 src={images[selectedImage]}
                                 alt={`${productName} - Image ${selectedImage + 1}`}
                                 fill
-                                className="object-cover"
+                                className="object-contain p-4 md:p-8"
                                 priority
                             />
                         </motion.div>
@@ -88,7 +88,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                     {/* Zoom Button */}
                     <button
                         onClick={() => setIsLightboxOpen(true)}
-                        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gold hover:text-black text-white z-10"
+                        className="absolute top-6 right-6 h-12 w-12 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 hover:bg-gold hover:text-black text-foreground shadow-lg z-10"
                     >
                         <ZoomIn className="h-5 w-5" />
                     </button>
@@ -98,13 +98,13 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                         <>
                             <button
                                 onClick={() => paginate(-1)}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gold hover:text-black text-white z-10"
+                                className="absolute left-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 hover:bg-gold hover:text-black text-foreground shadow-lg z-10"
                             >
                                 <ChevronLeft className="h-5 w-5" />
                             </button>
                             <button
                                 onClick={() => paginate(1)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-gold hover:text-black text-white z-10"
+                                className="absolute right-6 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 hover:bg-gold hover:text-black text-foreground shadow-lg z-10"
                             >
                                 <ChevronRight className="h-5 w-5" />
                             </button>
@@ -113,7 +113,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
                     {/* Image Counter */}
                     {images.length > 1 && (
-                        <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm text-xs font-medium text-white">
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md text-[10px] font-semibold tracking-widest uppercase text-foreground shadow-sm">
                             {selectedImage + 1} / {images.length}
                         </div>
                     )}
@@ -121,7 +121,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
                 {/* Thumbnails */}
                 {images.length > 1 && (
-                    <div className="flex gap-3 overflow-x-auto pb-2 px-1 scrollbar-hide">
+                    <div className="flex gap-4 overflow-x-auto pb-4 px-2 scrollbar-hide justify-center">
                         {images.map((image, index) => (
                             <button
                                 key={index}
@@ -130,17 +130,17 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                                     setSelectedImage(index)
                                 }}
                                 className={cn(
-                                    "relative flex-shrink-0 w-20 h-20 rounded-sm overflow-hidden transition-all duration-300",
+                                    "relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-500 border-2",
                                     selectedImage === index
-                                        ? "ring-2 ring-gold ring-offset-2 ring-offset-background opacity-100"
-                                        : "opacity-50 hover:opacity-100 grayscale hover:grayscale-0"
+                                        ? "border-gold shadow-lg shadow-gold/10 scale-105"
+                                        : "border-transparent opacity-40 hover:opacity-100 grayscale hover:grayscale-0"
                                 )}
                             >
                                 <Image
                                     src={image}
                                     alt={`${productName} - Thumbnail ${index + 1}`}
                                     fill
-                                    className="object-cover"
+                                    className="object-cover p-1"
                                 />
                             </button>
                         ))}
