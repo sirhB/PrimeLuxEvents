@@ -1,3 +1,5 @@
+"use client"
+
 import { ShieldCheck, Sparkles, Clock, HeartHandshake, Diamond, Star, Award, Shield } from "lucide-react"
 import { motion } from "framer-motion"
 

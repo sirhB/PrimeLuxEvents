@@ -5,6 +5,7 @@ import { FeaturedCollection } from "@/components/featured-collection"
 import { BrandValuesSection } from "@/components/brand-values-section"
 import { TestimonialsSection } from "@/components/testimonials-section"
 import { getSiteContent } from "@/lib/content"
+import Link from "next/link"
 
 export const dynamic = 'force-dynamic'
 
@@ -37,13 +38,7 @@ export default async function Home() {
       <section className="py-24 md:py-40 bg-[#1A1A1A] text-white text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay" />
         <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="max-w-3xl mx-auto"
-          >
+          <div className="max-w-3xl mx-auto">
             <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-6 block">Start Your Journey</span>
             <h2 className="text-4xl md:text-6xl font-serif font-light mb-8 tracking-tight">Ready to plan your next extraordinary event?</h2>
             <p className="text-gray-400 max-w-2xl mx-auto mb-12 text-lg font-light leading-relaxed">
@@ -64,7 +59,7 @@ export default async function Home() {
                 Contact Support
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </main>
