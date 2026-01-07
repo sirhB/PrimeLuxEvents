@@ -13,6 +13,7 @@ import {
     Clock,
     Flag,
     Truck,
+    Briefcase,
     Home,
     Building,
     MapPin,
