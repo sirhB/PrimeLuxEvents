@@ -75,20 +75,29 @@ export default async function ProductsPage({
     const { data: products, count } = await query.range(start, end)
 
     return (
-        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-                    <p className="text-gray-600 mt-1 text-sm">
-                        Manage your product catalog and inventory
+        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
+                            Inventory
+                        </span>
+                    </div>
+                    <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
+                        Products
+                    </h1>
+                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
+                        Manage your product catalog, pricing, and inventory levels.
                     </p>
                 </div>
-                <Button asChild>
-                    <Link href="/admin/products/new">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Product
-                    </Link>
-                </Button>
+                <div className="flex items-center gap-3">
+                    <Button asChild className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium px-6">
+                        <Link href="/admin/products/new">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Product
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
             <Tabs defaultValue="all" className="w-full">

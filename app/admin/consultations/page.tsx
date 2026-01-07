@@ -192,12 +192,21 @@ export default async function ConsultationsPage({
     }
 
     return (
-        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
-                <p className="text-gray-600 mt-1 text-sm">
-                    Track and follow up on every lead through a clear, kanban-style workflow.
-                </p>
+        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
+                            CRM
+                        </span>
+                    </div>
+                    <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
+                        Leads
+                    </h1>
+                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
+                        Track and follow up on every lead through a clear, kanban-style workflow.
+                    </p>
+                </div>
             </div>
 
             <div className="flex items-center justify-between gap-4 flex-wrap">

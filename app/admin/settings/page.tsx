@@ -142,10 +142,21 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-serif mb-2">Settings</h1>
-                <p className="text-muted-foreground">Configure global settings for your store</p>
+        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
+                            Configuration
+                        </span>
+                    </div>
+                    <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
+                        Settings
+                    </h1>
+                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
+                        Configure global settings for your store, tax, and delivery.
+                    </p>
+                </div>
             </div>
 
             <div className="grid gap-6 max-w-4xl">
