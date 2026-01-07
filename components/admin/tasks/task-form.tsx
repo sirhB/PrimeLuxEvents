@@ -8,7 +8,10 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { createClient } from '@/lib/supabase/client'
-import { Calendar, User, Flag, Truck, Briefcase, Home, Building, MapPin } from 'lucide-react'
+import { Calendar, User, Flag, Truck, Briefcase, Home, Building, MapPin, Check, ChevronsUpDown } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
+import { cn } from '@/lib/utils'
 
 interface TaskFormData {
     title: string
@@ -54,6 +57,7 @@ const taskTypes = [
 export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) {
     const router = useRouter()
     const [teamMembers, setTeamMembers] = useState<any[]>([])
+    const [open, setOpen] = useState(false)
     const [formData, setFormData] = useState<TaskFormData>({
         title: task?.title || '',
         description: task?.description || '',
@@ -237,21 +241,68 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                 </div>
             </div>
 
-            <div>
+            <div className="flex flex-col gap-2">
                 <Label htmlFor="assigned_to">Assigned To</Label>
-                <Select value={formData.assigned_to || 'unassigned'} onValueChange={(value) => handleInputChange('assigned_to', value)}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Assign to team member..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="unassigned">Unassigned</SelectItem>
-                        {teamMembers.map((member) => (
-                            <SelectItem key={member.id} value={member.id}>
-                                {member.full_name || member.email}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={open}
+                            className="w-full justify-between font-normal"
+                        >
+                            {formData.assigned_to && formData.assigned_to !== 'unassigned'
+                                ? teamMembers.find((member) => member.id === formData.assigned_to)?.full_name ||
+                                teamMembers.find((member) => member.id === formData.assigned_to)?.email
+                                : "Select team member..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px] p-0" align="start">
+                        <Command>
+                            <CommandInput placeholder="Search team members..." />
+                            <CommandEmpty>No team member found.</CommandEmpty>
+                            <CommandGroup>
+                                <CommandItem
+                                    value="unassigned"
+                                    onSelect={() => {
+                                        handleInputChange('assigned_to', 'unassigned')
+                                        setOpen(false)
+                                    }}
+                                >
+                                    <Check
+                                        className={cn(
+                                            "mr-2 h-4 w-4",
+                                            formData.assigned_to === 'unassigned' || !formData.assigned_to ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                    Unassigned
+                                </CommandItem>
+                                {teamMembers.map((member) => (
+                                    <CommandItem
+                                        key={member.id}
+                                        value={`${member.full_name} ${member.email}`}
+                                        onSelect={() => {
+                                            handleInputChange('assigned_to', member.id)
+                                            setOpen(false)
+                                        }}
+                                    >
+                                        <Check
+                                            className={cn(
+                                                "mr-2 h-4 w-4",
+                                                formData.assigned_to === member.id ? "opacity-100" : "opacity-0"
+                                            )}
+                                        />
+                                        <div className="flex flex-col">
+                                            <span className="font-medium">{member.full_name || 'Unnamed'}</span>
+                                            <span className="text-xs text-muted-foreground">{member.email}</span>
+                                        </div>
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
             </div>
 
             {errors.submit && (

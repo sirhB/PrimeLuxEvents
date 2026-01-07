@@ -7,9 +7,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { X, Plus } from 'lucide-react'
+import { X, Plus, Check, ChevronsUpDown } from 'lucide-react'
 import { assignUserRole, removeUserRole, updateUserProfile } from '@/app/admin/actions'
 import { toast } from 'sonner'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
+import { cn } from '@/lib/utils'
 
 interface TeamMember {
     id: string
@@ -61,6 +64,7 @@ export function EditMemberDialog({ member, roles, open, onOpenChange, onSuccess 
         member.user_roles?.map(ur => ur.roles.id) || []
     )
     const [selectedRoleToAdd, setSelectedRoleToAdd] = useState<string>('')
+    const [rolePickerOpen, setRolePickerOpen] = useState(false)
 
     const handleAddRole = async () => {
         if (!selectedRoleToAdd) return
@@ -251,24 +255,53 @@ export function EditMemberDialog({ member, roles, open, onOpenChange, onSuccess 
                             <div className="flex items-end gap-2">
                                 <div className="flex-1 space-y-2">
                                     <Label htmlFor="add_role">Add Role</Label>
-                                    <Select value={selectedRoleToAdd} onValueChange={setSelectedRoleToAdd}>
-                                        <SelectTrigger id="add_role">
-                                            <SelectValue placeholder="Select a role" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {availableRoles.map(role => (
-                                                <SelectItem key={role.id} value={role.id}>
-                                                    <div className="flex items-center gap-2">
-                                                        <div
-                                                            className="w-3 h-3 rounded"
-                                                            style={{ backgroundColor: role.color }}
-                                                        />
-                                                        {role.display_name}
-                                                    </div>
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <Popover open={rolePickerOpen} onOpenChange={setRolePickerOpen}>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                role="combobox"
+                                                aria-expanded={rolePickerOpen}
+                                                className="w-full justify-between font-normal"
+                                            >
+                                                {selectedRoleToAdd
+                                                    ? roles.find((role) => role.id === selectedRoleToAdd)?.display_name
+                                                    : "Search roles..."}
+                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-[400px] p-0" align="start">
+                                            <Command>
+                                                <CommandInput placeholder="Search roles..." />
+                                                <CommandEmpty>No role found.</CommandEmpty>
+                                                <CommandGroup>
+                                                    {availableRoles.map((role) => (
+                                                        <CommandItem
+                                                            key={role.id}
+                                                            value={role.display_name}
+                                                            onSelect={() => {
+                                                                setSelectedRoleToAdd(role.id)
+                                                                setRolePickerOpen(false)
+                                                            }}
+                                                        >
+                                                            <Check
+                                                                className={cn(
+                                                                    "mr-2 h-4 w-4",
+                                                                    selectedRoleToAdd === role.id ? "opacity-100" : "opacity-0"
+                                                                )}
+                                                            />
+                                                            <div className="flex items-center gap-2">
+                                                                <div
+                                                                    className="w-3 h-3 rounded"
+                                                                    style={{ backgroundColor: role.color }}
+                                                                />
+                                                                {role.display_name}
+                                                            </div>
+                                                        </CommandItem>
+                                                    ))}
+                                                </CommandGroup>
+                                            </Command>
+                                        </PopoverContent>
+                                    </Popover>
                                 </div>
                                 <Button
                                     onClick={handleAddRole}
