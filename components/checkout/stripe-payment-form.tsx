@@ -30,6 +30,9 @@ export function StripePaymentForm({ onSuccess, amount }: StripePaymentFormProps)
         const { error, paymentIntent } = await stripe.confirmPayment({
             elements,
             redirect: 'if_required',
+            confirmParams: {
+                return_url: `${window.location.origin}/checkout/return`,
+            },
         })
 
         if (error) {

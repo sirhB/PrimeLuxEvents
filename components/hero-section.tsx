@@ -33,7 +33,7 @@ export function HeroSection({
     <div ref={containerRef} className="relative h-screen w-full overflow-hidden bg-black">
       <motion.div style={{ y, scale }} className="absolute inset-0 w-full h-full">
         <Image
-          src="/luxury-event-setup-ballroom-chandelier.jpg"
+          src="/images/luxury-event-hero.png"
           alt="Luxury Event Setup"
           fill
           className="object-cover opacity-70"

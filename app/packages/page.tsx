@@ -25,7 +25,7 @@ export default async function PackagesPage() {
             <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 bg-black/40 z-10" />
                 <Image
-                    src="/images/packages-hero.jpg" // You might need to ensure this image exists or use a placeholder
+                    src="/images/packages-hero.png"
                     alt="Luxury Event Packages"
                     fill
                     className="object-cover"
