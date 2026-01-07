@@ -19,6 +19,7 @@ export async function searchProducts(query: string) {
       rental_price_daily,
       image_url,
       category_id,
+      slug,
       categories (
         name
       )
@@ -53,6 +54,7 @@ export async function searchProducts(query: string) {
       rental_price_daily,
       image_url,
       category_id,
+      slug,
       categories!inner (
         name
       )

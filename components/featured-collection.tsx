@@ -1,14 +1,62 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { products } from "@/lib/data"
 import { ArrowRight, Eye } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import { motion } from "framer-motion"
+import { createClient } from "@/lib/supabase/client"
+
+interface Product {
+  id: string
+  name: string
+  description: string | null
+  price: number
+  image_url: string | null
+  rental_price_daily?: number
+  is_featured?: boolean
+  slug?: string
+}
 
 export function FeaturedCollection() {
-  const featuredProducts = products.filter((p) => p.featured).slice(0, 6)
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const supabase = createClient()
+
+  useEffect(() => {
+    async function fetchFeaturedProducts() {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_featured', true)
+        .limit(6)
+
+      if (data) {
+        setFeaturedProducts(data)
+      }
+      setLoading(false)
+    }
+
+    fetchFeaturedProducts()
+  }, [])
+
+  if (loading) {
+    return (
+      <section className="py-20 md:py-32 bg-background overflow-hidden">
+        <div className="container mx-auto px-4 md:px-6 text-center">
+          <div className="animate-pulse flex flex-col items-center gap-4">
+            <div className="h-12 w-12 rounded-full border-2 border-gold/30 border-t-gold animate-spin" />
+            <div className="text-gold font-serif text-lg">Loading Collection...</div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (featuredProducts.length === 0) {
+    return null
+  }
 
   return (
     <section className="py-20 md:py-32 bg-background overflow-hidden">
@@ -26,7 +74,7 @@ export function FeaturedCollection() {
           </div>
           <Link
             href="/catalog"
-            className="group inline-flex items-center text-sm font-medium uppercase tracking-widest hover:text-primary transition-colors"
+            className="group inline-flex items-center text-sm font-medium uppercase tracking-widest hover:text-gold transition-colors"
           >
             View All
             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -42,16 +90,6 @@ export function FeaturedCollection() {
       </div>
     </section>
   )
-}
-
-interface Product {
-  id: string
-  name: string
-  category: string
-  price: number
-  image: string
-  description: string
-  featured?: boolean
 }
 
 function InfiniteScrollRow({ products, direction, speed }: { products: Product[], direction: "left" | "right", speed: number }) {
@@ -77,16 +115,18 @@ function InfiniteScrollRow({ products, direction, speed }: { products: Product[]
 }
 
 function ProductCard({ product }: { product: Product }) {
+  const price = product.rental_price_daily || product.price
+
   return (
     <motion.div
       className="flex-shrink-0 w-[300px] group relative"
       whileHover={{ y: -10 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      <Link href={`/catalog/${product.id}`} className="block">
+      <Link href={`/catalog/${product.slug || product.id}`} className="block">
         <div className="relative aspect-[3/4] overflow-hidden bg-secondary mb-4 rounded-sm">
           <Image
-            src={product.image || "/placeholder.svg"}
+            src={product.image_url || "/placeholder.svg"}
             alt={product.name}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -99,10 +139,10 @@ function ProductCard({ product }: { product: Product }) {
             </span>
           </div>
         </div>
-        <h3 className="font-serif text-lg group-hover:text-primary transition-colors">
+        <h3 className="font-serif text-lg group-hover:text-gold transition-colors">
           {product.name}
         </h3>
-        <p className="text-sm text-muted-foreground">{formatCurrency(product.price)}</p>
+        <p className="text-sm text-muted-foreground">{formatCurrency(price)}</p>
       </Link>
     </motion.div>
   )

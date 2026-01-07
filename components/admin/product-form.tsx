@@ -187,6 +187,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             category_id: (formData.get('category_id') as string) || null,
             image_url: formData.get('image_url') as string,
             is_featured: formData.get('is_featured') === 'on',
+            slug: formData.get('slug') as string,
             modifiers: modifiersInCents,
             assembly_items: assemblyItems.filter(item => item.name.trim() !== ''),
         }
@@ -227,9 +228,30 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                             id="name"
                             name="name"
                             defaultValue={product?.name}
+                            onChange={(e) => {
+                                const slugInput = document.getElementById('slug') as HTMLInputElement
+                                if (slugInput && (!slugInput.value || slugInput.value === product?.slug)) {
+                                    slugInput.value = e.target.value
+                                        .toLowerCase()
+                                        .replace(/[^a-z0-9\s]/g, '')
+                                        .replace(/\s+/g, '-')
+                                }
+                            }}
                             placeholder="Enter product name"
                             required
                         />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="slug">Product Slug (URL)</Label>
+                        <Input
+                            id="slug"
+                            name="slug"
+                            defaultValue={product?.slug}
+                            placeholder="product-name-slug"
+                            required
+                        />
+                        <p className="text-xs text-muted-foreground">This will be used in the URL: /catalog/product-slug</p>
                     </div>
 
                     <div className="space-y-2">

@@ -13,19 +13,20 @@ import { cn, formatCurrency } from "@/lib/utils"
 interface Product {
     id: string
     name: string
-    description: string
+    description: string | null
     price: number
     rental_price_daily?: number
     rental_price_weekend?: number
     rental_price_weekly?: number
-    image_url: string
+    image_url: string | null
     images?: string[]
-    category_id: string
-    categories?: { name: string }
+    category_id: string | null
+    categories?: { name: string } | null
     quantity_available?: number
     features?: string[]
     sku?: string
     modifiers?: any[]
+    slug?: string
 }
 
 interface ProductQuickViewProps {
@@ -69,7 +70,7 @@ export function ProductQuickView({
                     <div className="space-y-4">
                         <div className="relative aspect-[3/4] bg-secondary overflow-hidden rounded-lg">
                             <Image
-                                src={images[selectedImageIndex]}
+                                src={images[selectedImageIndex] || '/placeholder-product.jpg'}
                                 alt={product.name}
                                 fill
                                 className="object-cover"
@@ -91,7 +92,7 @@ export function ProductQuickView({
                                         )}
                                     >
                                         <Image
-                                            src={image}
+                                            src={image || '/placeholder-product.jpg'}
                                             alt={`${product.name} - ${index + 1}`}
                                             fill
                                             className="object-cover"
@@ -202,7 +203,7 @@ export function ProductQuickView({
                                 )}
                             </Button>
                             <Button variant="outline" asChild>
-                                <Link href={`/catalog/${product.id}`}>
+                                <Link href={`/catalog/${product.slug || product.id}`}>
                                     <ExternalLink className="mr-2 h-4 w-4" />
                                     Full Details
                                 </Link>

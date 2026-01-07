@@ -110,7 +110,7 @@ export function CartSheet() {
                     return (
                       <div key={item.id} className="flex gap-5 p-4 rounded-xl border border-border/50 bg-secondary/20 hover:bg-secondary/30 transition-colors">
                         <div className="h-24 w-24 rounded-lg border border-border/50 bg-background overflow-hidden flex-shrink-0">
-                          <Link href={`/catalog/${product.id}`} onClick={() => setIsOpen(false)}>
+                          <Link href={`/catalog/${product.slug || product.id}`} onClick={() => setIsOpen(false)}>
                             <img
                               src={product.image_url || "/placeholder.svg"}
                               alt={product.name}
@@ -121,7 +121,7 @@ export function CartSheet() {
                         <div className="flex-1 flex flex-col justify-between min-w-0">
                           <div className="space-y-2">
                             <div className="flex justify-between gap-3">
-                              <Link href={`/catalog/${product.id}`} onClick={() => setIsOpen(false)} className="flex-1 min-w-0">
+                              <Link href={`/catalog/${product.slug || product.id}`} onClick={() => setIsOpen(false)} className="flex-1 min-w-0">
                                 <h3 className="font-serif text-base font-medium line-clamp-2 pr-2 hover:underline decoration-gold underline-offset-4 transition-all">{product.name}</h3>
                               </Link>
                               <Button

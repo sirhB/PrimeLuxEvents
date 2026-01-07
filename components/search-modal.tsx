@@ -23,6 +23,7 @@ interface Product {
     rental_price_daily?: number
     image_url: string | null
     categories?: { name: string } | { name: string }[] | null
+    slug?: string
 }
 
 interface Category {
@@ -169,7 +170,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                     {results.products.map((product) => (
                                                         <Link
                                                             key={product.id}
-                                                            href={`/catalog/${product.id}`}
+                                                            href={`/catalog/${product.slug || product.id}`}
                                                             onClick={onClose}
                                                             className="flex items-start gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
                                                         >

@@ -15,6 +15,7 @@ interface Product {
     category_id: string | null
     categories?: { name: string } | null
     rental_price_daily?: number
+    slug?: string
 }
 
 interface FeaturedProductCardProps {
@@ -26,7 +27,7 @@ export function FeaturedProductCard({ product }: FeaturedProductCardProps) {
 
     return (
         <Link
-            href={`/catalog/${product.id}`}
+            href={`/catalog/${product.slug || product.id}`}
             className="group relative block w-full h-full"
         >
             <div className="relative h-full aspect-[16/10] md:aspect-[2/1] overflow-hidden rounded-sm bg-secondary border border-transparent hover:border-gold/30 transition-all duration-500">

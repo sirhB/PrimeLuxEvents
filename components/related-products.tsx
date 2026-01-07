@@ -16,6 +16,7 @@ interface Product {
     categories?: { name: string } | null
     quantity_available?: number
     features?: string[]
+    slug?: string
 }
 
 interface RelatedProductsProps {

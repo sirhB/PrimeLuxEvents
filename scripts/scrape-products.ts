@@ -1,3 +1,4 @@
+
 import fs from 'fs';
 import path from 'path';
 import * as cheerio from 'cheerio';
@@ -28,8 +29,8 @@ const CATEGORIES = [
     { name: 'Cooking & Prep', slug: 'cooking-prep' },
     { name: 'Decorations & Props', slug: 'decorations-props' },
     { name: 'Flooring & Staging', slug: 'flooring-staging' },
-    { name: 'Chairs', slug: 'chairs' }, // Seating
-    { name: 'Sofas & Loveseats', slug: 'sofas-loveseats' }, // Seating
+    { name: 'Chairs', slug: 'chairs' },
+    { name: 'Sofas & Loveseats', slug: 'sofas-loveseats' },
     { name: 'Kids Backdrops', slug: 'kids-backdrops' },
     { name: 'Kids Chairs', slug: 'kids-chairs' },
     { name: 'Kids Tables', slug: 'kids-tables' },
@@ -43,12 +44,15 @@ const CATEGORIES = [
     { name: 'Sweets Carts', slug: 'sweets-carts' },
     { name: 'Charger Plates', slug: 'charger-plates' },
     { name: 'Dinnerware', slug: 'dinnerware' },
-    { name: 'Flowers & Centerpieces', slug: 'centerpeices-2' }, // Deduced from sitemap
+    { name: 'Flowers & Centerpieces', slug: 'centerpeices-2' },
     { name: 'Table Linens', slug: 'table-linens' },
     { name: 'Napkins & Rings', slug: 'table-napkins-and-rings' },
-    { name: 'Tables', slug: 'dining-tables' }, // Deduced
+    { name: 'Tables', slug: 'dining-tables' },
     { name: 'Tents', slug: 'tent' },
-    { name: 'Buffet Service', slug: 'buffet-service' }, // Guessing, might need check
+    { name: 'Buffet Service', slug: 'buffet-service' },
+    { name: 'Glassware', slug: 'glasswear' },
+    { name: 'Chargers', slug: 'chargers' },
+    { name: 'Table Settings', slug: 'table-settings' },
 ];
 
 interface Product {
@@ -57,18 +61,16 @@ interface Product {
     description: string;
     imageUrl: string | null;
     productUrl: string;
-    categoryId: string; // slug for now
+    categoryId: string; // slug
     localImagePath?: string;
 }
 
-async function fetchSitemapImages(): Promise<Map<string, string>> {
+async function fetchSitemapData(): Promise<{ url: string; imageUrl: string | null }[]> {
     console.log('Fetching sitemap...');
     const response = await fetch(SITEMAP_URL);
     const text = await response.text();
-    const map = new Map<string, string>();
+    const products: { url: string; imageUrl: string | null }[] = [];
 
-    // Simple regex to parse XML sitemap for <loc> and <image:loc>
-    // Structure: <url><loc>URL</loc>...<image:image><image:loc>IMG_URL</image:loc></image:image></url>
     const urlRegex = /<url>(.*?)<\/url>/gs;
     let match;
 
@@ -77,20 +79,27 @@ async function fetchSitemapImages(): Promise<Map<string, string>> {
         const locMatch = content.match(/<loc>(.*?)<\/loc>/);
         const imgMatch = content.match(/<image:loc>(.*?)<\/image:loc>/);
 
-        if (locMatch && imgMatch) {
-            map.set(locMatch[1].trim(), imgMatch[1].trim());
+        if (locMatch) {
+            products.push({
+                url: locMatch[1].trim(),
+                imageUrl: imgMatch ? imgMatch[1].trim() : null
+            });
         }
     }
-    console.log(`Found ${map.size} images in sitemap.`);
-    return map;
+    console.log(`Found ${products.length} products in sitemap.`);
+    return products;
 }
 
 async function downloadImage(url: string, filename: string): Promise<string | null> {
     try {
+        const destPath = path.join(IMAGE_DIR, filename);
+        if (fs.existsSync(destPath)) {
+            return `/images/products/${filename}`;
+        }
+
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
 
-        const destPath = path.join(IMAGE_DIR, filename);
         const fileStream = createWriteStream(destPath);
 
         if (!response.body) throw new Error('No response body');
@@ -108,7 +117,7 @@ function sanitizeFilename(name: string): string {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '.jpg';
 }
 
-async function scrapeCategory(category: { name: string; slug: string }, imageMap: Map<string, string>): Promise<Product[]> {
+async function scrapeCategory(category: { name: string; slug: string }): Promise<Product[]> {
     const url = `${BASE_URL}/${category.slug}`;
     console.log(`Scraping category: ${category.name} (${url})`);
 
@@ -120,92 +129,65 @@ async function scrapeCategory(category: { name: string; slug: string }, imageMap
         }
         const html = await response.text();
         const $ = cheerio.load(html);
-        const products: Product[] = [];
-
-        // Selectors based on Wix stores usually
-        // We need to find the product list. Based on the markdown output, it seems to be a list.
-        // Wix often uses [data-hook="product-list-grid-item"]
-
-        // Let's try a generic approach finding links that look like products
-        // The markdown showed "### PRODUCT NAME" followed by a link "[Quick View](...)" and "[NAMEPrice$XX](...)"
-
-        // In HTML, this is likely an <a> tag wrapping the product info or separate elements.
-        // We'll look for elements that contain product info.
-
-        // Strategy: Look for the specific structure found in the markdown dump
-        // The markdown implies headers (h3) for product names.
-        // Let's try to find the product items container.
-
-        // Since I can't see the exact HTML classes without a browser, I'll try to be flexible.
-        // I'll look for links that contain "/product-page/"
+        const productsMap = new Map<string, Product>();
 
         const productLinks = $('a[href*="/product-page/"]');
-        const processedUrls = new Set<string>();
 
         productLinks.each((_, element) => {
             const href = $(element).attr('href');
             if (!href) return;
 
             const fullUrl = href.startsWith('http') ? href : `${BASE_URL}${href}`;
-            if (processedUrls.has(fullUrl)) return;
-
-            // Find the container for this product. usually a parent `li` or `div`
-            const container = $(element).closest('li') || $(element).closest('div[data-hook="product-item-root"]');
-
-            // If we can't find a structured container, we might parse the text inside the link or siblings.
-            // The markdown showed: "[CLEAR ROUND ELEGANCEPrice$7.50]"
-            // This suggests the name and price are in the same text block in the HTML.
 
             let name = '';
             let price = 0;
 
-            // Try to extract from text
-            const text = $(element).text().trim(); // e.g. "CLEAR ROUND ELEGANCEPrice$7.50"
-
-            // Regex to split Name and Price
-            // Looking for "Price$" or just "$"
+            const text = $(element).text().trim();
+            // Wix often has "Price$123.00" or just "$123.00"
             const priceMatch = text.match(/Price\$([\d,]+\.?\d*)/) || text.match(/\$([\d,]+\.?\d*)/);
 
             if (priceMatch) {
                 const priceStr = priceMatch[1].replace(/,/g, '');
                 price = Math.round(parseFloat(priceStr) * 100);
 
-                // Name is everything before "Price" or "$"
                 const splitIndex = text.indexOf(priceMatch[0]) || text.indexOf('Price') || text.indexOf('$');
                 if (splitIndex > 0) {
                     name = text.substring(0, splitIndex).trim();
                 }
             }
 
-            // Fallback: Look for specific elements if the text parsing failed or name is empty
             if (!name) {
-                // Try finding an h3 or similar inside the container
                 name = $(element).find('h3').text().trim() || $(element).parent().find('h3').text().trim();
             }
 
-            // If we still don't have a name, maybe it's just the text
             if (!name && text.length > 0 && !text.includes('Quick View')) {
-                name = text;
+                name = text.replace(/Price$/, '').trim();
             }
 
             if (name && name !== 'Quick View') {
-                // Clean up name
-                name = name.replace(/Price$/, '').trim();
-
-                const imageUrl = imageMap.get(fullUrl) || null;
-
-                products.push({
-                    name,
-                    price,
-                    description: `${name}.`, // Default description
-                    imageUrl,
-                    productUrl: fullUrl,
-                    categoryId: category.slug
-                });
-                processedUrls.add(fullUrl);
+                name = name.replace(/(Price|Regular|Sale)$/i, '').trim();
+                const existing = productsMap.get(fullUrl);
+                if (existing) {
+                    if (price > 0 && existing.price === 0) {
+                        existing.price = price;
+                    }
+                    if (name && (!existing.name || existing.name.length < name.length)) {
+                        existing.name = name;
+                    }
+                } else {
+                    productsMap.set(fullUrl, {
+                        name,
+                        price,
+                        description: `${name}.`,
+                        imageUrl: null,
+                        productUrl: fullUrl,
+                        categoryId: category.slug
+                    });
+                }
             }
         });
 
+        const products = Array.from(productsMap.values());
         console.log(`Found ${products.length} products in ${category.name}`);
         return products;
 
@@ -215,30 +197,107 @@ async function scrapeCategory(category: { name: string; slug: string }, imageMap
     }
 }
 
-async function generateSql() {
-    const imageMap = await fetchSitemapImages();
-    let allProducts: Product[] = [];
+async function scrapeProductPage(url: string): Promise<{ name: string; price: number; description: string } | null> {
+    console.log(`Scraping product page: ${url}`);
+    try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        const html = await response.text();
+        const $ = cheerio.load(html);
 
-    for (const category of CATEGORIES) {
-        const products = await scrapeCategory(category, imageMap);
-
-        // Download images for this batch
-        for (const product of products) {
-            if (product.imageUrl) {
-                const filename = sanitizeFilename(product.name);
-                const localPath = await downloadImage(product.imageUrl, filename);
-                if (localPath) {
-                    product.localImagePath = localPath;
-                }
-            }
+        // Wix product pages
+        let name = $('h1').text().trim() || $('[data-hook="product-title"]').text().trim();
+        if (name) {
+            name = name.replace(/(Price|Regular|Sale)$/i, '').trim();
         }
 
-        allProducts = allProducts.concat(products);
-        // Be nice to the server
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Try specific Wix price hooks first
+        let priceText = $('[data-hook="formatted-primary-price"]').text().trim();
+        if (!priceText) {
+            priceText = $('[data-hook="formatted-secondary-price"]').text().trim();
+        }
+        if (!priceText) {
+            priceText = $('span:contains("$")').first().text().trim();
+        }
+
+        const priceMatch = priceText.match(/\$([\d,]+\.?\d*)/);
+        let price = 0;
+        if (priceMatch) {
+            price = Math.round(parseFloat(priceMatch[1].replace(/,/g, '')) * 100);
+        }
+
+        const description = $('pre[data-hook="description"]').text().trim() ||
+            $('[data-hook="product-description"]').text().trim() ||
+            `${name}.`;
+
+        return { name, price, description };
+    } catch (error) {
+        console.error(`Error scraping product page ${url}:`, error);
+        return null;
+    }
+}
+
+async function generateSql() {
+    const sitemapProducts = await fetchSitemapData();
+    const imageMap = new Map(sitemapProducts.map(p => [p.url, p.imageUrl]));
+
+    let allProducts: Product[] = [];
+    const scrapedUrls = new Set<string>();
+
+    for (const category of CATEGORIES) {
+        const products = await scrapeCategory(category);
+        for (const p of products) {
+            p.imageUrl = imageMap.get(p.productUrl) || null;
+            allProducts.push(p);
+            scrapedUrls.add(p.productUrl);
+        }
+        await new Promise(resolve => setTimeout(resolve, 300));
     }
 
-    console.log(`Total products scraped: ${allProducts.length}`);
+    // Find missing products
+    const missingUrls = sitemapProducts.filter(p => !scrapedUrls.has(p.url));
+    console.log(`Found ${missingUrls.length} missing products in sitemap.`);
+
+    for (const item of missingUrls) {
+        const details = await scrapeProductPage(item.url);
+        if (details && details.name) {
+            allProducts.push({
+                ...details,
+                imageUrl: item.imageUrl,
+                productUrl: item.url,
+                categoryId: 'misc'
+            });
+        }
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
+
+    // Ensure all products have prices
+    const productsWithoutPrice = allProducts.filter(p => p.price === 0);
+    if (productsWithoutPrice.length > 0) {
+        console.log(`Found ${productsWithoutPrice.length} products without price. Scraping individual pages...`);
+        for (const p of productsWithoutPrice) {
+            const details = await scrapeProductPage(p.productUrl);
+            if (details) {
+                p.price = details.price;
+                if (details.name) p.name = details.name;
+                if (details.description) p.description = details.description;
+            }
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
+    }
+
+    console.log(`Total products to process: ${allProducts.length}`);
+
+    // Download images
+    for (const product of allProducts) {
+        if (product.imageUrl) {
+            const filename = sanitizeFilename(product.name);
+            const localPath = await downloadImage(product.imageUrl, filename);
+            if (localPath) {
+                product.localImagePath = localPath;
+            }
+        }
+    }
 
     let sql = `-- Seed data generated from PrimeLuxEvents.com\n\n`;
 
@@ -261,8 +320,12 @@ async function generateSql() {
     // 2. Insert Products
     sql += `  -- Products\n`;
 
-    // Group by category to use the variable
-    for (const cat of CATEGORIES) {
+    const categoriesToProcess = [...CATEGORIES];
+    if (!categoriesToProcess.find(c => c.slug === 'misc')) {
+        categoriesToProcess.push({ name: 'Misc', slug: 'misc' });
+    }
+
+    for (const cat of categoriesToProcess) {
         const catProducts = allProducts.filter(p => p.categoryId === cat.slug);
         if (catProducts.length === 0) continue;
 

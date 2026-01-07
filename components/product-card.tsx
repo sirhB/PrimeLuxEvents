@@ -21,6 +21,7 @@ interface Product {
     images?: string[]
     quantity_available?: number
     features?: string[]
+    slug?: string
 }
 
 interface ProductCardProps {
@@ -53,7 +54,7 @@ export function ProductCard({ product }: ProductCardProps) {
                             <div className="text-center">
                                 <div className="w-12 h-12 mx-auto mb-2 opacity-50">
                                     <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM4 7v10h16V7H4zm8 2l5 4H7l5-4z"/>
+                                        <path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM4 7v10h16V7H4zm8 2l5 4H7l5-4z" />
                                     </svg>
                                 </div>
                                 <span className="text-sm">No Image</span>
@@ -122,7 +123,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 {/* Content */}
                 <div className="flex flex-col gap-3 p-5 flex-grow">
                     <div className="space-y-2">
-                        <Link href={`/catalog/${product.id}`} className="block group/link">
+                        <Link href={`/catalog/${product.slug || product.id}`} className="block group/link">
                             <h3 className="font-serif text-lg font-medium group-hover/link:text-gold transition-colors line-clamp-2 leading-tight">
                                 {product.name}
                             </h3>
@@ -141,7 +142,7 @@ export function ProductCard({ product }: ProductCardProps) {
                             </span>
                             <span className="text-xs text-muted-foreground -mt-1">per day</span>
                         </div>
-                        <Link href={`/catalog/${product.id}`}>
+                        <Link href={`/catalog/${product.slug || product.id}`}>
                             <Button size="sm" className="rounded-full px-4 bg-gold hover:bg-gold/90 text-black font-medium">
                                 View Details
                             </Button>

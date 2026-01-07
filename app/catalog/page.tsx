@@ -8,27 +8,32 @@ export default async function CatalogPage() {
   const content = await getSiteContent()
   const supabase = await createClient()
 
-  const { data: products } = await supabase
-    .from('products')
-    .select('*, categories(name)')
-    .order('created_at', { ascending: false })
+  // Fetch products, categories, and packages separately to avoid relationship issues
+  const [productsRes, categoriesRes, packagesRes] = await Promise.all([
+    supabase.from('products').select('*').order('created_at', { ascending: false }),
+    supabase.from('categories').select('*').order('name'),
+    supabase.from('packages').select('*').order('created_at', { ascending: false })
+  ])
 
-  const { data: categories } = await supabase
-    .from('categories')
-    .select('*')
-    .order('name')
+  const products = productsRes.data || []
+  const categories = categoriesRes.data || []
+  const packages = packagesRes.data || []
 
-  const { data: packages } = await supabase
-    .from('packages')
-    .select('*')
-    .order('created_at', { ascending: false })
+  // Manually map category names to products to avoid joins
+  const productsWithCategories = products.map(product => {
+    const category = categories.find(c => c.id === product.category_id)
+    return {
+      ...product,
+      categories: category ? { name: category.name } : null
+    }
+  })
 
   return (
     <CatalogClient
       heroTitle={content['catalog.hero.title']}
-      products={products || []}
-      categories={categories || []}
-      packages={packages || []}
+      products={productsWithCategories as any}
+      categories={categories}
+      packages={packages}
     />
   )
 }
