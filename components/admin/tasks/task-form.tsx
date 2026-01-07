@@ -301,6 +301,7 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                                             handleInputChange('assigned_role_id', '')
                                             setOpen(false)
                                         }}
+                                        onPointerDown={(e) => e.preventDefault()}
                                         className="text-[var(--dashboard-text)] focus:bg-[var(--dashboard-accent-gold)]/10"
                                     >
                                         <Check
@@ -322,6 +323,7 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                                                 handleInputChange('assigned_to', member.id)
                                                 setOpen(false)
                                             }}
+                                            onPointerDown={(e) => e.preventDefault()}
                                             className="text-[var(--dashboard-text)] focus:bg-[var(--dashboard-accent-gold)]/10"
                                         >
                                             <Check
@@ -347,6 +349,7 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                                                 handleInputChange('assigned_role_id', role.id)
                                                 setOpen(false)
                                             }}
+                                            onPointerDown={(e) => e.preventDefault()}
                                             className="text-[var(--dashboard-text)] focus:bg-[var(--dashboard-accent-gold)]/10"
                                         >
                                             <Check
