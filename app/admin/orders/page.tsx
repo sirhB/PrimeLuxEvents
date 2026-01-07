@@ -27,18 +27,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { OrdersTable } from '@/components/admin/orders-table'
 
-// Helper function to map order status to badge variant
-function getStatusVariant(status: string): 'success' | 'pending' | 'cancelled' | 'on-hold' | 'default' {
-    const statusMap: Record<string, 'success' | 'pending' | 'cancelled' | 'on-hold' | 'default'> = {
-        'delivered': 'success',
-        'confirmed': 'success',
-        'pending': 'pending',
-        'processing': 'pending',
-        'cancelled': 'cancelled',
-        'on-hold': 'on-hold',
-    }
-    return statusMap[status.toLowerCase()] || 'default'
-}
 
 export default async function OrdersPage({
     searchParams,
@@ -149,7 +137,7 @@ export default async function OrdersPage({
                         />
                     </div>
 
-                    <OrdersTable orders={orders || []} getStatusVariant={getStatusVariant} />
+                    <OrdersTable orders={orders || []} />
 
                     {count !== null && count > 0 && (
                         <div className="mt-8 flex justify-center">

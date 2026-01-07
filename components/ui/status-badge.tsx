@@ -59,7 +59,7 @@ const statusConfig = {
 
 function getVariantFromStatus(status: string): keyof typeof statusConfig {
     const s = status.toLowerCase()
-    if (s === 'completed' || s === 'delivered' || s === 'paid' || s === 'success' || s === 'active') return 'success'
+    if (s === 'completed' || s === 'delivered' || s === 'confirmed' || s === 'paid' || s === 'success' || s === 'active') return 'success'
     if (s === 'pending' || s === 'waiting' || s === 'processing') return 'pending'
     if (s === 'in_progress' || s === 'shipping') return 'info'
     if (s === 'cancelled' || s === 'failed' || s === 'urgent') return 'cancelled'

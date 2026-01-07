@@ -38,10 +38,10 @@ interface Order {
 
 interface OrdersTableProps {
     orders: Order[]
-    getStatusVariant: (status: string) => any
 }
 
-export function OrdersTable({ orders, getStatusVariant }: OrdersTableProps) {
+
+export function OrdersTable({ orders }: OrdersTableProps) {
     const [selectedIds, setSelectedIds] = useState<string[]>([])
 
     const toggleAll = () => {
@@ -159,7 +159,6 @@ export function OrdersTable({ orders, getStatusVariant }: OrdersTableProps) {
                                 <TableCell>
                                     <StatusBadge
                                         status={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                                        variant={getStatusVariant(order.status)}
                                         className="rounded-lg text-[10px] font-bold uppercase tracking-widest"
                                     />
                                 </TableCell>
