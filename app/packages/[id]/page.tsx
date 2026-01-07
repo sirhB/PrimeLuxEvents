@@ -29,38 +29,41 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
     const supabase = await createClient()
 
     // Fetch complete package data
-    const { data: pkg, error } = await supabase
+    // 1. Fetch package details (simple query)
+    const { data: pkg, error: pkgError } = await supabase
         .from('packages')
-        .select(`
-            *,
-            package_item_groups (
-                id,
-                name,
-                description,
-                min_selections,
-                max_selections,
-                display_order,
-                package_item_options (
-                    id,
-                    product_id,
-                    is_default,
-                    quantity,
-                    display_order,
-                    products (
-                        id,
-                        name,
-                        price,
-                        image_url
-                    )
-                )
-            )
-        `)
+        .select('*')
         .eq('id', id)
         .single()
 
-    if (error || !pkg) {
+    if (pkgError) {
+        throw new Error(`Package Load Error: ${JSON.stringify(pkgError)}`)
+    }
+
+    if (!pkg) {
         notFound()
     }
+
+    // 2. Fetch groups and options separately to avoid deep nesting complexity/errors
+    const { data: groups, error: groupsError } = await supabase
+        .from('package_item_groups')
+        .select(`
+            *,
+            package_item_options (
+                *,
+                products (*)
+            )
+        `)
+        .eq('package_id', id)
+        .order('display_order')
+
+    if (groupsError) {
+        console.error('Error loading package groups:', groupsError)
+        // We catch this but don't crash, allowing the page to load with 0 groups
+    }
+
+    // 3. Attach groups to package object so it matches expected structure
+    pkg.package_item_groups = groups || []
 
     // Transform data for the client component
     const transformedPkg = {
