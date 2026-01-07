@@ -18,9 +18,9 @@ const Card = React.forwardRef<
             <div
                 ref={ref}
                 className={cn(
-                    "rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200",
+                    "rounded-[var(--radius)] border border-border bg-card text-card-foreground shadow-sm transition-all duration-300",
                     "hover:shadow-md",
-                    "group",
+                    "group overflow-hidden",
                     className
                 )}
                 {...restProps}
@@ -35,9 +35,9 @@ const Card = React.forwardRef<
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             className={cn(
-                "rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200",
+                "rounded-[var(--radius)] border border-border bg-card text-card-foreground shadow-sm transition-all duration-300",
                 "hover:shadow-md",
-                "group",
+                "group overflow-hidden",
                 className
             )}
             {...restProps}

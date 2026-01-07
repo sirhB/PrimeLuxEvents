@@ -64,7 +64,7 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
             case 'completed':
                 return { label: 'Completed', color: 'bg-slate-100 text-slate-700 border-slate-200' }
             default:
-                return { label: status, color: 'bg-gray-100 text-gray-800 border-gray-200' }
+                return { label: status, color: 'bg-gray-100 text-gray-800 border-border' }
         }
     }
 
@@ -290,7 +290,7 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
                                     <p className="text-xs text-muted-foreground truncate">{appointment.location}</p>
                                 )}
                                 <Link href={`/admin/appointments/${appointment.id}`} className="block mt-2">
-                                    <Button variant="outline" size="sm" className="w-full h-8 text-xs bg-white text-blue-700 hover:text-blue-800 border-blue-200">
+                                    <Button variant="outline" size="sm" className="w-full h-8 text-xs bg-card text-blue-700 hover:text-blue-800 border-blue-200">
                                         View Details
                                     </Button>
                                 </Link>

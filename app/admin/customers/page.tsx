@@ -150,8 +150,8 @@ export default async function CustomersPage({
 
                     <Card>
                         <CardContent className="p-0">
-                            <div className="px-6 py-4 border-b border-gray-100">
-                                <h2 className="text-base font-semibold text-gray-900">Customers</h2>
+                            <div className="px-6 py-4 border-b border-border">
+                                <h2 className="text-base font-semibold text-foreground">Customers</h2>
                             </div>
                             <Table>
                                 <TableHeader>
@@ -175,14 +175,14 @@ export default async function CustomersPage({
                                             <TableCell>
                                                 <Checkbox />
                                             </TableCell>
-                                            <TableCell className="font-medium text-gray-900">{customer.name}</TableCell>
-                                            <TableCell className="text-gray-600">
+                                            <TableCell className="font-medium text-foreground">{customer.name}</TableCell>
+                                            <TableCell className="text-muted-foreground">
                                                 <div className="flex items-center gap-2">
                                                     <Mail className="h-3.5 w-3.5 text-gray-400" />
                                                     {customer.email}
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-gray-600">
+                                            <TableCell className="text-muted-foreground">
                                                 {customer.phone ? (
                                                     <div className="flex items-center gap-2">
                                                         <Phone className="h-3.5 w-3.5 text-gray-400" />
@@ -192,20 +192,20 @@ export default async function CustomersPage({
                                                     <span className="text-gray-400">N/A</span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-gray-900">
+                                            <TableCell className="text-foreground">
                                                 <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 text-blue-700 text-sm font-medium">
                                                     {customer.orderCount}
                                                 </span>
                                             </TableCell>
-                                            <TableCell className="text-gray-900">
+                                            <TableCell className="text-foreground">
                                                 <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-purple-50 text-purple-700 text-sm font-medium">
                                                     {customer.consultationCount}
                                                 </span>
                                             </TableCell>
-                                            <TableCell className="font-semibold text-gray-900">
+                                            <TableCell className="font-semibold text-foreground">
                                                 ${customer.totalSpent.toFixed(2)}
                                             </TableCell>
-                                            <TableCell className="text-gray-600">
+                                            <TableCell className="text-muted-foreground">
                                                 {customer.lastOrderDate
                                                     ? new Date(customer.lastOrderDate).toLocaleDateString('en-US', {
                                                         month: 'short',
@@ -218,7 +218,7 @@ export default async function CustomersPage({
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
                                                         <Button variant="ghost" size="icon-sm">
-                                                            <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                            <MoreVertical className="h-4 w-4 text-muted-foreground" />
                                                             <span className="sr-only">Actions</span>
                                                         </Button>
                                                     </DropdownMenuTrigger>
@@ -241,7 +241,7 @@ export default async function CustomersPage({
                                             <TableCell colSpan={9} className="text-center h-32">
                                                 <div className="flex flex-col items-center gap-2">
                                                     <Users className="h-8 w-8 text-gray-400" />
-                                                    <p className="text-gray-500">No customers found.</p>
+                                                    <p className="text-muted-foreground">No customers found.</p>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
@@ -263,7 +263,7 @@ export default async function CustomersPage({
                 </TabsContent>
 
                 <TabsContent value="active" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                    <div className="flex items-center justify-center h-40 bg-card rounded-lg border border-dashed">
                         <p className="text-muted-foreground">Active customers view coming soon</p>
                     </div>
                 </TabsContent>

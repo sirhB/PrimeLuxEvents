@@ -57,12 +57,12 @@ export default async function TeamManagementPage() {
     const canManageRoles = await requirePermission('users.manage').then(() => true).catch(() => false)
 
     return (
-        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
+        <div className="flex flex-col gap-6 p-6 bg-muted/30 min-h-screen">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Team Management</h1>
-                    <p className="text-gray-600 mt-1 text-sm">
+                    <h1 className="text-2xl font-bold text-foreground">Team Management</h1>
+                    <p className="text-muted-foreground mt-1 text-sm">
                         Manage team members, roles, and permissions
                     </p>
                 </div>

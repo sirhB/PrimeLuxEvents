@@ -10,7 +10,7 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
     const { isCollapsed } = useAdminSidebar()
 
     return (
-        <div className="flex min-h-screen w-full bg-[var(--dashboard-background)] text-[var(--dashboard-text)] font-sans">
+        <div className="flex min-h-screen w-full bg-[var(--dashboard-background)] text-[var(--dashboard-text)] font-sans admin-theme">
             <div className="print:hidden">
                 <ModernSidebar />
             </div>

@@ -115,8 +115,8 @@ export default async function OrdersPage({
 
                     <Card>
                         <CardContent className="p-0">
-                            <div className="px-6 py-4 border-b border-gray-100">
-                                <h2 className="text-base font-semibold text-gray-900">Orders</h2>
+                            <div className="px-6 py-4 border-b border-border">
+                                <h2 className="text-base font-semibold text-foreground">Orders</h2>
                             </div>
                             <Table>
                                 <TableHeader>
@@ -139,25 +139,25 @@ export default async function OrdersPage({
                                             <TableCell>
                                                 <Checkbox />
                                             </TableCell>
-                                            <TableCell className="font-semibold text-blue-600">
+                                            <TableCell className="font-semibold text-primary">
                                                 #{order.id.slice(0, 8)}
                                             </TableCell>
                                             <TableCell>
                                                 <div className="flex flex-col">
-                                                    <span className="font-medium text-gray-900">{order.customer_name}</span>
-                                                    <span className="text-xs text-gray-500">
+                                                    <span className="font-medium text-foreground">{order.customer_name}</span>
+                                                    <span className="text-xs text-muted-foreground">
                                                         {order.customer_email}
                                                     </span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="text-gray-600">
+                                            <TableCell className="text-muted-foreground">
                                                 {new Date(order.created_at).toLocaleDateString('en-US', {
                                                     month: 'short',
                                                     day: 'numeric',
                                                     year: 'numeric'
                                                 })}
                                             </TableCell>
-                                            <TableCell className="font-medium text-gray-900">
+                                            <TableCell className="font-medium text-foreground">
                                                 {formatCents(order.total_amount)}
                                             </TableCell>
                                             <TableCell>
@@ -177,7 +177,7 @@ export default async function OrdersPage({
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
                                                         <Button variant="ghost" size="icon-sm">
-                                                            <MoreVertical className="h-4 w-4 text-gray-500" />
+                                                            <MoreVertical className="h-4 w-4 text-muted-foreground" />
                                                             <span className="sr-only">Actions</span>
                                                         </Button>
                                                     </DropdownMenuTrigger>
@@ -206,7 +206,7 @@ export default async function OrdersPage({
                                         <TableRow>
                                             <TableCell colSpan={8} className="text-center h-32">
                                                 <div className="flex flex-col items-center gap-2">
-                                                    <p className="text-gray-500">No orders found.</p>
+                                                    <p className="text-muted-foreground">No orders found.</p>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
@@ -228,17 +228,17 @@ export default async function OrdersPage({
                 </TabsContent>
 
                 <TabsContent value="pending" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                    <div className="flex items-center justify-center h-40 bg-card rounded-lg border border-dashed">
                         <p className="text-muted-foreground">Filtered views coming soon</p>
                     </div>
                 </TabsContent>
                 <TabsContent value="completed" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                    <div className="flex items-center justify-center h-40 bg-card rounded-lg border border-dashed">
                         <p className="text-muted-foreground">Filtered views coming soon</p>
                     </div>
                 </TabsContent>
                 <TabsContent value="cancelled" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                    <div className="flex items-center justify-center h-40 bg-card rounded-lg border border-dashed">
                         <p className="text-muted-foreground">Filtered views coming soon</p>
                     </div>
                 </TabsContent>

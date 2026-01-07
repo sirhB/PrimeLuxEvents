@@ -14,8 +14,8 @@ export default async function NewPackagePage() {
     return (
         <div className="max-w-5xl mx-auto p-6">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900">Create New Package</h1>
-                <p className="text-gray-600 mt-2">
+                <h1 className="text-3xl font-bold tracking-tight text-foreground">Create New Package</h1>
+                <p className="text-muted-foreground mt-2">
                     Design a package with configurable items and discounts.
                 </p>
             </div>

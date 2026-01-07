@@ -63,9 +63,9 @@ export default async function AppointmentsPage({
             case 'completed':
                 return 'bg-green-100 text-green-800 border-green-200'
             case 'cancelled':
-                return 'bg-gray-100 text-gray-800 border-gray-200'
+                return 'bg-gray-100 text-gray-800 border-border'
             default:
-                return 'bg-gray-100 text-gray-800 border-gray-200'
+                return 'bg-gray-100 text-gray-800 border-border'
         }
     }
 
@@ -168,7 +168,7 @@ export default async function AppointmentsPage({
                                                     {appointment.consultation_id ? (
                                                         <Link
                                                             href={`/admin/consultations/${appointment.consultation_id}`}
-                                                            className="text-blue-600 hover:underline text-sm"
+                                                            className="text-primary hover:underline text-sm"
                                                         >
                                                             View Consultation
                                                         </Link>
@@ -213,7 +213,7 @@ export default async function AppointmentsPage({
                 </TabsContent>
 
                 <TabsContent value="calendar" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                    <div className="flex items-center justify-center h-40 bg-card rounded-lg border border-dashed">
                         <p className="text-muted-foreground">Calendar view coming soon</p>
                     </div>
                 </TabsContent>

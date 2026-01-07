@@ -76,6 +76,27 @@
   --dashboard-glass-border: rgba(255, 255, 255, 0.05);
 }
 
+.admin-theme {
+  --background: var(--dashboard-background);
+  --foreground: var(--dashboard-text);
+  --card: var(--dashboard-card);
+  --card-foreground: var(--dashboard-text);
+  --popover: var(--dashboard-card);
+  --popover-foreground: var(--dashboard-text);
+  --muted: var(--dashboard-card-hover);
+  --muted-foreground: var(--dashboard-text-muted);
+  --primary: var(--dashboard-accent-gold);
+  --primary-foreground: #000000;
+  --secondary: var(--dashboard-card-hover);
+  --secondary-foreground: var(--dashboard-text);
+  --accent: var(--dashboard-accent-gold);
+  --accent-foreground: #000000;
+  --border: var(--dashboard-border);
+  --input: var(--dashboard-border);
+  --ring: var(--dashboard-accent-gold);
+  --radius: 1rem;
+}
+
 .glass-morphism {
   background: var(--dashboard-glass-bg);
   backdrop-filter: blur(12px);

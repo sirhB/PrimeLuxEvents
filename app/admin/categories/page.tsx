@@ -151,7 +151,7 @@ export default async function CategoriesPage({
                 </TabsContent>
 
                 <TabsContent value="active" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                    <div className="flex items-center justify-center h-40 bg-card rounded-lg border border-dashed">
                         <p className="text-muted-foreground">Active categories view coming soon</p>
                     </div>
                 </TabsContent>

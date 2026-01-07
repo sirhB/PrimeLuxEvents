@@ -23,7 +23,7 @@ function getPriorityColor(priority: string) {
         case 'urgent': return 'text-red-600 bg-red-50 border-red-200'
         case 'high': return 'text-orange-600 bg-orange-50 border-orange-200'
         case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200'
-        default: return 'text-gray-600 bg-gray-50 border-gray-200'
+        default: return 'text-muted-foreground bg-muted/30 border-border'
     }
 }
 
@@ -40,11 +40,11 @@ export default async function TasksPage() {
     const completedTasks = tasks?.filter(t => t.status === 'completed') || []
 
     return (
-        <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
+        <div className="flex flex-col gap-6 p-6 bg-muted/30 min-h-screen">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
-                    <p className="text-gray-600 mt-1 text-sm">
+                    <h1 className="text-2xl font-bold text-foreground">Tasks</h1>
+                    <p className="text-muted-foreground mt-1 text-sm">
                         Manage and assign tasks to your team
                     </p>
                 </div>
@@ -93,15 +93,15 @@ export default async function TasksPage() {
                         <CardContent className="p-0">
                             <div className="divide-y">
                                 {tasks?.map((task) => (
-                                    <div key={task.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
+                                    <div key={task.id} className="p-4 hover:bg-muted/30 transition-colors flex items-center justify-between">
                                         <div className="flex items-start gap-4">
                                             <div className={`mt-1 p-2 rounded-full bg-gray-100`}>
                                                 {getTaskIcon(task.task_type)}
                                             </div>
                                             <div>
-                                                <h3 className="font-medium text-gray-900">{task.title}</h3>
-                                                <p className="text-sm text-gray-500 line-clamp-1">{task.description}</p>
-                                                <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                                                <h3 className="font-medium text-foreground">{task.title}</h3>
+                                                <p className="text-sm text-muted-foreground line-clamp-1">{task.description}</p>
+                                                <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                                                     <span className={`px-2 py-0.5 rounded-full border ${getPriorityColor(task.priority)}`}>
                                                         {task.priority}
                                                     </span>
@@ -117,7 +117,7 @@ export default async function TasksPage() {
                                     </div>
                                 ))}
                                 {tasks?.length === 0 && (
-                                    <div className="p-8 text-center text-gray-500">
+                                    <div className="p-8 text-center text-muted-foreground">
                                         No tasks found.
                                     </div>
                                 )}
@@ -131,15 +131,15 @@ export default async function TasksPage() {
                         <CardContent className="p-0">
                             <div className="divide-y">
                                 {pendingTasks.map((task) => (
-                                    <div key={task.id} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
+                                    <div key={task.id} className="p-4 hover:bg-muted/30 transition-colors flex items-center justify-between">
                                         <div className="flex items-start gap-4">
                                             <div className={`mt-1 p-2 rounded-full bg-gray-100`}>
                                                 {getTaskIcon(task.task_type)}
                                             </div>
                                             <div>
-                                                <h3 className="font-medium text-gray-900">{task.title}</h3>
-                                                <p className="text-sm text-gray-500 line-clamp-1">{task.description}</p>
-                                                <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                                                <h3 className="font-medium text-foreground">{task.title}</h3>
+                                                <p className="text-sm text-muted-foreground line-clamp-1">{task.description}</p>
+                                                <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
                                                     <span className={`px-2 py-0.5 rounded-full border ${getPriorityColor(task.priority)}`}>
                                                         {task.priority}
                                                     </span>
@@ -160,7 +160,7 @@ export default async function TasksPage() {
                 </TabsContent>
 
                 <TabsContent value="my-tasks" className="mt-6">
-                    <div className="p-8 text-center text-gray-500 border rounded-lg border-dashed">
+                    <div className="p-8 text-center text-muted-foreground border rounded-lg border-dashed">
                         My Tasks view coming soon.
                     </div>
                 </TabsContent>

@@ -43,9 +43,9 @@ export default async function AppointmentDetailPage({ params }: { params: Promis
             case 'completed':
                 return 'bg-green-100 text-green-800 border-green-200'
             case 'cancelled':
-                return 'bg-gray-100 text-gray-800 border-gray-200'
+                return 'bg-gray-100 text-gray-800 border-border'
             default:
-                return 'bg-gray-100 text-gray-800 border-gray-200'
+                return 'bg-gray-100 text-gray-800 border-border'
         }
     }
 
@@ -147,7 +147,7 @@ export default async function AppointmentDetailPage({ params }: { params: Promis
                                 </p>
                                 <a
                                     href={`mailto:${appointment.client_email}`}
-                                    className="text-blue-600 hover:underline"
+                                    className="text-primary hover:underline"
                                 >
                                     {appointment.client_email}
                                 </a>
@@ -161,7 +161,7 @@ export default async function AppointmentDetailPage({ params }: { params: Promis
                                 </p>
                                 <a
                                     href={`tel:${appointment.client_phone}`}
-                                    className="text-blue-600 hover:underline"
+                                    className="text-primary hover:underline"
                                 >
                                     {appointment.client_phone}
                                 </a>
@@ -172,7 +172,7 @@ export default async function AppointmentDetailPage({ params }: { params: Promis
                                 <p className="text-sm font-medium text-muted-foreground">Linked Consultation</p>
                                 <Link
                                     href={`/admin/consultations/${consultation.id}`}
-                                    className="text-blue-600 hover:underline"
+                                    className="text-primary hover:underline"
                                 >
                                     View Consultation
                                 </Link>

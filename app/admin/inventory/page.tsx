@@ -139,7 +139,7 @@ export default async function InventoryPage({
                 </TabsContent>
 
                 <TabsContent value="low-stock" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-40 bg-white rounded-lg border border-dashed">
+                    <div className="flex items-center justify-center h-40 bg-card rounded-lg border border-dashed">
                         <p className="text-muted-foreground">Low stock view coming soon</p>
                     </div>
                 </TabsContent>

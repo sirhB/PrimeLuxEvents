@@ -4,20 +4,20 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-    "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
     {
         variants: {
             variant: {
                 default:
-                    "border-transparent bg-[var(--dashboard-accent-gold)] text-black shadow hover:bg-[var(--dashboard-accent-gold)]/80",
+                    "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/90",
                 secondary:
-                    "border-transparent bg-[var(--dashboard-card)] text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)]",
+                    "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
                 destructive:
                     "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-                outline: "text-[var(--dashboard-text)] border-[var(--dashboard-border)]",
-                success: "border-transparent bg-green-500/10 text-green-500 border-green-500/20",
-                warning: "border-transparent bg-orange-500/10 text-orange-500 border-orange-500/20",
-                info: "border-transparent bg-blue-500/10 text-blue-500 border-blue-500/20",
+                outline: "text-foreground border-border",
+                success: "border-[var(--dashboard-accent-green)]/20 bg-[var(--dashboard-accent-green)]/10 text-[var(--dashboard-accent-green)]",
+                warning: "border-[var(--dashboard-accent-orange)]/20 bg-[var(--dashboard-accent-orange)]/10 text-[var(--dashboard-accent-orange)]",
+                info: "border-[var(--dashboard-accent-blue)]/20 bg-[var(--dashboard-accent-blue)]/10 text-[var(--dashboard-accent-blue)]",
             },
         },
         defaultVariants: {
