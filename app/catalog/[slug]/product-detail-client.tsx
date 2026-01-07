@@ -312,9 +312,6 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                                 <Plus className="h-4 w-4" />
                                             </Button>
                                         </div>
-                                        <span className="text-sm text-muted-foreground">
-                                            {product.quantity_available ? `${product.quantity_available} available` : 'In Stock'}
-                                        </span>
                                     </div>
                                 </motion.div>
 
@@ -424,17 +421,7 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                         )}
                                     </Button>
 
-                                    {/* Stock Information */}
-                                    <div className="text-center text-sm text-muted-foreground">
-                                        {product.stock > 0 ? (
-                                            <div className="flex items-center justify-center gap-2">
-                                                <ShieldCheck className="h-4 w-4 text-green-600" />
-                                                <span>In Stock • Ships within 24 hours</span>
-                                            </div>
-                                        ) : (
-                                            <span className="text-red-600">Out of Stock</span>
-                                        )}
-                                    </div>
+
                                 </motion.div>
 
                                 <motion.div variants={itemVariants}>
