@@ -43,7 +43,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                     <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-10 mix-blend-overlay" />
                 </div>
 
-                <div className="container relative z-10 px-4 md:px-6 text-center">
+                <div className="container mx-auto relative z-10 px-4 md:px-6 text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -103,7 +103,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
 
             {/* Our Story Section */}
             <section className="relative py-24 md:py-48 overflow-hidden bg-[#151515]">
-                <div className="container px-4 md:px-6">
+                <div className="container mx-auto px-4 md:px-6">
                     <div className="grid lg:grid-cols-2 gap-24 items-center">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
@@ -183,7 +183,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
             {/* Values Section */}
             <section className="py-24 md:py-48 bg-[#1A1A1A] relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay" />
-                <div className="container px-4 md:px-6 relative z-10">
+                <div className="container mx-auto px-4 md:px-6 relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -233,7 +233,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
             {/* Premium CTA Section */}
             <section className="py-24 md:py-48 bg-gradient-to-br from-gold via-gold/90 to-gold/80 text-black relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
-                <div className="container px-4 md:px-6 relative z-10 text-center">
+                <div className="container mx-auto px-4 md:px-6 relative z-10 text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}

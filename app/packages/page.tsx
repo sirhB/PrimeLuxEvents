@@ -26,7 +26,7 @@ export default async function PackagesPage() {
             <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
 
             {/* Hero Section */}
-            <section className="container px-4 md:px-6 relative z-10 mb-24 md:mb-32">
+            <section className="container mx-auto px-4 md:px-6 relative z-10 mb-24 md:mb-32">
                 <div className="max-w-4xl mx-auto text-center space-y-8">
                     <div className="flex items-center justify-center gap-3">
                         <span className="w-12 h-px bg-gold/30" />
@@ -46,7 +46,7 @@ export default async function PackagesPage() {
             </section>
 
             {/* Packages Grid */}
-            <section className="container px-4 md:px-6 relative z-10">
+            <section className="container mx-auto px-4 md:px-6 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
                     {packages?.map((pkg, index) => (
                         <Link

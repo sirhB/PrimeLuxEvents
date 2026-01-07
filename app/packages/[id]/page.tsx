@@ -135,7 +135,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
                     <div className="w-full h-full bg-secondary" />
                 )}
 
-                <div className="relative z-20 container h-full flex flex-col justify-center px-4 md:px-6 text-white">
+                <div className="relative z-20 container mx-auto h-full flex flex-col justify-center px-4 md:px-6 text-white">
                     <Link href="/packages" className="inline-flex items-center text-white/80 hover:text-gold mb-6 transition-colors">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Packages
                     </Link>
@@ -158,7 +158,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
 
             {/* Included Items Section (Static) */}
             {pkg.package_items && pkg.package_items.length > 0 && (
-                <div className="container px-4 md:px-6 py-12 -mt-10 relative z-30 mb-8">
+                <div className="container mx-auto px-4 md:px-6 py-12 -mt-10 relative z-30 mb-8">
                     <div className="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100">
                         <h2 className="text-2xl font-serif font-light mb-6 flex items-center gap-3">
                             <span className="w-8 h-px bg-gold"></span>
@@ -196,7 +196,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
             )}
 
             {/* Configurator Section */}
-            <div className="container px-4 md:px-6 pb-24 relative z-30">
+            <div className="container mx-auto px-4 md:px-6 pb-24 relative z-30">
                 <PackageConfigurator pkg={transformedPkg} />
             </div>
         </div>

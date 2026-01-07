@@ -57,7 +57,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                     </motion.div>
                 </div>
 
-                <div className="container relative z-10 px-4 md:px-6 text-center">
+                <div className="container mx-auto relative z-10 px-4 md:px-6 text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -138,7 +138,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                     className="absolute top-0 left-1/2 w-px h-full bg-gradient-to-b from-gold via-gold to-transparent -translate-x-1/2 z-0 origin-top"
                 />
 
-                <div className="container px-4 md:px-6 relative z-10">
+                <div className="container mx-auto px-4 md:px-6 relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -173,7 +173,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
             {/* Concierge Service */}
             <section className="py-24 md:py-48 bg-[#151515] relative overflow-hidden border-t border-white/5">
                 <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay" />
-                <div className="container px-4 md:px-6 relative z-10">
+                <div className="container mx-auto px-4 md:px-6 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-24 items-center">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}

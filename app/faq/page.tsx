@@ -45,7 +45,7 @@ export default function FAQPage() {
       <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-gold/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
       <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
 
-      <div className="container px-4 md:px-6 relative z-10">
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
@@ -61,8 +61,8 @@ export default function FAQPage() {
             </div>
 
             <h1 className="text-6xl md:text-9xl font-serif font-light tracking-tighter leading-[0.85]">
-              {content['faq.hero.title']?.split(' ')[0] || 'Frequently'} <br />
-              <span className="italic text-gold">{content['faq.hero.title']?.split(' ').slice(1).join(' ') || 'Asked'}</span>
+              {(content['faq.hero.title']?.trim().split(' ')[0] || 'Frequently')} <br />
+              <span className="italic text-gold">{(content['faq.hero.title']?.trim().split(' ').slice(1).join(' ') || 'Asked')}</span>
             </h1>
 
             <p className="text-xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">

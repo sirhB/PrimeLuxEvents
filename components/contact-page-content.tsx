@@ -20,7 +20,7 @@ export function ContactPageContent({ content, isEditing = false }: ContactPageCo
             <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-gold/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
             <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
 
-            <div className="container px-4 md:px-6 relative z-10">
+            <div className="container mx-auto px-4 md:px-6 relative z-10">
                 <div className="grid lg:grid-cols-2 gap-20 lg:gap-32 items-start">
                     {/* Contact Info */}
                     <motion.div

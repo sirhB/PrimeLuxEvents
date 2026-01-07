@@ -17,7 +17,7 @@ export default async function ServicesPage() {
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 bg-muted/30">
-        <div className="container px-4 md:px-6 text-center space-y-6">
+        <div className="container mx-auto px-4 md:px-6 text-center space-y-6">
           <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-tight">{content['services.hero.title']}</h1>
           <p className="text-lg md:text-xl font-light text-muted-foreground max-w-2xl mx-auto">
             {content['services.hero.description']}
@@ -27,7 +27,7 @@ export default async function ServicesPage() {
 
       {/* Services Grid */}
       <section className="py-20 bg-background">
-        <div className="container px-4 md:px-6">
+        <div className="container mx-auto px-4 md:px-6">
           <div className="grid gap-12 md:gap-24">
             {/* Service 1 */}
             <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
@@ -121,7 +121,7 @@ export default async function ServicesPage() {
 
       {/* CTA */}
       <section className="py-24 bg-muted/30">
-        <div className="container px-4 md:px-6 text-center space-y-8">
+        <div className="container mx-auto px-4 md:px-6 text-center space-y-8">
           <div className="h-16 w-16 mx-auto rounded-full bg-background border border-border flex items-center justify-center text-primary mb-6">
             <Sparkles className="h-8 w-8" />
           </div>
