@@ -198,12 +198,8 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
             // Fetch ALL options for these packages to map selections to products
             const { data: optData, error: optError } = await supabase
                 .from('package_item_options')
-                .select('id, product_id, quantity')
+                .select('id, product_id, quantity, package_item_groups(name)')
                 .in('package_item_group_id',
-                    // We need to get group IDs first or just query by package_id if available
-                    // Let's query by product_id if we don't have package_id on options, 
-                    // but wait, we have packages.
-                    // Actually, let's just fetch all options for the groups belonging to these packages.
                     (await supabase.from('package_item_groups').select('id').in('package_id', packageIds)).data?.map(g => g.id) || []
                 )
 
@@ -348,11 +344,15 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 })
             } else if (item.packageId && item.packageData) {
                 const pkg = packages.find(p => p.id === item.packageId)
-                const packageContents: { productId: string, quantity: number }[] = []
+                const packageContents: { productId: string, quantity: number, groupName: string }[] = []
 
                 if (pkg) {
                     pkg.package_items?.forEach((pi: any) => {
-                        packageContents.push({ productId: pi.product_id, quantity: pi.quantity || 1 })
+                        packageContents.push({
+                            productId: pi.product_id,
+                            quantity: pi.quantity || 1,
+                            groupName: 'Included Items'
+                        })
                     })
                 }
                 if (item.packageSelections) {
@@ -360,7 +360,11 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                     optionIds.forEach(optId => {
                         const option = allOptions.find(o => o.id === optId)
                         if (option) {
-                            packageContents.push({ productId: option.product_id, quantity: option.quantity || 1 })
+                            packageContents.push({
+                                productId: option.product_id,
+                                quantity: option.quantity || 1,
+                                groupName: (option.package_item_groups as any)?.name || 'Selection'
+                            })
                         }
                     })
                 }
@@ -379,7 +383,8 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                                 modifiers: {},
                                 package_id: item.packageId,
                                 package_name: item.packageData?.name,
-                                bundle_id: bundleId
+                                bundle_id: bundleId,
+                                group_name: content.groupName
                             })
                         }
                     })

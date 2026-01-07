@@ -80,6 +80,7 @@ function OrderConfirmationContent() {
                     id: item.bundle_id,
                     name: item.package_name || 'Package',
                     price: 0,
+                    groups: [], // Array of { name: string, items: [] }
                     items: []
                 }
                 bundleMap.set(item.bundle_id, b)
@@ -89,6 +90,14 @@ function OrderConfirmationContent() {
             if (item.price_at_time > 0) {
                 b.price = item.price_at_time
             }
+            // Group by group_name within the bundle
+            const gName = item.group_name || 'Included Items'
+            let group = b.groups.find((g: any) => g.name === gName)
+            if (!group) {
+                group = { name: gName, items: [] }
+                b.groups.push(group)
+            }
+            group.items.push(item)
             b.items.push(item)
         } else {
             standalone.push(item)
@@ -203,15 +212,19 @@ function OrderConfirmationContent() {
                                             </div>
                                         </div>
 
-                                        <div className="ml-24 space-y-2 pt-2 border-t border-border/10">
-                                            <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Contents</p>
-                                            {bundle.items.map((item: any) => (
-                                                <div key={item.id} className="flex justify-between items-center text-sm">
-                                                    <span className="text-muted-foreground flex items-center gap-2">
-                                                        <div className="h-1.5 w-1.5 rounded-full bg-amber-300" />
-                                                        {item.products?.name}
-                                                    </span>
-                                                    <span className="text-gray-400">x{item.quantity}</span>
+                                        <div className="ml-24 space-y-4 pt-2 border-t border-border/10">
+                                            {bundle.groups.map((group: any, gIdx: number) => (
+                                                <div key={gIdx} className="space-y-2">
+                                                    <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">{group.name}</p>
+                                                    {group.items.map((item: any) => (
+                                                        <div key={item.id} className="flex justify-between items-center text-sm">
+                                                            <span className="text-muted-foreground flex items-center gap-2">
+                                                                <div className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+                                                                {item.products?.name}
+                                                            </span>
+                                                            <span className="text-gray-400">x{item.quantity}</span>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             ))}
                                         </div>
