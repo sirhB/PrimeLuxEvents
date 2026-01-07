@@ -7,29 +7,10 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
     const { id } = await params
     const supabase = await createClient()
 
-    // 1. Fetch Package Details (Basic + Groups)
-    // We split this to avoid deep nesting issues with Supabase
-    // We also remove the nested 'products' join to avoid PGRST200 errors if FKs are tricky
+    // 1. Fetch Package Details (Basic only)
     const { data: pkg, error: pkgError } = await supabase
         .from('packages')
-        .select(`
-            *,
-            package_item_groups (
-                id,
-                name,
-                description,
-                min_selections,
-                max_selections,
-                display_order,
-                package_item_options (
-                    id,
-                    product_id,
-                    is_default,
-                    quantity,
-                    display_order
-                )
-            )
-        `)
+        .select('*')
         .eq('id', id)
         .single()
 
@@ -45,7 +26,33 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
         )
     }
 
-    // 2. Fetch Static Items separately (without joining products to be safe)
+    // 2. Fetch Groups and Options
+    // We fetch this separately to avoid any nesting limits or confusion
+    const { data: groupsData, error: groupsError } = await supabase
+        .from('package_item_groups')
+        .select(`
+            id,
+            name,
+            description,
+            min_selections,
+            max_selections,
+            display_order,
+            package_item_options (
+                id,
+                product_id,
+                is_default,
+                quantity,
+                display_order
+            )
+        `)
+        .eq('package_id', id)
+        .order('display_order')
+
+    if (groupsError) {
+        console.error('Error fetching groups:', groupsError)
+    }
+
+    // 3. Fetch Static Items separately (without joining products to be safe)
     const { data: staticItemsData, error: staticItemsError } = await supabase
         .from('package_items')
         .select(`
@@ -59,7 +66,7 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
         console.error('Error fetching static items:', staticItemsError)
     }
 
-    // 3. Fetch All Products for the picker AND for name resolution
+    // 4. Fetch All Products for the picker AND for name resolution
     const { data: products } = await supabase
         .from('products')
         .select('id, name, price, image_url, category_id')
@@ -67,10 +74,9 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
 
     const productMap = new Map(products?.map(p => [p.id, p]) || [])
 
-    // 4. Transform data for the form
+    // 5. Transform data for the form
     // groups from pkg
-    const groups: PackageItemGroup[] = (pkg.package_item_groups || [])
-        .sort((a: any, b: any) => a.display_order - b.display_order)
+    const groups: PackageItemGroup[] = (groupsData || [])
         .map((g: any) => ({
             id: g.id,
             name: g.name,
