@@ -233,7 +233,7 @@ BEGIN
   ('Party in a Box (Ultimate)', 'This package includes everything you need to make your upcoming party pop! Inclusions: 1 Backdrop1 Pedestal (set)1 Throne Chair or Lux Chair50 Folding Chairs or 25 Fancy Chairs1 LED Sign5 Round Table Linens50 Table Napkins 50 Charger Plates5 Centerpieces (Flower Balls)1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 145000, cat_backdrops_panels, '/images/products/party-in-a-box-ultimate.jpg', 145000, 10, '[]'::jsonb),
   ('Party in a Box (Baby Shower)', 'This package includes everything you need to make your upcoming baby shower party pop! Inclusions: 1 Backdrop1 Pedestal (set)1 Cart1 Throne Chair or Lux Chair50 Bamboo Chairs (Gold or Silver) 5 Round Table Linens50 Table Napkins 50 Charger Plates1 Free Gift (upon availability)5 Centerpieces (Flower Balls)1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 190000, cat_backdrops_panels, '/images/products/party-in-a-box-baby-shower.jpg', 190000, 10, '[]'::jsonb),
   ('Party in a Box (Graduation)', 'This package includes everything you need to make your upcoming Graudation party pop! Inclusions: GRAD Lit Letters (any color)1 Backdrop1 Pedestal (set)1 Throne Chair or Lux Chair1 LED Sign5 Round Table Linens25 Fancy Chairs25 Table Napkins25 Charger Plates5 Graduation Centerpieces1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 200000, cat_backdrops_panels, '/images/products/party-in-a-box-graduation.jpg', 200000, 10, '[]'::jsonb),
-  ('Scarlet Royale FrameRegular', 'Scarlet Royale Frame.', 67500, cat_backdrops_panels, '/images/products/scarlet-royale-frameregular.jpg', 67500, 10, '[]'::jsonb),
+  ('Scarlet Royale Frame', 'Scarlet Royale Frame.', 67500, cat_backdrops_panels, '/images/products/scarlet-royale-frame.jpg', 67500, 10, '[]'::jsonb),
   ('Scottsdale Arch', 'Scottsdale Arch.', 37500, cat_backdrops_panels, '/images/products/scottsdale-arch.jpg', 37500, 10, '[]'::jsonb),
   ('Sapphire acrh', 'Sapphire acrh.', 25000, cat_backdrops_panels, '/images/products/sapphire-acrh.jpg', 25000, 10, '[]'::jsonb),
   ('Clover wave Acrh', 'Clover wave Acrh.', 27500, cat_backdrops_panels, '/images/products/clover-wave-acrh.jpg', 27500, 10, '[]'::jsonb),
@@ -261,7 +261,7 @@ BEGIN
   ('Party in a Box (Graduation)', 'This package includes everything you need to make your upcoming Graudation party pop! Inclusions: GRAD Lit Letters (any color)1 Backdrop1 Pedestal (set)1 Throne Chair or Lux Chair1 LED Sign5 Round Table Linens25 Fancy Chairs25 Table Napkins25 Charger Plates5 Graduation Centerpieces1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 200000, cat_flower_walls, '/images/products/party-in-a-box-graduation.jpg', 200000, 10, '[]'::jsonb),
   ('RED FLOWER WALL BACKDROP', 'RED FLOWER WALL BACKDROP.', 20000, cat_flower_walls, '/images/products/red-flower-wall-backdrop.jpg', 20000, 10, '[]'::jsonb),
   ('Grand Flower Wall Backdrop', 'Grand Flower Wall Backdrop.', 40000, cat_flower_walls, '/images/products/grand-flower-wall-backdrop.jpg', 40000, 10, '[]'::jsonb),
-  ('FLOWER WALL & BALLOONRegular', 'FLOWER WALL & BALLOON.', 58000, cat_flower_walls, '/images/products/flower-wall-balloonregular.jpg', 58000, 10, '[]'::jsonb),
+  ('FLOWER WALL & BALLOON', 'FLOWER WALL & BALLOON.', 58000, cat_flower_walls, '/images/products/flower-wall-balloon.jpg', 58000, 10, '[]'::jsonb),
   ('Flower Wall (Touch of Pink)', 'Flower Wall (Touch of Pink).', 25000, cat_flower_walls, '/images/products/flower-wall-touch-of-pink.jpg', 25000, 10, '[]'::jsonb);
 
   -- Shimmer Walls
@@ -287,7 +287,7 @@ BEGIN
   ('Party in a Box (Graduation)', 'This package includes everything you need to make your upcoming Graudation party pop! Inclusions: GRAD Lit Letters (any color)1 Backdrop1 Pedestal (set)1 Throne Chair or Lux Chair1 LED Sign5 Round Table Linens25 Fancy Chairs25 Table Napkins25 Charger Plates5 Graduation Centerpieces1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 200000, cat_bar_counters, '/images/products/party-in-a-box-graduation.jpg', 200000, 10, '[]'::jsonb),
   ('Malibu Bar 6ft', 'Malibu Bar 6ft.', 32500, cat_bar_counters, '/images/products/malibu-bar-6ft.jpg', 32500, 10, '[]'::jsonb),
   ('Lux Bar', 'Lux Bar.', 35000, cat_bar_counters, '/images/products/lux-bar.jpg', 35000, 10, '[]'::jsonb),
-  ('White CHAMPAGNE WALLRegular', 'White CHAMPAGNE WALL.', 20000, cat_bar_counters, '/images/products/white-champagne-wallregular.jpg', 20000, 10, '[]'::jsonb),
+  ('White CHAMPAGNE WALL', 'White CHAMPAGNE WALL.', 20000, cat_bar_counters, '/images/products/white-champagne-wall.jpg', 20000, 10, '[]'::jsonb),
   ('Black Champagne Wall', 'Black Champagne Wall.', 18000, cat_bar_counters, '/images/products/black-champagne-wall.jpg', 18000, 10, '[]'::jsonb),
   ('Walnut laminate bar', 'Walnut laminate bar.', 7500, cat_bar_counters, '/images/products/walnut-laminate-bar.jpg', 7500, 10, '[]'::jsonb),
   ('White Formica Bar', 'White Formica Bar.', 7500, cat_bar_counters, '/images/products/white-formica-bar.jpg', 7500, 10, '[]'::jsonb),
@@ -300,8 +300,8 @@ BEGIN
   ('Party in a Box (Baby Shower)', 'This package includes everything you need to make your upcoming baby shower party pop! Inclusions: 1 Backdrop1 Pedestal (set)1 Cart1 Throne Chair or Lux Chair50 Bamboo Chairs (Gold or Silver) 5 Round Table Linens50 Table Napkins 50 Charger Plates1 Free Gift (upon availability)5 Centerpieces (Flower Balls)1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 190000, cat_bar_stools, '/images/products/party-in-a-box-baby-shower.jpg', 190000, 10, '[]'::jsonb),
   ('Party in a Box (Graduation)', 'This package includes everything you need to make your upcoming Graudation party pop! Inclusions: GRAD Lit Letters (any color)1 Backdrop1 Pedestal (set)1 Throne Chair or Lux Chair1 LED Sign5 Round Table Linens25 Fancy Chairs25 Table Napkins25 Charger Plates5 Graduation Centerpieces1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 200000, cat_bar_stools, '/images/products/party-in-a-box-graduation.jpg', 200000, 10, '[]'::jsonb),
   ('LUX GOLD BAR STOOL', 'LUX GOLD BAR STOOL.', 2500, cat_bar_stools, '/images/products/lux-gold-bar-stool.jpg', 2500, 10, '[]'::jsonb),
-  ('Stylish Vintage  Barstool 30”Regular', 'Stylish Vintage  Barstool 30”.', 1500, cat_bar_stools, '/images/products/stylish-vintage-barstool-30-regular.jpg', 1500, 10, '[]'::jsonb),
-  ('Stylish Vintage  Barstool 24”Regular', 'Stylish Vintage  Barstool 24”.', 1200, cat_bar_stools, '/images/products/stylish-vintage-barstool-24-regular.jpg', 1200, 10, '[]'::jsonb),
+  ('Stylish Vintage  Barstool 30”', 'Stylish Vintage  Barstool 30”.', 1500, cat_bar_stools, '/images/products/stylish-vintage-barstool-30.jpg', 1500, 10, '[]'::jsonb),
+  ('Stylish Vintage  Barstool 24”', 'Stylish Vintage  Barstool 24”.', 1200, cat_bar_stools, '/images/products/stylish-vintage-barstool-24.jpg', 1200, 10, '[]'::jsonb),
   ('LUX SILVER BAR STOOL', 'LUX SILVER BAR STOOL.', 2000, cat_bar_stools, '/images/products/lux-silver-bar-stool.jpg', 2000, 10, '[]'::jsonb),
   ('O Back Gold Bar Stool', 'O Back Gold Bar Stool.', 2500, cat_bar_stools, '/images/products/o-back-gold-bar-stool.jpg', 2500, 10, '[]'::jsonb);
 
@@ -342,7 +342,7 @@ BEGIN
   ('Party in a Box (Graduation)', 'This package includes everything you need to make your upcoming Graudation party pop! Inclusions: GRAD Lit Letters (any color)1 Backdrop1 Pedestal (set)1 Throne Chair or Lux Chair1 LED Sign5 Round Table Linens25 Fancy Chairs25 Table Napkins25 Charger Plates5 Graduation Centerpieces1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 200000, cat_decorations_props, '/images/products/party-in-a-box-graduation.jpg', 200000, 10, '[]'::jsonb),
   ('Green Tree', 'Green Tree.', 10000, cat_decorations_props, '/images/products/green-tree.jpg', 10000, 10, '[]'::jsonb),
   ('Trio Wedding Gold Arch', 'Trio Wedding Gold Arch.', 105000, cat_decorations_props, '/images/products/trio-wedding-gold-arch.jpg', 105000, 10, '[]'::jsonb),
-  ('Telephone Booth Regular', 'Telephone Booth.', 35000, cat_decorations_props, '/images/products/telephone-booth-regular.jpg', 35000, 10, '[]'::jsonb),
+  ('Telephone Booth', 'Telephone Booth.', 35000, cat_decorations_props, '/images/products/telephone-booth.jpg', 35000, 10, '[]'::jsonb),
   ('Zebra', 'Zebra.', 12500, cat_decorations_props, '/images/products/zebra.jpg', 12500, 10, '[]'::jsonb),
   ('Giraffe', 'Giraffe.', 22500, cat_decorations_props, '/images/products/giraffe.jpg', 22500, 10, '[]'::jsonb),
   ('Elephant', 'Elephant.', 22500, cat_decorations_props, '/images/products/elephant.jpg', 22500, 10, '[]'::jsonb),
@@ -361,11 +361,11 @@ BEGIN
   ('Padded Folding Chair', 'Padded Folding Chair.', 350, cat_chairs, '/images/products/padded-folding-chair.jpg', 350, 10, '[]'::jsonb),
   ('BLACK PADDED CHAIR', 'BLACK PADDED CHAIR.', 350, cat_chairs, '/images/products/black-padded-chair.jpg', 350, 10, '[]'::jsonb),
   ('BLACK CHIAVARI CHAIR', 'BLACK CHIAVARI CHAIR.', 700, cat_chairs, '/images/products/black-chiavari-chair.jpg', 700, 10, '[]'::jsonb),
-  ('PRIME PINK  ROYALTY CHAIRRegular', 'PRIME PINK  ROYALTY CHAIR.', 1800, cat_chairs, '/images/products/prime-pink-royalty-chairregular.jpg', 1800, 10, '[]'::jsonb),
+  ('PRIME PINK  ROYALTY CHAIR', 'PRIME PINK  ROYALTY CHAIR.', 1800, cat_chairs, '/images/products/prime-pink-royalty-chair.jpg', 1800, 10, '[]'::jsonb),
   ('White Samsonite Chair', 'White Samsonite Chair.', 250, cat_chairs, '/images/products/white-samsonite-chair.jpg', 250, 10, '[]'::jsonb),
   ('O Back Gold Chair', 'O Back Gold Chair.', 1800, cat_chairs, '/images/products/o-back-gold-chair.jpg', 1800, 10, '[]'::jsonb),
   ('O Back Silver Chair', 'O Back Silver Chair.', 1800, cat_chairs, '/images/products/o-back-silver-chair.jpg', 1800, 10, '[]'::jsonb),
-  ('Heart Chair (Gold)Regular', 'Heart Chair (Gold).', 1500, cat_chairs, '/images/products/heart-chair-gold-regular.jpg', 1500, 10, '[]'::jsonb),
+  ('Heart Chair (Gold)', 'Heart Chair (Gold).', 1500, cat_chairs, '/images/products/heart-chair-gold.jpg', 1500, 10, '[]'::jsonb),
   ('Bamboo Chair (Gold)', 'Bamboo Chair (Gold).', 700, cat_chairs, '/images/products/bamboo-chair-gold.jpg', 700, 10, '[]'::jsonb),
   ('Bamboo Chair (Silver)', 'Bamboo Chair (Silver).', 700, cat_chairs, '/images/products/bamboo-chair-silver.jpg', 700, 10, '[]'::jsonb),
   ('Folding Acrylic Chair (Gold)', 'Folding Acrylic Chair (Gold).', 1125, cat_chairs, '/images/products/folding-acrylic-chair-gold.jpg', 1125, 10, '[]'::jsonb);
@@ -378,13 +378,13 @@ BEGIN
   ('Wave sofa', 'Wave sofa.', 29000, cat_sofas_loveseats, '/images/products/wave-sofa.jpg', 29000, 10, '[]'::jsonb),
   ('Hendrix Velvet Flared Arm Loveseats', 'Hendrix Velvet Flared Arm Loveseats.', 16000, cat_sofas_loveseats, '/images/products/hendrix-velvet-flared-arm-loveseats.jpg', 16000, 10, '[]'::jsonb),
   ('Lux Sofa', 'Lux Sofa.', 15000, cat_sofas_loveseats, '/images/products/lux-sofa.jpg', 15000, 10, '[]'::jsonb),
-  ('Cage sofa Regular', 'Cage sofa.', 27500, cat_sofas_loveseats, '/images/products/cage-sofa-regular.jpg', 27500, 10, '[]'::jsonb),
-  ('3 PIECE LUX SETRegular', '3 PIECE LUX SET.', 30000, cat_sofas_loveseats, '/images/products/3-piece-lux-setregular.jpg', 30000, 10, '[]'::jsonb),
+  ('Cage sofa', 'Cage sofa.', 27500, cat_sofas_loveseats, '/images/products/cage-sofa.jpg', 27500, 10, '[]'::jsonb),
+  ('3 PIECE LUX SET', '3 PIECE LUX SET.', 30000, cat_sofas_loveseats, '/images/products/3-piece-lux-set.jpg', 30000, 10, '[]'::jsonb),
   ('Lux Pink sofa', 'Lux Pink sofa.', 20000, cat_sofas_loveseats, '/images/products/lux-pink-sofa.jpg', 20000, 10, '[]'::jsonb),
-  ('fancy Royal SofaRegular', 'fancy Royal Sofa.', 29000, cat_sofas_loveseats, '/images/products/fancy-royal-sofaregular.jpg', 29000, 10, '[]'::jsonb),
+  ('fancy Royal Sofa', 'fancy Royal Sofa.', 29000, cat_sofas_loveseats, '/images/products/fancy-royal-sofa.jpg', 29000, 10, '[]'::jsonb),
   ('NUDE SOFA', 'NUDE SOFA.', 20000, cat_sofas_loveseats, '/images/products/nude-sofa.jpg', 20000, 10, '[]'::jsonb),
   ('Chic Sofa (Black)', 'Chic Sofa (Black).', 30000, cat_sofas_loveseats, '/images/products/chic-sofa-black.jpg', 30000, 10, '[]'::jsonb),
-  ('White Dotted Throne SofaRegular', 'White Dotted Throne Sofa.', 30000, cat_sofas_loveseats, '/images/products/white-dotted-throne-sofaregular.jpg', 30000, 10, '[]'::jsonb);
+  ('White Dotted Throne Sofa', 'White Dotted Throne Sofa.', 30000, cat_sofas_loveseats, '/images/products/white-dotted-throne-sofa.jpg', 30000, 10, '[]'::jsonb);
 
   -- Kids Backdrops
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available, modifiers) VALUES
@@ -435,12 +435,12 @@ BEGIN
   ('Party in a Box (Ultimate)', 'This package includes everything you need to make your upcoming party pop! Inclusions: 1 Backdrop1 Pedestal (set)1 Throne Chair or Lux Chair50 Folding Chairs or 25 Fancy Chairs1 LED Sign5 Round Table Linens50 Table Napkins 50 Charger Plates5 Centerpieces (Flower Balls)1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 145000, cat_lit_letters_and_numbers, '/images/products/party-in-a-box-ultimate.jpg', 145000, 10, '[]'::jsonb),
   ('Party in a Box (Baby Shower)', 'This package includes everything you need to make your upcoming baby shower party pop! Inclusions: 1 Backdrop1 Pedestal (set)1 Cart1 Throne Chair or Lux Chair50 Bamboo Chairs (Gold or Silver) 5 Round Table Linens50 Table Napkins 50 Charger Plates1 Free Gift (upon availability)5 Centerpieces (Flower Balls)1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 190000, cat_lit_letters_and_numbers, '/images/products/party-in-a-box-baby-shower.jpg', 190000, 10, '[]'::jsonb),
   ('Party in a Box (Graduation)', 'This package includes everything you need to make your upcoming Graudation party pop! Inclusions: GRAD Lit Letters (any color)1 Backdrop1 Pedestal (set)1 Throne Chair or Lux Chair1 LED Sign5 Round Table Linens25 Fancy Chairs25 Table Napkins25 Charger Plates5 Graduation Centerpieces1 Fancy Balloon Garland All rentals will be dropped off to your event location.  However, we do not set up.  Delivery and Pickup Fee for this package starts at $90.', 200000, cat_lit_letters_and_numbers, '/images/products/party-in-a-box-graduation.jpg', 200000, 10, '[]'::jsonb),
-  ('BABY MARQUEERegular', 'BABY MARQUEE.', 40000, cat_lit_letters_and_numbers, '/images/products/baby-marqueeregular.jpg', 40000, 10, '[]'::jsonb),
-  ('OH BABY MARQUEERegular', 'OH BABY MARQUEE.', 60000, cat_lit_letters_and_numbers, '/images/products/oh-baby-marqueeregular.jpg', 60000, 10, '[]'::jsonb),
+  ('BABY MARQUEE', 'BABY MARQUEE.', 40000, cat_lit_letters_and_numbers, '/images/products/baby-marquee.jpg', 40000, 10, '[]'::jsonb),
+  ('OH BABY MARQUEE', 'OH BABY MARQUEE.', 60000, cat_lit_letters_and_numbers, '/images/products/oh-baby-marquee.jpg', 60000, 10, '[]'::jsonb),
   ('BLACK MARQUEE NUMBERS', 'BLACK MARQUEE NUMBERS.', 10000, cat_lit_letters_and_numbers, '/images/products/black-marquee-numbers.jpg', 10000, 10, '[]'::jsonb),
   ('MARQUEE LETTER', 'MARQUEE LETTER.', 12500, cat_lit_letters_and_numbers, '/images/products/marquee-letter.jpg', 12500, 10, '[]'::jsonb),
   ('LARGE MARQUEE CROSS WITH LIGHT', 'LARGE MARQUEE CROSS WITH LIGHT.', 12500, cat_lit_letters_and_numbers, '/images/products/large-marquee-cross-with-light.jpg', 12500, 10, '[]'::jsonb),
-  ('WHITE MARQUEE NUMBERRegular', 'WHITE MARQUEE NUMBER.', 10000, cat_lit_letters_and_numbers, '/images/products/white-marquee-numberregular.jpg', 10000, 10, '[]'::jsonb);
+  ('WHITE MARQUEE NUMBER', 'WHITE MARQUEE NUMBER.', 10000, cat_lit_letters_and_numbers, '/images/products/white-marquee-number.jpg', 10000, 10, '[]'::jsonb);
 
   -- Luxury Thrones
   INSERT INTO products (name, description, price, category_id, image_url, rental_price_daily, quantity_available, modifiers) VALUES
@@ -451,14 +451,14 @@ BEGIN
   ('Gold Dust Throne', 'Gold Dust Throne.', 20000, cat_thrones, '/images/products/gold-dust-throne.jpg', 20000, 10, '[]'::jsonb),
   ('Mid Night Throne', 'Mid Night Throne.', 18000, cat_thrones, '/images/products/mid-night-throne.jpg', 18000, 10, '[]'::jsonb),
   ('Emerald Pearl Throne', 'Emerald Pearl Throne.', 18000, cat_thrones, '/images/products/emerald-pearl-throne.jpg', 18000, 10, '[]'::jsonb),
-  ('Silver Pearl ThroneRegular', 'Silver Pearl Throne.', 20000, cat_thrones, '/images/products/silver-pearl-throneregular.jpg', 20000, 10, '[]'::jsonb),
-  ('White Peal Throne ChairRegular', 'White Peal Throne Chair.', 20000, cat_thrones, '/images/products/white-peal-throne-chairregular.jpg', 20000, 10, '[]'::jsonb),
+  ('Silver Pearl Throne', 'Silver Pearl Throne.', 20000, cat_thrones, '/images/products/silver-pearl-throne.jpg', 20000, 10, '[]'::jsonb),
+  ('White Peal Throne Chair', 'White Peal Throne Chair.', 20000, cat_thrones, '/images/products/white-peal-throne-chair.jpg', 20000, 10, '[]'::jsonb),
   ('Red Throne', 'Red Throne.', 16000, cat_thrones, '/images/products/red-throne.jpg', 16000, 10, '[]'::jsonb),
   ('Kids Velvet Pink Throne', 'Kids Velvet Pink Throne.', 5000, cat_thrones, '/images/products/kids-velvet-pink-throne.jpg', 5000, 10, '[]'::jsonb),
-  ('White Princess Throne Sofa ChairRegular', 'White Princess Throne Sofa Chair.', 18000, cat_thrones, '/images/products/white-princess-throne-sofa-chairregular.jpg', 18000, 10, '[]'::jsonb),
-  ('King Throne sofa chairRegular', 'King Throne sofa chair.', 20000, cat_thrones, '/images/products/king-throne-sofa-chairregular.jpg', 20000, 10, '[]'::jsonb),
+  ('White Princess Throne Sofa Chair', 'White Princess Throne Sofa Chair.', 18000, cat_thrones, '/images/products/white-princess-throne-sofa-chair.jpg', 18000, 10, '[]'::jsonb),
+  ('King Throne sofa chair', 'King Throne sofa chair.', 20000, cat_thrones, '/images/products/king-throne-sofa-chair.jpg', 20000, 10, '[]'::jsonb),
   ('Cassie Loveseat (Gold)', 'Cassie Loveseat (Gold).', 29000, cat_thrones, '/images/products/cassie-loveseat-gold.jpg', 29000, 10, '[]'::jsonb),
-  ('Cage Gold Chair (White Cushion)Regular', 'Cage Gold Chair (White Cushion).', 17500, cat_thrones, '/images/products/cage-gold-chair-white-cushion-regular.jpg', 17500, 10, '[]'::jsonb),
+  ('Cage Gold Chair (White Cushion)', 'Cage Gold Chair (White Cushion).', 17500, cat_thrones, '/images/products/cage-gold-chair-white-cushion.jpg', 17500, 10, '[]'::jsonb),
   ('Cage Gold Chair (Black Cushion)', 'Cage Gold Chair (Black Cushion).', 17500, cat_thrones, '/images/products/cage-gold-chair-black-cushion.jpg', 17500, 10, '[]'::jsonb),
   ('Lux Throne Chair (Black)', 'Lux Throne Chair (Black).', 16000, cat_thrones, '/images/products/lux-throne-chair-black.jpg', 16000, 10, '[]'::jsonb),
   ('Canopy Throne Chair (White)', 'Canopy Throne Chair (White).', 17500, cat_thrones, '/images/products/canopy-throne-chair-white.jpg', 17500, 10, '[]'::jsonb),
@@ -844,7 +844,7 @@ Inventory: 1', 25000, cat_misc, '/images/products/marci-backdrop.jpg', 25000, 1
   ('3 GOBLETS', '3 GOBLETS.', 3500, cat_centerpeices_2, '/images/products/3-goblets.jpg', 3500, 10, '[]'::jsonb),
   ('FLORAL BALL', 'FLORAL BALL.', 3500, cat_centerpeices_2, '/images/products/floral-ball.jpg', 3500, 10, '[]'::jsonb),
   ('FLORAL CARRIAGE CENTERPIECE', 'FLORAL CARRIAGE CENTERPIECE.', 3500, cat_centerpeices_2, '/images/products/floral-carriage-centerpiece.jpg', 3500, 10, '[]'::jsonb),
-  ('BALLOON CENTERPIECERegular', 'BALLOON CENTERPIECERegular.', 3500, cat_centerpeices_2, '/images/products/balloon-centerpieceregular.jpg', 3500, 10, '[]'::jsonb),
+  ('BALLOON CENTERPIECE', 'BALLOON CENTERPIECE.', 3500, cat_centerpeices_2, '/images/products/balloon-centerpiece.jpg', 3500, 10, '[]'::jsonb),
   ('FLOWER QUEEN W/VASE', 'FLOWER QUEEN W/VASE.', 6500, cat_centerpeices_2, '/images/products/flower-queen-w-vase.jpg', 6500, 10, '[]'::jsonb),
   ('3 SET CORAL', '3 SET CORAL.', 3500, cat_centerpeices_2, '/images/products/3-set-coral.jpg', 3500, 10, '[]'::jsonb),
   ('FRESH FLOWER', 'FRESH FLOWER.', 5500, cat_centerpeices_2, '/images/products/fresh-flower.jpg', 5500, 10, '[]'::jsonb),
@@ -906,7 +906,7 @@ Inventory: 1', 25000, cat_misc, '/images/products/marci-backdrop.jpg', 25000, 1
   ('BANQUET ROUND PARTY TABLES', 'BANQUET ROUND PARTY TABLES.', 1100, cat_dining_tables, '/images/products/banquet-round-party-tables.jpg', 1100, 10, '[]'::jsonb),
   ('RECTANGULAR BANQUET TABLES', 'RECTANGULAR BANQUET TABLES.', 1100, cat_dining_tables, '/images/products/rectangular-banquet-tables.jpg', 1100, 10, '[]'::jsonb),
   ('gold mirrior table', 'gold mirrior table.', 25000, cat_dining_tables, '/images/products/gold-mirrior-table.jpg', 25000, 10, '[]'::jsonb),
-  ('Gold Serpentine tableRegular', 'Gold Serpentine table.', 25000, cat_dining_tables, '/images/products/gold-serpentine-tableregular.jpg', 25000, 10, '[]'::jsonb),
+  ('Gold Serpentine table', 'Gold Serpentine table.', 25000, cat_dining_tables, '/images/products/gold-serpentine-table.jpg', 25000, 10, '[]'::jsonb),
   ('Vogue Triangular Table', 'Vogue Triangular Table.', 35000, cat_dining_tables, '/images/products/vogue-triangular-table.jpg', 35000, 10, '[]'::jsonb),
   ('Fab Glass Table', 'Fab Glass Table.', 25000, cat_dining_tables, '/images/products/fab-glass-table.jpg', 25000, 10, '[]'::jsonb),
   ('Clear Rectangular Table', 'Clear Rectangular Table.', 25000, cat_dining_tables, '/images/products/clear-rectangular-table.jpg', 25000, 10, '[]'::jsonb),
@@ -983,7 +983,7 @@ Inventory: 1', 25000, cat_misc, '/images/products/marci-backdrop.jpg', 25000, 1
   ('Stone Tone Chargers', 'Stone Tone Chargers.', 100, cat_chargers, '/images/products/stone-tone-chargers.jpg', 100, 10, '[]'::jsonb),
   ('Gold Glass Charger', 'Gold Glass Charger.', 600, cat_chargers, '/images/products/gold-glass-charger.jpg', 600, 10, '[]'::jsonb),
   ('Lux Gold Charger', 'Lux Gold Charger.', 650, cat_chargers, '/images/products/lux-gold-charger.jpg', 650, 10, '[]'::jsonb),
-  ('Scarlet Royale FrameRegular', 'Scarlet Royale FrameRegular.', 67500, cat_chargers, '/images/products/scarlet-royale-frameregular.jpg', 67500, 10, '[]'::jsonb),
+  ('Scarlet Royale Frame', 'Scarlet Royale Frame.', 67500, cat_chargers, '/images/products/scarlet-royale-frame.jpg', 67500, 10, '[]'::jsonb),
   ('Dreamland Train', 'Dreamland Train.', 42500, cat_chargers, '/images/products/dreamland-train.jpg', 42500, 10, '[]'::jsonb),
   ('Princess Express Train', 'Princess Express Train.', 42500, cat_chargers, '/images/products/princess-express-train.jpg', 42500, 10, '[]'::jsonb),
   ('Scottsdale Arch', 'Scottsdale Arch.', 37500, cat_chargers, '/images/products/scottsdale-arch.jpg', 37500, 10, '[]'::jsonb),
