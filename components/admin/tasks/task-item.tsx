@@ -16,7 +16,8 @@ import {
     Briefcase,
     Home,
     Building,
-    MapPin
+    MapPin,
+    Shield
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -107,6 +108,7 @@ export function TaskItem({ task }: TaskItemProps) {
                             </span>
                             <span className="flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
+                                {task.assigned_role_id && <Shield className="h-3 w-3 text-muted-foreground" />}
                                 {task.assigned_to_text || 'Unassigned'}
                             </span>
                             {task.due_date && (

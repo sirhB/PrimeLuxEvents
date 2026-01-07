@@ -10,8 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { createClient } from '@/lib/supabase/client'
 import { Calendar, User, Flag, Truck, Briefcase, Home, Building, MapPin, Check, ChevronsUpDown } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { cn } from '@/lib/utils'
+import { Shield } from 'lucide-react'
 
 interface TaskFormData {
     title: string
@@ -19,6 +20,7 @@ interface TaskFormData {
     status: string
     priority: string
     assigned_to: string
+    assigned_role_id: string
     due_date: string
     task_type: string
     event_id?: string
@@ -26,7 +28,7 @@ interface TaskFormData {
 
 interface TaskFormProps {
     eventId?: string
-    task?: TaskFormData & { id: string }
+    task?: any // Using any to handle incoming data flexibly
     onSuccess?: () => void
     onCancel?: () => void
 }
@@ -57,6 +59,7 @@ const taskTypes = [
 export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) {
     const router = useRouter()
     const [teamMembers, setTeamMembers] = useState<any[]>([])
+    const [roles, setRoles] = useState<any[]>([])
     const [open, setOpen] = useState(false)
     const [formData, setFormData] = useState<TaskFormData>({
         title: task?.title || '',
@@ -64,6 +67,7 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
         status: task?.status || 'pending',
         priority: task?.priority || 'medium',
         assigned_to: task?.assigned_to || '',
+        assigned_role_id: task?.assigned_role_id || '',
         due_date: task?.due_date || '',
         task_type: task?.task_type || 'general',
         event_id: task?.event_id || eventId || ''
@@ -74,14 +78,16 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
     const supabase = createClient()
 
     useEffect(() => {
-        const fetchTeam = async () => {
-            const { data } = await supabase
-                .from('user_profiles')
-                .select('id, full_name, email')
-                .eq('is_active', true)
-            if (data) setTeamMembers(data)
+        const fetchData = async () => {
+            const [membersRes, rolesRes] = await Promise.all([
+                supabase.from('user_profiles').select('id, full_name, email').eq('is_active', true),
+                supabase.from('roles').select('id, display_name, name')
+            ])
+
+            if (membersRes.data) setTeamMembers(membersRes.data)
+            if (rolesRes.data) setRoles(rolesRes.data)
         }
-        fetchTeam()
+        fetchData()
     }, [supabase])
 
     const validateForm = (): boolean => {
@@ -98,6 +104,8 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
         setLoading(true)
         try {
             const selectedMember = teamMembers.find(m => m.id === formData.assigned_to)
+            const selectedRole = roles.find(r => r.id === formData.assigned_role_id)
+
             const taskData = {
                 title: formData.title,
                 description: formData.description,
@@ -105,8 +113,13 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                 priority: formData.priority,
                 task_type: formData.task_type,
                 due_date: formData.due_date || null,
-                assigned_to: formData.assigned_to === 'unassigned' ? null : (formData.assigned_to || null),
-                assigned_to_text: selectedMember ? (selectedMember.full_name || selectedMember.email) : (formData.assigned_to === 'unassigned' ? null : (formData.assigned_to || null)),
+                assigned_to: formData.assigned_to || null,
+                assigned_role_id: formData.assigned_role_id || null,
+                assigned_to_text: selectedMember
+                    ? (selectedMember.full_name || selectedMember.email)
+                    : selectedRole
+                        ? `Role: ${selectedRole.display_name}`
+                        : null,
                 event_id: formData.event_id || null,
                 updated_at: new Date().toISOString()
             }
@@ -138,7 +151,16 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
     }
 
     const handleInputChange = (field: keyof TaskFormData, value: string) => {
-        setFormData(prev => ({ ...prev, [field]: value }))
+        setFormData(prev => {
+            const newData = { ...prev, [field]: value }
+            // If assigning to a specific person, clear role assignment and vice versa
+            if (field === 'assigned_to' && value !== '') {
+                newData.assigned_role_id = ''
+            } else if (field === 'assigned_role_id' && value !== '') {
+                newData.assigned_to = ''
+            }
+            return newData
+        })
         if (errors[field]) {
             setErrors(prev => ({ ...prev, [field]: '' }))
         }
@@ -254,52 +276,84 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                             {formData.assigned_to && formData.assigned_to !== 'unassigned'
                                 ? teamMembers.find((member) => member.id === formData.assigned_to)?.full_name ||
                                 teamMembers.find((member) => member.id === formData.assigned_to)?.email
-                                : "Select team member..."}
+                                : formData.assigned_role_id
+                                    ? `Role: ${roles.find(r => r.id === formData.assigned_role_id)?.display_name}`
+                                    : "Select team member or role..."}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[400px] p-0" align="start">
                         <Command>
-                            <CommandInput placeholder="Search team members..." />
-                            <CommandEmpty>No team member found.</CommandEmpty>
-                            <CommandGroup>
-                                <CommandItem
-                                    value="unassigned"
-                                    onSelect={() => {
-                                        handleInputChange('assigned_to', 'unassigned')
-                                        setOpen(false)
-                                    }}
-                                >
-                                    <Check
-                                        className={cn(
-                                            "mr-2 h-4 w-4",
-                                            formData.assigned_to === 'unassigned' || !formData.assigned_to ? "opacity-100" : "opacity-0"
-                                        )}
-                                    />
-                                    Unassigned
-                                </CommandItem>
-                                {teamMembers.map((member) => (
+                            <CommandInput placeholder="Search people or roles..." />
+                            <CommandEmpty>No results found.</CommandEmpty>
+                            <CommandList>
+                                <CommandGroup>
                                     <CommandItem
-                                        key={member.id}
-                                        value={`${member.full_name} ${member.email}`}
+                                        value="unassigned"
                                         onSelect={() => {
-                                            handleInputChange('assigned_to', member.id)
+                                            handleInputChange('assigned_to', '')
+                                            handleInputChange('assigned_role_id', '')
                                             setOpen(false)
                                         }}
                                     >
                                         <Check
                                             className={cn(
                                                 "mr-2 h-4 w-4",
-                                                formData.assigned_to === member.id ? "opacity-100" : "opacity-0"
+                                                (!formData.assigned_to && !formData.assigned_role_id) ? "opacity-100" : "opacity-0"
                                             )}
                                         />
-                                        <div className="flex flex-col">
-                                            <span className="font-medium">{member.full_name || 'Unnamed'}</span>
-                                            <span className="text-xs text-muted-foreground">{member.email}</span>
-                                        </div>
+                                        Unassigned
                                     </CommandItem>
-                                ))}
-                            </CommandGroup>
+                                </CommandGroup>
+
+                                <CommandGroup heading="Team Members">
+                                    {teamMembers.map((member) => (
+                                        <CommandItem
+                                            key={member.id}
+                                            value={`${member.full_name} ${member.email}`}
+                                            onSelect={() => {
+                                                handleInputChange('assigned_to', member.id)
+                                                setOpen(false)
+                                            }}
+                                        >
+                                            <Check
+                                                className={cn(
+                                                    "mr-2 h-4 w-4",
+                                                    formData.assigned_to === member.id ? "opacity-100" : "opacity-0"
+                                                )}
+                                            />
+                                            <div className="flex flex-col">
+                                                <span className="font-medium">{member.full_name || 'Unnamed'}</span>
+                                                <span className="text-xs text-muted-foreground">{member.email}</span>
+                                            </div>
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+
+                                <CommandGroup heading="Roles">
+                                    {roles.map((role) => (
+                                        <CommandItem
+                                            key={role.id}
+                                            value={role.display_name}
+                                            onSelect={() => {
+                                                handleInputChange('assigned_role_id', role.id)
+                                                setOpen(false)
+                                            }}
+                                        >
+                                            <Check
+                                                className={cn(
+                                                    "mr-2 h-4 w-4",
+                                                    formData.assigned_role_id === role.id ? "opacity-100" : "opacity-0"
+                                                )}
+                                            />
+                                            <div className="flex items-center gap-2">
+                                                <Shield className="h-4 w-4 text-muted-foreground" />
+                                                <span>{role.display_name}</span>
+                                            </div>
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            </CommandList>
                         </Command>
                     </PopoverContent>
                 </Popover>
