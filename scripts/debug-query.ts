@@ -24,63 +24,28 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-async function testQuery() {
-    // using the ID from the URL in the screenshot or a known ID
-    // The user screenshot doesn't show the ID in URL clearly, but previous request had 
-    // 5a97a253-ef22-4065-aa5a-3bbe9a4c0423. Let's try that or any package.
+async function checkForeignKeys() {
+    console.log('Checking foreign keys for package_item_options...')
 
-    // First get a valid package ID
-    const { data: validPkg } = await supabase.from('packages').select('id').limit(1).single()
-    if (!validPkg) {
-        console.error('No packages found to test with')
-        return
-    }
+    // We can't query information_schema directly easily via PostgREST/Supabase-js client usually depending on permissions
+    // But we can try a raw RPC call if one exists, or just inspect what we can see.
+    // Actually, the error "Could not find a relationship" usually means PostgREST (the API layer) doesn't see it.
+    // This often happens if the FK was created but the schema cache wasn't reloaded.
 
-    const id = validPkg.id
-    console.log(`Testing with Package ID: ${id}`)
+    // Let's try to reload the schema cache.
+    // NOTE: This is a hack. Usually making a schema change triggers it.
 
-    const { data, error } = await supabase
-        .from('packages')
-        .select(`
-            *,
-            package_item_groups (
-                id,
-                name,
-                description,
-                min_selections,
-                max_selections,
-                display_order,
-                package_item_options (
-                    id,
-                    product_id,
-                    is_default,
-                    quantity,
-                    display_order,
-                    products (
-                        name
-                    )
-                )
-            ),
-            package_items (
-                id,
-                product_id,
-                quantity,
-                products (
-                    name
-                )
-            )
-        `)
-        .eq('id', id)
-        .single()
+    // Let's just try to query valid data and see if it works now.
+    const { data: options, error } = await supabase
+        .from('package_item_options')
+        .select('id, product_id, products(id, name)')
+        .limit(1)
 
     if (error) {
-        console.error('Query Failed:', JSON.stringify(error, null, 2))
+        console.error('Still failing:', error)
     } else {
-        console.log('Query Success!')
-        if (data.package_items) {
-            console.log('Static Items:', data.package_items.length)
-        }
+        console.log('It works now!', options)
     }
 }
 
-testQuery()
+checkForeignKeys()

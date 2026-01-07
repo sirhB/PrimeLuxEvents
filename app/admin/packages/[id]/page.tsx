@@ -9,6 +9,7 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
 
     // 1. Fetch Package Details (Basic + Groups)
     // We split this to avoid deep nesting issues with Supabase
+    // We also remove the nested 'products' join to avoid PGRST200 errors if FKs are tricky
     const { data: pkg, error: pkgError } = await supabase
         .from('packages')
         .select(`
@@ -25,10 +26,7 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
                     product_id,
                     is_default,
                     quantity,
-                    display_order,
-                    products (
-                        name
-                    )
+                    display_order
                 )
             )
         `)
@@ -47,29 +45,27 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
         )
     }
 
-    // 2. Fetch Static Items separately
+    // 2. Fetch Static Items separately (without joining products to be safe)
     const { data: staticItemsData, error: staticItemsError } = await supabase
         .from('package_items')
         .select(`
             id,
             product_id,
-            quantity,
-            products (
-                name
-            )
+            quantity
         `)
         .eq('package_id', id)
 
     if (staticItemsError) {
         console.error('Error fetching static items:', staticItemsError)
-        // We continue, just with empty static items
     }
 
-    // 3. Fetch All Products for the picker
+    // 3. Fetch All Products for the picker AND for name resolution
     const { data: products } = await supabase
         .from('products')
         .select('id, name, price, image_url, category_id')
         .order('name')
+
+    const productMap = new Map(products?.map(p => [p.id, p]) || [])
 
     // 4. Transform data for the form
     // groups from pkg
@@ -84,22 +80,28 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
             display_order: g.display_order,
             options: (g.package_item_options || [])
                 .sort((a: any, b: any) => a.display_order - b.display_order)
-                .map((o: any) => ({
-                    id: o.id,
-                    product_id: o.product_id,
-                    product_name: o.products?.name || 'Unknown Product',
-                    is_default: o.is_default,
-                    quantity: o.quantity
-                }))
+                .map((o: any) => {
+                    const prod = productMap.get(o.product_id)
+                    return {
+                        id: o.id,
+                        product_id: o.product_id,
+                        product_name: prod?.name || 'Unknown Product',
+                        is_default: o.is_default,
+                        quantity: o.quantity
+                    }
+                })
         }))
 
     // Transform static items
-    const staticItems = (staticItemsData || []).map((i: any) => ({
-        id: i.id,
-        product_id: i.product_id,
-        product_name: i.products?.name || 'Unknown Product',
-        quantity: i.quantity
-    }))
+    const staticItems = (staticItemsData || []).map((i: any) => {
+        const prod = productMap.get(i.product_id)
+        return {
+            id: i.id,
+            product_id: i.product_id,
+            product_name: prod?.name || 'Unknown Product',
+            quantity: i.quantity
+        }
+    })
 
     const initialData = {
         id: pkg.id,
