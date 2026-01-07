@@ -130,6 +130,22 @@ export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
             }
         })
 
+        // Generate summary of selections for display
+        const selectionsSummary = Object.entries(selections).map(([groupId, optionIds]) => {
+            const group = pkg.groups.find(g => g.id === groupId)
+            const selectedOptions = optionIds.map(optId => {
+                const opt = group?.options.find(o => o.id === optId)
+                return {
+                    name: opt?.product.name || 'Unknown Item',
+                    quantity: opt?.quantity || 1
+                }
+            })
+            return {
+                groupName: group?.name || 'Category',
+                items: selectedOptions
+            }
+        })
+
         addPackageItem(
             pkg.id,
             packageSelections,
@@ -137,12 +153,12 @@ export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
                 name: pkg.name,
                 price: pkg.price,
                 original_price: pkg.original_price,
-                savings_amount: pkg.savings_amount
+                savings_amount: pkg.savings_amount,
+                selectionsSummary
             }
         )
 
         toast.success(`'${pkg.name}' added to your cart!`)
-        // Optional: Redirect to cart or keep exploring
     }
 
     return (

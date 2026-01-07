@@ -15,13 +15,17 @@ export type CartItem = {
     price: number
     original_price: number
     savings_amount: number
+    selectionsSummary?: {
+      groupName: string
+      items: { name: string; quantity: number }[]
+    }[]
   }
 }
 
 type CartContextType = {
   items: CartItem[]
   addItem: (productId: string, quantity?: number, modifiers?: Record<string, any>) => void
-  addPackageItem: (packageId: string, packageSelections: Record<string, string[]>, packageData: { name: string; price: number; original_price: number; savings_amount: number }, quantity?: number) => void
+  addPackageItem: (packageId: string, packageSelections: Record<string, string[]>, packageData: { name: string; price: number; original_price: number; savings_amount: number; selectionsSummary?: any[] }, quantity?: number) => void
   removeItem: (cartItemId: string) => void
   updateQuantity: (cartItemId: string, quantity: number) => void
   clearCart: () => void

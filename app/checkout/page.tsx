@@ -1008,8 +1008,27 @@ export default function CheckoutPage() {
                                                                     <X className="h-5 w-5" />
                                                                 </button>
                                                             </div>
-                                                            <p className="text-gold font-bold text-lg">{formatCurrency(price * item.quantity)}</p>
-                                                            <div className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mt-1">
+                                                            <p className="text-gold font-bold text-lg mb-4">{formatCurrency(price * item.quantity)}</p>
+
+                                                            {/* Package Contents Breakdown */}
+                                                            {item.packageData.selectionsSummary && (
+                                                                <div className="space-y-4 mb-6">
+                                                                    {item.packageData.selectionsSummary.map((group: any, gIdx: number) => (
+                                                                        <div key={gIdx} className="space-y-1">
+                                                                            <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">{group.groupName}</p>
+                                                                            <div className="flex flex-wrap gap-2">
+                                                                                {group.items.map((selection: any, sIdx: number) => (
+                                                                                    <span key={sIdx} className="text-xs text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                                                                                        {selection.name} {selection.quantity > 1 ? `x${selection.quantity}` : ''}
+                                                                                    </span>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+
+                                                            <div className="text-[10px] uppercase tracking-widest font-bold text-gold/60">
                                                                 Package Deal
                                                             </div>
                                                         </div>
