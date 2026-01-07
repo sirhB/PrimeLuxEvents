@@ -1,10 +1,31 @@
 import { createClient } from '@/lib/supabase/server'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CreateTaskDialog } from '@/components/admin/tasks/create-task-dialog'
-import { Calendar, CheckCircle2, Clock, Flag } from 'lucide-react'
+import { CheckCircle2, Clock, Flag, Briefcase, Truck, Home, Building, MapPin, Calendar } from 'lucide-react'
 import { TaskItem } from '@/components/admin/tasks/task-item'
+import { cn } from '@/lib/utils'
+
+function getTaskIcon(type: string) {
+    switch (type) {
+        case 'delivery': return <Truck className="h-4 w-4" />
+        case 'event': return <Calendar className="h-4 w-4" />
+        case 'warehouse': return <Home className="h-4 w-4" />
+        case 'office': return <Building className="h-4 w-4" />
+        case 'venue': return <MapPin className="h-4 w-4" />
+        case 'return_trip': return <Truck className="h-4 w-4 rotate-180" />
+        default: return <Briefcase className="h-4 w-4" />
+    }
+}
+
+function getPriorityColor(priority: string) {
+    switch (priority) {
+        case 'urgent': return 'text-red-400 bg-red-400/10 border-red-400/20'
+        case 'high': return 'text-orange-400 bg-orange-400/10 border-orange-400/20'
+        case 'medium': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20'
+        default: return 'text-[var(--dashboard-text-muted)] bg-[var(--dashboard-card)] border-[var(--dashboard-border)]'
+    }
+}
 
 export default async function TasksPage() {
     const supabase = await createClient()
@@ -19,64 +40,111 @@ export default async function TasksPage() {
     const completedTasks = tasks?.filter(t => t.status === 'completed') || []
 
     return (
-        <div className="flex flex-col gap-6 p-6 bg-muted/30 min-h-screen">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-foreground">Tasks</h1>
-                    <p className="text-muted-foreground mt-1 text-sm">
-                        Manage and assign tasks to your team
+        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen admin-theme">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 animate-fade-in-up">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
+                            Operations
+                        </span>
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
+                        Task Management
+                    </h1>
+                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
+                        Coordinate event execution and manage team responsibilities.
                     </p>
                 </div>
-                <CreateTaskDialog />
+                <div className="flex items-center gap-4">
+                    <CreateTaskDialog />
+                </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
-                <Card>
+            {/* Stats Overview */}
+            <div className="grid gap-6 md:grid-cols-3 animate-fade-in-up delay-100">
+                <Card className="glass-card border-none overflow-hidden relative group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--dashboard-accent-orange)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Pending Tasks</CardTitle>
-                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider">Pending Tasks</CardTitle>
+                        <div className="p-2 rounded-lg bg-[var(--dashboard-accent-orange)]/10 text-[var(--dashboard-accent-orange)]">
+                            <Clock className="h-4 w-4" />
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{pendingTasks.length}</div>
+                        <div className="text-3xl font-light text-[var(--dashboard-text)]">{pendingTasks.length}</div>
+                        <p className="text-xs text-[var(--dashboard-text-muted)] mt-1">Awaiting start</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="glass-card border-none overflow-hidden relative group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--dashboard-accent-blue)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-                        <Flag className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider">In Progress</CardTitle>
+                        <div className="p-2 rounded-lg bg-[var(--dashboard-accent-blue)]/10 text-[var(--dashboard-accent-blue)]">
+                            <Flag className="h-4 w-4" />
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{inProgressTasks.length}</div>
+                        <div className="text-3xl font-light text-[var(--dashboard-text)]">{inProgressTasks.length}</div>
+                        <p className="text-xs text-[var(--dashboard-text-muted)] mt-1">Currently active</p>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="glass-card border-none overflow-hidden relative group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--dashboard-accent-green)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Completed</CardTitle>
-                        <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider">Completed</CardTitle>
+                        <div className="p-2 rounded-lg bg-[var(--dashboard-accent-green)]/10 text-[var(--dashboard-accent-green)]">
+                            <CheckCircle2 className="h-4 w-4" />
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{completedTasks.length}</div>
+                        <div className="text-3xl font-light text-[var(--dashboard-text)]">{completedTasks.length}</div>
+                        <p className="text-xs text-[var(--dashboard-text-muted)] mt-1">Successfully finished</p>
                     </CardContent>
                 </Card>
             </div>
 
-            <Tabs defaultValue="all" className="w-full">
-                <TabsList>
-                    <TabsTrigger value="all">All Tasks</TabsTrigger>
-                    <TabsTrigger value="pending">Pending</TabsTrigger>
-                    <TabsTrigger value="my-tasks">My Tasks</TabsTrigger>
-                </TabsList>
+            {/* Tasks Tabs */}
+            <Tabs defaultValue="all" className="w-full animate-fade-in-up delay-200">
+                <div className="flex items-center justify-between mb-6">
+                    <TabsList className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] p-1 h-auto">
+                        <TabsTrigger
+                            value="all"
+                            className="px-6 py-2 data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black rounded-md transition-all"
+                        >
+                            All Tasks
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="board"
+                            className="px-6 py-2 data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black rounded-md transition-all"
+                        >
+                            Board View
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="my-tasks"
+                            className="px-6 py-2 data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black rounded-md transition-all"
+                        >
+                            My Tasks
+                        </TabsTrigger>
+                    </TabsList>
+                </div>
 
-                <TabsContent value="all" className="mt-6">
-                    <Card>
+                <TabsContent value="all" className="mt-0">
+                    <Card className="glass-card border-none overflow-hidden">
                         <CardContent className="p-0">
-                            <div className="divide-y">
+                            <div className="divide-y divide-[var(--dashboard-border)]">
                                 {tasks?.map((task) => (
                                     <TaskItem key={task.id} task={task} />
                                 ))}
                                 {tasks?.length === 0 && (
-                                    <div className="p-8 text-center text-muted-foreground">
-                                        No tasks found.
+                                    <div className="p-12 text-center text-[var(--dashboard-text-muted)]">
+                                        <div className="mb-4 flex justify-center">
+                                            <div className="p-4 rounded-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)]">
+                                                <Briefcase className="h-8 w-8 opacity-20" />
+                                            </div>
+                                        </div>
+                                        <p className="text-lg font-serif">No tasks found</p>
+                                        <p className="text-sm opacity-60">Create a task to get started</p>
                                     </div>
                                 )}
                             </div>
@@ -84,29 +152,112 @@ export default async function TasksPage() {
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="pending" className="mt-6">
-                    <Card>
-                        <CardContent className="p-0">
-                            <div className="divide-y">
-                                {pendingTasks.map((task) => (
-                                    <TaskItem key={task.id} task={task} />
+                <TabsContent value="board" className="mt-0">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Pending Column */}
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center justify-between px-2">
+                                <h3 className="flex items-center gap-2 font-serif text-lg text-[var(--dashboard-text)]">
+                                    <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-orange)]" />
+                                    Pending
+                                </h3>
+                                <span className="text-xs text-[var(--dashboard-text-muted)] bg-[var(--dashboard-card)] px-2 py-0.5 rounded-full border border-[var(--dashboard-border)]">
+                                    {pendingTasks.length}
+                                </span>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                {pendingTasks.map(task => (
+                                    <TaskBoardItem key={task.id} task={task} />
                                 ))}
-                                {pendingTasks.length === 0 && (
-                                    <div className="p-8 text-center text-muted-foreground">
-                                        No pending tasks.
-                                    </div>
-                                )}
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+
+                        {/* In Progress Column */}
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center justify-between px-2">
+                                <h3 className="flex items-center gap-2 font-serif text-lg text-[var(--dashboard-text)]">
+                                    <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-blue)]" />
+                                    In Progress
+                                </h3>
+                                <span className="text-xs text-[var(--dashboard-text-muted)] bg-[var(--dashboard-card)] px-2 py-0.5 rounded-full border border-[var(--dashboard-border)]">
+                                    {inProgressTasks.length}
+                                </span>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                {inProgressTasks.map(task => (
+                                    <TaskBoardItem key={task.id} task={task} />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Completed Column */}
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center justify-between px-2">
+                                <h3 className="flex items-center gap-2 font-serif text-lg text-[var(--dashboard-text)]">
+                                    <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-green)]" />
+                                    Completed
+                                </h3>
+                                <span className="text-xs text-[var(--dashboard-text-muted)] bg-[var(--dashboard-card)] px-2 py-0.5 rounded-full border border-[var(--dashboard-border)]">
+                                    {completedTasks.length}
+                                </span>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                {completedTasks.map(task => (
+                                    <TaskBoardItem key={task.id} task={task} />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </TabsContent>
 
-                <TabsContent value="my-tasks" className="mt-6">
-                    <div className="p-8 text-center text-muted-foreground border rounded-lg border-dashed">
-                        My Tasks view coming soon.
+                <TabsContent value="my-tasks" className="mt-0">
+                    <div className="glass-card p-12 text-center text-[var(--dashboard-text-muted)]">
+                        <div className="mb-4 flex justify-center">
+                            <div className="p-4 rounded-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)]">
+                                <CheckCircle2 className="h-8 w-8 opacity-20" />
+                            </div>
+                        </div>
+                        <h3 className="text-xl font-serif text-[var(--dashboard-text)] mb-2">My Tasks View</h3>
+                        <p className="max-w-sm mx-auto opacity-60">This view will display tasks specifically assigned to you or your role. Coming in the next update.</p>
                     </div>
                 </TabsContent>
             </Tabs>
         </div>
+    )
+}
+
+function TaskBoardItem({ task }: { task: any }) {
+    return (
+        <Card className="glass-card border-[var(--dashboard-border)] hover:border-[var(--dashboard-accent-gold)]/30 transition-all cursor-pointer group">
+            <CardContent className="p-4">
+                <div className="flex items-start justify-between mb-2">
+                    <span className={cn(
+                        "text-[10px] uppercase tracking-wider px-2 py-0.5 rounded border shadow-sm font-medium",
+                        getPriorityColor(task.priority)
+                    )}>
+                        {task.priority}
+                    </span>
+                    <div className="p-1.5 rounded-md bg-[var(--dashboard-card-hover)] text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-accent-gold)] transition-colors">
+                        {getTaskIcon(task.task_type)}
+                    </div>
+                </div>
+                <h4 className="font-medium text-[var(--dashboard-text)] mb-1 line-clamp-2">{task.title}</h4>
+                <p className="text-xs text-[var(--dashboard-text-muted)] line-clamp-2 mb-4">{task.description}</p>
+                <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--dashboard-border)]">
+                    <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-[var(--dashboard-accent-gold)]/10 flex items-center justify-center border border-[var(--dashboard-accent-gold)]/20 text-[var(--dashboard-accent-gold)]">
+                            <span className="text-[10px] font-bold">{(task.assigned_to_text || 'U')[0].toUpperCase()}</span>
+                        </div>
+                        <span className="text-[10px] text-[var(--dashboard-text-muted)]">{task.assigned_to_text || 'Unassigned'}</span>
+                    </div>
+                    {task.due_date && (
+                        <div className="flex items-center gap-1 text-[10px] text-[var(--dashboard-text-muted)]">
+                            <Clock className="w-3 h-3" />
+                            {new Date(task.due_date).toLocaleDateString()}
+                        </div>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
     )
 }

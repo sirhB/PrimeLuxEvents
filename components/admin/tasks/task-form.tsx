@@ -167,42 +167,44 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <Label htmlFor="title">Task Title *</Label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="title" className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)]">Task Title *</Label>
                 <Input
                     id="title"
                     value={formData.title}
                     onChange={(e) => handleInputChange('title', e.target.value)}
                     placeholder="e.g., Deliver catering equipment"
                     required
+                    className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] rounded-xl"
                 />
-                {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title}</p>}
+                {errors.title && <p className="text-sm text-red-400 mt-1">{errors.title}</p>}
             </div>
 
-            <div>
-                <Label htmlFor="description">Description</Label>
+            <div className="space-y-2">
+                <Label htmlFor="description" className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)]">Description</Label>
                 <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     placeholder="Detailed description of the task..."
                     rows={3}
+                    className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] rounded-xl resize-none"
                 />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                    <Label htmlFor="task_type">Task Type</Label>
+            <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                    <Label htmlFor="task_type" className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)]">Task Type</Label>
                     <Select value={formData.task_type} onValueChange={(value) => handleInputChange('task_type', value)}>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] rounded-xl">
                             <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
                             {taskTypes.map((type) => (
-                                <SelectItem key={type.value} value={type.value}>
+                                <SelectItem key={type.value} value={type.value} className="focus:bg-[var(--dashboard-accent-gold)]/10 focus:text-[var(--dashboard-text)]">
                                     <div className="flex items-center gap-2">
-                                        <type.icon className="h-4 w-4 text-muted-foreground" />
+                                        <type.icon className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                                         {type.label}
                                     </div>
                                 </SelectItem>
@@ -211,20 +213,20 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                     </Select>
                 </div>
 
-                <div>
-                    <Label htmlFor="priority">Priority</Label>
+                <div className="space-y-2">
+                    <Label htmlFor="priority" className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)]">Priority</Label>
                     <Select value={formData.priority} onValueChange={(value) => handleInputChange('priority', value)}>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] rounded-xl">
                             <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
                             {priorities.map((priority) => (
-                                <SelectItem key={priority.value} value={priority.value}>
+                                <SelectItem key={priority.value} value={priority.value} className="focus:bg-[var(--dashboard-accent-gold)]/10 focus:text-[var(--dashboard-text)]">
                                     <div className="flex items-center gap-2">
-                                        <Flag className={`h-4 w-4 ${priority.value === 'urgent' ? 'text-red-500' :
-                                            priority.value === 'high' ? 'text-orange-500' :
-                                                priority.value === 'medium' ? 'text-yellow-500' :
-                                                    'text-gray-500'
+                                        <Flag className={`h-4 w-4 ${priority.value === 'urgent' ? 'text-red-400' :
+                                            priority.value === 'high' ? 'text-orange-400' :
+                                                priority.value === 'medium' ? 'text-yellow-400' :
+                                                    'text-zinc-400'
                                             }`} />
                                         {priority.label}
                                     </div>
@@ -235,16 +237,16 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                 </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                    <Label htmlFor="status">Status</Label>
+            <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                    <Label htmlFor="status" className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)]">Status</Label>
                     <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] rounded-xl">
                             <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
                             {statuses.map((status) => (
-                                <SelectItem key={status.value} value={status.value}>
+                                <SelectItem key={status.value} value={status.value} className="focus:bg-[var(--dashboard-accent-gold)]/10 focus:text-[var(--dashboard-text)]">
                                     {status.label}
                                 </SelectItem>
                             ))}
@@ -252,53 +254,58 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                     </Select>
                 </div>
 
-                <div>
-                    <Label htmlFor="due_date">Due Date</Label>
+                <div className="space-y-2">
+                    <Label htmlFor="due_date" className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)]">Due Date</Label>
                     <Input
                         id="due_date"
                         type="date"
                         value={formData.due_date}
                         onChange={(e) => handleInputChange('due_date', e.target.value)}
+                        className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] rounded-xl [color-scheme:dark]"
                     />
                 </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-                <Label htmlFor="assigned_to">Assigned To</Label>
+            <div className="space-y-2">
+                <Label htmlFor="assigned_to" className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)]">Assigned To</Label>
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                         <Button
+                            type="button"
                             variant="outline"
                             role="combobox"
                             aria-expanded={open}
-                            className="w-full justify-between font-normal"
+                            className="w-full justify-between font-normal text-left bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] rounded-xl h-10"
                         >
-                            {formData.assigned_to && formData.assigned_to !== 'unassigned'
-                                ? teamMembers.find((member) => member.id === formData.assigned_to)?.full_name ||
-                                teamMembers.find((member) => member.id === formData.assigned_to)?.email
-                                : formData.assigned_role_id
-                                    ? `Role: ${roles.find(r => r.id === formData.assigned_role_id)?.display_name}`
-                                    : "Select team member or role..."}
+                            <span className="truncate">
+                                {formData.assigned_to
+                                    ? teamMembers.find((member) => member.id === formData.assigned_to)?.full_name ||
+                                    teamMembers.find((member) => member.id === formData.assigned_to)?.email
+                                    : formData.assigned_role_id
+                                        ? `Role: ${roles.find(r => r.id === formData.assigned_role_id)?.display_name}`
+                                        : "Select team member or role..."}
+                            </span>
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[400px] p-0" align="start">
-                        <Command>
-                            <CommandInput placeholder="Search people or roles..." />
-                            <CommandEmpty>No results found.</CommandEmpty>
-                            <CommandList>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-[var(--dashboard-background)] border-[var(--dashboard-border)] shadow-2xl" align="start">
+                        <Command className="bg-transparent">
+                            <CommandInput placeholder="Search people or roles..." className="border-none focus:ring-0 text-[var(--dashboard-text)]" />
+                            <CommandEmpty className="text-[var(--dashboard-text-muted)] p-4">No results found.</CommandEmpty>
+                            <CommandList className="max-h-[300px]">
                                 <CommandGroup>
                                     <CommandItem
-                                        value="unassigned"
+                                        value="unassigned-task"
                                         onSelect={() => {
                                             handleInputChange('assigned_to', '')
                                             handleInputChange('assigned_role_id', '')
                                             setOpen(false)
                                         }}
+                                        className="text-[var(--dashboard-text)] focus:bg-[var(--dashboard-accent-gold)]/10"
                                     >
                                         <Check
                                             className={cn(
-                                                "mr-2 h-4 w-4",
+                                                "mr-2 h-4 w-4 text-[var(--dashboard-accent-gold)]",
                                                 (!formData.assigned_to && !formData.assigned_role_id) ? "opacity-100" : "opacity-0"
                                             )}
                                         />
@@ -306,48 +313,50 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                                     </CommandItem>
                                 </CommandGroup>
 
-                                <CommandGroup heading="Team Members">
+                                <CommandGroup heading={<span className="text-[var(--dashboard-text-muted)] px-2 text-[10px] font-bold uppercase tracking-widest">Team Members</span>}>
                                     {teamMembers.map((member) => (
                                         <CommandItem
                                             key={member.id}
-                                            value={`${member.full_name} ${member.email}`}
+                                            value={`${member.full_name} ${member.email} ${member.id}`}
                                             onSelect={() => {
                                                 handleInputChange('assigned_to', member.id)
                                                 setOpen(false)
                                             }}
+                                            className="text-[var(--dashboard-text)] focus:bg-[var(--dashboard-accent-gold)]/10"
                                         >
                                             <Check
                                                 className={cn(
-                                                    "mr-2 h-4 w-4",
+                                                    "mr-2 h-4 w-4 text-[var(--dashboard-accent-gold)]",
                                                     formData.assigned_to === member.id ? "opacity-100" : "opacity-0"
                                                 )}
                                             />
                                             <div className="flex flex-col">
                                                 <span className="font-medium">{member.full_name || 'Unnamed'}</span>
-                                                <span className="text-xs text-muted-foreground">{member.email}</span>
+                                                <span className="text-[10px] text-[var(--dashboard-text-muted)]">{member.email}</span>
                                             </div>
                                         </CommandItem>
                                     ))}
                                 </CommandGroup>
 
-                                <CommandGroup heading="Roles">
+                                <CommandGroup heading={<span className="text-[var(--dashboard-text-muted)] px-2 text-[10px] font-bold uppercase tracking-widest">Roles</span>}>
                                     {roles.map((role) => (
                                         <CommandItem
                                             key={role.id}
-                                            value={role.display_name}
+                                            value={`${role.display_name} ${role.id}`}
                                             onSelect={() => {
                                                 handleInputChange('assigned_role_id', role.id)
                                                 setOpen(false)
                                             }}
+                                            className="text-[var(--dashboard-text)] focus:bg-[var(--dashboard-accent-gold)]/10"
                                         >
                                             <Check
                                                 className={cn(
-                                                    "mr-2 h-4 w-4",
+                                                    "mr-2 h-4 w-4 text-[var(--dashboard-accent-gold)]",
                                                     formData.assigned_role_id === role.id ? "opacity-100" : "opacity-0"
                                                 )}
                                             />
                                             <div className="flex items-center gap-2">
-                                                <Shield className="h-4 w-4 text-muted-foreground" />
+                                                <Shield className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                                                 <span>{role.display_name}</span>
                                             </div>
                                         </CommandItem>
@@ -360,18 +369,27 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
             </div>
 
             {errors.submit && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                <div className="bg-red-400/10 border border-red-400/20 text-red-400 px-4 py-3 rounded-xl text-sm">
                     {errors.submit}
                 </div>
             )}
 
-            <div className="flex justify-end gap-4 pt-4 border-t">
+            <div className="flex justify-end gap-4 pt-6 border-t border-[var(--dashboard-border)]">
                 {onCancel && (
-                    <Button type="button" variant="outline" onClick={onCancel}>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={onCancel}
+                        className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)] rounded-xl"
+                    >
                         Cancel
                     </Button>
                 )}
-                <Button type="submit" disabled={loading}>
+                <Button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium rounded-xl px-8 transition-all"
+                >
                     {loading ? 'Saving...' : task ? 'Update Task' : 'Create Task'}
                 </Button>
             </div>
