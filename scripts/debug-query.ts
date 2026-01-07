@@ -25,43 +25,60 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function testQuery() {
-    const id = '5a97a253-ef22-4065-aa5a-3bbe9a4c0423'
+    // using the ID from the URL in the screenshot or a known ID
+    // The user screenshot doesn't show the ID in URL clearly, but previous request had 
+    // 5a97a253-ef22-4065-aa5a-3bbe9a4c0423. Let's try that or any package.
 
-    console.log('Testing metadata query...')
-    const { data: simplePkg, error: simpleError } = await supabase
-        .from('packages')
-        .select('name, description')
-        .eq('id', id)
-        .single()
-
-    if (simpleError) {
-        console.error('Metadata query failed:', simpleError)
-    } else {
-        console.log('Metadata query success:', simplePkg)
+    // First get a valid package ID
+    const { data: validPkg } = await supabase.from('packages').select('id').limit(1).single()
+    if (!validPkg) {
+        console.error('No packages found to test with')
+        return
     }
 
-    console.log('\nTesting complex query...')
-    const { data: pkg, error } = await supabase
+    const id = validPkg.id
+    console.log(`Testing with Package ID: ${id}`)
+
+    const { data, error } = await supabase
         .from('packages')
         .select(`
-          *,
-          package_item_groups (
-              *,
-              package_item_options (
-                  *,
-                  products (*)
-              )
-          )
-      `)
+            *,
+            package_item_groups (
+                id,
+                name,
+                description,
+                min_selections,
+                max_selections,
+                display_order,
+                package_item_options (
+                    id,
+                    product_id,
+                    is_default,
+                    quantity,
+                    display_order,
+                    products (
+                        name
+                    )
+                )
+            ),
+            package_items (
+                id,
+                product_id,
+                quantity,
+                products (
+                    name
+                )
+            )
+        `)
         .eq('id', id)
         .single()
 
     if (error) {
-        console.error('Complex query failed:', error)
+        console.error('Query Failed:', JSON.stringify(error, null, 2))
     } else {
-        console.log('Complex query success. Groups count:', pkg.package_item_groups.length)
-        if (pkg.package_item_groups.length > 0) {
-            console.log('First group options:', pkg.package_item_groups[0].package_item_options)
+        console.log('Query Success!')
+        if (data.package_items) {
+            console.log('Static Items:', data.package_items.length)
         }
     }
 }

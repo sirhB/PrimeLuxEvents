@@ -7,8 +7,9 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
     const { id } = await params
     const supabase = await createClient()
 
-    // 1. Fetch Package Details with Groups and Options AND Static Items
-    const { data: pkg, error } = await supabase
+    // 1. Fetch Package Details (Basic + Groups)
+    // We split this to avoid deep nesting issues with Supabase
+    const { data: pkg, error: pkgError } = await supabase
         .from('packages')
         .select(`
             *,
@@ -29,39 +30,50 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
                         name
                     )
                 )
-            ),
-            package_items (
-                id,
-                product_id,
-                quantity,
-                products (
-                    name
-                )
             )
         `)
         .eq('id', id)
         .single()
 
-    if (error || !pkg) {
-        console.error('Error fetching package:', error)
-        try {
-            // Attempt fallback if query fails (e.g. if schema mismatch)
-            redirect('/admin/packages')
-        } catch (e) {
-            // This is just to satisfy the linter if redirect is not detected as returning never
-            return <div>Error loading package</div>
-        }
+    if (pkgError || !pkg) {
+        console.error('Error fetching package:', pkgError)
+        return (
+            <div className="p-8 text-center text-red-500">
+                <h2 className="text-xl font-bold">Error loading package</h2>
+                <pre className="mt-4 text-xs bg-gray-100 p-4 rounded text-left overflow-auto max-w-2xl mx-auto">
+                    {JSON.stringify(pkgError, null, 2)}
+                </pre>
+            </div>
+        )
     }
 
-    // 2. Fetch All Products for the picker
+    // 2. Fetch Static Items separately
+    const { data: staticItemsData, error: staticItemsError } = await supabase
+        .from('package_items')
+        .select(`
+            id,
+            product_id,
+            quantity,
+            products (
+                name
+            )
+        `)
+        .eq('package_id', id)
+
+    if (staticItemsError) {
+        console.error('Error fetching static items:', staticItemsError)
+        // We continue, just with empty static items
+    }
+
+    // 3. Fetch All Products for the picker
     const { data: products } = await supabase
         .from('products')
         .select('id, name, price, image_url, category_id')
         .order('name')
 
-    // 3. Transform data for the form
-    // We need to sort groups and options by display_order
-    const groups: PackageItemGroup[] = pkg.package_item_groups
+    // 4. Transform data for the form
+    // groups from pkg
+    const groups: PackageItemGroup[] = (pkg.package_item_groups || [])
         .sort((a: any, b: any) => a.display_order - b.display_order)
         .map((g: any) => ({
             id: g.id,
@@ -70,7 +82,7 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
             min_selections: g.min_selections,
             max_selections: g.max_selections,
             display_order: g.display_order,
-            options: g.package_item_options
+            options: (g.package_item_options || [])
                 .sort((a: any, b: any) => a.display_order - b.display_order)
                 .map((o: any) => ({
                     id: o.id,
@@ -82,7 +94,7 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
         }))
 
     // Transform static items
-    const staticItems = pkg.package_items.map((i: any) => ({
+    const staticItems = (staticItemsData || []).map((i: any) => ({
         id: i.id,
         product_id: i.product_id,
         product_name: i.products?.name || 'Unknown Product',
