@@ -229,12 +229,24 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                             name="name"
                             defaultValue={product?.name}
                             onChange={(e) => {
+                                const name = e.target.value
                                 const slugInput = document.getElementById('slug') as HTMLInputElement
-                                if (slugInput && (!slugInput.value || slugInput.value === product?.slug)) {
-                                    slugInput.value = e.target.value
+                                const categorySelect = document.getElementsByName('category_id')[0] as HTMLSelectElement
+
+                                if (slugInput && (!slugInput.value || slugInput.value === product?.slug || slugInput.dataset.auto === 'true')) {
+                                    let categoryName = ''
+                                    if (categorySelect && categorySelect.value) {
+                                        const category = categories.find(c => c.id === categorySelect.value)
+                                        if (category) categoryName = category.name
+                                    }
+
+                                    const base = categoryName ? `${categoryName} ${name}` : name
+                                    slugInput.value = base
                                         .toLowerCase()
                                         .replace(/[^a-z0-9\s]/g, '')
+                                        .trim()
                                         .replace(/\s+/g, '-')
+                                    slugInput.dataset.auto = 'true'
                                 }
                             }}
                             placeholder="Enter product name"
@@ -248,10 +260,13 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                             id="slug"
                             name="slug"
                             defaultValue={product?.slug}
-                            placeholder="product-name-slug"
+                            onChange={(e) => {
+                                e.target.dataset.auto = 'false'
+                            }}
+                            placeholder="category-product-name"
                             required
                         />
-                        <p className="text-xs text-muted-foreground">This will be used in the URL: /catalog/product-slug</p>
+                        <p className="text-xs text-muted-foreground">This will be used in the URL: /catalog/category-product-name</p>
                     </div>
 
                     <div className="space-y-2">
@@ -291,7 +306,26 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="category_id">Category</Label>
-                            <Select name="category_id" defaultValue={product?.category_id}>
+                            <Select
+                                name="category_id"
+                                defaultValue={product?.category_id}
+                                onValueChange={(value) => {
+                                    const nameInput = document.getElementById('name') as HTMLInputElement
+                                    const slugInput = document.getElementById('slug') as HTMLInputElement
+                                    if (nameInput && slugInput && (slugInput.dataset.auto === 'true' || !slugInput.value || slugInput.value === product?.slug)) {
+                                        const category = categories.find(c => c.id === value)
+                                        const categoryName = category ? category.name : ''
+                                        const name = nameInput.value
+                                        const base = categoryName ? `${categoryName} ${name}` : name
+                                        slugInput.value = base
+                                            .toLowerCase()
+                                            .replace(/[^a-z0-9\s]/g, '')
+                                            .trim()
+                                            .replace(/\s+/g, '-')
+                                        slugInput.dataset.auto = 'true'
+                                    }
+                                }}
+                            >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select a category" />
                                 </SelectTrigger>

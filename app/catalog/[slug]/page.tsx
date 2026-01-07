@@ -8,15 +8,41 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params
   const supabase = await createClient()
 
-  // Fetch product directly without joins to avoid relationship errors
-  const { data: product, error: productError } = await supabase
+  // Fetch product - try slug first, then ID as fallback
+  let product = null
+  let productError = null
+
+  // Try slug first
+  const { data: slugData, error: slugError } = await supabase
     .from('products')
     .select('*')
     .eq('slug', slug)
-    .single()
+    .maybeSingle()
 
-  if (productError || !product) {
-    console.error('Error fetching product:', productError)
+  if (slugData) {
+    product = slugData
+  } else {
+    // If not found by slug, try ID if it's a valid UUID
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug)
+    if (isUuid) {
+      const { data: idData, error: idError } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', slug)
+        .maybeSingle()
+
+      if (idData) {
+        product = idData
+      } else {
+        productError = idError
+      }
+    } else {
+      productError = slugError
+    }
+  }
+
+  if (!product) {
+    console.error('Product not found for slug/id:', slug, productError)
     notFound()
   }
 
