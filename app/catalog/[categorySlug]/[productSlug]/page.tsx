@@ -81,10 +81,11 @@ export default async function ProductPage({ params }: { params: Promise<{ catego
 
     // Fetch related products separately
     // We include category info in related products too
+    // We fetch a larger pool of products to ensure the client-side scoring finds good matches
     const { data: rawRelatedProducts } = await supabase
         .from('products')
         .select('*, categories(name, slug)')
-        .limit(12)
+        .limit(100)
         .order('created_at', { ascending: false })
 
     // Combine data

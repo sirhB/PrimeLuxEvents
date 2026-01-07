@@ -81,14 +81,6 @@ export function FeaturedProductCard({ product }: FeaturedProductCardProps) {
                         </div>
                     </div>
 
-                    <div className="flex-shrink-0">
-                        <Button
-                            className="bg-white text-black hover:bg-gold hover:text-black rounded-full px-8 py-6 text-base transition-all duration-300 group-hover:translate-x-2"
-                        >
-                            View Details
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                    </div>
                 </div>
             </div>
         </Link>

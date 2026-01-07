@@ -62,11 +62,12 @@ export function RelatedProducts({
                 const priceDiff = Math.abs(currentPrice - productPrice)
                 if (priceDiff < currentPrice * 0.3) {
                     score += 3
+                } else if (priceDiff < currentPrice * 0.6) {
+                    score += 1 // Small boost for moderate price similarity
                 }
 
                 return { product, score }
             })
-            .filter(item => item.score > 0) // Only include products with some relevance
             .sort((a, b) => b.score - a.score) // Sort by score descending
             .slice(0, maxItems)
             .map(item => item.product)

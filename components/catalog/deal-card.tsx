@@ -16,8 +16,11 @@ interface DealCardProps {
 
 export function DealCard({ name, description, price, imageUrl, onViewDetails, dealBadge = "SPECIAL DEAL" }: DealCardProps) {
     return (
-        <div className="group relative w-full h-full">
-            <div className="relative h-full overflow-hidden rounded-2xl bg-white border border-border/5 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col">
+        <div
+            className="group relative w-full h-full cursor-pointer"
+            onClick={onViewDetails}
+        >
+            <div className="relative h-full overflow-hidden rounded-2xl bg-white border border-border/5 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col group-hover:-translate-y-2">
 
                 {/* Image Section */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-[#FDFBF7]">
@@ -73,13 +76,6 @@ export function DealCard({ name, description, price, imageUrl, onViewDetails, de
                                 </span>
                             </div>
                         </div>
-
-                        <Button
-                            onClick={onViewDetails}
-                            className="rounded-full bg-black text-white hover:bg-gold hover:text-black px-8 py-6 transition-all duration-300 font-medium"
-                        >
-                            View Package
-                        </Button>
                     </div>
                 </div>
             </div>
