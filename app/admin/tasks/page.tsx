@@ -48,7 +48,7 @@ export default async function TasksPage() {
                         Manage and assign tasks to your team
                     </p>
                 </div>
-                <CreateTaskDialog onSuccess={() => { /* Refresh handled by server component revalidation usually, or client reload */ }} />
+                <CreateTaskDialog />
             </div>
 
             <div className="grid gap-6 md:grid-cols-3">

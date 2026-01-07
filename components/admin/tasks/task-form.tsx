@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -52,6 +53,7 @@ const taskTypes = [
 import { MapPin } from 'lucide-react'
 
 export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) {
+    const router = useRouter()
     const [formData, setFormData] = useState<TaskFormData>({
         title: task?.title || '',
         description: task?.description || '',
@@ -113,6 +115,7 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                 if (error) throw error
             }
 
+            router.refresh()
             onSuccess?.()
         } catch (error) {
             console.error('Error saving task:', error)
