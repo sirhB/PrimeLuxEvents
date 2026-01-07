@@ -135,8 +135,8 @@ export default function SettingsPage() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-96">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <div className="flex items-center justify-center min-h-screen bg-[var(--dashboard-background)]">
+                <div className="h-8 w-8 border-4 border-[var(--dashboard-accent-gold)] border-t-transparent rounded-full animate-spin" />
             </div>
         )
     }
@@ -159,16 +159,16 @@ export default function SettingsPage() {
                 </div>
             </div>
 
-            <div className="grid gap-6 max-w-4xl">
+            <div className="grid gap-8 max-w-4xl">
                 {/* Tax Settings */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Tax Configuration</CardTitle>
-                        <CardDescription>Set the sales tax rate for all orders</CardDescription>
+                <Card className="border-none glass-card overflow-hidden">
+                    <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">
+                        <CardTitle className="font-serif text-2xl">Tax Configuration</CardTitle>
+                        <CardDescription className="text-[var(--dashboard-text-muted)]">Set the sales tax rate for all orders</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="tax_rate">Tax Rate (%)</Label>
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="space-y-3">
+                            <Label htmlFor="tax_rate" className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Tax Rate (%)</Label>
                             <Input
                                 id="tax_rate"
                                 type="number"
@@ -179,25 +179,26 @@ export default function SettingsPage() {
                                 onChange={(e) =>
                                     setSettings({ ...settings, tax_rate: (parseFloat(e.target.value) / 100).toString() })
                                 }
+                                className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
                                 placeholder="8.875"
                             />
-                            <p className="text-sm text-muted-foreground">
-                                Current rate: {(parseFloat(settings.tax_rate) * 100).toFixed(2)}%
+                            <p className="text-[10px] text-[var(--dashboard-accent-gold)] font-bold uppercase tracking-wider">
+                                Current effective rate: {(parseFloat(settings.tax_rate) * 100).toFixed(2)}%
                             </p>
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* Delivery Fee Settings */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Delivery Fee Configuration</CardTitle>
-                        <CardDescription>Set base fee and per-mile rate for delivery calculations</CardDescription>
+                <Card className="border-none glass-card overflow-hidden">
+                    <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">
+                        <CardTitle className="font-serif text-2xl">Delivery Fee Configuration</CardTitle>
+                        <CardDescription className="text-[var(--dashboard-text-muted)]">Set base fee and per-mile rate for delivery calculations</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid sm:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="delivery_base_fee">Base Delivery Fee ($)</Label>
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="grid sm:grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                                <Label htmlFor="delivery_base_fee" className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Base Delivery Fee ($)</Label>
                                 <Input
                                     id="delivery_base_fee"
                                     type="number"
@@ -205,11 +206,12 @@ export default function SettingsPage() {
                                     min="0"
                                     value={settings.delivery_base_fee}
                                     onChange={(e) => setSettings({ ...settings, delivery_base_fee: e.target.value })}
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
                                     placeholder="50.00"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="delivery_per_mile_rate">Per Mile Rate ($)</Label>
+                            <div className="space-y-3">
+                                <Label htmlFor="delivery_per_mile_rate" className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Per Mile Rate ($)</Label>
                                 <Input
                                     id="delivery_per_mile_rate"
                                     type="number"
@@ -217,29 +219,33 @@ export default function SettingsPage() {
                                     min="0"
                                     value={settings.delivery_per_mile_rate}
                                     onChange={(e) => setSettings({ ...settings, delivery_per_mile_rate: e.target.value })}
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
                                     placeholder="1.50"
                                 />
                             </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                            Formula: Base Fee + (Distance × Per Mile Rate)
-                        </p>
+                        <div className="bg-black/20 p-4 rounded-xl border border-[var(--dashboard-border)]">
+                            <p className="text-xs text-[var(--dashboard-text-muted)] font-medium">
+                                Formula: <span className="text-[var(--dashboard-accent-gold)] font-bold">Base Fee</span> + (Distance × <span className="text-[var(--dashboard-accent-gold)] font-bold">Per Mile Rate</span>)
+                            </p>
+                        </div>
                     </CardContent>
                 </Card>
 
                 {/* Warehouse Address */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Warehouse Location</CardTitle>
-                        <CardDescription>Set your warehouse address for delivery distance calculations</CardDescription>
+                <Card className="border-none glass-card overflow-hidden">
+                    <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">
+                        <CardTitle className="font-serif text-2xl">Warehouse Location</CardTitle>
+                        <CardDescription className="text-[var(--dashboard-text-muted)]">Set your warehouse address for delivery distance calculations</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="warehouse_address">Warehouse Address</Label>
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="space-y-3">
+                            <Label htmlFor="warehouse_address" className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Warehouse Address</Label>
                             <Textarea
                                 id="warehouse_address"
                                 value={settings.warehouse_address}
                                 onChange={(e) => setSettings({ ...settings, warehouse_address: e.target.value })}
+                                className="min-h-[100px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all resize-none"
                                 placeholder="123 Main St, New York, NY 10001"
                                 rows={3}
                             />
@@ -248,26 +254,31 @@ export default function SettingsPage() {
                 </Card>
 
                 {/* Distance Calculator Test */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Test Distance Calculator</CardTitle>
-                        <CardDescription>Test the delivery fee calculation with a sample address</CardDescription>
+                <Card className="border-none glass-card overflow-hidden">
+                    <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">
+                        <CardTitle className="font-serif text-2xl">Test Distance Calculator</CardTitle>
+                        <CardDescription className="text-[var(--dashboard-text-muted)]">Analyze the delivery fee calculation with a sample address</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="test_address">Test Delivery Address</Label>
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="space-y-3">
+                            <Label htmlFor="test_address" className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Test Delivery Address</Label>
                             <Textarea
                                 id="test_address"
                                 value={testAddress}
                                 onChange={(e) => setTestAddress(e.target.value)}
+                                className="min-h-[80px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all resize-none"
                                 placeholder="456 Park Ave, New York, NY 10022"
                                 rows={2}
                             />
                         </div>
-                        <Button onClick={handleTestDistance} disabled={isTesting || !testAddress || !settings.warehouse_address}>
+                        <Button
+                            onClick={handleTestDistance}
+                            disabled={isTesting || !testAddress || !settings.warehouse_address}
+                            className="w-full sm:w-auto rounded-full bg-white/5 hover:bg-white/10 text-[var(--dashboard-text)] border border-[var(--dashboard-border)] font-bold uppercase text-[10px] tracking-widest h-12 px-8 transition-all"
+                        >
                             {isTesting ? (
                                 <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    <div className="mr-2 h-4 w-4 border-2 border-[var(--dashboard-accent-gold)] border-t-transparent rounded-full animate-spin" />
                                     Calculating...
                                 </>
                             ) : (
@@ -275,32 +286,41 @@ export default function SettingsPage() {
                             )}
                         </Button>
                         {testResult && (
-                            <div className="bg-muted/50 border border-border rounded-lg p-4">
-                                <pre className="text-sm whitespace-pre-wrap">{testResult}</pre>
+                            <div className="bg-black/30 border border-[var(--dashboard-border)] rounded-2xl p-6 animate-fade-in shadow-2xl">
+                                <pre className="text-sm font-mono text-[var(--dashboard-text)] whitespace-pre-wrap leading-relaxed">
+                                    {testResult}
+                                </pre>
                             </div>
                         )}
                     </CardContent>
                 </Card>
 
                 {/* Save Button */}
-                <div className="flex items-center gap-4">
-                    <Button onClick={handleSave} disabled={isSaving} size="lg">
+                <div className="flex items-center gap-6 pt-4">
+                    <Button
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        size="lg"
+                        className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-bold uppercase text-[11px] tracking-[0.2em] px-10 h-14 shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all transform active:scale-95"
+                    >
                         {isSaving ? (
                             <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                <div className="mr-2 h-4 w-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                                 Saving...
                             </>
                         ) : (
                             <>
                                 <SettingsIcon className="mr-2 h-4 w-4" />
-                                Save Settings
+                                Save Global Settings
                             </>
                         )}
                     </Button>
                     {saveSuccess && (
-                        <div className="flex items-center gap-2 text-green-600">
-                            <Check className="h-4 w-4" />
-                            <span className="text-sm">Settings saved successfully!</span>
+                        <div className="flex items-center gap-3 text-[var(--dashboard-accent-green)] animate-fade-in">
+                            <div className="bg-[var(--dashboard-accent-green)]/10 p-1.5 rounded-full border border-[var(--dashboard-accent-green)]/20 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                                <Check className="h-4 w-4" />
+                            </div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest">Settings updated successfully</span>
                         </div>
                     )}
                 </div>

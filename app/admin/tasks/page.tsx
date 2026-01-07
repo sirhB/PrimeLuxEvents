@@ -107,22 +107,22 @@ export default async function TasksPage() {
             {/* Tasks Tabs */}
             <Tabs defaultValue="all" className="w-full animate-fade-in-up delay-200">
                 <div className="flex items-center justify-between mb-6">
-                    <TabsList className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] p-1 h-auto">
+                    <TabsList className="glass-card border-none p-1 bg-black/20 w-fit h-auto">
                         <TabsTrigger
                             value="all"
-                            className="px-6 py-2 data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black rounded-md transition-all"
+                            className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6"
                         >
                             All Tasks
                         </TabsTrigger>
                         <TabsTrigger
                             value="board"
-                            className="px-6 py-2 data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black rounded-md transition-all"
+                            className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6"
                         >
                             Board View
                         </TabsTrigger>
                         <TabsTrigger
                             value="my-tasks"
-                            className="px-6 py-2 data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black rounded-md transition-all"
+                            className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6"
                         >
                             My Tasks
                         </TabsTrigger>
@@ -156,13 +156,13 @@ export default async function TasksPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Pending Column */}
                         <div className="flex flex-col gap-4">
-                            <div className="flex items-center justify-between px-2">
+                            <div className="flex items-center justify-between px-4 py-3 glass-card border-none rounded-2xl mb-2">
                                 <h3 className="flex items-center gap-2 font-serif text-lg text-[var(--dashboard-text)]">
                                     <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-orange)]" />
                                     Pending
                                 </h3>
-                                <span className="text-xs text-[var(--dashboard-text-muted)] bg-[var(--dashboard-card)] px-2 py-0.5 rounded-full border border-[var(--dashboard-border)]">
-                                    {pendingTasks.length}
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-accent-gold)]">
+                                    {pendingTasks.length} Units
                                 </span>
                             </div>
                             <div className="flex flex-col gap-4">
@@ -174,13 +174,13 @@ export default async function TasksPage() {
 
                         {/* In Progress Column */}
                         <div className="flex flex-col gap-4">
-                            <div className="flex items-center justify-between px-2">
+                            <div className="flex items-center justify-between px-4 py-3 glass-card border-none rounded-2xl mb-2">
                                 <h3 className="flex items-center gap-2 font-serif text-lg text-[var(--dashboard-text)]">
                                     <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-blue)]" />
                                     In Progress
                                 </h3>
-                                <span className="text-xs text-[var(--dashboard-text-muted)] bg-[var(--dashboard-card)] px-2 py-0.5 rounded-full border border-[var(--dashboard-border)]">
-                                    {inProgressTasks.length}
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-accent-gold)]">
+                                    {inProgressTasks.length} Units
                                 </span>
                             </div>
                             <div className="flex flex-col gap-4">
@@ -192,13 +192,13 @@ export default async function TasksPage() {
 
                         {/* Completed Column */}
                         <div className="flex flex-col gap-4">
-                            <div className="flex items-center justify-between px-2">
+                            <div className="flex items-center justify-between px-4 py-3 glass-card border-none rounded-2xl mb-2">
                                 <h3 className="flex items-center gap-2 font-serif text-lg text-[var(--dashboard-text)]">
                                     <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-green)]" />
                                     Completed
                                 </h3>
-                                <span className="text-xs text-[var(--dashboard-text-muted)] bg-[var(--dashboard-card)] px-2 py-0.5 rounded-full border border-[var(--dashboard-border)]">
-                                    {completedTasks.length}
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-accent-gold)]">
+                                    {completedTasks.length} Units
                                 </span>
                             </div>
                             <div className="flex flex-col gap-4">

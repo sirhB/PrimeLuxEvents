@@ -24,7 +24,6 @@ import {
     MapPin,
     Clock,
     FileText,
-    Eye,
     ChevronRight,
     Search,
     Truck
@@ -44,6 +43,11 @@ interface PackItem {
     assemblyItems: (string | AssemblyItem)[]
 }
 
+interface AssemblyPartDetail {
+    quantity: number
+    products: Record<string, number>
+}
+
 interface OrderPack {
     id: string
     customerName: string
@@ -52,7 +56,7 @@ interface OrderPack {
     deliveryDate: string | null
     deliveryNotes: string | null
     items: PackItem[]
-    assemblySummary: Record<string, number>
+    assemblySummary: Record<string, AssemblyPartDetail>
 }
 
 interface UpcomingDate {
@@ -64,7 +68,7 @@ export default function PackSlipPage() {
     const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0])
     const [loading, setLoading] = useState(false)
     const [items, setItems] = useState<PackItem[]>([])
-    const [assemblySummary, setAssemblySummary] = useState<Record<string, number>>({})
+    const [assemblySummary, setAssemblySummary] = useState<Record<string, AssemblyPartDetail>>({})
     const [orders, setOrders] = useState<OrderPack[]>([])
     const [orderCount, setOrderCount] = useState(0)
     const [hasSearched, setHasSearched] = useState(false)
@@ -147,7 +151,7 @@ export default function PackSlipPage() {
             }
 
             const itemMap = new Map<string, PackItem>()
-            const assemblyMap: Record<string, number> = {}
+            const assemblyMap: Record<string, AssemblyPartDetail> = {}
             const orderMap = new Map<string, OrderPack>()
 
             ordersData.forEach((order: any) => {
@@ -192,7 +196,11 @@ export default function PackSlipPage() {
                                 partQty = part.quantity * quantity
                             }
 
-                            assemblyMap[partName] = (assemblyMap[partName] || 0) + partQty
+                            if (!assemblyMap[partName]) {
+                                assemblyMap[partName] = { quantity: 0, products: {} }
+                            }
+                            assemblyMap[partName].quantity += partQty
+                            assemblyMap[partName].products[product.name] = (assemblyMap[partName].products[product.name] || 0) + partQty
                         })
                     }
 
@@ -216,7 +224,11 @@ export default function PackSlipPage() {
                                 partQty = part.quantity * quantity
                             }
 
-                            orderPack.assemblySummary[partName] = (orderPack.assemblySummary[partName] || 0) + partQty
+                            if (!orderPack.assemblySummary[partName]) {
+                                orderPack.assemblySummary[partName] = { quantity: 0, products: {} }
+                            }
+                            orderPack.assemblySummary[partName].quantity += partQty
+                            orderPack.assemblySummary[partName].products[product.name] = (orderPack.assemblySummary[partName].products[product.name] || 0) + partQty
                         })
                     }
                 })
@@ -465,10 +477,20 @@ export default function PackSlipPage() {
                                                         </TableRow>
                                                     </TableHeader>
                                                     <TableBody>
-                                                        {Object.entries(assemblySummary).map(([part, qty]) => (
+                                                        {Object.entries(assemblySummary).map(([part, details]) => (
                                                             <TableRow key={part} className="border-[var(--dashboard-border)] hover:bg-[var(--dashboard-card-hover)]">
-                                                                <TableCell className="py-4">{part}</TableCell>
-                                                                <td className="px-4 py-4 text-right font-mono text-lg text-[var(--dashboard-accent-gold)]">{qty}</td>
+                                                                <TableCell className="py-4">
+                                                                    <div className="font-medium">{part}</div>
+                                                                    <div className="text-[10px] text-[var(--dashboard-text-muted)] mt-1 flex flex-wrap gap-x-2">
+                                                                        {Object.entries(details.products).map(([productName, productQty]) => (
+                                                                            <span key={productName} className="flex items-center gap-1">
+                                                                                <span className="h-1 w-1 rounded-full bg-[var(--dashboard-accent-gold)]/50" />
+                                                                                {productName} (x{productQty})
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                </TableCell>
+                                                                <td className="px-4 py-4 text-right font-mono text-lg text-[var(--dashboard-accent-gold)]">{details.quantity}</td>
                                                                 <td className="px-4 py-4">
                                                                     <div className="w-6 h-6 border border-[var(--dashboard-border)] rounded mx-auto bg-black/20" />
                                                                 </td>

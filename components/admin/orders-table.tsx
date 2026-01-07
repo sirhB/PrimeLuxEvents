@@ -7,10 +7,12 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableHead,
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { SortableHeader } from '@/components/admin/sortable-header'
 import { StatusBadge } from '@/components/ui/status-badge'
@@ -86,23 +88,32 @@ export function OrdersTable({ orders, getStatusVariant }: OrdersTableProps) {
                 )}
             </AnimatePresence>
 
-            <div className="rounded-[var(--radius)] border border-border bg-card/30 backdrop-blur-md overflow-hidden">
+            <Card className="border-none glass-card overflow-hidden">
                 <Table>
-                    <TableHeader>
-                        <TableRow className="hover:bg-transparent border-b border-border/50">
-                            <TableCell className="w-12">
+                    <TableHeader className="bg-black/20">
+                        <TableRow className="hover:bg-transparent border-b border-[var(--dashboard-border)]">
+                            <TableHead className="w-12 pl-6">
                                 <Checkbox
                                     checked={selectedIds.length === orders.length && orders.length > 0}
                                     onCheckedChange={toggleAll}
+                                    className="border-[var(--dashboard-border)] data-[state=checked]:bg-[var(--dashboard-accent-gold)] data-[state=checked]:border-[var(--dashboard-accent-gold)]"
                                 />
-                            </TableCell>
-                            <SortableHeader column="id" label="Invoice" />
-                            <SortableHeader column="customer_name" label="Customer" className="min-w-[180px]" />
-                            <SortableHeader column="created_at" label="Date" />
-                            <SortableHeader column="total_amount" label="Amount" />
-                            <TableCell>Order Status</TableCell>
-                            <TableCell>Payment Status</TableCell>
-                            <TableCell className="text-right">Actions</TableCell>
+                            </TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] py-4">
+                                <SortableHeader column="id" label="Invoice No." />
+                            </TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                <SortableHeader column="customer_name" label="Client" className="min-w-[180px]" />
+                            </TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                <SortableHeader column="created_at" label="Placement Date" />
+                            </TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                <SortableHeader column="total_amount" label="Total Value" />
+                            </TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Order Status</TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Payment</TableHead>
+                            <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] pr-6">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -110,79 +121,81 @@ export function OrdersTable({ orders, getStatusVariant }: OrdersTableProps) {
                             <TableRow
                                 key={order.id}
                                 data-state={selectedIds.includes(order.id) ? 'selected' : ''}
-                                className="group/row transition-colors"
+                                className="group/row hover:bg-[var(--dashboard-card-hover)] border-b border-[var(--dashboard-border)] transition-colors"
                             >
-                                <TableCell>
+                                <TableCell className="pl-6">
                                     <Checkbox
                                         checked={selectedIds.includes(order.id)}
                                         onCheckedChange={() => toggleOne(order.id)}
+                                        className="border-[var(--dashboard-border)] data-[state=checked]:bg-[var(--dashboard-accent-gold)] data-[state=checked]:border-[var(--dashboard-accent-gold)]"
                                     />
                                 </TableCell>
-                                <TableCell className="font-semibold text-primary">
-                                    <div className="flex items-center gap-2">
+                                <TableCell className="py-4">
+                                    <div className="flex items-center gap-2 font-mono font-bold text-[var(--dashboard-accent-gold)]">
                                         <Hash className="h-3 w-3 opacity-50" />
-                                        {order.id.slice(0, 8)}
+                                        {order.id.slice(0, 8).toUpperCase()}
                                     </div>
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex flex-col">
-                                        <span className="font-medium text-foreground group-hover/row:text-primary transition-colors">
+                                        <span className="font-serif text-lg text-[var(--dashboard-text)] group-hover/row:text-[var(--dashboard-accent-gold)] transition-colors">
                                             {order.customer_name}
                                         </span>
-                                        <span className="text-[10px] text-muted-foreground font-light tracking-wide uppercase">
+                                        <span className="text-[10px] text-[var(--dashboard-text-muted)] font-bold tracking-widest uppercase opacity-70">
                                             {order.customer_email}
                                         </span>
                                     </div>
                                 </TableCell>
-                                <TableCell className="text-muted-foreground font-light">
+                                <TableCell className="text-[var(--dashboard-text-muted)] font-light italic">
                                     {new Date(order.created_at).toLocaleDateString('en-US', {
                                         month: 'short',
                                         day: 'numeric',
                                         year: 'numeric'
                                     })}
                                 </TableCell>
-                                <TableCell className="font-serif">
+                                <TableCell className="font-mono font-bold text-[var(--dashboard-text)] text-base">
                                     {formatCents(order.total_amount)}
                                 </TableCell>
                                 <TableCell>
                                     <StatusBadge
                                         status={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                                         variant={getStatusVariant(order.status)}
+                                        className="rounded-lg text-[10px] font-bold uppercase tracking-widest"
                                     />
                                 </TableCell>
                                 <TableCell>
                                     {order.is_overbooked ? (
-                                        <StatusBadge status="Overbooked" variant="cancelled" />
+                                        <StatusBadge status="Overbooked" variant="cancelled" className="rounded-lg text-[10px] font-bold uppercase tracking-widest" />
                                     ) : (
-                                        <StatusBadge status="Paid" variant="success" />
+                                        <StatusBadge status="Paid" variant="success" className="rounded-lg text-[10px] font-bold uppercase tracking-widest" />
                                     )}
                                 </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex justify-end items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                                        <Button variant="ghost" size="icon-sm" asChild>
+                                <TableCell className="text-right pr-6">
+                                    <div className="flex justify-end items-center gap-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300">
+                                        <Button variant="ghost" size="icon-sm" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]" asChild title="View Details">
                                             <Link href={`/admin/orders/${order.id}`}>
-                                                <Eye className="h-3.5 w-3.5" />
+                                                <Eye className="h-4 w-4" />
                                             </Link>
                                         </Button>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon-sm">
-                                                    <MoreVertical className="h-3.5 w-3.5 opacity-50" />
+                                                <Button variant="ghost" size="icon-sm" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]">
+                                                    <MoreVertical className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
+                                            <DropdownMenuContent align="end" className="glass-card border-[var(--dashboard-border)] bg-black/95 text-[var(--dashboard-text)]">
                                                 <DropdownMenuItem asChild>
-                                                    <Link href={`/admin/orders/${order.id}`} className="flex items-center gap-2">
+                                                    <Link href={`/admin/orders/${order.id}`} className="flex items-center gap-2 hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)] transition-colors">
                                                         <Eye className="h-4 w-4" />
                                                         View Details
                                                     </Link>
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem className="flex items-center gap-2">
+                                                <DropdownMenuItem className="flex items-center gap-2 hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)] transition-colors">
                                                     <Pencil className="h-4 w-4" />
                                                     Edit Order
                                                 </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem className="flex items-center gap-2 text-red-600">
+                                                <DropdownMenuSeparator className="bg-[var(--dashboard-border)]" />
+                                                <DropdownMenuItem className="flex items-center gap-2 text-red-500 hover:bg-red-500/10 transition-colors">
                                                     <Trash2 className="h-4 w-4" />
                                                     Delete
                                                 </DropdownMenuItem>
@@ -194,7 +207,7 @@ export function OrdersTable({ orders, getStatusVariant }: OrdersTableProps) {
                         ))}
                     </TableBody>
                 </Table>
-            </div>
+            </Card>
         </div>
     )
 }

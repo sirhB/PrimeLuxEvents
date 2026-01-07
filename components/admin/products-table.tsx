@@ -7,10 +7,12 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableHead,
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DeleteProductButton } from '@/components/admin/delete-product-button'
 import { SortableHeader } from '@/components/admin/sortable-header'
@@ -78,21 +80,30 @@ export function ProductsTable({ products }: ProductsTableProps) {
                 )}
             </AnimatePresence>
 
-            <div className="rounded-[var(--radius)] border border-border bg-card/30 backdrop-blur-md overflow-hidden">
+            <Card className="border-none glass-card overflow-hidden">
                 <Table>
-                    <TableHeader>
-                        <TableRow className="hover:bg-transparent border-b border-border/50">
-                            <TableCell className="w-12">
+                    <TableHeader className="bg-black/20">
+                        <TableRow className="hover:bg-transparent border-b border-[var(--dashboard-border)]">
+                            <TableHead className="w-12 pl-6">
                                 <Checkbox
                                     checked={selectedIds.length === products.length && products.length > 0}
                                     onCheckedChange={toggleAll}
+                                    className="border-[var(--dashboard-border)] data-[state=checked]:bg-[var(--dashboard-accent-gold)] data-[state=checked]:border-[var(--dashboard-accent-gold)]"
                                 />
-                            </TableCell>
-                            <SortableHeader column="name" label="Name" className="min-w-[250px]" />
-                            <SortableHeader column="category" label="Category" />
-                            <SortableHeader column="price" label="Price" />
-                            <SortableHeader column="stock" label="Stock" />
-                            <TableCell className="text-right">Actions</TableCell>
+                            </TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] py-4">
+                                <SortableHeader column="name" label="Product Name" className="min-w-[250px]" />
+                            </TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                <SortableHeader column="category" label="Category" />
+                            </TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                <SortableHeader column="price" label="Price" />
+                            </TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                <SortableHeader column="stock" label="Inventory" />
+                            </TableHead>
+                            <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] pr-6">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -104,55 +115,62 @@ export function ProductsTable({ products }: ProductsTableProps) {
                                 <TableRow
                                     key={product.id}
                                     data-state={selectedIds.includes(product.id) ? 'selected' : ''}
-                                    className="group/row transition-colors"
+                                    className="group/row hover:bg-[var(--dashboard-card-hover)] border-b border-[var(--dashboard-border)] transition-colors"
                                 >
-                                    <TableCell>
+                                    <TableCell className="pl-6">
                                         <Checkbox
                                             checked={selectedIds.includes(product.id)}
                                             onCheckedChange={() => toggleOne(product.id)}
+                                            className="border-[var(--dashboard-border)] data-[state=checked]:bg-[var(--dashboard-accent-gold)] data-[state=checked]:border-[var(--dashboard-accent-gold)]"
                                         />
                                     </TableCell>
-                                    <TableCell className="font-medium">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                                                <PackageIcon className="h-4 w-4 text-muted-foreground opacity-50" />
+                                    <TableCell className="py-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-xl bg-black/20 flex items-center justify-center shrink-0 border border-[var(--dashboard-border)] transition-colors group-hover/row:border-[var(--dashboard-accent-gold)]/30">
+                                                <PackageIcon className="h-5 w-5 text-[var(--dashboard-accent-gold)] opacity-50" />
                                             </div>
-                                            <span className="truncate group-hover/row:text-primary transition-colors">
-                                                {product.name}
-                                            </span>
+                                            <div className="flex flex-col">
+                                                <span className="font-serif text-lg text-[var(--dashboard-text)] truncate transition-colors group-hover/row:text-[var(--dashboard-accent-gold)]">
+                                                    {product.name}
+                                                </span>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                                    SKU: {product.sku || 'N/A'}
+                                                </span>
+                                            </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="px-2.5 py-1 rounded-full bg-muted/30 text-[10px] uppercase font-bold tracking-widest text-muted-foreground border border-border/50">
+                                        <span className="inline-flex items-center rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-widest bg-black/20 text-[var(--dashboard-text-muted)] border border-[var(--dashboard-border)]">
                                             {product.categories?.name || 'Uncategorized'}
                                         </span>
                                     </TableCell>
-                                    <TableCell className="font-serif">
+                                    <TableCell className="font-mono font-bold text-[var(--dashboard-text)]">
                                         {formatCents(product.price)}
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-2">
                                             <span className={cn(
-                                                "font-bold",
-                                                isOutOfStock ? "text-red-500" : isLowStock ? "text-orange-500" : "text-foreground"
+                                                "font-mono font-bold text-base",
+                                                isOutOfStock ? "text-red-500" : isLowStock ? "text-orange-500" : "text-[var(--dashboard-accent-gold)]"
                                             )}>
                                                 {product.stock}
                                             </span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] opacity-50">Units</span>
                                             {isLowStock && (
-                                                <AlertCircle className="h-3 w-3 text-orange-500" />
+                                                <AlertCircle className="h-3 w-3 text-orange-500 animate-pulse" />
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex justify-end items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                                            <Button variant="ghost" size="icon-sm" asChild>
+                                    <TableCell className="text-right pr-6">
+                                        <div className="flex justify-end items-center gap-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300">
+                                            <Button variant="ghost" size="icon-sm" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]" asChild>
                                                 <Link href={`/admin/products/${product.id}`}>
-                                                    <Pencil className="h-3.5 w-3.5" />
+                                                    <Pencil className="h-4 w-4" />
                                                 </Link>
                                             </Button>
                                             <DeleteProductButton id={product.id} productName={product.name} />
-                                            <Button variant="ghost" size="icon-sm">
-                                                <MoreVertical className="h-3.5 w-3.5 opacity-50" />
+                                            <Button variant="ghost" size="icon-sm" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]">
+                                                <MoreVertical className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     </TableCell>
@@ -161,17 +179,17 @@ export function ProductsTable({ products }: ProductsTableProps) {
                         })}
                         {products.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-40 text-center">
-                                    <div className="flex flex-col items-center justify-center gap-2 opacity-50">
-                                        <PackageIcon className="h-8 w-8" />
-                                        <p>No products found matching your filters.</p>
+                                <TableCell colSpan={6} className="h-60 text-center">
+                                    <div className="flex flex-col items-center justify-center gap-2 opacity-30">
+                                        <PackageIcon className="h-10 w-10 text-[var(--dashboard-text-muted)]" />
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)]">No products found</p>
                                     </div>
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
-            </div>
+            </Card>
         </div>
     )
 }

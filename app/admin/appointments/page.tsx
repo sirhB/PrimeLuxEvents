@@ -99,85 +99,83 @@ export default async function AppointmentsPage({
             </div>
 
             <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-                    <TabsTrigger value="all">All Appointments</TabsTrigger>
-                    <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+                <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
+                    <TabsTrigger value="all" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">All Appointments</TabsTrigger>
+                    <TabsTrigger value="calendar" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Calendar View</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="all" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-between gap-4">
-                        <SearchInput placeholder="Search appointments..." />
+                <TabsContent value="all" className="space-y-6 mt-6 animate-fade-in">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 glass-card p-6 rounded-3xl border-none">
+                        <div className="w-full max-w-md">
+                            <SearchInput placeholder="Search appointments..." />
+                        </div>
                         <StatusFilter statuses={statusOptions} />
                     </div>
 
-                    <Card>
+                    <Card className="border-none glass-card overflow-hidden">
                         <CardContent className="p-0">
                             <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Date & Time</TableHead>
-                                        <TableHead>Client</TableHead>
-                                        <TableHead>Location</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Linked Consultation</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                <TableHeader className="bg-black/20">
+                                    <TableRow className="hover:bg-transparent border-b border-[var(--dashboard-border)]">
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] py-4 pl-6">Date & Time</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Client</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Location</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Status</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Details</TableHead>
+                                        <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] pr-6">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {appointments && appointments.length > 0 ? (
                                         appointments.map((appointment) => (
-                                            <TableRow key={appointment.id}>
-                                                <TableCell>
+                                            <TableRow key={appointment.id} className="hover:bg-[var(--dashboard-card-hover)] border-b border-[var(--dashboard-border)] transition-colors">
+                                                <TableCell className="py-4 pl-6">
                                                     <div className="flex flex-col">
-                                                        <span className="font-medium">
+                                                        <span className="font-serif text-lg text-[var(--dashboard-text)]">
                                                             {formatDate(appointment.appointment_date)}
                                                         </span>
-                                                        <span className="text-xs text-muted-foreground">
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-accent-gold)]">
                                                             {appointment.appointment_time}
                                                         </span>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex flex-col">
-                                                        <span>{appointment.client_name || 'N/A'}</span>
+                                                        <span className="font-medium text-[var(--dashboard-text)]">{appointment.client_name || 'N/A'}</span>
                                                         {appointment.client_email && (
-                                                            <span className="text-xs text-muted-foreground">
+                                                            <span className="text-[10px] text-[var(--dashboard-text-muted)] uppercase tracking-tight">
                                                                 {appointment.client_email}
-                                                            </span>
-                                                        )}
-                                                        {appointment.client_phone && (
-                                                            <span className="text-xs text-muted-foreground">
-                                                                {appointment.client_phone}
                                                             </span>
                                                         )}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell>{appointment.location || 'N/A'}</TableCell>
+                                                <TableCell className="text-[var(--dashboard-text-muted)] font-light text-sm italic">{appointment.location || 'N/A'}</TableCell>
                                                 <TableCell>
                                                     <span
                                                         className={cn(
-                                                            'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border',
-                                                            getStatusColor(appointment.status)
+                                                            'inline-flex items-center rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border',
+                                                            appointment.status === 'scheduled' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                                                                appointment.status === 'completed' ? 'bg-[var(--dashboard-accent-green)]/10 text-[var(--dashboard-accent-green)] border-[var(--dashboard-accent-green)]/20 shadow-[0_0_10px_rgba(16,185,129,0.05)]' :
+                                                                    'bg-[var(--dashboard-text-muted)]/10 text-[var(--dashboard-text-muted)] border-[var(--dashboard-border)]'
                                                         )}
                                                     >
-                                                        {appointment.status.charAt(0).toUpperCase() +
-                                                            appointment.status.slice(1)}
+                                                        {appointment.status}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell>
                                                     {appointment.consultation_id ? (
                                                         <Link
                                                             href={`/admin/consultations/${appointment.consultation_id}`}
-                                                            className="text-primary hover:underline text-sm"
+                                                            className="text-[var(--dashboard-accent-gold)] hover:underline text-[10px] font-bold uppercase tracking-widest"
                                                         >
                                                             View Consultation
                                                         </Link>
                                                     ) : (
-                                                        <span className="text-muted-foreground text-sm">None</span>
+                                                        <span className="text-[var(--dashboard-text-muted)] text-[10px] font-bold uppercase tracking-widest opacity-30">Standalone</span>
                                                     )}
                                                 </TableCell>
-                                                <TableCell className="text-right">
-                                                    <Button variant="ghost" size="icon" asChild>
+                                                <TableCell className="text-right pr-6">
+                                                    <Button variant="ghost" size="icon-sm" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]" asChild>
                                                         <Link href={`/admin/appointments/${appointment.id}`}>
                                                             <Eye className="h-4 w-4" />
                                                             <span className="sr-only">View</span>
@@ -188,10 +186,10 @@ export default async function AppointmentsPage({
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="text-center h-24">
-                                                <div className="flex flex-col items-center gap-2">
-                                                    <CalendarIcon className="h-8 w-8 text-muted-foreground" />
-                                                    <p className="text-muted-foreground">No appointments found.</p>
+                                            <TableCell colSpan={6} className="text-center h-40">
+                                                <div className="flex flex-col items-center gap-2 opacity-30">
+                                                    <CalendarIcon className="h-10 w-10 text-[var(--dashboard-text-muted)]" />
+                                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)]">No appointments found</p>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
@@ -213,8 +211,8 @@ export default async function AppointmentsPage({
                 </TabsContent>
 
                 <TabsContent value="calendar" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-40 bg-card rounded-lg border border-dashed">
-                        <p className="text-muted-foreground">Calendar view coming soon</p>
+                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
+                        <p className="text-[var(--dashboard-text-muted)] font-light">Calendar view coming soon</p>
                     </div>
                 </TabsContent>
             </Tabs>

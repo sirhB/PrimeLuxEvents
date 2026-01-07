@@ -238,17 +238,17 @@ export default async function ConsultationsPage({
             {/* Main Content Areas */}
             <Tabs defaultValue="board" className="w-full space-y-6">
                 <div className="flex items-center justify-between">
-                    <TabsList className="grid w-[200px] grid-cols-2 bg-muted/50 p-1">
-                        <TabsTrigger value="board" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                    <TabsList className="glass-card border-none p-1 bg-black/20 w-fit h-auto translate-y-2">
+                        <TabsTrigger value="board" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
                             <LayoutGrid className="w-4 h-4 mr-2" />
                             Board
                         </TabsTrigger>
-                        <TabsTrigger value="list" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                        <TabsTrigger value="list" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
                             <ListFilter className="w-4 h-4 mr-2" />
                             List
                         </TabsTrigger>
                     </TabsList>
-                    <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                    <div className="text-[10px] text-[var(--dashboard-text-muted)] font-bold uppercase tracking-[0.2em] bg-black/20 px-3 py-1 rounded-full border border-[var(--dashboard-border)]">
                         Total Leads: {totalCount}
                     </div>
                 </div>
@@ -280,26 +280,26 @@ export default async function ConsultationsPage({
                                         const budgetLabel = formatBudgetRange(consultation.budget_range)
 
                                         return (
-                                            <Card key={consultation.id} className="group hover:shadow-md transition-all duration-300 border-l-2 border-l-transparent hover:border-l-[var(--dashboard-accent-gold)] overflow-hidden bg-[var(--dashboard-card-bg)]">
-                                                <CardContent className="p-4 space-y-4">
+                                            <Card key={consultation.id} className="group hover:bg-[var(--dashboard-card-hover)] transition-all duration-300 border-none glass-card overflow-hidden">
+                                                <CardContent className="p-5 space-y-4">
                                                     {/* Card Header */}
                                                     <div className="space-y-1">
                                                         <div className="flex items-start justify-between gap-2">
-                                                            <h4 className="font-semibold text-[15px] text-[var(--dashboard-text)]">
+                                                            <h4 className="font-serif text-lg text-[var(--dashboard-text)] leading-tight">
                                                                 {getDisplayName(consultation)}
                                                             </h4>
                                                             {consultation.event_date && (
-                                                                <span className="text-[10px] font-medium px-2 py-1 rounded bg-secondary/50 text-secondary-foreground whitespace-nowrap">
+                                                                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20 uppercase tracking-wider">
                                                                     {formatEventDate(consultation.event_date)}
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        <a href={`mailto:${consultation.customer_email}`} className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1.5 truncate">
+                                                        <a href={`mailto:${consultation.customer_email}`} className="text-xs text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] flex items-center gap-1.5 truncate transition-colors">
                                                             <Mail className="w-3 h-3" />
                                                             {consultation.customer_email}
                                                         </a>
                                                         {consultation.customer_phone && (
-                                                            <div className="text-xs text-muted-foreground flex items-center gap-1.5 truncate">
+                                                            <div className="text-xs text-[var(--dashboard-text-muted)] flex items-center gap-1.5 truncate opacity-70">
                                                                 <Phone className="w-3 h-3" />
                                                                 {consultation.customer_phone}
                                                             </div>
@@ -307,16 +307,16 @@ export default async function ConsultationsPage({
                                                     </div>
 
                                                     {/* Details Badges */}
-                                                    <div className="flex flex-wrap gap-1.5">
+                                                    <div className="flex flex-wrap gap-2">
                                                         {consultation.number_of_guests && (
-                                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border">
-                                                                <Users className="w-3 h-3 mr-1" />
-                                                                {consultation.number_of_guests}
+                                                            <span className="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold bg-black/30 text-[var(--dashboard-text-muted)] border border-[var(--dashboard-border)] uppercase tracking-tight">
+                                                                <Users className="w-3 h-3 mr-1.5 text-[var(--dashboard-accent-gold)]" />
+                                                                {consultation.number_of_guests} Guests
                                                             </span>
                                                         )}
                                                         {budgetLabel && (
-                                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground border">
-                                                                <DollarSign className="w-3 h-3 mr-1" />
+                                                            <span className="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold bg-black/30 text-[var(--dashboard-text-muted)] border border-[var(--dashboard-border)] uppercase tracking-tight">
+                                                                <DollarSign className="w-3 h-3 mr-1.5 text-[var(--dashboard-accent-gold)]" />
                                                                 {budgetLabel}
                                                             </span>
                                                         )}
@@ -324,17 +324,17 @@ export default async function ConsultationsPage({
 
                                                     {/* Message Preview */}
                                                     {consultation.message && (
-                                                        <div className="bg-muted/30 p-2.5 rounded text-xs text-muted-foreground italic line-clamp-3">
+                                                        <div className="bg-black/20 p-3 rounded-xl text-xs text-[var(--dashboard-text-muted)] italic font-light line-clamp-2 border border-[var(--dashboard-border)]/50 leading-relaxed">
                                                             "{consultation.message}"
                                                         </div>
                                                     )}
 
                                                     {/* Actions */}
-                                                    <div className="pt-3 border-t flex items-center justify-between gap-2 mt-2">
-                                                        <div className="flex gap-1">
-                                                            <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                                                    <div className="pt-4 border-t border-[var(--dashboard-border)] flex items-center justify-between gap-2 mt-2">
+                                                        <div className="flex gap-1.5">
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]" asChild>
                                                                 <Link href={`/admin/consultations/${consultation.id}`}>
-                                                                    <Eye className="h-3.5 w-3.5" />
+                                                                    <Eye className="h-4 w-4" />
                                                                 </Link>
                                                             </Button>
                                                             <div className="scale-90 origin-left">
@@ -354,10 +354,10 @@ export default async function ConsultationsPage({
                                                                 <Button
                                                                     size="sm"
                                                                     variant="outline"
-                                                                    className="h-7 text-xs px-2 hover:bg-[var(--dashboard-accent-gold)] hover:text-white hover:border-[var(--dashboard-accent-gold)] transition-colors"
+                                                                    className="h-8 text-[10px] font-bold uppercase tracking-widest px-3 rounded-lg border-[var(--dashboard-border)] hover:bg-[var(--dashboard-accent-gold)] hover:text-black hover:border-[var(--dashboard-accent-gold)] transition-all"
                                                                 >
-                                                                    Move
-                                                                    <ArrowRight className="ml-1 h-3 w-3" />
+                                                                    Advance
+                                                                    <ArrowRight className="ml-2 h-3 w-3" />
                                                                 </Button>
                                                             </form>
                                                         )}
@@ -367,8 +367,8 @@ export default async function ConsultationsPage({
                                         )
                                     })}
                                     {groupedByStatus[stage.value].length === 0 && (
-                                        <div className={`rounded-lg border border-dashed p-4 text-center ${stage.bgColor} ${stage.borderColor}`}>
-                                            <p className="text-xs text-muted-foreground font-medium">Empty Stage</p>
+                                        <div className={`rounded-2xl border border-dashed p-8 text-center bg-black/10 border-[var(--dashboard-border)]`}>
+                                            <p className="text-[10px] text-[var(--dashboard-text-muted)] font-bold uppercase tracking-widest">No Active Leads</p>
                                         </div>
                                     )}
                                 </ConsultationColumn>
@@ -378,59 +378,60 @@ export default async function ConsultationsPage({
                 </TabsContent>
 
                 {/* LIST VIEW */}
-                <TabsContent value="list" className="mt-0">
-                    <Card className="border shadow-sm overflow-hidden bg-[var(--dashboard-card-bg)]">
+                <TabsContent value="list" className="mt-0 animate-fade-in">
+                    <Card className="border-none glass-card overflow-hidden">
                         <CardContent className="p-0">
                             <Table>
-                                <TableHeader className="bg-muted/30">
-                                    <TableRow>
-                                        <TableHead className="w-[100px]">Lead ID</TableHead>
-                                        <TableHead>Customer Details</TableHead>
-                                        <TableHead>Event Info</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Submitted</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                <TableHeader className="bg-black/20 border-b border-[var(--dashboard-border)]">
+                                    <TableRow className="hover:bg-transparent">
+                                        <TableHead className="w-[100px] text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Lead ID</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Customer Details</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Event Info</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Status</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Submitted</TableHead>
+                                        <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {paginatedConsultations.map((consultation) => (
-                                        <TableRow key={consultation.id} className="hover:bg-muted/20">
-                                            <TableCell className="font-mono text-xs text-muted-foreground">
-                                                {consultation.id.slice(0, 8)}
+                                        <TableRow key={consultation.id} className="hover:bg-[var(--dashboard-card-hover)] border-b border-[var(--dashboard-border)] transition-colors">
+                                            <TableCell className="font-mono text-[10px] text-[var(--dashboard-text-muted)]">
+                                                #{consultation.id.slice(0, 8).toUpperCase()}
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell className="py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="font-medium">{getDisplayName(consultation)}</span>
-                                                    <a href={`mailto:${consultation.customer_email}`} className="text-xs text-muted-foreground hover:underline">
+                                                    <span className="font-serif text-base text-[var(--dashboard-text)]">{getDisplayName(consultation)}</span>
+                                                    <a href={`mailto:${consultation.customer_email}`} className="text-[10px] text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] transition-colors inline-flex items-center gap-1.5">
+                                                        <Mail className="w-3 h-3" />
                                                         {consultation.customer_email || 'No email'}
                                                     </a>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="space-y-0.5">
-                                                    <div className="flex items-center text-xs">
-                                                        <Calendar className="mr-1.5 h-3 w-3 text-muted-foreground" />
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center text-[10px] font-bold uppercase tracking-wider text-[var(--dashboard-text)]">
+                                                        <Calendar className="mr-2 h-3 w-3 text-[var(--dashboard-accent-gold)]" />
                                                         {formatEventDate(consultation.event_date)}
                                                     </div>
                                                     {consultation.number_of_guests && (
-                                                        <div className="flex items-center text-xs text-muted-foreground">
-                                                            <Users className="mr-1.5 h-3 w-3" />
-                                                            {consultation.number_of_guests} guests
+                                                        <div className="flex items-center text-[10px] text-[var(--dashboard-text-muted)] font-medium">
+                                                            <Users className="mr-2 h-3 w-3 opacity-60" />
+                                                            {consultation.number_of_guests} Guests
                                                         </div>
                                                     )}
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium border', STATUS_BADGES[consultation.status])}>
+                                                <span className={cn('inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border', STATUS_BADGES[consultation.status])}>
                                                     {STATUS_LABELS[consultation.status]}
                                                 </span>
                                             </TableCell>
-                                            <TableCell className="text-sm text-muted-foreground">
-                                                {new Date(consultation.created_at).toLocaleDateString()}
+                                            <TableCell className="text-[10px] font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wide">
+                                                {new Date(consultation.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]" asChild>
                                                         <Link href={`/admin/consultations/${consultation.id}`}>
                                                             <Eye className="h-4 w-4" />
                                                         </Link>
@@ -441,8 +442,8 @@ export default async function ConsultationsPage({
                                     ))}
                                     {paginatedConsultations.length === 0 && (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="h-24 text-center">
-                                                No leads found.
+                                            <TableCell colSpan={6} className="h-40 text-center">
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)]">No leads found</p>
                                             </TableCell>
                                         </TableRow>
                                     )}

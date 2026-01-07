@@ -126,15 +126,15 @@ export default async function OrdersPage({
             </div>
 
             <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
-                    <TabsTrigger value="all">All Orders</TabsTrigger>
-                    <TabsTrigger value="pending">Pending</TabsTrigger>
-                    <TabsTrigger value="completed">Completed</TabsTrigger>
-                    <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+                <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
+                    <TabsTrigger value="all" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">All Orders</TabsTrigger>
+                    <TabsTrigger value="pending" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Pending</TabsTrigger>
+                    <TabsTrigger value="completed" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Completed</TabsTrigger>
+                    <TabsTrigger value="cancelled" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Cancelled</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="all" className="space-y-6 mt-6">
-                    <div className="flex flex-col xxl:flex-row gap-6 items-start xxl:items-center justify-between glass-morphism p-6 rounded-3xl border border-border/50">
+                <TabsContent value="all" className="space-y-6 mt-6 animate-fade-in">
+                    <div className="flex flex-col xxl:flex-row gap-6 items-start xxl:items-center justify-between glass-card p-6 rounded-3xl border-none">
                         <div className="w-full max-w-md">
                             <SearchInput placeholder="Search orders..." />
                         </div>
@@ -165,18 +165,18 @@ export default async function OrdersPage({
                 </TabsContent>
 
                 <TabsContent value="pending" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 bg-card/30 rounded-3xl border border-dashed border-border/50 backdrop-blur-sm">
-                        <p className="text-muted-foreground font-light text-center">Filtered views coming soon</p>
+                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
+                        <p className="text-[var(--dashboard-text-muted)] font-light text-center">Filtered views coming soon</p>
                     </div>
                 </TabsContent>
                 <TabsContent value="completed" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 bg-card/30 rounded-3xl border border-dashed border-border/50 backdrop-blur-sm">
-                        <p className="text-muted-foreground font-light text-center">Filtered views coming soon</p>
+                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
+                        <p className="text-[var(--dashboard-text-muted)] font-light text-center">Filtered views coming soon</p>
                     </div>
                 </TabsContent>
                 <TabsContent value="cancelled" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 bg-card/30 rounded-3xl border border-dashed border-border/50 backdrop-blur-sm">
-                        <p className="text-muted-foreground font-light text-center">Filtered views coming soon</p>
+                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
+                        <p className="text-[var(--dashboard-text-muted)] font-light text-center">Filtered views coming soon</p>
                     </div>
                 </TabsContent>
             </Tabs>

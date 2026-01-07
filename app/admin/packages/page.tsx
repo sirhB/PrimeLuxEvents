@@ -65,100 +65,100 @@ export default async function PackagesPage() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-4">
-                <Card>
+            <div className="grid gap-6 md:grid-cols-4">
+                <Card className="border-none glass-card overflow-hidden">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Packages</CardTitle>
-                        <Package className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)]">Total Packages</CardTitle>
+                        <Package className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{totalPackages}</div>
+                        <div className="text-3xl font-serif font-light text-[var(--dashboard-text)]">{totalPackages}</div>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="border-none glass-card overflow-hidden">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Featured</CardTitle>
-                        <Tag className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)]">Featured</CardTitle>
+                        <Tag className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{featuredPackages}</div>
+                        <div className="text-3xl font-serif font-light text-[var(--dashboard-text)]">{featuredPackages}</div>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="border-none glass-card overflow-hidden">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Avg. Discount</CardTitle>
-                        <Percent className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)]">Avg. Discount</CardTitle>
+                        <Percent className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
+                        <div className="text-3xl font-serif font-light text-[var(--dashboard-text)]">
                             {packages?.length ? Math.round(packages.reduce((acc, p) => acc + (p.discount_type === 'percentage' ? p.discount_value : 0), 0) / packages.length) : 0}%
                         </div>
                     </CardContent>
                 </Card>
-                <Card>
+                <Card className="border-none glass-card overflow-hidden">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Savings Value</CardTitle>
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)]">Total Savings</CardTitle>
+                        <DollarSign className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{formatCurrency(totalSavings)}</div>
+                        <div className="text-3xl font-serif font-light text-[var(--dashboard-text)]">{formatCurrency(totalSavings)}</div>
                     </CardContent>
                 </Card>
             </div>
 
             {/* Main Content */}
             <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-                    <TabsTrigger value="all">All Packages</TabsTrigger>
-                    <TabsTrigger value="featured">Featured Only</TabsTrigger>
+                <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
+                    <TabsTrigger value="all" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">All Packages</TabsTrigger>
+                    <TabsTrigger value="featured" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Featured Only</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="all" className="space-y-6 mt-6">
-                    <Card>
+                <TabsContent value="all" className="space-y-6 mt-6 animate-fade-in">
+                    <Card className="border-none glass-card overflow-hidden">
                         <CardContent className="p-0">
                             <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Package Name</TableHead>
-                                        <TableHead>Price</TableHead>
-                                        <TableHead>Original Value</TableHead>
-                                        <TableHead>Savings</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                <TableHeader className="bg-black/20">
+                                    <TableRow className="hover:bg-transparent border-b border-[var(--dashboard-border)]">
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] py-4 pl-6">Package Name</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Price</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Original Value</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Savings</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Status</TableHead>
+                                        <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] pr-6">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {packages?.map((pkg) => (
-                                        <TableRow key={pkg.id}>
-                                            <TableCell>
+                                        <TableRow key={pkg.id} className="hover:bg-[var(--dashboard-card-hover)] border-b border-[var(--dashboard-border)] transition-colors">
+                                            <TableCell className="py-4 pl-6">
                                                 <div className="flex flex-col">
-                                                    <span className="font-medium">{pkg.name}</span>
-                                                    <span className="text-xs text-muted-foreground truncate max-w-[200px]">
+                                                    <span className="font-serif text-lg text-[var(--dashboard-text)]">{pkg.name}</span>
+                                                    <span className="text-[10px] text-[var(--dashboard-text-muted)] font-medium uppercase tracking-tight truncate max-w-[300px]">
                                                         {pkg.description}
                                                     </span>
                                                 </div>
                                             </TableCell>
-                                            <TableCell className="font-bold">{formatCurrency(pkg.price)}</TableCell>
-                                            <TableCell className="text-muted-foreground line-through">
+                                            <TableCell className="font-mono font-bold text-[var(--dashboard-text)]">{formatCurrency(pkg.price)}</TableCell>
+                                            <TableCell className="text-[var(--dashboard-text-muted)] line-through font-mono">
                                                 {pkg.original_price ? formatCurrency(pkg.original_price) : '-'}
                                             </TableCell>
                                             <TableCell>
                                                 {pkg.savings_amount > 0 && (
-                                                    <Badge variant="secondary" className="bg-green-100 text-green-800 hover:bg-green-100">
+                                                    <span className="inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[var(--dashboard-accent-green)]/10 text-[var(--dashboard-accent-green)] border border-[var(--dashboard-accent-green)]/20">
                                                         Save {formatCurrency(pkg.savings_amount)}
-                                                    </Badge>
+                                                    </span>
                                                 )}
                                             </TableCell>
                                             <TableCell>
                                                 {pkg.is_featured && (
-                                                    <Badge variant="outline" className="border-gold text-gold">
+                                                    <span className="inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
                                                         Featured
-                                                    </Badge>
+                                                    </span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <Button variant="ghost" size="icon" asChild>
+                                            <TableCell className="text-right pr-6">
+                                                <div className="flex justify-end gap-1">
+                                                    <Button variant="ghost" size="icon-sm" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]" asChild>
                                                         <Link href={`/admin/packages/${pkg.id}`}>
                                                             <Pencil className="h-4 w-4" />
                                                             <span className="sr-only">Edit</span>
@@ -166,8 +166,8 @@ export default async function PackagesPage() {
                                                     </Button>
                                                     <form action={deletePackage}>
                                                         <input type="hidden" name="id" value={pkg.id} />
-                                                        <Button variant="ghost" size="icon" type="submit">
-                                                            <Trash2 className="h-4 w-4 text-red-500" />
+                                                        <Button variant="ghost" size="icon-sm" type="submit" className="h-8 w-8 rounded-lg hover:bg-red-500/10 hover:text-red-500">
+                                                            <Trash2 className="h-4 w-4" />
                                                             <span className="sr-only">Delete</span>
                                                         </Button>
                                                     </form>
@@ -177,8 +177,11 @@ export default async function PackagesPage() {
                                     ))}
                                     {packages?.length === 0 && (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                                No packages found. Create your first package to get started.
+                                            <TableCell colSpan={6} className="text-center py-12">
+                                                <div className="flex flex-col items-center gap-2 opacity-30">
+                                                    <Package className="h-10 w-10 text-[var(--dashboard-text-muted)]" />
+                                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)]">No packages found</p>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     )}
@@ -189,32 +192,32 @@ export default async function PackagesPage() {
                 </TabsContent>
 
                 <TabsContent value="featured" className="space-y-6 mt-6">
-                    <Card>
+                    <Card className="border-none glass-card overflow-hidden">
                         <CardContent className="p-0">
                             <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Package Name</TableHead>
-                                        <TableHead>Price</TableHead>
-                                        <TableHead>Savings</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                <TableHeader className="bg-black/20">
+                                    <TableRow className="hover:bg-transparent border-b border-[var(--dashboard-border)]">
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] py-4 pl-6">Package Name</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Price</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Savings</TableHead>
+                                        <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] pr-6">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {packages?.filter(p => p.is_featured).map((pkg) => (
-                                        <TableRow key={pkg.id}>
-                                            <TableCell className="font-medium">{pkg.name}</TableCell>
-                                            <TableCell>{formatCurrency(pkg.price)}</TableCell>
+                                        <TableRow key={pkg.id} className="hover:bg-[var(--dashboard-card-hover)] border-b border-[var(--dashboard-border)] transition-colors">
+                                            <TableCell className="font-serif text-lg py-4 pl-6">{pkg.name}</TableCell>
+                                            <TableCell className="font-mono font-bold text-[var(--dashboard-text)]">{formatCurrency(pkg.price)}</TableCell>
                                             <TableCell>
                                                 {pkg.savings_amount > 0 && (
-                                                    <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                                    <span className="inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-[var(--dashboard-accent-green)]/10 text-[var(--dashboard-accent-green)] border border-[var(--dashboard-accent-green)]/20">
                                                         Save {formatCurrency(pkg.savings_amount)}
-                                                    </Badge>
+                                                    </span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <Button variant="ghost" size="icon" asChild>
+                                            <TableCell className="text-right pr-6">
+                                                <div className="flex justify-end gap-1">
+                                                    <Button variant="ghost" size="icon-sm" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]" asChild>
                                                         <Link href={`/admin/packages/${pkg.id}`}>
                                                             <Pencil className="h-4 w-4" />
                                                             <span className="sr-only">Edit</span>
@@ -226,8 +229,8 @@ export default async function PackagesPage() {
                                     ))}
                                     {packages?.filter(p => p.is_featured).length === 0 && (
                                         <TableRow>
-                                            <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                                                No featured packages found.
+                                            <TableCell colSpan={4} className="text-center py-12">
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)] opacity-30">No featured packages found</p>
                                             </TableCell>
                                         </TableRow>
                                     )}

@@ -58,30 +58,30 @@ export default async function InventoryPage({
             </div>
 
             <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-                    <TabsTrigger value="all">All Inventory</TabsTrigger>
-                    <TabsTrigger value="low-stock">Low Stock</TabsTrigger>
+                <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
+                    <TabsTrigger value="all" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">All Inventory</TabsTrigger>
+                    <TabsTrigger value="low-stock" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Low Stock</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="all" className="space-y-6 mt-6">
+                <TabsContent value="all" className="space-y-6 mt-6 animate-fade-in">
                     <div className="flex items-center justify-between gap-4">
                         <SearchInput placeholder="Search inventory..." />
                     </div>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Product Availability</CardTitle>
-                            <CardDescription>Current stock levels and reservations</CardDescription>
+                    <Card className="border-none glass-card overflow-hidden">
+                        <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">
+                            <CardTitle className="font-serif text-2xl">Product Availability</CardTitle>
+                            <CardDescription className="text-[var(--dashboard-text-muted)]">Current stock levels and rental reservations</CardDescription>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="p-0">
                             <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Product</TableHead>
-                                        <TableHead>SKU</TableHead>
-                                        <TableHead>Available</TableHead>
-                                        <TableHead>Reserved</TableHead>
-                                        <TableHead>Status</TableHead>
+                                <TableHeader className="bg-black/20">
+                                    <TableRow className="hover:bg-transparent border-b border-[var(--dashboard-border)]">
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] py-4 pl-6">Product</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">SKU</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] text-right">Available</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] text-right">Reserved</TableHead>
+                                        <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] text-center pr-6">Status</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -90,20 +90,20 @@ export default async function InventoryPage({
                                         const isLowStock = available <= 2
 
                                         return (
-                                            <TableRow key={product.id}>
-                                                <TableCell className="font-medium">{product.name}</TableCell>
-                                                <TableCell className="font-mono text-xs">
+                                            <TableRow key={product.id} className="hover:bg-[var(--dashboard-card-hover)] border-b border-[var(--dashboard-border)] transition-colors">
+                                                <TableCell className="font-serif text-lg py-4 pl-6">{product.name}</TableCell>
+                                                <TableCell className="font-mono text-xs text-[var(--dashboard-text-muted)]">
                                                     {product.sku || 'N/A'}
                                                 </TableCell>
-                                                <TableCell>{product.quantity_available}</TableCell>
-                                                <TableCell>{product.quantity_reserved}</TableCell>
-                                                <TableCell>
+                                                <TableCell className="text-right font-mono font-bold text-[var(--dashboard-text)]">{product.quantity_available}</TableCell>
+                                                <TableCell className="text-right font-mono text-[var(--dashboard-text-muted)]">{product.quantity_reserved}</TableCell>
+                                                <TableCell className="text-center pr-6">
                                                     <span
                                                         className={cn(
-                                                            'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                                                            'inline-flex items-center rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border',
                                                             isLowStock
-                                                                ? 'bg-red-100 text-red-800'
-                                                                : 'bg-green-100 text-green-800'
+                                                                ? 'bg-red-500/10 text-red-500 border-red-500/20'
+                                                                : 'bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border-[var(--dashboard-accent-gold)]/20 shadow-[0_0_10px_rgba(212,175,55,0.05)]'
                                                         )}
                                                     >
                                                         {isLowStock ? 'Low Stock' : 'In Stock'}
@@ -114,10 +114,10 @@ export default async function InventoryPage({
                                     })}
                                     {products?.length === 0 && (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="text-center h-24">
-                                                <div className="flex flex-col items-center gap-2">
-                                                    <Package className="h-8 w-8 text-muted-foreground" />
-                                                    <p className="text-muted-foreground">No products found.</p>
+                                            <TableCell colSpan={5} className="text-center h-40">
+                                                <div className="flex flex-col items-center gap-2 opacity-30">
+                                                    <Package className="h-10 w-10 text-[var(--dashboard-text-muted)]" />
+                                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">No products found</p>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
@@ -128,19 +128,21 @@ export default async function InventoryPage({
                     </Card>
 
                     {count !== null && count > 0 && (
-                        <PaginationControls
-                            hasNextPage={end < count}
-                            hasPrevPage={start > 0}
-                            totalCount={count}
-                            currentPage={currentPage}
-                            pageSize={pageSize}
-                        />
+                        <div className="flex justify-center mt-8">
+                            <PaginationControls
+                                hasNextPage={end < count}
+                                hasPrevPage={start > 0}
+                                totalCount={count}
+                                currentPage={currentPage}
+                                pageSize={pageSize}
+                            />
+                        </div>
                     )}
                 </TabsContent>
 
                 <TabsContent value="low-stock" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-40 bg-card rounded-lg border border-dashed">
-                        <p className="text-muted-foreground">Low stock view coming soon</p>
+                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
+                        <p className="text-[var(--dashboard-text-muted)] font-light">Low stock view coming soon</p>
                     </div>
                 </TabsContent>
             </Tabs>

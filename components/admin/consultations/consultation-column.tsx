@@ -26,20 +26,20 @@ export function ConsultationColumn({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
             className={cn(
-                'rounded-lg border bg-card/70 backdrop-blur px-4 py-5 shadow-sm flex flex-col gap-4 h-full',
+                'rounded-3xl border-none glass-card px-4 py-5 flex flex-col gap-4 h-full min-h-[500px]',
                 accentClass
             )}
         >
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between gap-2 pb-2 border-b border-[var(--dashboard-border)] mb-2">
                 <div>
-                    <p className="text-sm font-semibold tracking-tight">{title}</p>
-                    <p className="text-xs text-muted-foreground">{subtitle}</p>
+                    <p className="text-sm font-serif font-bold tracking-widest uppercase text-[var(--dashboard-text)]">{title}</p>
+                    <p className="text-[10px] text-[var(--dashboard-text-muted)] font-medium uppercase tracking-wider">{subtitle}</p>
                 </div>
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border bg-background text-sm font-semibold">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] text-xs font-bold border border-[var(--dashboard-accent-gold)]/20 shadow-[0_0_10px_rgba(212,175,55,0.1)]">
                     {count}
                 </span>
             </div>
-            <motion.div layout className="flex flex-col gap-3">
+            <motion.div layout className="flex flex-col gap-4">
                 {children}
             </motion.div>
         </motion.section>

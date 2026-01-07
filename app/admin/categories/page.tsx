@@ -93,13 +93,13 @@ export default async function CategoriesPage({
             </div>
 
             <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-                    <TabsTrigger value="all">All Categories</TabsTrigger>
-                    <TabsTrigger value="active">Active</TabsTrigger>
+                <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
+                    <TabsTrigger value="all" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">All Categories</TabsTrigger>
+                    <TabsTrigger value="active" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Active</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="all" className="space-y-6 mt-6">
-                    <div className="flex flex-col xxl:flex-row gap-6 items-start xxl:items-center justify-between glass-morphism p-6 rounded-3xl border border-border/50">
+                <TabsContent value="all" className="space-y-6 mt-6 animate-fade-in">
+                    <div className="flex flex-col xxl:flex-row gap-6 items-start xxl:items-center justify-between glass-card p-6 rounded-3xl border-none">
                         <div className="w-full max-w-md">
                             <SearchInput placeholder="Search categories..." />
                         </div>
@@ -121,10 +121,10 @@ export default async function CategoriesPage({
                 </TabsContent>
 
                 <TabsContent value="active" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 bg-card/30 rounded-3xl border border-dashed border-border/50 backdrop-blur-sm">
+                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
                         <div className="text-center">
-                            <FolderTree className="h-10 w-10 text-muted-foreground/30 mx-auto mb-4" />
-                            <p className="text-muted-foreground font-light">Active categories view coming soon</p>
+                            <FolderTree className="h-10 w-10 text-[var(--dashboard-text-muted)] opacity-30 mx-auto mb-4" />
+                            <p className="text-[var(--dashboard-text-muted)] font-light">Active categories view coming soon</p>
                         </div>
                     </div>
                 </TabsContent>
