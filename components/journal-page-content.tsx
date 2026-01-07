@@ -42,7 +42,7 @@ export function JournalPageContent({ content, isEditing = false }: JournalPageCo
                     )}
                 </div>
 
-                <div className="container relative z-10 px-4 md:px-6">
+                <div className="container mx-auto relative z-10 px-4 md:px-6">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}

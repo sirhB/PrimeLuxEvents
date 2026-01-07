@@ -83,7 +83,7 @@ export function GalleryPageContent({ content, isEditing = false }: GalleryPageCo
                     )}
                 </div>
 
-                <div className="container relative z-10 px-4 md:px-6 text-center">
+                <div className="container mx-auto relative z-10 px-4 md:px-6 text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -146,8 +146,8 @@ export function GalleryPageContent({ content, isEditing = false }: GalleryPageCo
                                         key={category}
                                         onClick={() => setActiveFilter(category)}
                                         className={`px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-500 ${activeFilter === category
-                                                ? "bg-gold text-black shadow-2xl shadow-gold/20 scale-110"
-                                                : "bg-white/5 text-gray-400 hover:text-gold hover:bg-white/10 border border-white/5"
+                                            ? "bg-gold text-black shadow-2xl shadow-gold/20 scale-110"
+                                            : "bg-white/5 text-gray-400 hover:text-gold hover:bg-white/10 border border-white/5"
                                             }`}
                                     >
                                         {category}
