@@ -11,6 +11,7 @@ import { ContactPageContent } from "@/components/contact-page-content"
 import { GalleryPageContent } from "@/components/gallery-page-content"
 import { JournalPageContent } from "@/components/journal-page-content"
 import { AnimatePresence, motion } from "framer-motion"
+import { VisualEditorSidebar } from "@/components/admin/visual-editor-sidebar"
 
 export default function VisualEditorPage() {
     const [activePage, setActivePage] = useState<string | null>(null)
@@ -55,11 +56,18 @@ export default function VisualEditorPage() {
         fetchContent()
     }, [activePage])
 
+    const handleUpdateContent = (key: string, value: string) => {
+        setContent((prev: any) => ({
+            ...prev,
+            [key]: value
+        }))
+    }
+
     const renderContent = () => {
         if (loading) {
             return (
-                <div className="flex items-center justify-center h-screen">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="flex items-center justify-center h-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
                 </div>
             )
         }
@@ -78,7 +86,7 @@ export default function VisualEditorPage() {
             case 'journal':
                 return <JournalPageContent {...props} />
             default:
-                return <div>Page not found</div>
+                return <div className="p-12 text-center text-muted-foreground">Select a page to start editing</div>
         }
     }
 
@@ -87,25 +95,37 @@ export default function VisualEditorPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background relative">
+        <div className="min-h-screen bg-[#F8F9FA] flex flex-col overflow-hidden">
             <VisualEditorNav
                 activePage={activePage}
                 onPageChange={setActivePage}
                 onNavigateToLanding={() => setActivePage(null)}
             />
 
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={activePage}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="pt-0"
-                >
-                    {renderContent()}
-                </motion.div>
-            </AnimatePresence>
+            <div className="flex-1 flex overflow-hidden">
+                <VisualEditorSidebar
+                    activePage={activePage}
+                    content={content}
+                    onUpdateContent={handleUpdateContent}
+                />
+
+                <main className="flex-1 overflow-auto relative">
+                    <div className="max-w-[1440px] mx-auto min-h-full bg-white shadow-2xl my-8 mx-8 rounded-xl overflow-hidden border border-border/50">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activePage}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="w-full h-full"
+                            >
+                                {renderContent()}
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
+                </main>
+            </div>
         </div>
     )
 }
