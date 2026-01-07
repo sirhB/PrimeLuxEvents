@@ -110,8 +110,8 @@ export default function CheckoutPage() {
             if (data) {
                 // Filter out items already in cart
                 const available = data.filter(p => !cartIds.includes(p.id))
-                // Shuffle and take 3
-                const shuffled = available.sort(() => 0.5 - Math.random()).slice(0, 3)
+                // Shuffle and take 8
+                const shuffled = available.sort(() => 0.5 - Math.random()).slice(0, 8)
                 setSupplementalProducts(shuffled)
 
                 // Initialize quantities to 1 for each product
@@ -556,14 +556,14 @@ export default function CheckoutPage() {
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                             {isLoadingSupplemental ? (
-                                Array(3).fill(0).map((_, i) => (
+                                Array(4).fill(0).map((_, i) => (
                                     <Card key={i} className="animate-pulse border-border/40">
-                                        <div className="h-64 bg-muted rounded-t-lg" />
-                                        <CardContent className="p-6 space-y-3">
-                                            <div className="h-5 bg-muted rounded w-3/4" />
-                                            <div className="h-4 bg-muted rounded w-1/2" />
+                                        <div className="aspect-square bg-muted rounded-t-lg" />
+                                        <CardContent className="p-4 space-y-2">
+                                            <div className="h-4 bg-muted rounded w-3/4" />
+                                            <div className="h-3 bg-muted rounded w-1/2" />
                                         </CardContent>
                                     </Card>
                                 ))
@@ -575,54 +575,55 @@ export default function CheckoutPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{
                                             duration: 0.4,
-                                            delay: index * 0.1,
+                                            delay: index * 0.05,
                                             ease: "easeOut"
                                         }}
                                     >
-                                        <Card className="overflow-hidden flex flex-col h-full border-border/40 hover:border-gold/30 transition-all duration-300 hover:shadow-lg hover:shadow-gold/5 group">
-                                            <div className="aspect-[4/5] relative bg-secondary/20 overflow-hidden">
+                                        <Card className="overflow-hidden flex flex-col h-full border-border/40 hover:border-gold/30 transition-all duration-300 hover:shadow-md hover:shadow-gold/5 group bg-card/50 backdrop-blur-sm">
+                                            <div className="aspect-square relative bg-secondary/20 overflow-hidden">
                                                 <img
                                                     src={product.image_url || '/placeholder.svg'}
                                                     alt={product.name}
                                                     className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
                                                 />
-                                            </div>
-                                            <CardHeader className="p-6 pb-2">
-                                                <CardTitle className="text-xl font-serif line-clamp-1">{product.name}</CardTitle>
-                                                <CardDescription className="text-gold font-medium text-base">{formatCurrency(product.price)}</CardDescription>
-                                            </CardHeader>
-                                            <CardFooter className="p-6 pt-2 mt-auto flex flex-col gap-4">
-                                                <div className="flex items-center justify-between w-full">
-                                                    <span className="text-sm text-muted-foreground uppercase tracking-wider font-light">Quantity</span>
-                                                    <div className="flex items-center gap-3">
-                                                        <Button
-                                                            size="icon"
-                                                            variant="outline"
-                                                            className="h-8 w-8 rounded-full border-border/50 hover:border-gold/50 hover:text-gold"
-                                                            onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) - 1)}
-                                                        >
-                                                            <Minus className="h-3 w-3" />
-                                                        </Button>
-                                                        <span className="w-6 text-center font-medium">
-                                                            {supplementalQuantities[product.id] || 1}
-                                                        </span>
-                                                        <Button
-                                                            size="icon"
-                                                            variant="outline"
-                                                            className="h-8 w-8 rounded-full border-border/50 hover:border-gold/50 hover:text-gold"
-                                                            onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) + 1)}
-                                                        >
-                                                            <Plus className="h-3 w-3" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                                 <Button
-                                                    variant="outline"
-                                                    className="w-full border-gold/30 hover:bg-gold hover:text-black hover:border-gold transition-all duration-300"
+                                                    size="icon"
+                                                    className="absolute bottom-2 right-2 h-8 w-8 rounded-full bg-white text-black hover:bg-gold hover:text-white opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0 shadow-sm"
                                                     onClick={() => handleAddSupplementalItem(product)}
                                                 >
-                                                    <ShoppingBag className="mr-2 h-4 w-4" /> Add to Quote
+                                                    <Plus className="h-4 w-4" />
                                                 </Button>
+                                            </div>
+                                            <CardContent className="p-3 flex flex-col gap-1 flex-grow">
+                                                <div className="flex justify-between items-start gap-2">
+                                                    <h3 className="font-medium text-sm line-clamp-2 leading-tight">{product.name}</h3>
+                                                    <span className="font-semibold text-sm whitespace-nowrap text-gold-dark">{formatCurrency(product.price)}</span>
+                                                </div>
+                                            </CardContent>
+                                            <CardFooter className="p-3 pt-0 mt-auto">
+                                                <div className="flex items-center justify-between w-full bg-secondary/30 rounded-lg p-1">
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="h-6 w-6 rounded-md hover:bg-white hover:text-destructive"
+                                                        onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) - 1)}
+                                                        disabled={(supplementalQuantities[product.id] || 1) <= 1}
+                                                    >
+                                                        <Minus className="h-3 w-3" />
+                                                    </Button>
+                                                    <span className="text-xs font-medium w-4 text-center">
+                                                        {supplementalQuantities[product.id] || 1}
+                                                    </span>
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="h-6 w-6 rounded-md hover:bg-white hover:text-primary"
+                                                        onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) + 1)}
+                                                    >
+                                                        <Plus className="h-3 w-3" />
+                                                    </Button>
+                                                </div>
                                             </CardFooter>
                                         </Card>
                                     </motion.div>
