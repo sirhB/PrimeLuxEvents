@@ -4,11 +4,12 @@ import Stripe from 'stripe'
 // For now, this will be undefined until you add STRIPE_SECRET_KEY
 export const stripe = process.env.STRIPE_SECRET_KEY
     ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-        apiVersion: '2024-11-20.acacia',
+        apiVersion: '2025-11-17.clover',
     })
     : null
 
-export const STRIPE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
+export const NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
+
 
 // Mock payment intent for development without API key
 export async function createMockPaymentIntent(amount: number) {

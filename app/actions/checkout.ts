@@ -140,7 +140,7 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
 /**
  * Create a new order
  */
-export async function createOrder(formData: CheckoutFormData, items: CartItem[]) {
+export async function createOrder(formData: CheckoutFormData, items: CartItem[], paymentIntentId?: string) {
     try {
         const supabase = await createClient()
 
@@ -155,19 +155,24 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[])
             throw new Error('Some items in your cart are no longer available. Please refresh the page.')
         }
 
-        // Create payment intent (mock for now if no Stripe key)
-        let paymentIntent
-        if (stripe) {
-            paymentIntent = await stripe.paymentIntents.create({
-                amount: totals.totalAmount,
-                currency: 'usd',
-                automatic_payment_methods: {
-                    enabled: true,
-                },
-            })
-        } else {
-            paymentIntent = await createMockPaymentIntent(totals.totalAmount)
+        // Use provided payment intent ID or create a new one (mock if no Stripe key)
+        let finalPaymentIntentId = paymentIntentId
+        if (!finalPaymentIntentId) {
+            if (stripe) {
+                const paymentIntent = await stripe.paymentIntents.create({
+                    amount: totals.totalAmount,
+                    currency: 'usd',
+                    automatic_payment_methods: {
+                        enabled: true,
+                    },
+                })
+                finalPaymentIntentId = paymentIntent.id
+            } else {
+                const paymentIntent = await createMockPaymentIntent(totals.totalAmount)
+                finalPaymentIntentId = paymentIntent.id
+            }
         }
+
 
         // Check for stock availability
         let isOverbooked = false
@@ -216,8 +221,8 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[])
                 delivery_fee: totals.deliveryFee,
                 setup_fee: totals.setupFee,
                 total_amount: totals.totalAmount,
-                payment_intent_id: paymentIntent.id,
-                payment_status: 'pending',
+                payment_intent_id: finalPaymentIntentId,
+                payment_status: paymentIntentId ? 'succeeded' : 'pending',
                 status: 'pending',
                 is_overbooked: isOverbooked,
                 pickup_date: formData.sameDayPickup ? formData.eventDate : (formData.pickupDate || null),
@@ -278,8 +283,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[])
         return {
             success: true,
             orderId: order.id,
-            clientSecret: paymentIntent.client_secret,
-            paymentIntentId: paymentIntent.id,
+            paymentIntentId: finalPaymentIntentId,
         }
     } catch (error) {
         console.error('Error in createOrder:', error)

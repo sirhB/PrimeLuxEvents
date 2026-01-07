@@ -20,6 +20,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox"
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
+import Link from 'next/link'
+import { StripeProvider, stripePromise } from '@/components/providers/stripe-provider'
+import { StripePaymentForm } from '@/components/checkout/stripe-payment-form'
+import { createPaymentIntent } from '@/app/actions/create-payment-intent'
+import { Elements } from '@stripe/react-stripe-js'
+
+
+
 
 export default function CheckoutPage() {
     const router = useRouter()
@@ -39,6 +47,8 @@ export default function CheckoutPage() {
     const [totals, setTotals] = useState<any>(null)
     const [isCalculating, setIsCalculating] = useState(false)
     const [agreesToRentalAgreement, setAgreesToRentalAgreement] = useState(false)
+    const [clientSecret, setClientSecret] = useState<string | null>(null)
+
 
     // Form Data
     const [formData, setFormData] = useState<CheckoutFormData>({
@@ -174,13 +184,16 @@ export default function CheckoutPage() {
 
             setIsCalculating(true)
             try {
-                const cartItems: CartItem[] = items.map((item) => ({
-                    productId: item.productId,
-                    quantity: item.quantity,
-                    modifiers: item.modifiers
-                }))
+                const cartItems: CartItem[] = items
+                    .filter(item => !!item.productId)
+                    .map((item) => ({
+                        productId: item.productId as string,
+                        quantity: item.quantity,
+                        modifiers: item.modifiers
+                    }))
 
                 const calculated = await calculateOrderTotal(cartItems, addressToUse)
+
                 setTotals(calculated)
             } catch (err) {
                 console.error('Error calculating totals:', err)
@@ -299,48 +312,74 @@ export default function CheckoutPage() {
 
             setError(null)
         }
+
+        if (currentStep === 2) {
+            // Prepare for payment by creating a payment intent
+            const preparePayment = async () => {
+                setIsLoading(true)
+                try {
+                    const cartItems: CartItem[] = items
+                        .filter(item => !!item.productId)
+                        .map((item) => ({
+                            productId: item.productId as string,
+                            quantity: item.quantity,
+                            modifiers: item.modifiers
+                        }))
+
+                    const addressToUse = formData.deliveryAddress || formData.venueAddress
+                    const result = await createPaymentIntent(cartItems, addressToUse)
+
+                    if (result.clientSecret) {
+                        setClientSecret(result.clientSecret)
+                    } else if (result.error) {
+                        setError(result.error)
+                    }
+                } catch (err) {
+                    console.error('Error preparing payment:', err)
+                    setError('Failed to initialize payment. Please try again.')
+                } finally {
+                    setIsLoading(false)
+                }
+            }
+            preparePayment()
+        }
+
+
         setCurrentStep(prev => prev + 1)
         window.scrollTo(0, 0)
     }
+
 
     const handlePrevStep = () => {
         setCurrentStep(prev => prev - 1)
         window.scrollTo(0, 0)
     }
 
-    const handleSubmit = async () => {
+    const handlePaymentSuccess = async (paymentIntentId: string) => {
         setIsLoading(true)
         setError(null)
 
-        // Validate rental agreement agreement
-        if (!agreesToRentalAgreement) {
-            setError("Please agree to the rental agreement terms before placing your order.")
-            setIsLoading(false)
-            return
-        }
-
         try {
-            const cartItems: CartItem[] = items.map((item) => ({
-                productId: item.productId,
-                quantity: item.quantity,
-                modifiers: item.modifiers
-            }))
+            const cartItems: CartItem[] = items
+                .filter(item => !!item.productId)
+                .map((item) => ({
+                    productId: item.productId as string,
+                    quantity: item.quantity,
+                    modifiers: item.modifiers
+                }))
 
-            // Final sync of form data before submission
             const finalFormData = {
                 ...formData,
                 deliveryDate: date ? format(date, 'yyyy-MM-dd') : formData.deliveryDate,
                 eventDate: date ? format(date, 'yyyy-MM-dd') : formData.eventDate,
-                // Ensure delivery time is set, default to start time if empty
                 deliveryTime: formData.deliveryTime || startTime,
-                // Include pickup data
                 pickupDate: sameDayPickup ? (date ? format(date, 'yyyy-MM-dd') : formData.eventDate) : (pickupDate ? format(pickupDate, 'yyyy-MM-dd') : ''),
                 pickupTime,
                 pickupNotes,
                 sameDayPickup,
             }
 
-            const result = await createOrder(finalFormData, cartItems)
+            const result = await createOrder(finalFormData, cartItems, paymentIntentId)
 
             if (result.success) {
                 setIsSuccess(true)
@@ -359,6 +398,14 @@ export default function CheckoutPage() {
             setIsLoading(false)
         }
     }
+
+    const handleSubmit = async () => {
+        if (!agreesToRentalAgreement) {
+            setError("Please agree to the rental agreement terms before placing your order.")
+            return
+        }
+    }
+
 
     if (items.length === 0 && isLoaded) return null
 
@@ -919,7 +966,7 @@ export default function CheckoutPage() {
                                                                     variant="ghost"
                                                                     className="h-8 w-8 rounded-l-full hover:text-gold"
                                                                     onClick={() => {
-                                                                        updateQuantity(item.productId, item.quantity - 1)
+                                                                        updateQuantity(item.id, item.quantity - 1)
                                                                         toast.info('Quantity updated')
                                                                     }}
                                                                 >
@@ -933,7 +980,7 @@ export default function CheckoutPage() {
                                                                     variant="ghost"
                                                                     className="h-8 w-8 rounded-r-full hover:text-gold"
                                                                     onClick={() => {
-                                                                        updateQuantity(item.productId, item.quantity + 1)
+                                                                        updateQuantity(item.id, item.quantity + 1)
                                                                         toast.info('Quantity updated')
                                                                     }}
                                                                 >
@@ -958,15 +1005,22 @@ export default function CheckoutPage() {
                                     </div>
                                 </CardHeader>
                                 <CardContent className="p-8">
-                                    <div className="bg-gold/5 border border-gold/20 rounded-xl p-8 text-center space-y-3">
-                                        <p className="text-foreground font-medium">
-                                            Payment processing will be integrated once Stripe is configured.
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            For now, orders will be created with pending payment status.
-                                        </p>
-                                    </div>
+                                    {clientSecret ? (
+                                        <Elements stripe={stripePromise} options={{ clientSecret }}>
+                                            <StripePaymentForm
+                                                amount={totals?.totalAmount || 0}
+                                                onSuccess={handlePaymentSuccess}
+                                            />
+                                        </Elements>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                                            <Loader2 className="h-8 w-8 animate-spin text-gold" />
+                                            <p className="text-muted-foreground">Initializing secure payment...</p>
+                                        </div>
+                                    )}
                                 </CardContent>
+
+
                             </Card>
                         </div>
 
@@ -1050,20 +1104,23 @@ export default function CheckoutPage() {
                                         </div>
                                     </div>
 
-                                    <Button
-                                        className="w-full h-14 text-lg bg-gold text-black hover:bg-gold/90 rounded-full font-medium shadow-lg hover:shadow-gold/20 transition-all duration-300"
-                                        onClick={handleSubmit}
-                                        disabled={isLoading || isCalculating || !totals || !agreesToRentalAgreement}
-                                    >
-                                        {isLoading ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                Processing...
-                                            </>
-                                        ) : (
-                                            'Place Order'
-                                        )}
-                                    </Button>
+                                    {!clientSecret && (
+                                        <Button
+                                            className="w-full h-14 text-lg bg-gold text-black hover:bg-gold/90 rounded-full font-medium shadow-lg hover:shadow-gold/20 transition-all duration-300"
+                                            onClick={handleSubmit}
+                                            disabled={isLoading || isCalculating || !totals || !agreesToRentalAgreement}
+                                        >
+                                            {isLoading ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                                    Processing...
+                                                </>
+                                            ) : (
+                                                'Place Order'
+                                            )}
+                                        </Button>
+                                    )}
+
 
                                     <Button variant="ghost" className="w-full hover:bg-transparent hover:text-gold" onClick={handlePrevStep}>
                                         Back to Details
