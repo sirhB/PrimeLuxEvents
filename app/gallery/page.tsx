@@ -1,10 +1,17 @@
 import { getSiteContent } from "@/lib/content"
-import { GalleryPageContent } from "@/components/gallery-page-content"
+import { GalleryLanding } from "@/components/gallery/gallery-landing"
+import { createClient } from "@/lib/supabase/server"
 
 export const dynamic = 'force-dynamic'
 
 export default async function GalleryPage() {
   const content = await getSiteContent()
+  const supabase = await createClient()
 
-  return <GalleryPageContent content={content} />
+  const { data: categories } = await supabase
+    .from('portfolio_categories')
+    .select('*')
+    .order('name')
+
+  return <GalleryLanding content={content} categories={categories || []} />
 }
