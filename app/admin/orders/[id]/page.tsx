@@ -152,13 +152,25 @@ export default async function OrderDetailsPage({
                                     order.order_items.forEach((item: any) => {
                                         if (item.bundle_id) {
                                             if (!bundleMap.has(item.bundle_id)) {
-                                                const b = { id: item.bundle_id, name: item.package_name || 'Package', price: 0, items: [] }
+                                                const b = {
+                                                    id: item.bundle_id,
+                                                    name: item.package_name || 'Package',
+                                                    price: 0,
+                                                    groups: []
+                                                }
                                                 bundleMap.set(item.bundle_id, b)
                                                 bundles.push(b)
                                             }
                                             const b = bundleMap.get(item.bundle_id)
                                             if (item.price_at_time > 0) b.price = item.price_at_time
-                                            b.items.push(item)
+
+                                            const gName = item.group_name || 'Included Items'
+                                            let group = (b.groups as any[]).find((g: any) => g.name === gName)
+                                            if (!group) {
+                                                group = { name: gName, items: [] }
+                                                b.groups.push(group)
+                                            }
+                                            group.items.push(item)
                                         } else {
                                             standalone.push(item)
                                         }
@@ -195,17 +207,26 @@ export default async function OrderDetailsPage({
                                                             {formatCents(bundle.price)}
                                                         </TableCell>
                                                     </TableRow>
-                                                    {bundle.items.map((subItem: any) => (
-                                                        <TableRow key={subItem.id} className="border-[var(--dashboard-border)] hover:bg-[var(--dashboard-card-hover)] opacity-70">
-                                                            <TableCell className="text-[var(--dashboard-text)] pl-10 text-xs italic">
-                                                                - {subItem.products?.name}
-                                                            </TableCell>
-                                                            <TableCell className="text-[var(--dashboard-text)] text-xs">{subItem.quantity}</TableCell>
-                                                            <TableCell className="text-[var(--dashboard-text)] text-xs">{formatCents(subItem.price_at_time)}</TableCell>
-                                                            <TableCell className="text-right text-[var(--dashboard-text)] text-xs">
-                                                                {formatCents(subItem.quantity * subItem.price_at_time)}
-                                                            </TableCell>
-                                                        </TableRow>
+                                                    {bundle.groups.map((group: any, gIdx: number) => (
+                                                        <React.Fragment key={gIdx}>
+                                                            <TableRow className="border-none hover:bg-transparent">
+                                                                <TableCell colSpan={4} className="pl-10 py-1 font-bold text-[10px] uppercase tracking-widest text-[var(--dashboard-text-muted)] opacity-50">
+                                                                    {group.name}
+                                                                </TableCell>
+                                                            </TableRow>
+                                                            {group.items.map((subItem: any) => (
+                                                                <TableRow key={subItem.id} className="border-[var(--dashboard-border)] hover:bg-[var(--dashboard-card-hover)] opacity-70">
+                                                                    <TableCell className="text-[var(--dashboard-text)] pl-12 text-xs italic">
+                                                                        - {subItem.products?.name}
+                                                                    </TableCell>
+                                                                    <TableCell className="text-[var(--dashboard-text)] text-xs">{subItem.quantity}</TableCell>
+                                                                    <TableCell className="text-[var(--dashboard-text)] text-xs">{formatCents(subItem.price_at_time)}</TableCell>
+                                                                    <TableCell className="text-right text-[var(--dashboard-text)] text-xs">
+                                                                        {formatCents(subItem.quantity * subItem.price_at_time)}
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </React.Fragment>
                                                     ))}
                                                 </React.Fragment>
                                             ))}

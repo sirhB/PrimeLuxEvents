@@ -186,25 +186,47 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         let allOptions: any[] = []
 
         if (packageIds.length > 0) {
-            // Fetch packages and their static items
+            // 1. Fetch basic packages and static items
             const { data: pkgData, error: pkgError } = await supabase
                 .from('packages')
                 .select('*, package_items(product_id, quantity)')
                 .in('id', packageIds)
 
-            if (pkgError) throw new Error('Failed to fetch package details')
+            if (pkgError) {
+                console.error('Error fetching packages:', pkgError)
+                throw new Error('Failed to fetch package details')
+            }
             packages = pkgData || []
 
-            // Fetch ALL options for these packages to map selections to products
-            const { data: optData, error: optError } = await supabase
-                .from('package_item_options')
-                .select('id, product_id, quantity, package_item_groups(name)')
-                .in('package_item_group_id',
-                    (await supabase.from('package_item_groups').select('id').in('package_id', packageIds)).data?.map(g => g.id) || []
-                )
+            // 2. Fetch all groups for these packages
+            const { data: groupData, error: groupError } = await supabase
+                .from('package_item_groups')
+                .select('id, name, package_id')
+                .in('package_id', packageIds)
 
-            if (optError) console.error('Error fetching package options:', optError)
-            allOptions = optData || []
+            if (groupError) {
+                console.error('Error fetching package groups:', groupError)
+            } else {
+                const groupIds = groupData?.map(g => g.id) || []
+
+                if (groupIds.length > 0) {
+                    // 3. Fetch all options for these groups
+                    const { data: optData, error: optError } = await supabase
+                        .from('package_item_options')
+                        .select('id, product_id, quantity, group_id')
+                        .in('group_id', groupIds)
+
+                    if (optError) {
+                        console.error('Error fetching options:', optError)
+                    } else if (optData) {
+                        // Map group name to each option for later use
+                        allOptions = optData.map(opt => ({
+                            ...opt,
+                            group_name: groupData.find(g => g.id === opt.group_id)?.name || 'Selection'
+                        }))
+                    }
+                }
+            }
         }
 
         const missingPackages = items.filter(i => i.packageId && !packages.find(p => p.id === i.packageId))
@@ -363,7 +385,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                             packageContents.push({
                                 productId: option.product_id,
                                 quantity: option.quantity || 1,
-                                groupName: (option.package_item_groups as any)?.name || 'Selection'
+                                groupName: option.group_name || 'Selection'
                             })
                         }
                     })
