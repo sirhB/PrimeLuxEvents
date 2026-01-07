@@ -1082,24 +1082,24 @@ export default function CheckoutPage() {
 
 
                                     {/* Rental Agreement Agreement */}
-                                    <div className="space-y-4 p-6 bg-secondary/10 rounded-xl border border-border/40">
-                                        <div className="flex items-start space-x-3">
+                                    <div className="p-6 bg-secondary/5 rounded-xl border border-border/40 space-y-4">
+                                        <div className="flex items-start gap-4">
                                             <Checkbox
                                                 id="rental-agreement"
                                                 checked={agreesToRentalAgreement}
                                                 onCheckedChange={(checked) => setAgreesToRentalAgreement(checked as boolean)}
-                                                className="mt-1 border-gold/50 data-[state=checked]:bg-gold data-[state=checked]:text-black"
+                                                className="mt-1 h-5 w-5 border-gold/50 data-[state=checked]:bg-gold data-[state=checked]:text-black transition-colors"
                                             />
-                                            <div className="space-y-2">
+                                            <div className="flex-1 space-y-3">
                                                 <Label
                                                     htmlFor="rental-agreement"
-                                                    className="text-sm font-medium cursor-pointer leading-relaxed"
+                                                    className="text-sm font-medium cursor-pointer leading-relaxed block select-none"
                                                 >
                                                     I agree to the{' '}
                                                     <Link
                                                         href="/rental-agreement"
                                                         target="_blank"
-                                                        className="text-gold hover:text-gold/80 underline font-medium"
+                                                        className="text-gold hover:text-gold/80 underline underline-offset-4 font-semibold transition-colors"
                                                     >
                                                         PrimeLux Events Rental Agreement
                                                     </Link>

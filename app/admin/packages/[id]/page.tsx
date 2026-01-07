@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation'
 import PackageBuilderForm from '../new/PackageBuilderForm'
 import { PackageItemGroup } from '@/components/admin/PackageItemGroupBuilder'
 
-export default async function EditPackagePage({ params }: { params: { id: string } }) {
+export default async function EditPackagePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
     const supabase = await createClient()
 
     // 1. Fetch Package Details with Groups and Options
@@ -30,7 +31,7 @@ export default async function EditPackagePage({ params }: { params: { id: string
                 )
             )
         `)
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
 
     if (error || !pkg) {

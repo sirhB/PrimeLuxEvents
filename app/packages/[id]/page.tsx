@@ -7,12 +7,13 @@ import { formatCurrency } from '@/lib/utils'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
     const supabase = await createClient()
     const { data: pkg } = await supabase
         .from('packages')
         .select('name, description')
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
 
     if (!pkg) return { title: 'Package Not Found' }
@@ -23,7 +24,8 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     }
 }
 
-export default async function PackageDetailPage({ params }: { params: { id: string } }) {
+export default async function PackageDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
     const supabase = await createClient()
 
     // Fetch complete package data
@@ -54,7 +56,7 @@ export default async function PackageDetailPage({ params }: { params: { id: stri
                 )
             )
         `)
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
 
     if (error || !pkg) {
