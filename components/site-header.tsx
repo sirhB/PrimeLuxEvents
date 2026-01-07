@@ -62,16 +62,10 @@ export function SiteHeader() {
 
       <header
         className={cn(
-          "sticky top-0 z-50 w-full transition-all duration-500",
-          scrolled
-            ? "bg-[#1A1A1A]/80 backdrop-blur-xl py-3 border-b border-white/5 shadow-2xl"
-            : "bg-transparent py-6 border-b border-transparent"
+          "sticky top-0 z-50 w-full transition-all duration-500 bg-[#1A1A1A]/90 backdrop-blur-xl border-b border-white/5 shadow-2xl",
+          scrolled ? "py-3" : "py-6"
         )}
       >
-        {/* Subtle gradient for legibility on bright backgrounds */}
-        {!scrolled && isDarkPage && (
-          <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent pointer-events-none -z-10" />
-        )}
 
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
           {/* Mobile Menu Trigger */}
