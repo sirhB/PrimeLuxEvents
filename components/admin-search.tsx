@@ -42,7 +42,7 @@ const typeIcons = {
 const typeLabels = {
     product: 'Products',
     order: 'Orders',
-    consultation: 'Consultations',
+    consultation: 'Leads',
     customer: 'Customers',
     category: 'Categories',
     setting: 'Settings',
@@ -138,7 +138,7 @@ export function AdminSearch() {
                 className="relative h-9 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-64"
                 onClick={() => setOpen(true)}
             >
-                <span className="hidden lg:inline-flex">Search orders, products, consultations...</span>
+                <span className="hidden lg:inline-flex">Search orders, products, leads...</span>
                 <span className="inline-flex lg:hidden">Search...</span>
                 <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
                     <span className="text-xs">⌘</span>K
@@ -146,7 +146,7 @@ export function AdminSearch() {
             </Button>
             <CommandDialog open={open} onOpenChange={setOpen}>
                 <CommandInput
-                    placeholder="Search for orders, products, customers, consultations..."
+                    placeholder="Search for orders, products, customers, leads..."
                     value={query}
                     onValueChange={setQuery}
                 />
@@ -208,7 +208,7 @@ export function AdminSearch() {
                     {results.length === 0 && !loading && query.length >= 2 && (
                         <div className="py-6 text-center text-sm text-muted-foreground">
                             <p>No results found for "{query}"</p>
-                            <p className="text-xs mt-1">Try searching for orders, products, customers, or consultations</p>
+                            <p className="text-xs mt-1">Try searching for orders, products, customers, or leads</p>
                         </div>
                     )}
 
@@ -224,7 +224,7 @@ export function AdminSearch() {
                         </CommandItem>
                         <CommandItem onSelect={() => runCommand(() => router.push('/admin/consultations'))}>
                             <FileText className="mr-2 h-4 w-4" />
-                            <span>Consultations</span>
+                            <span>Leads</span>
                         </CommandItem>
                         <CommandItem onSelect={() => runCommand(() => router.push('/admin/products'))}>
                             <Package className="mr-2 h-4 w-4" />

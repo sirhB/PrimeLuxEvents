@@ -36,7 +36,7 @@ const sidebarItems = [
         icon: ShoppingCart,
     },
     {
-        title: 'Consultations',
+        title: 'Leads',
         href: '/admin/consultations',
         icon: FileText,
     },

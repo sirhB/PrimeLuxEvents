@@ -42,7 +42,6 @@ const priorities = [
 
 const taskTypes = [
     { value: 'general', label: 'General', icon: Briefcase },
-    { value: 'event', label: 'Event', icon: Calendar },
     { value: 'delivery', label: 'Delivery', icon: Truck },
     { value: 'warehouse', label: 'Warehouse', icon: Home }, // Using Home as generic building
     { value: 'office', label: 'Office', icon: Building },
@@ -60,7 +59,7 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
         priority: task?.priority || 'medium',
         assigned_to: task?.assigned_to || '',
         due_date: task?.due_date || '',
-        task_type: task?.task_type || (eventId ? 'event' : 'general')
+        task_type: task?.task_type || 'general'
     })
 
     const [loading, setLoading] = useState(false)
@@ -86,7 +85,6 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
         try {
             const taskData = {
                 ...formData,
-                event_id: eventId || null,
                 updated_at: new Date().toISOString()
             }
 
@@ -187,9 +185,9 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                                 <SelectItem key={priority.value} value={priority.value}>
                                     <div className="flex items-center gap-2">
                                         <Flag className={`h-4 w-4 ${priority.value === 'urgent' ? 'text-red-500' :
-                                                priority.value === 'high' ? 'text-orange-500' :
-                                                    priority.value === 'medium' ? 'text-yellow-500' :
-                                                        'text-gray-500'
+                                            priority.value === 'high' ? 'text-orange-500' :
+                                                priority.value === 'medium' ? 'text-yellow-500' :
+                                                    'text-gray-500'
                                             }`} />
                                         {priority.label}
                                     </div>

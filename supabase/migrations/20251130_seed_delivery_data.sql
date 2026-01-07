@@ -1,12 +1,7 @@
--- Migration: Seed data for delivery and task testing
+-- Migration: Seed data for delivery and task testing (Updated - No Events)
 
 DO $$
 DECLARE
-  -- Event IDs
-  evt_wedding uuid;
-  evt_gala uuid;
-  evt_birthday uuid;
-  
   -- Order IDs
   ord_wedding uuid;
   ord_gala uuid;
@@ -21,48 +16,31 @@ DECLARE
 
 BEGIN
 
-  -- 1. Create Events
-  INSERT INTO events (event_id, name, event_date, location, status, customer_name, customer_email, customer_phone, event_type, guest_count, created_by)
-  VALUES 
-    ('EVT-2025-001', 'Smith Wedding', (now() + interval '2 days')::date, '123 Wedding Lane, Beverly Hills, CA', 'confirmed', 'John Smith', 'john@example.com', '555-0101', 'wedding', 150, 'admin')
-  RETURNING id INTO evt_wedding;
-
-  INSERT INTO events (event_id, name, event_date, location, status, customer_name, customer_email, customer_phone, event_type, guest_count, created_by)
-  VALUES 
-    ('EVT-2025-002', 'Tech Corp Gala', (now() + interval '5 days')::date, '500 Convention Center Dr, Los Angeles, CA', 'planning', 'Jane Doe', 'jane@techcorp.com', '555-0102', 'corporate', 500, 'admin')
-  RETURNING id INTO evt_gala;
-
-  INSERT INTO events (event_id, name, event_date, location, status, customer_name, customer_email, customer_phone, event_type, guest_count, created_by)
-  VALUES 
-    ('EVT-2025-003', 'Kids Birthday Bash', (now() + interval '1 day')::date, '888 Suburban St, Pasadena, CA', 'confirmed', 'Mike Johnson', 'mike@example.com', '555-0103', 'birthday', 30, 'admin')
-  RETURNING id INTO evt_birthday;
-
-
-  -- 2. Create Orders (Linked to Events)
+  -- 1. Create Orders with delivery information
   -- Note: Latitude/Longitude are approximate for LA area to test map/routing
   
   -- Wedding Order
-  INSERT INTO orders (event_id, customer_name, customer_email, delivery_address, delivery_time, status, total_amount, latitude, longitude)
-  VALUES (evt_wedding, 'John Smith', 'john@example.com', '123 Wedding Lane, Beverly Hills, CA', '10:00 AM', 'confirmed', 500000, 34.0736, -118.4004)
+  INSERT INTO orders (customer_name, customer_email, delivery_address, delivery_time, status, total_amount, latitude, longitude)
+  VALUES ('John Smith', 'john@example.com', '123 Wedding Lane, Beverly Hills, CA', (now() + interval '2 days')::timestamp, 'confirmed', 500000, 34.0736, -118.4004)
   RETURNING id INTO ord_wedding;
 
   -- Gala Order
-  INSERT INTO orders (event_id, customer_name, customer_email, delivery_address, delivery_time, status, total_amount, latitude, longitude)
-  VALUES (evt_gala, 'Jane Doe', 'jane@techcorp.com', '500 Convention Center Dr, Los Angeles, CA', '08:00 AM', 'pending', 1500000, 34.0407, -118.2690)
+  INSERT INTO orders (customer_name, customer_email, delivery_address, delivery_time, status, total_amount, latitude, longitude)
+  VALUES ('Jane Doe', 'jane@techcorp.com', '500 Convention Center Dr, Los Angeles, CA', (now() + interval '5 days')::timestamp, 'pending', 1500000, 34.0407, -118.2690)
   RETURNING id INTO ord_gala;
 
   -- Birthday Order
-  INSERT INTO orders (event_id, customer_name, customer_email, delivery_address, delivery_time, status, total_amount, latitude, longitude)
-  VALUES (evt_birthday, 'Mike Johnson', 'mike@example.com', '888 Suburban St, Pasadena, CA', '12:00 PM', 'confirmed', 75000, 34.1478, -118.1445)
+  INSERT INTO orders (customer_name, customer_email, delivery_address, delivery_time, status, total_amount, latitude, longitude)
+  VALUES ('Mike Johnson', 'mike@example.com', '888 Suburban St, Pasadena, CA', (now() + interval '1 day')::timestamp, 'confirmed', 75000, 34.1478, -118.1445)
   RETURNING id INTO ord_birthday;
 
-  -- Standalone Order (No Event)
+  -- Standalone Order
   INSERT INTO orders (customer_name, customer_email, delivery_address, delivery_time, status, total_amount, latitude, longitude)
-  VALUES ('Sarah Connor', 'sarah@example.com', '101 Terminator Blvd, Santa Monica, CA', '02:00 PM', 'confirmed', 25000, 34.0195, -118.4912)
+  VALUES ('Sarah Connor', 'sarah@example.com', '101 Terminator Blvd, Santa Monica, CA', (now() + interval '3 days')::timestamp, 'confirmed', 25000, 34.0195, -118.4912)
   RETURNING id INTO ord_standalone;
 
 
-  -- 3. Add Order Items
+  -- 2. Add Order Items
   -- Fetch some product IDs and their prices
   SELECT id INTO prod_chair FROM products WHERE name ILIKE '%Chiavari%' LIMIT 1;
   SELECT id INTO prod_table FROM products WHERE name ILIKE '%Banquet%' LIMIT 1;
@@ -106,21 +84,15 @@ BEGIN
   END IF;
 
 
-  -- 4. Create Tasks
+  -- 3. Create Tasks
   
   -- Delivery Tasks (Linked to Orders)
-  INSERT INTO tasks (title, description, status, priority, task_type, assigned_to_text, due_date, order_id, event_id, route_order, created_by_text)
+  INSERT INTO tasks (title, description, status, priority, task_type, assigned_to_text, due_date, order_id, route_order, created_by_text)
   VALUES 
-    ('Deliver to Smith Wedding', 'Deliver chairs and tables to main hall', 'pending', 'high', 'delivery', 'Driver Team A', (now() + interval '2 days')::date, ord_wedding, evt_wedding, 1, 'admin'),
-    ('Deliver to Tech Gala', 'Early morning delivery for setup', 'pending', 'urgent', 'delivery', 'Driver Team B', (now() + interval '5 days')::date, ord_gala, evt_gala, 2, 'admin'),
-    ('Deliver to Birthday Bash', 'Backyard setup required', 'pending', 'medium', 'delivery', 'Driver Team A', (now() + interval '1 day')::date, ord_birthday, evt_birthday, 3, 'admin'),
-    ('Deliver to Sarah Connor', 'Standard drop-off', 'pending', 'medium', 'delivery', 'Driver Team C', now()::date, ord_standalone, NULL, 4, 'admin');
-
-  -- Event Tasks
-  INSERT INTO tasks (title, description, status, priority, task_type, assigned_to_text, due_date, event_id, created_by_text)
-  VALUES 
-    ('Finalize Seating Chart', 'Get final guest list from bride', 'in_progress', 'high', 'event', 'Planner Sarah', (now() + interval '1 day')::date, evt_wedding, 'admin'),
-    ('Confirm Menu Selection', 'Send menu options to catering', 'completed', 'medium', 'event', 'Planner Mike', (now() - interval '1 day')::date, evt_gala, 'admin');
+    ('Deliver to Smith Wedding', 'Deliver chairs and tables to main hall', 'pending', 'high', 'delivery', 'Driver Team A', (now() + interval '2 days')::date, ord_wedding, 1, 'admin'),
+    ('Deliver to Tech Gala', 'Early morning delivery for setup', 'pending', 'urgent', 'delivery', 'Driver Team B', (now() + interval '5 days')::date, ord_gala, 2, 'admin'),
+    ('Deliver to Birthday Bash', 'Backyard setup required', 'pending', 'medium', 'delivery', 'Driver Team A', (now() + interval '1 day')::date, ord_birthday, 3, 'admin'),
+    ('Deliver to Sarah Connor', 'Standard drop-off', 'pending', 'medium', 'delivery', 'Driver Team C', (now() + interval '3 days')::date, ord_standalone, 4, 'admin');
 
   -- General/Warehouse Tasks
   INSERT INTO tasks (title, description, status, priority, task_type, assigned_to_text, due_date, created_by_text)

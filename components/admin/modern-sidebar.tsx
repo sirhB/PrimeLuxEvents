@@ -21,7 +21,6 @@ import {
     CalendarCheck,
     Search,
     ChevronRight,
-    Calendar,
     UserCog,
     CheckSquare
 } from 'lucide-react'
@@ -42,8 +41,7 @@ const sidebarGroups = [
         title: "Sales & Operations",
         items: [
             { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
-            { icon: FileText, label: 'Consultations', href: '/admin/consultations' },
-            { icon: Calendar, label: 'Events', href: '/admin/events' },
+            { icon: FileText, label: 'Leads', href: '/admin/consultations' },
             { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments' },
             { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks' },
             { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },

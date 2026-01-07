@@ -194,14 +194,14 @@ export default async function ConsultationsPage({
     return (
         <div className="flex flex-col gap-6 p-6 bg-gray-50 min-h-screen">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Consultations</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
                 <p className="text-gray-600 mt-1 text-sm">
-                    Track every consultation request through a clear, kanban-style workflow.
+                    Track and follow up on every lead through a clear, kanban-style workflow.
                 </p>
             </div>
 
             <div className="flex items-center justify-between gap-4 flex-wrap">
-                <SearchInput placeholder="Search consultations..." />
+                <SearchInput placeholder="Search leads..." />
                 <StatusFilter statuses={statusFilterOptions} />
             </div>
 
@@ -210,7 +210,7 @@ export default async function ConsultationsPage({
                     <CardContent className="py-10 text-center space-y-3">
                         <Calendar className="mx-auto h-8 w-8 text-muted-foreground" />
                         <p className="text-sm text-muted-foreground">
-                            No consultations match the current filters.
+                            No leads match the current filters.
                         </p>
                     </CardContent>
                 </Card>
@@ -297,7 +297,7 @@ export default async function ConsultationsPage({
                             })}
                             {groupedByStatus[stage.value].length === 0 && (
                                 <p className="text-xs text-muted-foreground text-center py-4">
-                                    No consultations in this stage.
+                                    No leads in this stage.
                                 </p>
                             )}
                         </ConsultationColumn>
@@ -370,7 +370,7 @@ export default async function ConsultationsPage({
                                         <TableCell colSpan={7} className="text-center h-24">
                                             <div className="flex flex-col items-center gap-2">
                                                 <Calendar className="h-8 w-8 text-muted-foreground" />
-                                                <p className="text-muted-foreground">No consultations found.</p>
+                                                <p className="text-muted-foreground">No leads found.</p>
                                             </div>
                                         </TableCell>
                                     </TableRow>
