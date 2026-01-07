@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { createClient } from '@/lib/supabase/client'
-import { Calendar, User, Flag, Truck, Briefcase, Home, Building } from 'lucide-react'
+import { Calendar, User, Flag, Truck, Briefcase, Home, Building, MapPin } from 'lucide-react'
 
 interface TaskFormData {
     title: string
@@ -18,6 +18,7 @@ interface TaskFormData {
     assigned_to: string
     due_date: string
     task_type: string
+    event_id?: string
 }
 
 interface TaskFormProps {
@@ -44,16 +45,15 @@ const priorities = [
 const taskTypes = [
     { value: 'general', label: 'General', icon: Briefcase },
     { value: 'delivery', label: 'Delivery', icon: Truck },
-    { value: 'warehouse', label: 'Warehouse', icon: Home }, // Using Home as generic building
+    { value: 'warehouse', label: 'Warehouse', icon: Home },
     { value: 'office', label: 'Office', icon: Building },
     { value: 'venue', label: 'Venue', icon: MapPin },
     { value: 'return_trip', label: 'Return Trip', icon: Truck }
 ]
 
-import { MapPin } from 'lucide-react'
-
 export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) {
     const router = useRouter()
+    const [teamMembers, setTeamMembers] = useState<any[]>([])
     const [formData, setFormData] = useState<TaskFormData>({
         title: task?.title || '',
         description: task?.description || '',
@@ -61,57 +61,65 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
         priority: task?.priority || 'medium',
         assigned_to: task?.assigned_to || '',
         due_date: task?.due_date || '',
-        task_type: task?.task_type || 'general'
+        task_type: task?.task_type || 'general',
+        event_id: task?.event_id || eventId || ''
     })
 
     const [loading, setLoading] = useState(false)
     const [errors, setErrors] = useState<Record<string, string>>({})
+    const supabase = createClient()
+
+    useEffect(() => {
+        const fetchTeam = async () => {
+            const { data } = await supabase
+                .from('user_profiles')
+                .select('id, full_name, email')
+                .eq('is_active', true)
+            if (data) setTeamMembers(data)
+        }
+        fetchTeam()
+    }, [supabase])
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {}
-
         if (!formData.title.trim()) newErrors.title = 'Task title is required'
-
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-
         if (!validateForm()) return
 
         setLoading(true)
-        const supabase = createClient()
-
         try {
+            const selectedMember = teamMembers.find(m => m.id === formData.assigned_to)
             const taskData = {
-                ...formData,
+                title: formData.title,
+                description: formData.description,
+                status: formData.status,
+                priority: formData.priority,
+                task_type: formData.task_type,
+                due_date: formData.due_date || null,
+                assigned_to: formData.assigned_to === 'unassigned' ? null : (formData.assigned_to || null),
+                assigned_to_text: selectedMember ? (selectedMember.full_name || selectedMember.email) : (formData.assigned_to === 'unassigned' ? null : (formData.assigned_to || null)),
+                event_id: formData.event_id || null,
                 updated_at: new Date().toISOString()
             }
 
             if (task?.id) {
-                // Update existing task
                 const { error } = await supabase
                     .from('tasks')
-                    .update({
-                        ...taskData,
-                        assigned_to_text: formData.assigned_to
-                    })
+                    .update(taskData)
                     .eq('id', task.id)
-
                 if (error) throw error
             } else {
-                // Create new task
                 const { error } = await supabase
                     .from('tasks')
-                    .insert({
+                    .insert([{
                         ...taskData,
-                        assigned_to_text: formData.assigned_to, // Store text in legacy field for now
-                        assigned_to: null, // We don't have UUID yet
-                        created_by_text: 'admin' // This should come from auth context
-                    })
-
+                        created_by_text: 'admin'
+                    }])
                 if (error) throw error
             }
 
@@ -231,12 +239,19 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
 
             <div>
                 <Label htmlFor="assigned_to">Assigned To</Label>
-                <Input
-                    id="assigned_to"
-                    value={formData.assigned_to}
-                    onChange={(e) => handleInputChange('assigned_to', e.target.value)}
-                    placeholder="Enter team member name"
-                />
+                <Select value={formData.assigned_to || 'unassigned'} onValueChange={(value) => handleInputChange('assigned_to', value)}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Assign to team member..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                        {teamMembers.map((member) => (
+                            <SelectItem key={member.id} value={member.id}>
+                                {member.full_name || member.email}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
 
             {errors.submit && (
