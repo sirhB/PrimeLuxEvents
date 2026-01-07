@@ -21,20 +21,10 @@ export function ContactPageContent({ content, settings = {}, isEditing = false }
     const phoneValue = settings.company_phone || content['contact.info.phone.value']
     return (
         <section className="pt-32 pb-24 md:pt-48 md:pb-40 bg-[#1A1A1A] min-h-screen relative overflow-hidden">
-            {/* Hero Background Image */}
-            <div className="absolute inset-0 z-0">
-                <div
-                    className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                    style={{ backgroundImage: "url('/images/luxury-event-hero.png')" }}
-                />
-                {/* Dark overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A1A]/95 via-[#1A1A1A]/90 to-[#1A1A1A]/85" />
-            </div>
-
             {/* Decorative background elements */}
-            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gold/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2 z-[1]" />
-            <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-gold/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2 z-[1]" />
-            <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none z-[1]" />
+            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gold/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-gold/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
+            <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
             <div className="container mx-auto px-4 md:px-6 relative z-10">
                 <div className="grid lg:grid-cols-2 gap-20 lg:gap-32 items-start">

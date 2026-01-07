@@ -109,65 +109,45 @@ export function GalleryDetail({ content, category, images }: GalleryDetailProps)
                 </div>
             </section>
 
-            {/* Gallery Scrollable */}
-            <section className="py-24 md:py-48 bg-[#1A1A1A] overflow-hidden">
+            {/* Gallery Grid */}
+            <section className="py-24 md:py-48 bg-[#1A1A1A]">
                 <div className="container mx-auto px-4 md:px-6">
-                    {images.length > 0 ? (
-                        <div className="relative">
-                            {/* Scroll Container */}
-                            <div
-                                className="flex gap-8 md:gap-12 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide scroll-smooth"
-                                style={{
-                                    scrollbarWidth: 'none',
-                                    msOverflowStyle: 'none',
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-16">
+                        {images.map((image, index) => (
+                            <motion.div
+                                key={image.id}
+                                initial={{ opacity: 0, y: 50 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                transition={{ duration: 1, delay: index * 0.1 }}
+                                className="group relative cursor-pointer"
+                                onClick={() => {
+                                    setSelectedImage(image)
+                                    setCurrentImageIndex(index)
                                 }}
                             >
-                                {images.map((image, index) => (
-                                    <motion.div
-                                        key={image.id}
-                                        initial={{ opacity: 0, x: 50 }}
-                                        whileInView={{ opacity: 1, x: 0 }}
-                                        viewport={{ once: true, margin: "-100px" }}
-                                        transition={{ duration: 0.8, delay: index * 0.05 }}
-                                        className="group relative cursor-pointer flex-shrink-0 snap-center"
-                                        style={{ width: 'min(85vw, 500px)' }}
-                                        onClick={() => {
-                                            setSelectedImage(image)
-                                            setCurrentImageIndex(index)
-                                        }}
-                                    >
-                                        <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#1E1E1E] border border-white/5 shadow-2xl">
-                                            <Image
-                                                src={image.image_url}
-                                                alt={image.title || category.name}
-                                                fill
-                                                className="object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[10%] group-hover:grayscale-0"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-                                            <div className="absolute inset-0 p-8 flex flex-col justify-end translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                                                <h3 className="text-2xl md:text-3xl font-serif text-white mb-2 opacity-90 group-hover:opacity-100 transition-opacity duration-500">
-                                                    {image.title}
-                                                </h3>
-                                                <p className="text-gray-400 text-sm font-light line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                                                    {image.description}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-
-                            {/* Scroll Indicator */}
-                            <div className="flex justify-center gap-2 mt-12">
-                                {images.map((_, index) => (
-                                    <div
-                                        key={index}
-                                        className="h-1 w-8 rounded-full bg-white/10 transition-all duration-300"
+                                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#1E1E1E] border border-white/5 shadow-xl">
+                                    <Image
+                                        src={image.image_url}
+                                        alt={image.title || category.name}
+                                        fill
+                                        className="object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-[10%] group-hover:grayscale-0"
                                     />
-                                ))}
-                            </div>
-                        </div>
-                    ) : (
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                    <div className="absolute inset-0 p-8 flex flex-col justify-end translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                        <h3 className="text-2xl font-serif text-white opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                            {image.title}
+                                        </h3>
+                                        <p className="text-gray-400 text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                                            {image.description}
+                                        </p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    {images.length === 0 && (
                         <div className="text-center py-40 bg-white/5 rounded-3xl border border-white/5">
                             <Camera className="h-16 w-16 text-gold/20 mx-auto mb-8" />
                             <h3 className="text-2xl font-serif text-white mb-4">Gallery Opening Soon</h3>
