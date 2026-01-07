@@ -561,8 +561,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                             className={cn(
                                                 "transition-all duration-500",
                                                 viewMode === 'grid'
-                                                    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 md:gap-10"
-                                                    : "columns-2 sm:columns-2 lg:columns-3 xl:columns-3 gap-6 md:gap-10 space-y-6 md:space-y-10"
+                                                    ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10"
+                                                    : "columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 md:gap-10 space-y-6 md:space-y-10"
                                             )}
                                         >
                                             {filteredProducts.map((product, index) => (

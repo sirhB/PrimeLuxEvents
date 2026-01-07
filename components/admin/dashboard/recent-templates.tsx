@@ -2,7 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, Layout, FileText, Users, CreditCard, ArrowRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const templates = [
     {
@@ -10,54 +11,90 @@ const templates = [
         category: "Finance",
         title: "Event Budget Tracker",
         description: "Track and manage expenses across key categories.",
-        color: "bg-pink-50"
+        color: "text-rose-600",
+        bgColor: "bg-rose-50",
+        icon: CreditCard
     },
     {
         id: 2,
-        category: "Guest Management",
+        category: "Planning",
         title: "Guest Seating Plan",
         description: "Plan guest seating with drag & drop layout.",
-        color: "bg-orange-50"
+        color: "text-amber-600",
+        bgColor: "bg-amber-50",
+        icon: Layout
     },
     {
         id: 3,
         category: "Vendors",
-        title: "Vendor Onboarding Checklist",
-        description: "Step-by-step tasks to onboard new vendors efficiently.",
-        color: "bg-purple-50"
+        title: "Vendor Onboarding",
+        description: "Step-by-step tasks to onboard new vendors.",
+        color: "text-violet-600",
+        bgColor: "bg-violet-50",
+        icon: FileText
     },
     {
         id: 4,
-        category: "Guest Management",
+        category: "Guests",
         title: "RSVP Tracker",
-        description: "Track guest responses, meal choices & special notes.",
-        color: "bg-blue-50"
+        description: "Track guest responses and meal choices.",
+        color: "text-blue-600",
+        bgColor: "bg-blue-50",
+        icon: Users
     }
 ]
 
 export function RecentTemplates() {
     return (
-        <Card className="border-none shadow-sm rounded-3xl bg-white">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-bold">Recent Templates</CardTitle>
-                <Button variant="link" className="text-[#6366f1] font-semibold">See All</Button>
+        <Card className="border-none shadow-[0_10px_40px_rgba(0,0,0,0.04)] rounded-3xl bg-white overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-gray-50">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                        <Layout className="h-5 w-5 text-indigo-600" />
+                    </div>
+                    <div>
+                        <CardTitle className="text-lg font-serif font-light tracking-tight">Recent Templates</CardTitle>
+                        <p className="text-xs text-muted-foreground font-light">Quick start your next project</p>
+                    </div>
+                </div>
+                <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-full font-medium">
+                    Browse Library
+                </Button>
             </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <CardContent className="pt-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {templates.map((template) => (
-                        <div key={template.id} className={`${template.color} p-6 rounded-3xl transition-transform hover:scale-[1.02] cursor-pointer`}>
-                            <div className="flex justify-between items-start mb-4">
-                                <span className="bg-white text-gray-900 text-xs font-medium px-3 py-1.5 rounded-full shadow-sm">
+                        <div key={template.id} className="group relative p-6 rounded-3xl bg-white border border-gray-100 hover:border-indigo-100 hover:shadow-[0_20px_40px_rgba(0,0,0,0.04)] transition-all duration-500 cursor-pointer overflow-hidden">
+                            <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <ArrowUpRight className="h-4 w-4 text-indigo-400" />
+                            </div>
+
+                            <div className={cn(
+                                "w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-500 group-hover:scale-110",
+                                template.bgColor,
+                                template.color
+                            )}>
+                                <template.icon className="h-6 w-6" />
+                            </div>
+
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
                                     {template.category}
                                 </span>
-                                <div className="h-8 w-8 bg-[#6366f1]/10 rounded-lg flex items-center justify-center text-[#6366f1]">
-                                    <ArrowUpRight className="h-4 w-4" />
-                                </div>
+                                <h3 className="font-serif text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                                    {template.title}
+                                </h3>
+                                <p className="text-xs text-gray-500 leading-relaxed font-light">
+                                    {template.description}
+                                </p>
                             </div>
-                            <h3 className="font-bold text-gray-900 mb-2">{template.title}</h3>
-                            <p className="text-sm text-gray-500 leading-relaxed">
-                                {template.description}
-                            </p>
+
+                            <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between">
+                                <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+                                    Use Template
+                                </span>
+                                <ArrowRight className="h-3 w-3 text-indigo-600 opacity-0 group-hover:opacity-100 transition-all" />
+                            </div>
                         </div>
                     ))}
                 </div>

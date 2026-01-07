@@ -2,8 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { Calendar, MapPin, Package } from 'lucide-react'
+import { Calendar, MapPin, Package, ArrowRight, TrendingUp, DollarSign } from 'lucide-react'
 import { formatCents } from '@/lib/format-money'
+import { cn } from '@/lib/utils'
 
 interface Order {
     id: string
@@ -39,41 +40,54 @@ export async function UpcomingOrdersCard() {
     const totalRevenue = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0
 
     return (
-        <Card className="border-none shadow-sm rounded-3xl bg-white h-full">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <div>
-                    <CardTitle className="text-lg font-bold">Upcoming Orders</CardTitle>
-                    <p className="text-xs text-muted-foreground mt-1">Next 10 days</p>
-                </div>
-                <Button variant="link" className="text-[#6366f1] font-semibold" asChild>
-                    <Link href="/admin/orders">See All</Link>
-                </Button>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {/* Summary Stats */}
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-blue-50 rounded-xl p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                            <Package className="h-4 w-4 text-blue-600" />
-                            <span className="text-xs text-blue-600 font-medium">Total Orders</span>
-                        </div>
-                        <p className="text-2xl font-bold text-blue-900">{totalOrders}</p>
+        <Card className="border-none shadow-[0_10px_40px_rgba(0,0,0,0.04)] rounded-3xl bg-white h-full overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-gray-50">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                        <Package className="h-5 w-5 text-emerald-600" />
                     </div>
-                    <div className="bg-green-50 rounded-xl p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                            <Calendar className="h-4 w-4 text-green-600" />
-                            <span className="text-xs text-green-600 font-medium">Revenue</span>
+                    <div>
+                        <CardTitle className="text-lg font-serif font-light tracking-tight">Upcoming Orders</CardTitle>
+                        <p className="text-xs text-muted-foreground font-light">Next 10 days</p>
+                    </div>
+                </div>
+                <Link href="/admin/orders">
+                    <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full font-medium">
+                        See All
+                    </Button>
+                </Link>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-6">
+                {/* Summary Stats */}
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100/50">
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1 rounded-md bg-emerald-100">
+                                <TrendingUp className="h-3 w-3 text-emerald-600" />
+                            </div>
+                            <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Orders</span>
                         </div>
-                        <p className="text-2xl font-bold text-green-900">{formatCents(totalRevenue)}</p>
+                        <p className="text-2xl font-serif font-bold text-emerald-900">{totalOrders}</p>
+                    </div>
+                    <div className="bg-blue-50/50 rounded-2xl p-4 border border-blue-100/50">
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="p-1 rounded-md bg-blue-100">
+                                <DollarSign className="h-3 w-3 text-blue-600" />
+                            </div>
+                            <span className="text-[10px] text-blue-700 font-bold uppercase tracking-wider">Revenue</span>
+                        </div>
+                        <p className="text-2xl font-serif font-bold text-blue-900">{formatCents(totalRevenue)}</p>
                     </div>
                 </div>
 
                 {/* Orders List */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                     {!orders || orders.length === 0 ? (
-                        <div className="text-center py-6 text-muted-foreground">
-                            <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                            <p className="text-sm">No upcoming orders</p>
+                        <div className="text-center py-10">
+                            <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <Package className="h-6 w-6 text-gray-300" />
+                            </div>
+                            <p className="text-sm text-gray-500 font-light">No upcoming orders found.</p>
                         </div>
                     ) : (
                         orders.map((order) => {
@@ -86,44 +100,43 @@ export async function UpcomingOrdersCard() {
                                 <Link
                                     key={order.id}
                                     href={`/admin/orders/${order.id}`}
-                                    className="block"
+                                    className="block group"
                                 >
-                                    <div className="flex items-start justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100">
+                                    <div className="flex items-center justify-between p-4 rounded-2xl hover:bg-gray-50 transition-all duration-300 border border-transparent hover:border-gray-100">
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-sm text-gray-900 truncate">
+                                            <p className="font-medium text-gray-900 truncate group-hover:text-emerald-600 transition-colors">
                                                 {order.customer_name}
                                             </p>
-                                            {deliveryDate && (
-                                                <div className="flex items-center gap-1 mt-1">
-                                                    <Calendar className="h-3 w-3 text-gray-400" />
-                                                    <span className="text-xs text-gray-500">
-                                                        {deliveryDate.toLocaleDateString('en-US', {
-                                                            month: 'short',
-                                                            day: 'numeric',
-                                                            year: 'numeric'
-                                                        })}
-                                                    </span>
-                                                </div>
-                                            )}
-                                            {daysUntil !== null && (
-                                                <div className="flex items-center gap-1 mt-1">
-                                                    <MapPin className="h-3 w-3 text-gray-400" />
-                                                    <span className="text-xs text-gray-500">
+                                            <div className="flex items-center gap-3 mt-1">
+                                                {deliveryDate && (
+                                                    <div className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
+                                                        <Calendar className="h-3 w-3" />
+                                                        {deliveryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                    </div>
+                                                )}
+                                                {daysUntil !== null && (
+                                                    <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold uppercase tracking-tighter">
+                                                        <MapPin className="h-3 w-3" />
                                                         {daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `In ${daysUntil} days`}
-                                                    </span>
-                                                </div>
-                                            )}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="text-right ml-3">
-                                            <p className="text-sm font-semibold text-gray-900">
+                                        <div className="text-right ml-4">
+                                            <p className="text-sm font-bold text-gray-900">
                                                 {formatCents(order.total_amount)}
                                             </p>
-                                            <span className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full ${order.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                                                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                            <span className={cn(
+                                                "inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider",
+                                                order.status === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
+                                                    order.status === 'pending' ? 'bg-amber-100 text-amber-700' :
                                                         'bg-gray-100 text-gray-700'
-                                                }`}>
+                                            )}>
                                                 {order.status}
                                             </span>
+                                        </div>
+                                        <div className="ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <ArrowRight className="h-4 w-4 text-emerald-600" />
                                         </div>
                                     </div>
                                 </Link>

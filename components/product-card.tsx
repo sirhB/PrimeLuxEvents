@@ -36,7 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
     return (
         <>
             <motion.div
-                className="group relative flex flex-col h-full bg-white overflow-hidden rounded-2xl border border-border/5 transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]"
+                className="group relative flex flex-col h-full bg-white overflow-hidden rounded-2xl border border-border/10 transition-all duration-500 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)]"
                 whileHover={{ y: -10 }}
                 transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
             >
