@@ -30,7 +30,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                 <div className="absolute inset-0 z-0">
                     <EditableContent
                         contentKey="about.hero.image"
-                        initialValue={content['about.hero.image'] || "/images/luxury-event-hero.png"}
+                        initialValue={content['about.hero.image'] || "/images/about-hero.png"}
                         type="image"
                         isEditing={isEditing}
                         as={Image}

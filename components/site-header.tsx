@@ -11,6 +11,7 @@ import { SearchTrigger } from "@/components/search-trigger"
 import { SearchModal } from "@/components/search-modal"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { createClient } from "@/lib/supabase/client"
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false)
@@ -18,11 +19,37 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
 
+  const [settings, setSettings] = useState({
+    company_email: "info@primeluxevents.com",
+    company_phone: "(555) 123-4567"
+  })
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
     window.addEventListener("scroll", handleScroll)
+
+    async function fetchSettings() {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('settings')
+        .select('key, value')
+        .in('key', ['company_email', 'company_phone'])
+
+      if (data) {
+        const fetchedSettings: any = {}
+        data.forEach(item => {
+          fetchedSettings[item.key] = item.value
+        })
+        setSettings(prev => ({
+          ...prev,
+          ...fetchedSettings
+        }))
+      }
+    }
+    fetchSettings()
+
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
@@ -50,11 +77,11 @@ export function SiteHeader() {
             Serving the Tri-State Area & New England
           </p>
           <div className="flex items-center gap-6 w-full md:w-auto justify-center md:justify-end">
-            <a href="tel:5551234567" className="hover:text-gold transition-colors flex items-center gap-2">
-              <Phone className="h-3 w-3" /> (555) 123-4567
+            <a href={`tel:${settings.company_phone.replace(/\D/g, '')}`} className="hover:text-gold transition-colors flex items-center gap-2">
+              <Phone className="h-3 w-3" /> {settings.company_phone}
             </a>
-            <a href="mailto:info@primeluxevents.com" className="hover:text-gold transition-colors flex items-center gap-2">
-              <Mail className="h-3 w-3" /> info@primeluxevents.com
+            <a href={`mailto:${settings.company_email}`} className="hover:text-gold transition-colors flex items-center gap-2">
+              <Mail className="h-3 w-3" /> {settings.company_email}
             </a>
           </div>
         </div>

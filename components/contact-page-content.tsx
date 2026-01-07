@@ -10,10 +10,15 @@ import { cn } from "@/lib/utils"
 
 interface ContactPageContentProps {
     content: any
+    settings?: any
     isEditing?: boolean
 }
 
-export function ContactPageContent({ content, isEditing = false }: ContactPageContentProps) {
+export function ContactPageContent({ content, settings = {}, isEditing = false }: ContactPageContentProps) {
+    // Map settings to content if settings exist, otherwise use content table values
+    const addressValue = settings.company_address || content['contact.info.address.value']
+    const emailValue = settings.company_email || content['contact.info.email.value']
+    const phoneValue = settings.company_phone || content['contact.info.phone.value']
     return (
         <section className="pt-32 pb-24 md:pt-48 md:pb-40 bg-[#1A1A1A] min-h-screen relative overflow-hidden">
             {/* Decorative background elements */}
@@ -53,7 +58,8 @@ export function ContactPageContent({ content, isEditing = false }: ContactPageCo
                             <ContactInfoItem
                                 icon={MapPin}
                                 titleKey="contact.info.address.title"
-                                valueKey="contact.info.address.value"
+                                value={addressValue}
+                                contentKey={isEditing ? "contact.info.address.value" : undefined}
                                 subtitleKey="contact.info.address.hours"
                                 content={content}
                                 isEditing={isEditing}
@@ -61,7 +67,8 @@ export function ContactPageContent({ content, isEditing = false }: ContactPageCo
                             <ContactInfoItem
                                 icon={Phone}
                                 titleKey="contact.info.phone.title"
-                                valueKey="contact.info.phone.value"
+                                value={phoneValue}
+                                contentKey={isEditing ? "contact.info.phone.value" : undefined}
                                 subtitleKey="contact.info.phone.hours"
                                 content={content}
                                 isEditing={isEditing}
@@ -69,7 +76,8 @@ export function ContactPageContent({ content, isEditing = false }: ContactPageCo
                             <ContactInfoItem
                                 icon={Mail}
                                 titleKey="contact.info.email.title"
-                                valueKey="contact.info.email.value"
+                                value={emailValue}
+                                contentKey={isEditing ? "contact.info.email.value" : undefined}
                                 content={content}
                                 isEditing={isEditing}
                             />
@@ -134,7 +142,7 @@ export function ContactPageContent({ content, isEditing = false }: ContactPageCo
     )
 }
 
-function ContactInfoItem({ icon: Icon, titleKey, valueKey, subtitleKey, content, isEditing }: any) {
+function ContactInfoItem({ icon: Icon, titleKey, valueKey, value, contentKey, subtitleKey, content, isEditing }: any) {
     return (
         <div className="flex items-start gap-10 group">
             <div className="h-20 w-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-gold group-hover:border-gold transition-all duration-500 group-hover:translate-x-2">
@@ -148,14 +156,20 @@ function ContactInfoItem({ icon: Icon, titleKey, valueKey, subtitleKey, content,
                     as="h3"
                     className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold/60"
                 />
-                <EditableContent
-                    contentKey={valueKey}
-                    initialValue={content[valueKey]}
-                    type="textarea"
-                    isEditing={isEditing}
-                    as="p"
-                    className="text-white text-2xl font-serif font-light leading-snug group-hover:text-gold transition-colors duration-300"
-                />
+                {isEditing ? (
+                    <EditableContent
+                        contentKey={contentKey || valueKey}
+                        initialValue={value || content[valueKey]}
+                        type="textarea"
+                        isEditing={isEditing}
+                        as="p"
+                        className="text-white text-2xl font-serif font-light leading-snug group-hover:text-gold transition-colors duration-300"
+                    />
+                ) : (
+                    <p className="text-white text-2xl font-serif font-light leading-snug group-hover:text-gold transition-colors duration-300 whitespace-pre-line">
+                        {value}
+                    </p>
+                )}
                 {subtitleKey && (
                     <div className="flex items-center gap-2 mt-2">
                         {content[subtitleKey] === 'By Appointment Only' && (

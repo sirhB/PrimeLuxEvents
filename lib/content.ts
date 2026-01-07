@@ -35,3 +35,28 @@ export async function getSiteContent() {
         return {}
     }
 }
+
+export async function getGlobalSettings() {
+    const supabase = await createClient()
+
+    try {
+        const { data, error } = await supabase
+            .from('settings')
+            .select('key, value')
+
+        if (error) {
+            console.error('Error fetching settings:', error)
+            return {}
+        }
+
+        const settingsMap: Record<string, string> = {}
+        data?.forEach((item) => {
+            settingsMap[item.key] = item.value
+        })
+
+        return settingsMap
+    } catch (error) {
+        console.error('Error in getGlobalSettings:', error)
+        return {}
+    }
+}

@@ -33,7 +33,7 @@ export function JournalPageContent({ content, isEditing = false }: JournalPageCo
                     <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-10 mix-blend-overlay" />
                     {posts.length > 0 && (
                         <Image
-                            src={posts[0].image || "/images/luxury-event-hero.png"}
+                            src={posts[0].image || "/images/journal-hero.png"}
                             alt="Journal Hero"
                             fill
                             className="object-cover opacity-40 grayscale-[20%]"
@@ -143,7 +143,7 @@ function JournalPostCard({ post, index }: { post: any, index: number }) {
             <div className={`lg:col-span-7 ${index % 2 === 1 ? 'lg:order-last' : ''}`}>
                 <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-[#1E1E1E] border border-white/5">
                     <Image
-                        src={post.image || "/images/luxury-event-hero.png"}
+                        src={post.image || "/images/journal-hero.png"}
                         alt={post.title}
                         fill
                         className="object-cover transition-transform duration-1000 group-hover:scale-105"
