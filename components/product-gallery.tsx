@@ -73,10 +73,10 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
     return (
         <>
-            <div className={cn("space-y-6", className)}>
+            <div className={cn("space-y-4", className)}>
                 {/* Main Image Container */}
                 <div
-                    className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-white group border border-border/5 shadow-2xl shadow-black/[0.03]"
+                    className="relative aspect-square w-full overflow-hidden rounded-[1.5rem] bg-white group border border-border/5 shadow-xl"
                     onMouseEnter={() => setIsAutoPlaying(false)}
                     onMouseLeave={() => setIsAutoPlaying(true)}
                 >
@@ -98,7 +98,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                                 src={images[selectedImage]}
                                 alt={`${productName} - Image ${selectedImage + 1}`}
                                 fill
-                                className="object-contain p-4 md:p-8"
+                                className="object-contain p-2 md:p-4"
                                 priority
                             />
                         </motion.div>
@@ -172,9 +172,9 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                                     setIsAutoPlaying(false)
                                 }}
                                 className={cn(
-                                    "relative flex-shrink-0 w-20 h-24 rounded-2xl overflow-hidden transition-all duration-500 border-2",
+                                    "relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all duration-500 border-2",
                                     selectedImage === index
-                                        ? "border-gold shadow-xl shadow-gold/20 -translate-y-1"
+                                        ? "border-gold shadow-lg shadow-gold/20 -translate-y-0.5"
                                         : "border-transparent opacity-40 hover:opacity-100 hover:border-gold/20"
                                 )}
                             >
