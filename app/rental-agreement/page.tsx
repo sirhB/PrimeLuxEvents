@@ -29,7 +29,36 @@ export default function RentalAgreementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-white selection:bg-gold selection:text-black font-sans print:bg-white print:text-black">
+    <div className="min-h-screen bg-[#0A0A0B] text-white selection:bg-gold selection:text-black font-sans print:bg-white print:text-black rental-agreement-container">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @media print {
+          .rental-agreement-container * {
+            color: black !important;
+            background-color: transparent !important;
+            border-color: #ddd !important;
+          }
+          .rental-agreement-container .bg-gold,
+          .rental-agreement-container .bg-gold\\/10,
+          .rental-agreement-container .bg-white\\/10,
+          .rental-agreement-container .bg-white\\/\\[0\\.02\\] {
+            background-color: transparent !important;
+            border: 1px solid #ddd !important;
+          }
+          .rental-agreement-container h1, 
+          .rental-agreement-container h2, 
+          .rental-agreement-container h3, 
+          .rental-agreement-container h4 {
+            color: black !important;
+          }
+          .rental-agreement-container .text-gold,
+          .rental-agreement-container .text-gold\\/90,
+          .rental-agreement-container .text-gray-400,
+          .rental-agreement-container .text-gray-500 {
+            color: black !important;
+          }
+        }
+      `}} />
       {/* Background Decorative Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none print:hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gold/5 rounded-full blur-[120px] opacity-50" />
