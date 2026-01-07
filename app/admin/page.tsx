@@ -10,19 +10,23 @@ export const dynamic = 'force-dynamic'
 
 export default function AdminDashboardPage() {
     return (
-        <div className="flex flex-col gap-8 p-8 bg-[#FDFBF7] min-h-screen">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                <div className="space-y-1">
-                    <span className="text-indigo-600 text-[10px] font-bold uppercase tracking-[0.2em]">Management Console</span>
-                    <h1 className="text-4xl md:text-5xl font-serif font-light text-gray-900 tracking-tight">
+        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
+                            Management Console
+                        </span>
+                    </div>
+                    <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
                         Dashboard
                     </h1>
-                    <p className="text-gray-500 font-light text-sm max-w-md">
+                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
                         Welcome back to PrimeLux. Here is a summary of your operations for today.
                     </p>
                 </div>
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-400">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="flex items-center gap-3 px-4 py-2 rounded-full glass-card text-sm font-medium text-[var(--dashboard-text-muted)]">
+                    <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-green)] animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
                     System Online
                 </div>
             </div>

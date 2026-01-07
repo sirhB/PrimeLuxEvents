@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
 import { motion, AnimatePresence } from "framer-motion"
+import { CheckCircle2, AlertCircle, ArrowRight } from "lucide-react"
 
 export function ContactForm() {
     const formRef = useRef<HTMLFormElement>(null)
@@ -31,7 +32,6 @@ export function ContactForm() {
         setSubmitMessage(null)
         setValidationErrors([])
 
-        // Capture form element before async operations
         const formElement = e.currentTarget || formRef.current
         if (!formElement) {
             setIsSubmitting(false)
@@ -59,7 +59,6 @@ export function ContactForm() {
             return
         }
 
-        // Normalize event_date - convert empty string to null
         const eventDateValue = formData.get('event-date') as string
         const eventDate = eventDateValue && eventDateValue.trim() ? eventDateValue : null
 
@@ -94,47 +93,40 @@ export function ContactForm() {
                 .insert([consultationData])
                 .select()
 
-            if (error) {
-                console.error('Supabase error:', error)
-                throw new Error(error.message || 'Failed to submit consultation request')
-            }
+            if (error) throw new Error(error.message)
 
             setSubmitMessage({
                 type: 'success',
                 text: 'Thank you! Your consultation request has been submitted. We\'ll be in touch soon!'
             })
 
-            // Reset form using captured form element or ref
-            if (formElement) {
-                formElement.reset()
-            }
+            if (formElement) formElement.reset()
             setHasVenue('')
             setHasCaterer('')
             setHasPlanner('')
             setBudgetRange('')
 
-            // Scroll to success message
             setTimeout(() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' })
             }, 100)
         } catch (error) {
             console.error('Error submitting consultation:', error)
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
             setSubmitMessage({
                 type: 'error',
-                text: errorMessage.includes('RLS') || errorMessage.includes('policy')
-                    ? 'Sorry, there was an authentication error. Please refresh the page and try again.'
-                    : `Sorry, there was an error: ${errorMessage}. Please try again or contact us directly.`
+                text: 'Sorry, there was an error submitting your request. Please try again.'
             })
         } finally {
             setIsSubmitting(false)
         }
     }
 
+    const inputClasses = "bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-12 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light"
+    const labelClasses = "text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400"
+
     return (
         <motion.form
             ref={formRef as React.RefObject<HTMLFormElement>}
-            className="space-y-6"
+            className="space-y-10"
             onSubmit={handleSubmit}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -144,69 +136,78 @@ export function ContactForm() {
                 {submitMessage && (
                     <motion.div
                         key={submitMessage.type}
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        className={`p-4 rounded-md ${submitMessage.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className={`p-6 rounded-2xl flex items-center gap-4 ${submitMessage.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-100' : 'bg-red-50 text-red-800 border border-red-100'}`}
                     >
-                        {submitMessage.text}
+                        {submitMessage.type === 'success' ? <CheckCircle2 className="h-6 w-6 shrink-0" /> : <AlertCircle className="h-6 w-6 shrink-0" />}
+                        <p className="text-sm font-medium">{submitMessage.text}</p>
                     </motion.div>
                 )}
             </AnimatePresence>
 
             <AnimatePresence>
                 {validationErrors.length > 0 && (
-                    <motion.ul
-                        initial={{ opacity: 0, y: -8 }}
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        className="p-4 rounded-md border border-red-200 bg-red-50 text-red-800 space-y-1 text-sm"
+                        exit={{ opacity: 0, y: -10 }}
+                        className="p-6 rounded-2xl border border-red-100 bg-red-50 text-red-800 space-y-2"
                     >
-                        {validationErrors.map((err) => (
-                            <li key={err}>• {err}</li>
-                        ))}
-                    </motion.ul>
+                        <div className="flex items-center gap-2 mb-2">
+                            <AlertCircle className="h-4 w-4" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Please correct the following:</span>
+                        </div>
+                        <ul className="space-y-1 text-sm font-light">
+                            {validationErrors.map((err) => (
+                                <li key={err}>• {err}</li>
+                            ))}
+                        </ul>
+                    </motion.div>
                 )}
             </AnimatePresence>
 
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid sm:grid-cols-2 gap-10">
                 <div className="space-y-2">
-                    <Label htmlFor="first-name">First name *</Label>
-                    <Input id="first-name" name="first-name" placeholder="Jane" required />
+                    <Label htmlFor="first-name" className={labelClasses}>First name *</Label>
+                    <Input id="first-name" name="first-name" placeholder="E.g. Isabella" required className={inputClasses} />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="last-name">Last name *</Label>
-                    <Input id="last-name" name="last-name" placeholder="Doe" required />
+                    <Label htmlFor="last-name" className={labelClasses}>Last name *</Label>
+                    <Input id="last-name" name="last-name" placeholder="E.g. Rossi" required className={inputClasses} />
+                </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-10">
+                <div className="space-y-2">
+                    <Label htmlFor="email" className={labelClasses}>Email Address *</Label>
+                    <Input id="email" name="email" placeholder="isabella@example.com" type="email" required className={inputClasses} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="phone" className={labelClasses}>Phone Number *</Label>
+                    <Input id="phone" name="phone" placeholder="(555) 000-0000" type="tel" required className={inputClasses} />
+                </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-10">
+                <div className="space-y-2">
+                    <Label htmlFor="event-date" className={labelClasses}>Event Date</Label>
+                    <Input id="event-date" name="event-date" type="date" className={inputClasses} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="guests" className={labelClasses}>Number of Guests</Label>
+                    <Input id="guests" name="guests" type="number" placeholder="e.g. 150" min="1" className={inputClasses} />
                 </div>
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input id="email" name="email" placeholder="jane@example.com" type="email" required />
-            </div>
-
-            <div className="space-y-2">
-                <Label htmlFor="phone">Phone *</Label>
-                <Input id="phone" name="phone" placeholder="(555) 000-0000" type="tel" required />
-            </div>
-
-            <div className="space-y-2">
-                <Label htmlFor="event-date">Event Date (Optional)</Label>
-                <Input id="event-date" name="event-date" type="date" />
-            </div>
-
-            <div className="space-y-2">
-                <Label htmlFor="guests">Number of Guests</Label>
-                <Input id="guests" name="guests" type="number" placeholder="e.g. 150" min="1" />
-            </div>
-
-            <div className="space-y-2">
-                <Label htmlFor="budget">Budget</Label>
+                <Label htmlFor="budget" className={labelClasses}>Estimated Budget</Label>
                 <Select value={budgetRange} onValueChange={setBudgetRange}>
-                    <SelectTrigger id="budget">
+                    <SelectTrigger id="budget" className={inputClasses}>
                         <SelectValue placeholder="Select a budget range" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-[#FDFBF7] border-border/10">
                         <SelectItem value="under-1000">Under $1,000</SelectItem>
                         <SelectItem value="1000-5000">$1,000 - $5,000</SelectItem>
                         <SelectItem value="5000-10000">$5,000 - $10,000</SelectItem>
@@ -216,145 +217,100 @@ export function ContactForm() {
                 </Select>
             </div>
 
-            {/* Venue Question */}
-            <div className="space-y-2">
-                <Label>Do you have a venue?</Label>
-                <div className="flex gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="has-venue"
-                            value="yes"
-                            checked={hasVenue === "yes"}
-                            onChange={(e) => setHasVenue(e.target.value)}
-                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
-                        />
-                        <span className="text-sm">Yes</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="has-venue"
-                            value="no"
-                            checked={hasVenue === "no"}
-                            onChange={(e) => setHasVenue(e.target.value)}
-                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
-                        />
-                        <span className="text-sm">No</span>
-                    </label>
+            {/* Radio Questions */}
+            <div className="grid sm:grid-cols-3 gap-10">
+                <div className="space-y-4">
+                    <Label className={labelClasses}>Do you have a venue?</Label>
+                    <div className="flex gap-6">
+                        {['yes', 'no'].map((val) => (
+                            <label key={val} className="flex items-center gap-3 cursor-pointer group">
+                                <input
+                                    type="radio"
+                                    name="has-venue"
+                                    value={val}
+                                    checked={hasVenue === val}
+                                    onChange={(e) => setHasVenue(e.target.value)}
+                                    className="w-4 h-4 text-gold accent-gold cursor-pointer"
+                                />
+                                <span className="text-xs font-bold uppercase tracking-widest text-gray-500 group-hover:text-gold transition-colors">{val}</span>
+                            </label>
+                        ))}
+                    </div>
+                    <AnimatePresence>
+                        {hasVenue === "yes" && (
+                            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                                <Input id="venue" name="venue" placeholder="Venue Name" className={inputClasses} />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
-                <AnimatePresence>
-                    {hasVenue === "yes" && (
-                        <motion.div
-                            key="venue-input"
-                            initial={{ opacity: 0, y: -8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -8 }}
-                            transition={{ duration: 0.2 }}
-                            className="mt-3"
-                        >
-                            <Input id="venue" name="venue" placeholder="e.g. The Grand Hotel" />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
 
-            {/* Caterer Question */}
-            <div className="space-y-2">
-                <Label>Do you have a caterer?</Label>
-                <div className="flex gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="has-caterer"
-                            value="yes"
-                            checked={hasCaterer === "yes"}
-                            onChange={(e) => setHasCaterer(e.target.value)}
-                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
-                        />
-                        <span className="text-sm">Yes</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="has-caterer"
-                            value="no"
-                            checked={hasCaterer === "no"}
-                            onChange={(e) => setHasCaterer(e.target.value)}
-                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
-                        />
-                        <span className="text-sm">No</span>
-                    </label>
+                <div className="space-y-4">
+                    <Label className={labelClasses}>Do you have a caterer?</Label>
+                    <div className="flex gap-6">
+                        {['yes', 'no'].map((val) => (
+                            <label key={val} className="flex items-center gap-3 cursor-pointer group">
+                                <input
+                                    type="radio"
+                                    name="has-caterer"
+                                    value={val}
+                                    checked={hasCaterer === val}
+                                    onChange={(e) => setHasCaterer(e.target.value)}
+                                    className="w-4 h-4 text-gold accent-gold cursor-pointer"
+                                />
+                                <span className="text-xs font-bold uppercase tracking-widest text-gray-500 group-hover:text-gold transition-colors">{val}</span>
+                            </label>
+                        ))}
+                    </div>
+                    <AnimatePresence>
+                        {hasCaterer === "yes" && (
+                            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                                <Input id="caterer" name="caterer" placeholder="Caterer Name" className={inputClasses} />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
-                <AnimatePresence>
-                    {hasCaterer === "yes" && (
-                        <motion.div
-                            key="caterer-input"
-                            initial={{ opacity: 0, y: -8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -8 }}
-                            transition={{ duration: 0.2 }}
-                            className="mt-3"
-                        >
-                            <Input id="caterer" name="caterer" placeholder="e.g. Delicious Eats" />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
 
-            {/* Event Planner Question */}
-            <div className="space-y-2">
-                <Label>Do you have an event planner?</Label>
-                <div className="flex gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="has-planner"
-                            value="yes"
-                            checked={hasPlanner === "yes"}
-                            onChange={(e) => setHasPlanner(e.target.value)}
-                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
-                        />
-                        <span className="text-sm">Yes</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="has-planner"
-                            value="no"
-                            checked={hasPlanner === "no"}
-                            onChange={(e) => setHasPlanner(e.target.value)}
-                            className="w-4 h-4 text-gold accent-gold cursor-pointer"
-                        />
-                        <span className="text-sm">No</span>
-                    </label>
+                <div className="space-y-4">
+                    <Label className={labelClasses}>Do you have a planner?</Label>
+                    <div className="flex gap-6">
+                        {['yes', 'no'].map((val) => (
+                            <label key={val} className="flex items-center gap-3 cursor-pointer group">
+                                <input
+                                    type="radio"
+                                    name="has-planner"
+                                    value={val}
+                                    checked={hasPlanner === val}
+                                    onChange={(e) => setHasPlanner(e.target.value)}
+                                    className="w-4 h-4 text-gold accent-gold cursor-pointer"
+                                />
+                                <span className="text-xs font-bold uppercase tracking-widest text-gray-500 group-hover:text-gold transition-colors">{val}</span>
+                            </label>
+                        ))}
+                    </div>
+                    <AnimatePresence>
+                        {hasPlanner === "yes" && (
+                            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                                <Input id="planner" name="planner" placeholder="Planner Name" className={inputClasses} />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
-                <AnimatePresence>
-                    {hasPlanner === "yes" && (
-                        <motion.div
-                            key="planner-input"
-                            initial={{ opacity: 0, y: -8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -8 }}
-                            transition={{ duration: 0.2 }}
-                            className="mt-3"
-                        >
-                            <Input id="planner" name="planner" placeholder="Event planner name or company" />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
             </div>
 
-            <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
-                <Textarea id="message" name="message" placeholder="Tell us about your event..." className="min-h-[150px]" />
+            <div className="space-y-4">
+                <Label htmlFor="message" className={labelClasses}>Tell us about your vision</Label>
+                <Textarea id="message" name="message" placeholder="Share your event details, style preferences, and any specific items you're interested in..." className={`${inputClasses} min-h-[120px] resize-none border-b`} />
             </div>
 
-            <motion.div whileHover={{ scale: isSubmitting ? 1 : 1.01 }} whileTap={{ scale: isSubmitting ? 1 : 0.99 }}>
-                <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
-                    {isSubmitting ? 'Submitting...' : 'Request Consultation'}
-                </Button>
-            </motion.div>
+            <Button
+                type="submit"
+                className="w-full h-16 bg-[#1A1A1A] text-white rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-gold hover:text-black transition-all duration-500 group shadow-xl"
+                disabled={isSubmitting}
+            >
+                {isSubmitting ? 'Sending Request...' : 'Send Consultation Request'}
+                {!isSubmitting && <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />}
+            </Button>
         </motion.form>
     )
 }

@@ -66,53 +66,53 @@ export default async function OrderDetailsPage({
             <OrderInvoice order={order} />
 
             {/* Order details for screen viewing */}
-            <div className="flex flex-col gap-6 print:hidden">
+            <div className="flex flex-col gap-8 print:hidden p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild>
+                    <Button variant="ghost" size="icon" asChild className="glass-card hover:bg-[var(--dashboard-card-hover)]">
                         <Link href="/admin/orders">
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>
                     <div className="flex-1">
-                        <h1 className="text-3xl font-bold tracking-tight">Order Details</h1>
-                        <p className="text-muted-foreground mt-1">
+                        <h1 className="text-4xl font-serif font-light tracking-tight text-[var(--dashboard-text)]">Order Details</h1>
+                        <p className="text-[var(--dashboard-text-muted)] mt-1 font-light">
                             Order ID: {order.id.slice(0, 8)}...
                         </p>
                     </div>
                     <PrintButton />
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2">
                     {/* Customer Information */}
-                    <Card>
+                    <Card className="glass-card border-none">
                         <CardHeader>
-                            <CardTitle>Customer Information</CardTitle>
+                            <CardTitle className="text-[var(--dashboard-text)] font-serif font-light">Customer Information</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-2">
+                            <div className="space-y-4">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Name</p>
-                                    <p>{order.customer_name}</p>
+                                    <p className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)] mb-1">Name</p>
+                                    <p className="text-[var(--dashboard-text)]">{order.customer_name}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Email</p>
-                                    <p>{order.customer_email}</p>
+                                    <p className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)] mb-1">Email</p>
+                                    <p className="text-[var(--dashboard-text)]">{order.customer_email}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">
+                                    <p className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)] mb-1">
                                         Order Date
                                     </p>
-                                    <p>{new Date(order.created_at).toLocaleString()}</p>
+                                    <p className="text-[var(--dashboard-text)]">{new Date(order.created_at).toLocaleString()}</p>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
                     {/* Order Status */}
-                    <Card>
+                    <Card className="glass-card border-none">
                         <CardHeader>
-                            <CardTitle>Order Status</CardTitle>
-                            <CardDescription>Update the status of this order</CardDescription>
+                            <CardTitle className="text-[var(--dashboard-text)] font-serif font-light">Order Status</CardTitle>
+                            <CardDescription className="text-[var(--dashboard-text-muted)]">Update the status of this order</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <OrderStatusForm
@@ -127,36 +127,36 @@ export default async function OrderDetailsPage({
 
 
                 {/* Order Items */}
-                <Card>
+                <Card className="glass-card border-none">
                     <CardHeader>
-                        <CardTitle>Order Items</CardTitle>
+                        <CardTitle className="text-[var(--dashboard-text)] font-serif font-light">Order Items</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <Table>
                             <TableHeader>
-                                <TableRow>
-                                    <TableHead>Product</TableHead>
-                                    <TableHead>Quantity</TableHead>
-                                    <TableHead>Price</TableHead>
-                                    <TableHead className="text-right">Total</TableHead>
+                                <TableRow className="border-[var(--dashboard-border)] hover:bg-transparent">
+                                    <TableHead className="text-[var(--dashboard-text-muted)] font-bold uppercase text-xs tracking-wider">Product</TableHead>
+                                    <TableHead className="text-[var(--dashboard-text-muted)] font-bold uppercase text-xs tracking-wider">Quantity</TableHead>
+                                    <TableHead className="text-[var(--dashboard-text-muted)] font-bold uppercase text-xs tracking-wider">Price</TableHead>
+                                    <TableHead className="text-right text-[var(--dashboard-text-muted)] font-bold uppercase text-xs tracking-wider">Total</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {order.order_items.map((item: any) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell>{item.products?.name || 'Unknown Product'}</TableCell>
-                                        <TableCell>{item.quantity}</TableCell>
-                                        <TableCell>{formatCents(item.price_at_time)}</TableCell>
-                                        <TableCell className="text-right">
+                                    <TableRow key={item.id} className="border-[var(--dashboard-border)] hover:bg-[var(--dashboard-card-hover)]">
+                                        <TableCell className="text-[var(--dashboard-text)]">{item.products?.name || 'Unknown Product'}</TableCell>
+                                        <TableCell className="text-[var(--dashboard-text)]">{item.quantity}</TableCell>
+                                        <TableCell className="text-[var(--dashboard-text)]">{formatCents(item.price_at_time)}</TableCell>
+                                        <TableCell className="text-right text-[var(--dashboard-text)]">
                                             {formatCents(item.quantity * item.price_at_time)}
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                                <TableRow>
-                                    <TableCell colSpan={3} className="font-bold text-right">
+                                <TableRow className="border-[var(--dashboard-border)] hover:bg-transparent">
+                                    <TableCell colSpan={3} className="font-bold text-right text-[var(--dashboard-text)] uppercase text-sm tracking-wider">
                                         Total Amount
                                     </TableCell>
-                                    <TableCell className="font-bold text-right">
+                                    <TableCell className="font-bold text-right text-[var(--dashboard-accent-gold)] text-lg">
                                         {formatCents(order.total_amount)}
                                     </TableCell>
                                 </TableRow>
@@ -166,27 +166,27 @@ export default async function OrderDetailsPage({
                 </Card>
 
                 {/* Order Timeline */}
-                <Card>
+                <Card className="glass-card border-none">
                     <CardHeader>
-                        <CardTitle>Order Timeline</CardTitle>
-                        <CardDescription>Track the progress of this order</CardDescription>
+                        <CardTitle className="text-[var(--dashboard-text)] font-serif font-light">Order Timeline</CardTitle>
+                        <CardDescription className="text-[var(--dashboard-text-muted)]">Track the progress of this order</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                             <div className="flex items-start gap-4">
-                                <div className="h-2 w-2 rounded-full bg-primary mt-2" />
+                                <div className="h-3 w-3 rounded-full bg-[var(--dashboard-accent-gold)] mt-1 shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
                                 <div>
-                                    <p className="font-medium">Order Created</p>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="font-medium text-[var(--dashboard-text)]">Order Created</p>
+                                    <p className="text-sm text-[var(--dashboard-text-muted)] opacity-70">
                                         {new Date(order.created_at).toLocaleString()}
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-4">
-                                <div className="h-2 w-2 rounded-full bg-muted mt-2" />
+                                <div className="h-3 w-3 rounded-full bg-[var(--dashboard-text-muted)] opacity-30 mt-1" />
                                 <div>
-                                    <p className="font-medium">Current Status</p>
-                                    <p className="text-sm text-muted-foreground capitalize">
+                                    <p className="font-medium text-[var(--dashboard-text)]">Current Status</p>
+                                    <p className="text-sm text-[var(--dashboard-text-muted)] capitalize opacity-70">
                                         {order.status}
                                     </p>
                                 </div>

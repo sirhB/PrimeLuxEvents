@@ -4,10 +4,11 @@ import { useState, useEffect } from "react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { ShoppingBag, Trash2, Plus, Minus, Check } from "lucide-react"
+import { ShoppingBag, Trash2, Plus, Minus, Check, ArrowRight, X } from "lucide-react"
 import { useCart } from "@/components/providers/cart-provider"
 import { createClient } from "@/lib/supabase/client"
 import { formatCurrency } from "@/lib/utils"
+import { motion, AnimatePresence } from "framer-motion"
 
 export function CartSheet() {
   const { items, removeItem, updateQuantity, cartCount, clearCart } = useCart()
@@ -36,172 +37,169 @@ export function CartSheet() {
     fetchProducts()
   }, [items])
 
-  const handleSubmit = () => {
-    // Mock API call
-    setIsSuccess(true)
-    setTimeout(() => {
-      clearCart()
-      setIsSuccess(false)
-      setIsOpen(false)
-    }, 3000)
-  }
-
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <ShoppingBag className="h-5 w-5" />
+        <Button variant="ghost" size="icon" className="relative group">
+          <ShoppingBag className="h-5 w-5 transition-transform group-hover:scale-110" />
           {cartCount > 0 && (
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gold text-[10px] font-bold flex items-center justify-center text-black shadow-sm">
+              {cartCount}
+            </span>
           )}
           <span className="sr-only">Cart</span>
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg flex flex-col h-full bg-background border-l border-border/50">
-        <SheetHeader className="space-y-3 px-6 pt-6 pb-6 border-b border-border/50">
-          <SheetTitle className="font-serif text-3xl">Your Cart</SheetTitle>
-          <SheetDescription className="text-base">Review your items and proceed to checkout.</SheetDescription>
+      <SheetContent className="w-full sm:max-w-md flex flex-col h-full bg-[#FDFBF7] border-l border-border/10 p-0 overflow-hidden">
+        <SheetHeader className="px-8 pt-10 pb-6 border-b border-border/5 bg-white/50 backdrop-blur-md">
+          <div className="flex items-center justify-between mb-2">
+            <SheetTitle className="font-serif text-3xl font-light tracking-tight">Your Selection</SheetTitle>
+          </div>
+          <SheetDescription className="text-sm font-light text-gray-500">
+            Review your curated items for your upcoming event.
+          </SheetDescription>
         </SheetHeader>
 
-        {isSuccess ? (
-          <div className="flex flex-col items-center justify-center h-full text-center space-y-6 px-6">
-            <div className="h-20 w-20 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400">
-              <Check className="h-10 w-10" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-serif">Request Sent!</h3>
-              <p className="text-muted-foreground max-w-sm">
-                We've received your quote request. Our team will review your selection and get back to you within 24
-                hours.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="flex-1 overflow-y-auto px-6 py-8">
-              {items.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
-                  <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                    <ShoppingBag className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="font-medium text-lg">Your quote is empty</p>
-                    <p className="text-sm text-muted-foreground max-w-xs">Browse our collection and add items to get started.</p>
-                  </div>
-                  <Button variant="outline" size="lg" onClick={() => setIsOpen(false)}>
-                    Browse Catalog
-                  </Button>
+        <div className="flex-1 overflow-y-auto px-8 py-8 custom-scrollbar">
+          <AnimatePresence mode="popLayout">
+            {items.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center justify-center h-full text-center space-y-8"
+              >
+                <div className="h-24 w-24 rounded-full bg-white shadow-[0_10px_40px_rgba(0,0,0,0.03)] flex items-center justify-center border border-border/5">
+                  <ShoppingBag className="h-10 w-10 text-gold/30" />
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  {items.map((item) => {
-                    const product = products.find((p) => p.id === item.productId)
-                    if (!product) return null
-
-                    const price = product.rental_price_daily || product.price
-
-                    // Calculate modifiers price
-                    const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
-                      return acc + (curr.priceAdjustment || 0)
-                    }, 0)
-
-                    const itemPrice = price + modifiersPrice
-
-                    return (
-                      <div key={item.id} className="flex gap-5 p-4 rounded-xl border border-border/50 bg-secondary/20 hover:bg-secondary/30 transition-colors">
-                        <div className="h-24 w-24 rounded-lg border border-border/50 bg-background overflow-hidden flex-shrink-0">
-                          <Link href={`/catalog/${product.slug || product.id}`} onClick={() => setIsOpen(false)}>
-                            <img
-                              src={product.image_url || "/placeholder.svg"}
-                              alt={product.name}
-                              className="h-full w-full object-cover"
-                            />
-                          </Link>
-                        </div>
-                        <div className="flex-1 flex flex-col justify-between min-w-0">
-                          <div className="space-y-2">
-                            <div className="flex justify-between gap-3">
-                              <Link href={`/catalog/${product.slug || product.id}`} onClick={() => setIsOpen(false)} className="flex-1 min-w-0">
-                                <h3 className="font-serif text-base font-medium line-clamp-2 pr-2 hover:underline decoration-gold underline-offset-4 transition-all">{product.name}</h3>
-                              </Link>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 flex-shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                onClick={() => removeItem(item.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <p className="text-sm font-medium text-gold">{formatCurrency(itemPrice)} <span className="text-xs text-muted-foreground">/ day</span></p>
-
-                            {/* Display Modifiers */}
-                            {item.modifiers && Object.keys(item.modifiers).length > 0 && (
-                              <div className="text-xs text-muted-foreground space-y-1">
-                                {Object.entries(item.modifiers).map(([key, option]: [string, any]) => (
-                                  <div key={key} className="flex items-center gap-1">
-                                    <span className="capitalize">{key}:</span>
-                                    <span className="font-medium text-foreground">{option.label || option.name || option}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex items-center justify-between mt-3">
-                            <div className="flex items-center gap-3 border border-border/50 rounded-lg p-1 bg-background">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 hover:bg-secondary"
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                disabled={item.quantity <= 1}
-                              >
-                                <Minus className="h-3.5 w-3.5" />
-                              </Button>
-                              <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 hover:bg-secondary"
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              >
-                                <Plus className="h-3.5 w-3.5" />
-                              </Button>
-                            </div>
-                            <p className="text-sm font-semibold">{formatCurrency(itemPrice * item.quantity)}</p>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {items.length > 0 && (
-              <div className="border-t border-border/50 px-6 py-6 space-y-6 bg-secondary/10">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Items</span>
-                    <span className="font-semibold text-lg">{cartCount}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Tax and delivery fees will be calculated at checkout based on your delivery address.
+                <div className="space-y-3">
+                  <p className="font-serif text-xl font-bold text-gray-900">Your collection is empty</p>
+                  <p className="text-sm text-gray-500 font-light max-w-[240px] mx-auto leading-relaxed">
+                    Browse our catalog to discover premium pieces for your next extraordinary event.
                   </p>
                 </div>
                 <Button
-                  className="w-full h-14 text-base font-medium shadow-lg hover:shadow-xl transition-all"
+                  variant="outline"
                   size="lg"
-                  onClick={() => {
-                    setIsOpen(false)
-                    window.location.href = '/checkout'
-                  }}
+                  onClick={() => setIsOpen(false)}
+                  className="rounded-full px-10 border-gold/20 hover:border-gold hover:bg-gold/5 text-gold font-bold uppercase tracking-widest text-[10px]"
                 >
-                  Proceed to Checkout
+                  Explore Catalog
                 </Button>
+              </motion.div>
+            ) : (
+              <div className="space-y-8">
+                {items.map((item) => {
+                  const product = products.find((p) => p.id === item.productId)
+                  if (!product) return null
+
+                  const price = product.rental_price_daily || product.price
+                  const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
+                    return acc + (curr.priceAdjustment || 0)
+                  }, 0)
+                  const itemPrice = price + modifiersPrice
+
+                  return (
+                    <motion.div
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="flex gap-6 group"
+                    >
+                      <div className="h-28 w-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-border/5 bg-white">
+                        <Link href={`/catalog/${product.slug || product.id}`} onClick={() => setIsOpen(false)}>
+                          <img
+                            src={product.image_url || "/placeholder.svg"}
+                            alt={product.name}
+                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                        </Link>
+                      </div>
+                      <div className="flex-1 flex flex-col justify-between py-1">
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-start gap-4">
+                            <Link href={`/catalog/${product.slug || product.id}`} onClick={() => setIsOpen(false)} className="flex-1">
+                              <h3 className="font-serif text-lg font-bold text-gray-900 group-hover:text-gold transition-colors leading-tight">{product.name}</h3>
+                            </Link>
+                            <button
+                              onClick={() => removeItem(item.id)}
+                              className="text-gray-300 hover:text-red-500 transition-colors p-1"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+
+                          {/* Modifiers */}
+                          {item.modifiers && Object.keys(item.modifiers).length > 0 && (
+                            <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] uppercase tracking-widest font-bold text-gray-400">
+                              {Object.entries(item.modifiers).map(([key, option]: [string, any]) => (
+                                <div key={key} className="flex items-center gap-1">
+                                  <span className="text-gold/60">{key}:</span>
+                                  <span className="text-gray-600">{option.label || option.name || option}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between mt-4">
+                          <div className="flex items-center gap-4 bg-white rounded-full px-3 py-1 shadow-sm border border-border/5">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                              className="text-gray-400 hover:text-gold disabled:opacity-30 transition-colors"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="text-gray-400 hover:text-gold transition-colors"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                          <p className="text-sm font-bold text-gray-900">{formatCurrency(itemPrice * item.quantity)}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )
+                })}
               </div>
             )}
-          </>
+          </AnimatePresence>
+        </div>
+
+        {items.length > 0 && (
+          <div className="px-8 py-10 border-t border-border/5 bg-white/50 backdrop-blur-md space-y-8">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">Subtotal</span>
+                <span className="font-serif text-2xl font-light text-gray-900">
+                  {formatCurrency(items.reduce((acc, item) => {
+                    const product = products.find(p => p.id === item.productId)
+                    if (!product) return acc
+                    const price = product.rental_price_daily || product.price
+                    const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
+                    return acc + (price + modifiersPrice) * item.quantity
+                  }, 0))}
+                </span>
+              </div>
+              <p className="text-[10px] text-gray-400 font-light leading-relaxed uppercase tracking-widest text-center">
+                Final pricing including delivery & tax will be calculated at checkout.
+              </p>
+            </div>
+            <Button
+              className="w-full h-16 bg-[#1A1A1A] text-white rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-gold hover:text-black transition-all duration-500 group shadow-xl"
+              onClick={() => {
+                setIsOpen(false)
+                window.location.href = '/checkout'
+              }}
+            >
+              Proceed to Checkout <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </div>
         )}
       </SheetContent>
     </Sheet>

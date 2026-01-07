@@ -58,20 +58,37 @@
   --sidebar-border: oklch(0.88 0.02 90);
   --sidebar-ring: oklch(0.15 0.02 85);
 
-  /* Modern Dashboard Colors - Light Theme */
-  --dashboard-background: #F3F4F6;
-  --dashboard-card: #FFFFFF;
-  --dashboard-card-hover: #F9FAFB;
-  --dashboard-text: #111827;
-  --dashboard-text-muted: #6B7280;
-  --dashboard-border: #E5E7EB;
-  --dashboard-accent-gold: #D4AF37;
-  --dashboard-accent-green: #10B981;
-  --dashboard-accent-orange: #F59E0B;
-  --dashboard-accent-blue: #3B82F6;
-  --dashboard-accent-purple: #8B5CF6;
-  --dashboard-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --dashboard-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
+  /* Modern Dashboard Colors - Premium Theme */
+  --dashboard-background: #0a0a0b;
+  --dashboard-card: rgba(23, 23, 26, 0.7);
+  --dashboard-card-hover: rgba(30, 30, 35, 0.8);
+  --dashboard-text: #f8fafc;
+  --dashboard-text-muted: #94a3b8;
+  --dashboard-border: rgba(255, 255, 255, 0.08);
+  --dashboard-accent-gold: #d4af37;
+  --dashboard-accent-green: #10b981;
+  --dashboard-accent-orange: #f59e0b;
+  --dashboard-accent-blue: #3b82f6;
+  --dashboard-accent-purple: #8b5cf6;
+  --dashboard-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  --dashboard-shadow-lg: 0 10px 40px -4px rgba(0, 0, 0, 0.7);
+  --dashboard-glass-bg: rgba(15, 15, 18, 0.6);
+  --dashboard-glass-border: rgba(255, 255, 255, 0.05);
+}
+
+.glass-morphism {
+  background: var(--dashboard-glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--dashboard-glass-border);
+}
+
+.glass-card {
+  background: var(--dashboard-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--dashboard-border);
+  box-shadow: var(--dashboard-shadow);
 }
 
 .dark {
@@ -214,6 +231,35 @@
     pointer-events: none;
     z-index: 1;
     opacity: 0.4;
+  }
+
+  /* Custom scrollbar for admin dashboard */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
   }
 }
 

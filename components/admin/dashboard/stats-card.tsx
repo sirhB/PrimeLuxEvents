@@ -23,27 +23,30 @@ export function StatsCard({ title, value, subtitle, icon: Icon, className, index
             <Card
                 animate={false}
                 className={cn(
-                    "bg-[var(--dashboard-card)] border-none text-[var(--dashboard-text)] shadow-sm",
-                    "hover:shadow-md transition-all duration-300",
-                    "flex items-center p-4 gap-4",
+                    "glass-card border-none text-[var(--dashboard-text)]",
+                    "hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] transition-all duration-500 group",
+                    "flex items-center p-6 gap-6 overflow-hidden relative",
                     className
                 )}
             >
+                {/* Decorative background glow */}
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-[var(--dashboard-accent-gold)]/5 rounded-full blur-3xl group-hover:bg-[var(--dashboard-accent-gold)]/10 transition-colors duration-500" />
+
                 {Icon && (
-                    <div className="h-12 w-12 rounded-full bg-[var(--dashboard-accent-gold)]/10 flex items-center justify-center shrink-0">
-                        <Icon className="h-6 w-6 text-[var(--dashboard-accent-gold)]" />
+                    <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[var(--dashboard-accent-gold)]/20 to-[var(--dashboard-accent-gold)]/5 flex items-center justify-center shrink-0 border border-[var(--dashboard-accent-gold)]/10 group-hover:border-[var(--dashboard-accent-gold)]/30 transition-colors duration-500 shadow-lg">
+                        <Icon className="h-7 w-7 text-[var(--dashboard-accent-gold)] transition-transform duration-500 group-hover:scale-110" />
                     </div>
                 )}
-                <div className="flex flex-col">
-                    <span className="text-sm text-[var(--dashboard-text-muted)] font-medium font-sans">
+                <div className="flex flex-col relative z-10">
+                    <span className="text-xs text-[var(--dashboard-text-muted)] font-bold uppercase tracking-wider mb-1">
                         {title}
                     </span>
-                    <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-[var(--dashboard-text)] font-serif">
+                    <div className="flex items-end gap-3">
+                        <span className="text-3xl font-light text-[var(--dashboard-text)] font-serif tracking-tight">
                             {value}
                         </span>
                         {subtitle && (
-                            <span className="text-xs font-medium text-[var(--dashboard-accent-green)] bg-[var(--dashboard-accent-green)]/10 px-1.5 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold text-[var(--dashboard-accent-green)] bg-[var(--dashboard-accent-green)]/10 px-2 py-0.5 rounded-full border border-[var(--dashboard-accent-green)]/20 mb-1">
                                 {subtitle}
                             </span>
                         )}
