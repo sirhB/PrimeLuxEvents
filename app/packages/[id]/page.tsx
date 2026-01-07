@@ -32,7 +32,18 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
     // 1. Fetch package details (simple query)
     const { data: pkg, error: pkgError } = await supabase
         .from('packages')
-        .select('*')
+        .select(`
+            *,
+            package_items (
+                id,
+                quantity,
+                products (
+                    id,
+                    name,
+                    image_url
+                )
+            )
+        `)
         .eq('id', id)
         .single()
 
@@ -122,8 +133,44 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
                 </div>
             </div>
 
+            {/* Included Items Section (Static) */}
+            {pkg.package_items && pkg.package_items.length > 0 && (
+                <div className="container px-4 md:px-6 py-12 -mt-10 relative z-30 mb-8">
+                    <div className="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100">
+                        <h2 className="text-2xl font-serif font-light mb-6 flex items-center gap-3">
+                            <span className="w-8 h-px bg-gold"></span>
+                            Included in this Package
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            {pkg.package_items.map((item: any) => (
+                                <div key={item.id} className="flex items-center gap-4 bg-[#FDFBF7] p-4 rounded-xl">
+                                    <div className="relative w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 flex-shrink-0">
+                                        {item.products?.image_url ? (
+                                            <Image
+                                                src={item.products.image_url}
+                                                alt={item.products.name}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+                                                <span className="text-xs">No Img</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h3 className="font-medium text-gray-900">{item.products?.name}</h3>
+                                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Configurator Section */}
-            <div className="container px-4 md:px-6 py-12 -mt-10 relative z-30">
+            <div className="container px-4 md:px-6 pb-24 relative z-30">
                 <PackageConfigurator pkg={transformedPkg} />
             </div>
         </div>

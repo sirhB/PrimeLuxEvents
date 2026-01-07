@@ -31,7 +31,17 @@ export type ItemGroupData = {
     }[]
 }
 
-export async function createPackageWithItems(packageData: PackageData, groups: ItemGroupData[]) {
+export type StaticItemData = {
+    id?: string
+    product_id: string
+    quantity: number
+}
+
+export async function createPackageWithItems(
+    packageData: PackageData,
+    groups: ItemGroupData[],
+    staticItems: StaticItemData[] = []
+) {
     const supabase = await createClient()
 
     // 1. Create Package
@@ -85,11 +95,33 @@ export async function createPackageWithItems(packageData: PackageData, groups: I
         }
     }
 
+    // 3. Create Static Items
+    if (staticItems.length > 0) {
+        const itemsToInsert = staticItems.map(item => ({
+            package_id: pkg.id,
+            product_id: item.product_id,
+            quantity: item.quantity
+        }))
+
+        const { error: itemsError } = await supabase
+            .from('package_items')
+            .insert(itemsToInsert)
+
+        if (itemsError) {
+            console.error('Error creating static items:', itemsError)
+        }
+    }
+
     revalidatePath('/admin/packages')
     return { success: true, packageId: pkg.id }
 }
 
-export async function updatePackageWithItems(packageId: string, packageData: PackageData, groups: ItemGroupData[]) {
+export async function updatePackageWithItems(
+    packageId: string,
+    packageData: PackageData,
+    groups: ItemGroupData[],
+    staticItems: StaticItemData[] = []
+) {
     const supabase = await createClient()
 
     // 1. Update Package
@@ -103,19 +135,14 @@ export async function updatePackageWithItems(packageId: string, packageData: Pac
         throw new Error('Failed to update package')
     }
 
-    // 2. Handle Groups (Complex: Add, Update, Delete)
-    // For simplicity, we'll delete all existing groups and recreate them
-    // This is safe because we're passing the full state from the UI
-    // In a high-concurrency app, we'd want to be more granular, but for this admin tool it's fine
-
-    // First, delete existing groups (cascade will handle options)
-    const { error: deleteError } = await supabase
+    // 2. Handle Groups (Delete and Recreate)
+    const { error: deleteGroupsError } = await supabase
         .from('package_item_groups')
         .delete()
         .eq('package_id', packageId)
 
-    if (deleteError) {
-        console.error('Error clearing old groups:', deleteError)
+    if (deleteGroupsError) {
+        console.error('Error clearing old groups:', deleteGroupsError)
         throw new Error('Failed to update package items')
     }
 
@@ -155,6 +182,32 @@ export async function updatePackageWithItems(packageId: string, packageData: Pac
             if (optionsError) {
                 console.error('Error creating options:', optionsError)
             }
+        }
+    }
+
+    // 3. Handle Static Items (Delete and Recreate)
+    const { error: deleteItemsError } = await supabase
+        .from('package_items')
+        .delete()
+        .eq('package_id', packageId)
+
+    if (deleteItemsError) {
+        console.error('Error clearing old static items:', deleteItemsError)
+    }
+
+    if (staticItems.length > 0) {
+        const itemsToInsert = staticItems.map(item => ({
+            package_id: packageId,
+            product_id: item.product_id,
+            quantity: item.quantity
+        }))
+
+        const { error: itemsError } = await supabase
+            .from('package_items')
+            .insert(itemsToInsert)
+
+        if (itemsError) {
+            console.error('Error creating static items:', itemsError)
         }
     }
 

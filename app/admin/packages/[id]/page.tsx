@@ -7,7 +7,7 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
     const { id } = await params
     const supabase = await createClient()
 
-    // 1. Fetch Package Details with Groups and Options
+    // 1. Fetch Package Details with Groups and Options AND Static Items
     const { data: pkg, error } = await supabase
         .from('packages')
         .select(`
@@ -29,6 +29,14 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
                         name
                     )
                 )
+            ),
+            package_items (
+                id,
+                product_id,
+                quantity,
+                products (
+                    name
+                )
             )
         `)
         .eq('id', id)
@@ -36,13 +44,19 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
 
     if (error || !pkg) {
         console.error('Error fetching package:', error)
-        redirect('/admin/packages')
+        try {
+            // Attempt fallback if query fails (e.g. if schema mismatch)
+            redirect('/admin/packages')
+        } catch (e) {
+            // This is just to satisfy the linter if redirect is not detected as returning never
+            return <div>Error loading package</div>
+        }
     }
 
     // 2. Fetch All Products for the picker
     const { data: products } = await supabase
         .from('products')
-        .select('id, name, price, image_url, category')
+        .select('id, name, price, image_url, category_id')
         .order('name')
 
     // 3. Transform data for the form
@@ -67,6 +81,14 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
                 }))
         }))
 
+    // Transform static items
+    const staticItems = pkg.package_items.map((i: any) => ({
+        id: i.id,
+        product_id: i.product_id,
+        product_name: i.products?.name || 'Unknown Product',
+        quantity: i.quantity
+    }))
+
     const initialData = {
         id: pkg.id,
         package: {
@@ -80,7 +102,8 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
             original_price: pkg.original_price,
             savings_amount: pkg.savings_amount
         },
-        groups
+        groups,
+        staticItems
     }
 
     return (

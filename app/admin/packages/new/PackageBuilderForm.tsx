@@ -9,7 +9,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { createPackageWithItems, updatePackageWithItems, PackageData, ItemGroupData } from '../actions'
+import Link from 'next/link'
+import PackageStaticItemsBuilder, { PackageStaticItem } from '@/components/admin/PackageStaticItemsBuilder'
+import { createPackageWithItems, updatePackageWithItems, PackageData, ItemGroupData, StaticItemData } from '../actions'
 import PackageItemGroupBuilder, { PackageItemGroup } from '@/components/admin/PackageItemGroupBuilder'
 import PackageDiscountCalculator from '@/components/admin/PackageDiscountCalculator'
 import { Loader2, Save } from 'lucide-react'
@@ -21,6 +23,7 @@ interface PackageBuilderFormProps {
         id: string
         package: PackageData
         groups: PackageItemGroup[]
+        staticItems: PackageStaticItem[]
     }
 }
 
@@ -39,6 +42,7 @@ export default function PackageBuilderForm({ products, initialData }: PackageBui
     })
 
     const [itemGroups, setItemGroups] = useState<PackageItemGroup[]>(initialData?.groups || [])
+    const [staticItems, setStaticItems] = useState<PackageStaticItem[]>(initialData?.staticItems || [])
 
     const [pricing, setPricing] = useState({
         price: initialData?.package.price || 0,
@@ -87,11 +91,17 @@ export default function PackageBuilderForm({ products, initialData }: PackageBui
                 }))
             }))
 
+            // Convert UI static items to API format
+            const staticItemsData: StaticItemData[] = staticItems.map(i => ({
+                product_id: i.product_id,
+                quantity: i.quantity
+            }))
+
             if (isEditing && initialData) {
-                await updatePackageWithItems(initialData.id, packageData, groupsData)
+                await updatePackageWithItems(initialData.id, packageData, groupsData, staticItemsData)
                 toast.success('Package updated successfully')
             } else {
-                await createPackageWithItems(packageData, groupsData)
+                await createPackageWithItems(packageData, groupsData, staticItemsData)
                 toast.success('Package created successfully')
             }
 
@@ -107,10 +117,11 @@ export default function PackageBuilderForm({ products, initialData }: PackageBui
     return (
         <div className="space-y-8">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="basic">1. Basic Info</TabsTrigger>
-                    <TabsTrigger value="items">2. Configurable Items</TabsTrigger>
-                    <TabsTrigger value="pricing">3. Pricing & Discounts</TabsTrigger>
+                    <TabsTrigger value="static">2. Included Items</TabsTrigger>
+                    <TabsTrigger value="items">3. Configurable Items</TabsTrigger>
+                    <TabsTrigger value="pricing">4. Pricing & Discounts</TabsTrigger>
                 </TabsList>
 
                 <div className="mt-6">
@@ -163,6 +174,23 @@ export default function PackageBuilderForm({ products, initialData }: PackageBui
                         </Card>
 
                         <div className="flex justify-end mt-6">
+                            <Button onClick={() => setActiveTab('static')}>
+                                Next: Included Items
+                            </Button>
+                        </div>
+                    </TabsContent>
+
+                    <TabsContent value="static">
+                        <PackageStaticItemsBuilder
+                            initialItems={staticItems}
+                            products={products}
+                            onChange={setStaticItems}
+                        />
+
+                        <div className="flex justify-between mt-6">
+                            <Button variant="outline" onClick={() => setActiveTab('basic')}>
+                                Back
+                            </Button>
                             <Button onClick={() => setActiveTab('items')}>
                                 Next: Configurable Items
                             </Button>
@@ -177,7 +205,7 @@ export default function PackageBuilderForm({ products, initialData }: PackageBui
                         />
 
                         <div className="flex justify-between mt-6">
-                            <Button variant="outline" onClick={() => setActiveTab('basic')}>
+                            <Button variant="outline" onClick={() => setActiveTab('static')}>
                                 Back
                             </Button>
                             <Button onClick={() => setActiveTab('pricing')}>
