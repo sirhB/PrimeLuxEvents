@@ -103,9 +103,10 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 -- Contact Page Content
 INSERT INTO content (key, value, type) VALUES
 ('contact.hero.title', 'Get in Touch', 'text'),
-('contact.hero.description', 'We''d love to hear about your upcoming event. Fill out the form or contact us directly to start the conversation.', 'text'),
+('contact.hero.description', 'We''d love to hear about your upcoming event. Our Beverly Hills showroom is open for viewing by appointment only. Fill out the form or contact us directly to schedule your visit.', 'text'),
 ('contact.info.address.title', 'Visit Our Showroom', 'text'),
 ('contact.info.address.value', '123 Luxury Lane, Suite 100\nBeverly Hills, CA 90210', 'text'),
+('contact.info.address.hours', 'By Appointment Only', 'text'),
 ('contact.info.phone.title', 'Call Us', 'text'),
 ('contact.info.phone.value', '(310) 555-0123', 'text'),
 ('contact.info.phone.hours', 'Mon-Fri: 9am - 6pm', 'text'),

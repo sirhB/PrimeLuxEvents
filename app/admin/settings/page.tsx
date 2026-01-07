@@ -22,6 +22,9 @@ export default function SettingsPage() {
         delivery_base_fee: '',
         delivery_per_mile_rate: '',
         warehouse_address: '',
+        company_address: '',
+        company_email: '',
+        company_phone: '',
     })
 
     const [testAddress, setTestAddress] = useState('')
@@ -41,6 +44,9 @@ export default function SettingsPage() {
                     delivery_base_fee: (parseInt(settingsMap.delivery_base_fee || '5000') / 100).toString(),
                     delivery_per_mile_rate: (parseInt(settingsMap.delivery_per_mile_rate || '150') / 100).toString(),
                     warehouse_address: settingsMap.warehouse_address || '',
+                    company_address: settingsMap.company_address || '123 Luxury Lane, Suite 100, Beverly Hills, CA 90210',
+                    company_email: settingsMap.company_email || 'info@primeluxevents.com',
+                    company_phone: settingsMap.company_phone || '(555) 123-4567',
                 })
             }
 
@@ -78,6 +84,21 @@ export default function SettingsPage() {
                     key: 'warehouse_address',
                     value: settings.warehouse_address,
                     description: 'Warehouse address for delivery distance calculation',
+                },
+                {
+                    key: 'company_address',
+                    value: settings.company_address,
+                    description: 'Publicly displayed company address',
+                },
+                {
+                    key: 'company_email',
+                    value: settings.company_email,
+                    description: 'Publicly displayed company email',
+                },
+                {
+                    key: 'company_phone',
+                    value: settings.company_phone,
+                    description: 'Publicly displayed company phone number',
                 },
             ]
 
@@ -228,6 +249,51 @@ export default function SettingsPage() {
                             <p className="text-xs text-[var(--dashboard-text-muted)] font-medium">
                                 Formula: <span className="text-[var(--dashboard-accent-gold)] font-bold">Base Fee</span> + (Distance × <span className="text-[var(--dashboard-accent-gold)] font-bold">Per Mile Rate</span>)
                             </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Company Information */}
+                <Card className="border-none glass-card overflow-hidden">
+                    <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">
+                        <CardTitle className="font-serif text-2xl">Company Information</CardTitle>
+                        <CardDescription className="text-[var(--dashboard-text-muted)]">Set public contact information for your business</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="grid sm:grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                                <Label htmlFor="company_email" className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Company Email</Label>
+                                <Input
+                                    id="company_email"
+                                    type="email"
+                                    value={settings.company_email}
+                                    onChange={(e) => setSettings({ ...settings, company_email: e.target.value })}
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                    placeholder="info@primeluxevents.com"
+                                />
+                            </div>
+                            <div className="space-y-3">
+                                <Label htmlFor="company_phone" className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Company Phone</Label>
+                                <Input
+                                    id="company_phone"
+                                    type="tel"
+                                    value={settings.company_phone}
+                                    onChange={(e) => setSettings({ ...settings, company_phone: e.target.value })}
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                    placeholder="(555) 123-4567"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-3">
+                            <Label htmlFor="company_address" className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Display Address</Label>
+                            <Textarea
+                                id="company_address"
+                                value={settings.company_address}
+                                onChange={(e) => setSettings({ ...settings, company_address: e.target.value })}
+                                className="min-h-[100px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all resize-none"
+                                placeholder="123 Luxury Lane, Suite 100, Beverly Hills, CA 90210"
+                                rows={3}
+                            />
                         </div>
                     </CardContent>
                 </Card>

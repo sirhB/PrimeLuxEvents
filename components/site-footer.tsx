@@ -1,7 +1,39 @@
+"use client"
+
 import Link from "next/link"
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, ArrowRight } from "lucide-react"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 
 export function SiteFooter() {
+  const [settings, setSettings] = useState({
+    company_address: "123 Luxury Lane, Suite 100\nBeverly Hills, CA 90210",
+    company_email: "info@primeluxevents.com",
+    company_phone: "(555) 123-4567"
+  })
+
+  useEffect(() => {
+    async function fetchSettings() {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('settings')
+        .select('key, value')
+        .in('key', ['company_address', 'company_email', 'company_phone'])
+
+      if (data) {
+        const fetchedSettings: any = {}
+        data.forEach(item => {
+          fetchedSettings[item.key] = item.value
+        })
+        setSettings(prev => ({
+          ...prev,
+          ...fetchedSettings
+        }))
+      }
+    }
+    fetchSettings()
+  }, [])
+
   return (
     <footer className="bg-[#1A1A1A] text-white pt-24 pb-12 overflow-hidden relative">
       {/* Decorative background element */}
@@ -98,15 +130,15 @@ export function SiteFooter() {
             <ul className="space-y-6 text-sm text-gray-400 font-light">
               <li className="flex items-start gap-4">
                 <MapPin className="h-5 w-5 text-gold shrink-0" />
-                <span>123 Luxury Lane, Suite 100<br />Beverly Hills, CA 90210</span>
+                <span className="whitespace-pre-line">{settings.company_address}</span>
               </li>
               <li className="flex items-center gap-4">
                 <Phone className="h-5 w-5 text-gold shrink-0" />
-                <a href="tel:5551234567" className="hover:text-white transition-colors">(555) 123-4567</a>
+                <a href={`tel:${settings.company_phone.replace(/\D/g, '')}`} className="hover:text-white transition-colors">{settings.company_phone}</a>
               </li>
               <li className="flex items-center gap-4">
                 <Mail className="h-5 w-5 text-gold shrink-0" />
-                <a href="mailto:info@primeluxevents.com" className="hover:text-white transition-colors">info@primeluxevents.com</a>
+                <a href={`mailto:${settings.company_email}`} className="hover:text-white transition-colors">{settings.company_email}</a>
               </li>
             </ul>
           </div>

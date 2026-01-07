@@ -1,11 +1,12 @@
 "use client"
 
-import { MapPin, Phone, Mail, Sparkles, Clock, ArrowRight } from "lucide-react"
+import { MapPin, Phone, Mail, Sparkles, Clock, ArrowRight, Calendar } from "lucide-react"
 import { ContactForm } from "@/components/contact-form"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { EditableContent } from "@/components/admin/editable-content"
 import { NonEditableOverlay } from "@/components/admin/non-editable-overlay"
+import { cn } from "@/lib/utils"
 
 interface ContactPageContentProps {
     content: any
@@ -53,6 +54,7 @@ export function ContactPageContent({ content, isEditing = false }: ContactPageCo
                                 icon={MapPin}
                                 titleKey="contact.info.address.title"
                                 valueKey="contact.info.address.value"
+                                subtitleKey="contact.info.address.hours"
                                 content={content}
                                 isEditing={isEditing}
                             />
@@ -103,6 +105,10 @@ export function ContactPageContent({ content, isEditing = false }: ContactPageCo
                                 </div>
                             </div>
 
+                            <p className="text-gray-400 text-sm font-light mb-10 -mt-8 max-w-sm">
+                                To schedule a showroom viewing or discuss your event in detail, please provide your information below.
+                            </p>
+
                             <NonEditableOverlay isEditing={isEditing} message="Contact form fields are managed in settings">
                                 <div className="contact-form-dark">
                                     <ContactForm />
@@ -151,13 +157,21 @@ function ContactInfoItem({ icon: Icon, titleKey, valueKey, subtitleKey, content,
                     className="text-white text-2xl font-serif font-light leading-snug group-hover:text-gold transition-colors duration-300"
                 />
                 {subtitleKey && (
-                    <EditableContent
-                        contentKey={subtitleKey}
-                        initialValue={content[subtitleKey]}
-                        isEditing={isEditing}
-                        as="p"
-                        className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mt-2"
-                    />
+                    <div className="flex items-center gap-2 mt-2">
+                        {content[subtitleKey] === 'By Appointment Only' && (
+                            <Calendar className="w-3 h-3 text-gold" />
+                        )}
+                        <EditableContent
+                            contentKey={subtitleKey}
+                            initialValue={content[subtitleKey]}
+                            isEditing={isEditing}
+                            as="p"
+                            className={cn(
+                                "text-[10px] font-bold uppercase tracking-widest",
+                                content[subtitleKey] === 'By Appointment Only' ? "text-gold" : "text-gray-500"
+                            )}
+                        />
+                    </div>
                 )}
             </div>
         </div>
