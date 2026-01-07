@@ -18,6 +18,19 @@ export function ProductGallery({ images, productName, className, selectedImage: 
     const [selectedImage, setSelectedImage] = useState(0)
     const [isLightboxOpen, setIsLightboxOpen] = useState(false)
     const [direction, setDirection] = useState(0)
+    const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+
+    // Auto-play logic
+    useEffect(() => {
+        if (!isAutoPlaying || images.length <= 1 || isLightboxOpen) return
+
+        const interval = setInterval(() => {
+            setDirection(1)
+            setSelectedImage((prev) => (prev + 1) % images.length)
+        }, 5000)
+
+        return () => clearInterval(interval)
+    }, [isAutoPlaying, images.length, isLightboxOpen])
 
     // Update selected image when external prop changes
     useEffect(() => {
@@ -26,11 +39,13 @@ export function ProductGallery({ images, productName, className, selectedImage: 
             if (index !== -1) {
                 setDirection(index > selectedImage ? 1 : -1)
                 setSelectedImage(index)
+                setIsAutoPlaying(false) // Pause auto-play on manual interaction
             }
         }
     }, [externalSelectedImage, images])
 
     const paginate = (newDirection: number) => {
+        setIsAutoPlaying(false) // Pause auto-play on manual interaction
         setDirection(newDirection)
         setSelectedImage((prev) => (prev + newDirection + images.length) % images.length)
     }
@@ -58,9 +73,13 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
     return (
         <>
-            <div className={cn("space-y-8", className)}>
+            <div className={cn("space-y-6", className)}>
                 {/* Main Image Container */}
-                <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white group border border-border/5 shadow-inner">
+                <div
+                    className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-white group border border-border/5 shadow-2xl shadow-black/[0.03]"
+                    onMouseEnter={() => setIsAutoPlaying(false)}
+                    onMouseLeave={() => setIsAutoPlaying(true)}
+                >
                     <AnimatePresence initial={false} custom={direction}>
                         <motion.div
                             key={selectedImage}
@@ -119,29 +138,55 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                     )}
                 </div>
 
+                {/* Progress Indicators (Dots) */}
+                {images.length > 1 && (
+                    <div className="flex justify-center gap-2 pt-2">
+                        {images.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => {
+                                    setDirection(index > selectedImage ? 1 : -1)
+                                    setSelectedImage(index)
+                                    setIsAutoPlaying(false)
+                                }}
+                                className={cn(
+                                    "h-1.5 rounded-full transition-all duration-500",
+                                    selectedImage === index
+                                        ? "w-8 bg-gold"
+                                        : "w-2 bg-border hover:bg-gold/30"
+                                )}
+                            />
+                        ))}
+                    </div>
+                )}
+
                 {/* Thumbnails */}
                 {images.length > 1 && (
-                    <div className="flex gap-4 overflow-x-auto pb-4 px-2 scrollbar-hide justify-center">
+                    <div className="flex gap-3 overflow-x-auto pb-4 px-2 scrollbar-hide justify-center pt-4">
                         {images.map((image, index) => (
                             <button
                                 key={index}
                                 onClick={() => {
                                     setDirection(index > selectedImage ? 1 : -1)
                                     setSelectedImage(index)
+                                    setIsAutoPlaying(false)
                                 }}
                                 className={cn(
-                                    "relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden transition-all duration-500 border-2",
+                                    "relative flex-shrink-0 w-20 h-24 rounded-2xl overflow-hidden transition-all duration-500 border-2",
                                     selectedImage === index
-                                        ? "border-gold shadow-lg shadow-gold/10 scale-105"
-                                        : "border-transparent opacity-40 hover:opacity-100 grayscale hover:grayscale-0"
+                                        ? "border-gold shadow-xl shadow-gold/20 -translate-y-1"
+                                        : "border-transparent opacity-40 hover:opacity-100 hover:border-gold/20"
                                 )}
                             >
                                 <Image
                                     src={image}
                                     alt={`${productName} - Thumbnail ${index + 1}`}
                                     fill
-                                    className="object-cover p-1"
+                                    className="object-cover"
                                 />
+                                {selectedImage === index && (
+                                    <div className="absolute inset-0 bg-gold/5 animate-pulse" />
+                                )}
                             </button>
                         ))}
                     </div>
