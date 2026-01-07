@@ -967,59 +967,59 @@ export default function CheckoutPage() {
                                     </div>
                                 </div>
                                 <div className="divide-y divide-border/5">
-                                        {items.map((item, index) => {
-                                            const product = cartProducts.find((p) => p.id === item.productId)
-                                            if (!product) return null
-                                            return (
-                                                <motion.div
-                                                    key={item.productId}
-                                                    className="flex gap-8 p-10 hover:bg-gray-50/50 transition-all duration-300 group"
-                                                    initial={{ opacity: 0, x: -20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                                                >
-                                                    <div className="h-32 w-32 rounded-[2rem] border border-border/5 bg-gray-50 overflow-hidden flex-shrink-0 shadow-sm">
-                                                        <img
-                                                            src={product.image_url || '/placeholder.svg'}
-                                                            alt={product.name}
-                                                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                        />
+                                    {items.map((item, index) => {
+                                        const product = cartProducts.find((p) => p.id === item.productId)
+                                        if (!product) return null
+                                        return (
+                                            <motion.div
+                                                key={item.productId}
+                                                className="flex gap-8 p-10 hover:bg-gray-50/50 transition-all duration-300 group"
+                                                initial={{ opacity: 0, x: -20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                                            >
+                                                <div className="h-32 w-32 rounded-[2rem] border border-border/5 bg-gray-50 overflow-hidden flex-shrink-0 shadow-sm">
+                                                    <img
+                                                        src={product.image_url || '/placeholder.svg'}
+                                                        alt={product.name}
+                                                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                    />
+                                                </div>
+                                                <div className="flex-1 flex flex-col justify-between">
+                                                    <div>
+                                                        <h4 className="font-serif text-xl font-bold text-gray-900 mb-2">{product.name}</h4>
+                                                        <p className="text-gold font-bold text-lg">{formatCurrency(product.price * item.quantity)}</p>
                                                     </div>
-                                                    <div className="flex-1 flex flex-col justify-between">
-                                                        <div>
-                                                            <h4 className="font-serif text-xl font-bold text-gray-900 mb-2">{product.name}</h4>
-                                                            <p className="text-gold font-bold text-lg">{formatCurrency(product.price * item.quantity)}</p>
-                                                        </div>
-                                                        <div className="flex items-center gap-6 mt-6">
-                                                            <div className="flex items-center gap-6 bg-gray-50 rounded-full px-6 py-2 border border-border/5">
-                                                                <button
-                                                                    className="text-gray-400 hover:text-gold transition-colors"
-                                                                    onClick={() => {
-                                                                        updateQuantity(item.id, item.quantity - 1)
-                                                                        toast.info('Quantity updated')
-                                                                    }}
-                                                                >
-                                                                    <Minus className="h-4 w-4" />
-                                                                </button>
-                                                                <span className="text-sm font-bold w-6 text-center">
-                                                                    {item.quantity}
-                                                                </span>
-                                                                <button
-                                                                    className="text-gray-400 hover:text-gold transition-colors"
-                                                                    onClick={() => {
-                                                                        updateQuantity(item.id, item.quantity + 1)
-                                                                        toast.info('Quantity updated')
-                                                                    }}
-                                                                >
-                                                                    <Plus className="h-4 w-4" />
-                                                                </button>
-                                                            </div>
+                                                    <div className="flex items-center gap-6 mt-6">
+                                                        <div className="flex items-center gap-6 bg-gray-50 rounded-full px-6 py-2 border border-border/5">
+                                                            <button
+                                                                className="text-gray-400 hover:text-gold transition-colors"
+                                                                onClick={() => {
+                                                                    updateQuantity(item.id, item.quantity - 1)
+                                                                    toast.info('Quantity updated')
+                                                                }}
+                                                            >
+                                                                <Minus className="h-4 w-4" />
+                                                            </button>
+                                                            <span className="text-sm font-bold w-6 text-center">
+                                                                {item.quantity}
+                                                            </span>
+                                                            <button
+                                                                className="text-gray-400 hover:text-gold transition-colors"
+                                                                onClick={() => {
+                                                                    updateQuantity(item.id, item.quantity + 1)
+                                                                    toast.info('Quantity updated')
+                                                                }}
+                                                            >
+                                                                <Plus className="h-4 w-4" />
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                </motion.div>
-                                            )
-                                        })}
-                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )
+                                    })}
+                                </div>
                                 </div>
                             </div>
 
