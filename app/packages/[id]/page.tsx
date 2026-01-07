@@ -50,8 +50,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
                         id,
                         name,
                         price,
-                        image_url,
-                        category
+                        image_url
                     )
                 )
             )
