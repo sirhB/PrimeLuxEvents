@@ -73,7 +73,7 @@ export default function RentalAgreementPage() {
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gold/5 rounded-full blur-[120px] opacity-50" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-gold/5 rounded-full blur-[120px] opacity-50" />
         <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-gold/3 rounded-full blur-[100px]" />
-        <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-[0.03] mix-blend-overlay" />
+        <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-[0.03] mix-blend-overlay" />
       </div>
 
       {/* Hero Section */}

@@ -160,7 +160,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
     return (
         <main className="min-h-screen bg-[#1A1A1A] text-white selection:bg-gold selection:text-black">
             {/* Background Texture Overlays */}
-            <div className="fixed inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none z-0" />
+            <div className="fixed inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none z-0" />
 
             {/* Immersive Hero Section */}
             <div className="relative h-[60vh] md:h-[70vh] overflow-hidden bg-black">

@@ -68,7 +68,7 @@ export function GalleryDetail({ content, category, images }: GalleryDetailProps)
             <section ref={heroRef} className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#1A1A1A]" />
-                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-10 mix-blend-overlay" />
+                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-10 mix-blend-overlay" />
                     <Image
                         src={category.cover_image || "/images/gallery-hero.png"}
                         alt={category.name}
@@ -167,7 +167,7 @@ export function GalleryDetail({ content, category, images }: GalleryDetailProps)
                         className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-2xl flex items-center justify-center p-4 md:p-12"
                         onClick={() => setSelectedImage(null)}
                     >
-                        <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 pointer-events-none" />
+                        <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 pointer-events-none" />
 
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}

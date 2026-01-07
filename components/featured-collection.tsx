@@ -45,7 +45,7 @@ export function FeaturedCollection() {
   if (loading) {
     return (
       <section className="py-24 md:py-40 bg-[#1A1A1A] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
         <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
           <div className="flex flex-col items-center gap-6">
             <div className="h-16 w-16 rounded-full border-2 border-gold/10 border-t-gold animate-spin" />
@@ -62,7 +62,7 @@ export function FeaturedCollection() {
 
   return (
     <section className="py-24 md:py-40 bg-[#1A1A1A] overflow-hidden relative">
-      <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 mb-24 relative z-10">
         <motion.div

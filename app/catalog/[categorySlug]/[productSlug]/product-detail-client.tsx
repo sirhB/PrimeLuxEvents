@@ -183,7 +183,7 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
 
     return (
         <div className="min-h-screen bg-[#1A1A1A] text-white selection:bg-gold selection:text-black">
-            <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
             {/* Top Blur Effect */}
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[120px] pointer-events-none" />

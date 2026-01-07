@@ -41,7 +41,7 @@ export function InteractiveProcess() {
     return (
         <section ref={containerRef} className="py-24 md:py-40 bg-[#1A1A1A] text-white relative overflow-hidden">
             {/* Decorative background element */}
-            <div className="absolute top-0 right-0 w-full h-full bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay" />
+            <div className="absolute top-0 right-0 w-full h-full bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
 
             <div className="container mx-auto px-4 md:px-6 relative z-10">
                 <div className="text-center max-w-3xl mx-auto mb-24">

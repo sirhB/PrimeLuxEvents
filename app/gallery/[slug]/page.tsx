@@ -6,13 +6,13 @@ import { notFound } from "next/navigation"
 export const dynamic = 'force-dynamic'
 
 interface GalleryDetailPageProps {
-    params: {
+    params: Promise<{
         slug: string
-    }
+    }>
 }
 
 export default async function GalleryDetailPage({ params }: GalleryDetailPageProps) {
-    const { slug } = params
+    const { slug } = await params
     const content = await getSiteContent()
     const supabase = await createClient()
 

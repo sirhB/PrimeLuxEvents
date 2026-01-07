@@ -40,7 +40,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                         priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#1A1A1A]" />
-                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-10 mix-blend-overlay" />
+                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-10 mix-blend-overlay" />
                 </div>
 
                 <div className="container mx-auto relative z-10 px-4 md:px-6 text-center">
@@ -182,7 +182,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
 
             {/* Values Section */}
             <section className="py-24 md:py-48 bg-[#1A1A1A] relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay" />
+                <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}

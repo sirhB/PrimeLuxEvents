@@ -46,7 +46,7 @@ export function TestimonialsSection({
 }: TestimonialsSectionProps) {
   return (
     <section className="py-24 md:py-48 bg-[#1A1A1A] relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
       {/* Background Orbs */}
       <div className="absolute top-1/4 right-0 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[120px] pointer-events-none" />

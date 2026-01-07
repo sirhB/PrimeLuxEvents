@@ -34,17 +34,17 @@ ON portfolio_images FOR SELECT USING (true);
 CREATE POLICY "Admin full access on portfolio_categories" 
 ON portfolio_categories FOR ALL USING (
   EXISTS (
-    SELECT 1 FROM profiles 
-    WHERE profiles.id = auth.uid() 
-    AND profiles.role = 'admin'
+    SELECT 1 FROM user_roles ur
+    JOIN roles r ON ur.role_id = r.id
+    WHERE ur.user_id = auth.uid() AND r.name = 'admin'
   )
 );
 
 CREATE POLICY "Admin full access on portfolio_images" 
 ON portfolio_images FOR ALL USING (
   EXISTS (
-    SELECT 1 FROM profiles 
-    WHERE profiles.id = auth.uid() 
-    AND profiles.role = 'admin'
+    SELECT 1 FROM user_roles ur
+    JOIN roles r ON ur.role_id = r.id
+    WHERE ur.user_id = auth.uid() AND r.name = 'admin'
   )
 );

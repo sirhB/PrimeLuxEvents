@@ -23,7 +23,7 @@ export default async function PackagesPage() {
         <main className="min-h-screen bg-[#1A1A1A] text-white selection:bg-gold selection:text-black pt-32 pb-24 md:pt-48 md:pb-40 relative overflow-hidden">
             {/* Background elements */}
             <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gold/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
+            <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
             {/* Hero Section */}
             <section className="container mx-auto px-4 md:px-6 relative z-10 mb-24 md:mb-32">

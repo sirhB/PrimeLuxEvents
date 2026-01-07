@@ -41,7 +41,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
             <section className="relative h-screen flex items-center justify-center overflow-hidden">
                 {/* Background Elements */}
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-10 mix-blend-overlay" />
+                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-10 mix-blend-overlay" />
                     <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-[#1A1A1A]" />
                     <motion.div
                         initial={{ opacity: 0, scale: 1.1 }}
@@ -173,7 +173,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
 
             {/* Concierge Service */}
             <section className="py-24 md:py-48 bg-[#151515] relative overflow-hidden border-t border-white/5">
-                <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay" />
+                <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-24 items-center">
                         <motion.div

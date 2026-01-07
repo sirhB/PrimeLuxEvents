@@ -37,7 +37,7 @@ export function GalleryLanding({ content, categories, isEditing = false }: Galle
             <section ref={heroRef} className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#1A1A1A]" />
-                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-10 mix-blend-overlay" />
+                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-10 mix-blend-overlay" />
                     <Image
                         src="/images/gallery-hero.png"
                         alt="Gallery Hero"

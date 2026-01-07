@@ -30,7 +30,7 @@ export function JournalPageContent({ content, isEditing = false }: JournalPageCo
             <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#1A1A1A]" />
-                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-10 mix-blend-overlay" />
+                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-10 mix-blend-overlay" />
                     {posts.length > 0 && (
                         <Image
                             src={posts[0].image || "/images/journal-hero.png"}

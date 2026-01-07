@@ -55,7 +55,7 @@ export function CartSheet() {
         </Button>
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-md flex flex-col h-full bg-[#1A1A1A] border-l border-white/5 p-0 overflow-hidden text-white">
-        <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
         <SheetHeader className="px-8 pt-10 pb-6 border-b border-white/5 bg-white/5 backdrop-blur-xl relative z-10">
           <div className="flex items-center justify-between mb-2">
