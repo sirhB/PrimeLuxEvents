@@ -37,11 +37,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
             package_items (
                 id,
                 quantity,
-                products (
-                    id,
-                    name,
-                    image_url
-                )
+                product_id
             )
         `)
         .eq('id', id)
@@ -55,18 +51,41 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
         notFound()
     }
 
-    // 2. Fetch groups and options separately to avoid deep nesting complexity/errors
-    const { data: groups, error: groupsError } = await supabase
+    // 2. Fetch groups and options separately (without nested products to avoid PGRST200)
+    const { data: groupsData, error: groupsError } = await supabase
         .from('package_item_groups')
         .select(`
             *,
             package_item_options (
-                *,
-                products (*)
+                id,
+                product_id,
+                is_default,
+                quantity,
+                display_order
             )
         `)
         .eq('package_id', id)
         .order('display_order')
+
+    if (groupsError) {
+        console.error('Error loading package groups:', groupsError)
+    }
+
+    // 3. Fetch all products needed for resolution
+    const { data: products } = await supabase
+        .from('products')
+        .select('id, name, price, image_url')
+
+    const productMap = new Map(products?.map(p => [p.id, p]) || [])
+
+    // 4. Transform groups with resolved products
+    const groups = groupsData?.map((g: any) => ({
+        ...g,
+        package_item_options: g.package_item_options.map((o: any) => ({
+            ...o,
+            products: productMap.get(o.product_id) || { name: 'Unknown', price: 0, image_url: '' }
+        }))
+    }))
 
     if (groupsError) {
         console.error('Error loading package groups:', groupsError)
@@ -142,28 +161,31 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
                             Included in this Package
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            {pkg.package_items.map((item: any) => (
-                                <div key={item.id} className="flex items-center gap-4 bg-[#FDFBF7] p-4 rounded-xl">
-                                    <div className="relative w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 flex-shrink-0">
-                                        {item.products?.image_url ? (
-                                            <Image
-                                                src={item.products.image_url}
-                                                alt={item.products.name}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
-                                                <span className="text-xs">No Img</span>
-                                            </div>
-                                        )}
+                            {pkg.package_items.map((item: any) => {
+                                const product = productMap.get(item.product_id)
+                                return (
+                                    <div key={item.id} className="flex items-center gap-4 bg-[#FDFBF7] p-4 rounded-xl">
+                                        <div className="relative w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 flex-shrink-0">
+                                            {product?.image_url ? (
+                                                <Image
+                                                    src={product.image_url}
+                                                    alt={product.name}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+                                                    <span className="text-xs">No Img</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h3 className="font-medium text-gray-900">{product?.name || 'Unknown Product'}</h3>
+                                            <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="font-medium text-gray-900">{item.products?.name}</h3>
-                                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                                    </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     </div>
                 </div>
