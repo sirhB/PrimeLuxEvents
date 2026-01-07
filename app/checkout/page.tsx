@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
-import { Loader2, Check, AlertCircle, CalendarIcon, Clock, MapPin, Truck, ArrowRight, ArrowLeft, ShoppingBag, Plus, Minus, Package } from 'lucide-react'
+import { Loader2, Check, AlertCircle, CalendarIcon, Clock, MapPin, Truck, ArrowRight, ArrowLeft, ShoppingBag, Plus, Minus, Package, X } from 'lucide-react'
 import { createOrder, calculateOrderTotal, type CheckoutFormData, type CartItem } from '@/app/actions/checkout'
 import { formatCurrency } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/client'
@@ -150,16 +150,24 @@ export default function CheckoutPage() {
     useEffect(() => {
         async function fetchCartProducts() {
             if (items.length === 0) return
+
+            const productIds = items.filter(item => item.productId).map((item) => item.productId)
+
+            if (productIds.length === 0) {
+                setCartProducts([])
+                return
+            }
+
             const supabase = createClient()
-            const productIds = items.map((item) => item.productId)
             const { data } = await supabase.from('products').select('*').in('id', productIds)
 
             if (data) {
                 setCartProducts(data)
 
                 // Check for invalid items and remove them
+                // Only check standard products
                 const validIds = data.map(p => p.id)
-                const invalidItems = items.filter(i => !validIds.includes(i.productId))
+                const invalidItems = items.filter(i => i.productId && !validIds.includes(i.productId))
 
                 if (invalidItems.length > 0) {
                     console.log("Removing invalid items:", invalidItems)
@@ -192,13 +200,14 @@ export default function CheckoutPage() {
 
             setIsCalculating(true)
             try {
-                const cartItems: CartItem[] = items
-                    .filter(item => !!item.productId)
-                    .map((item) => ({
-                        productId: item.productId as string,
-                        quantity: item.quantity,
-                        modifiers: item.modifiers
-                    }))
+                const cartItems: CartItem[] = items.map((item) => ({
+                    productId: item.productId,
+                    packageId: item.packageId,
+                    packageData: item.packageData,
+                    packageSelections: item.packageSelections,
+                    quantity: item.quantity,
+                    modifiers: item.modifiers
+                }))
 
                 const calculated = await calculateOrderTotal(cartItems, addressToUse)
 
@@ -326,13 +335,14 @@ export default function CheckoutPage() {
             const preparePayment = async () => {
                 setIsLoading(true)
                 try {
-                    const cartItems: CartItem[] = items
-                        .filter(item => !!item.productId)
-                        .map((item) => ({
-                            productId: item.productId as string,
-                            quantity: item.quantity,
-                            modifiers: item.modifiers
-                        }))
+                    const cartItems: CartItem[] = items.map((item) => ({
+                        productId: item.productId,
+                        packageId: item.packageId,
+                        packageData: item.packageData,
+                        packageSelections: item.packageSelections,
+                        quantity: item.quantity,
+                        modifiers: item.modifiers
+                    }))
 
                     const addressToUse = formData.deliveryAddress || formData.venueAddress
                     const result = await createPaymentIntent(cartItems, addressToUse)
@@ -368,13 +378,14 @@ export default function CheckoutPage() {
         setError(null)
 
         try {
-            const cartItems: CartItem[] = items
-                .filter(item => !!item.productId)
-                .map((item) => ({
-                    productId: item.productId as string,
-                    quantity: item.quantity,
-                    modifiers: item.modifiers
-                }))
+            const cartItems: CartItem[] = items.map((item) => ({
+                productId: item.productId,
+                packageId: item.packageId,
+                packageData: item.packageData,
+                packageSelections: item.packageSelections,
+                quantity: item.quantity,
+                modifiers: item.modifiers
+            }))
 
             const finalFormData = {
                 ...formData,
@@ -968,6 +979,72 @@ export default function CheckoutPage() {
                                 </div>
                                 <div className="divide-y divide-border/5">
                                     {items.map((item, index) => {
+                                        // Handle Package Items
+                                        if (item.packageId && item.packageData) {
+                                            const { name, price } = item.packageData
+
+                                            return (
+                                                <motion.div
+                                                    key={item.id}
+                                                    className="flex gap-8 p-10 hover:bg-gray-50/50 transition-all duration-300 group"
+                                                    initial={{ opacity: 0, x: -20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                                                >
+                                                    <div className="h-32 w-32 rounded-[2rem] border border-border/5 bg-gray-50 overflow-hidden flex-shrink-0 shadow-sm relative">
+                                                        <div className="absolute inset-0 bg-gold/5 flex items-center justify-center">
+                                                            <span className="text-xs text-gold font-bold uppercase tracking-widest">Package</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex-1 flex flex-col justify-between">
+                                                        <div>
+                                                            <div className="flex justify-between items-start">
+                                                                <h4 className="font-serif text-xl font-bold text-gray-900 mb-2">{name}</h4>
+                                                                <button
+                                                                    onClick={() => removeItem(item.id)}
+                                                                    className="text-gray-300 hover:text-red-500 transition-colors p-2"
+                                                                >
+                                                                    <span className="sr-only">Remove</span>
+                                                                    <X className="h-5 w-5" />
+                                                                </button>
+                                                            </div>
+                                                            <p className="text-gold font-bold text-lg">{formatCurrency(price * item.quantity)}</p>
+                                                            <div className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mt-1">
+                                                                Package Deal
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-6 mt-6">
+                                                            <div className="flex items-center gap-6 bg-gray-50 rounded-full px-6 py-2 border border-border/5">
+                                                                <button
+                                                                    className="text-gray-400 hover:text-gold transition-colors"
+                                                                    onClick={() => {
+                                                                        updateQuantity(item.id, item.quantity - 1)
+                                                                        toast.info('Quantity updated')
+                                                                    }}
+                                                                    disabled={item.quantity <= 1}
+                                                                >
+                                                                    <Minus className="h-4 w-4" />
+                                                                </button>
+                                                                <span className="text-sm font-bold w-6 text-center">
+                                                                    {item.quantity}
+                                                                </span>
+                                                                <button
+                                                                    className="text-gray-400 hover:text-gold transition-colors"
+                                                                    onClick={() => {
+                                                                        updateQuantity(item.id, item.quantity + 1)
+                                                                        toast.info('Quantity updated')
+                                                                    }}
+                                                                >
+                                                                    <Plus className="h-4 w-4" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            )
+                                        }
+
+                                        // Handle Standard Products
                                         const product = cartProducts.find((p) => p.id === item.productId)
                                         if (!product) return null
                                         return (
@@ -987,7 +1064,16 @@ export default function CheckoutPage() {
                                                 </div>
                                                 <div className="flex-1 flex flex-col justify-between">
                                                     <div>
-                                                        <h4 className="font-serif text-xl font-bold text-gray-900 mb-2">{product.name}</h4>
+                                                        <div className="flex justify-between items-start">
+                                                            <h4 className="font-serif text-xl font-bold text-gray-900 mb-2">{product.name}</h4>
+                                                            <button
+                                                                onClick={() => removeItem(item.id)}
+                                                                className="text-gray-300 hover:text-red-500 transition-colors p-2"
+                                                            >
+                                                                <span className="sr-only">Remove</span>
+                                                                <X className="h-5 w-5" />
+                                                            </button>
+                                                        </div>
                                                         <p className="text-gold font-bold text-lg">{formatCurrency(product.price * item.quantity)}</p>
                                                     </div>
                                                     <div className="flex items-center gap-6 mt-6">

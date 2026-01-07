@@ -31,11 +31,21 @@ import {
 } from "@/components/ui/select"
 
 export type EventDetails = {
-    eventName: string
+    eventName?: string
     date: Date
     eventType: string
-    guestCount: number
-    venue: string
+    guestCount?: number
+    venue?: string
+    venueAddress?: string
+    startTime?: string
+    endTime?: string
+    venueType?: string
+    logistics?: {
+        notes?: string
+        hasElevator?: boolean
+        hasStairs?: boolean
+        hasLoadingDock?: boolean
+    }
 }
 
 interface EventDetailsDialogProps {

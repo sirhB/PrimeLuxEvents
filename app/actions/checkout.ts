@@ -22,7 +22,13 @@ export interface CheckoutFormData {
 }
 
 export interface CartItem {
-    productId: string
+    productId?: string
+    packageId?: string
+    packageData?: {
+        name: string
+        price: number
+    }
+    packageSelections?: Record<string, string[]>
     quantity: number
     modifiers?: Record<string, any>
 }
@@ -85,12 +91,20 @@ export async function calculateDeliveryFee(deliveryAddress: string): Promise<num
 export async function calculateOrderTotal(items: CartItem[], deliveryAddress: string) {
     const supabase = await createClient()
 
-    // Fetch products
-    const productIds = items.map((item) => item.productId)
-    const { data: products, error } = await supabase.from('products').select('*').in('id', productIds)
+    // Fetch products for standard items
+    const productIds = items
+        .filter(item => item.productId)
+        .map((item) => item.productId as string)
 
-    if (error || !products) {
-        throw new Error('Failed to fetch products')
+    // Also fetch products that are part of packages (if we want to validate stock/existence later),
+    // but for price calculation, we use the package price.
+    // We still return 'products' list for standard items verification.
+
+    let products: any[] = []
+    if (productIds.length > 0) {
+        const { data, error } = await supabase.from('products').select('*').in('id', productIds)
+        if (error) throw new Error('Failed to fetch products')
+        products = data || []
     }
 
     // Calculate subtotal
@@ -98,16 +112,26 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
     let setupFee = 0
 
     items.forEach((item) => {
-        const product = products.find((p) => p.id === item.productId)
-        if (product) {
-            // Calculate modifier price
-            const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
-                return acc + (curr.priceAdjustment || 0)
-            }, 0)
+        // Handle Package Items
+        if (item.packageId && item.packageData) {
+            subtotal += item.packageData.price * item.quantity
+            // Packages might have their own setup fee logic, usually included or 0
+            return
+        }
 
-            subtotal += (product.price + modifiersPrice) * item.quantity
-            if (product.setup_fee) {
-                setupFee += product.setup_fee * item.quantity
+        // Handle Standard Product Items
+        if (item.productId) {
+            const product = products.find((p) => p.id === item.productId)
+            if (product) {
+                // Calculate modifier price
+                const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
+                    return acc + (curr.priceAdjustment || 0)
+                }, 0)
+
+                subtotal += (product.price + modifiersPrice) * item.quantity
+                if (product.setup_fee) {
+                    setupFee += product.setup_fee * item.quantity
+                }
             }
         }
     })
@@ -147,13 +171,31 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         // Calculate totals
         const totals = await calculateOrderTotal(items, formData.deliveryAddress)
 
-        // Validate that all items exist
-        const foundIds = totals.products.map(p => p.id)
-        const missingItems = items.filter(i => !foundIds.includes(i.productId))
+        // Validate that all STANDARD items exist
+        const foundProductIds = totals.products.map(p => p.id)
+        const missingProducts = items.filter(i => i.productId && !foundProductIds.includes(i.productId))
 
-        if (missingItems.length > 0) {
-            console.error('Missing products:', missingItems)
+        if (missingProducts.length > 0) {
+            console.error('Missing products:', missingProducts)
             throw new Error('Some items in your cart are no longer available. Please refresh the page.')
+        }
+
+        // Fetch Package Data for validation and decomposition
+        const packageIds = [...new Set(items.filter(i => i.packageId).map(i => i.packageId))]
+        let packages: any[] = []
+        if (packageIds.length > 0) {
+            const { data, error } = await supabase
+                .from('packages')
+                .select('*, package_items(product_id)')
+                .in('id', packageIds)
+
+            if (error) throw new Error('Failed to fetch package details')
+            packages = data || []
+        }
+
+        const missingPackages = items.filter(i => i.packageId && !packages.find(p => p.id === i.packageId))
+        if (missingPackages.length > 0) {
+            throw new Error('Some packages in your cart are no longer available.')
         }
 
         // Use provided payment intent ID or create a new one (mock if no Stripe key)
@@ -178,30 +220,55 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         // Check for stock availability
         let isOverbooked = false
         const eventDate = formData.eventDate || formData.deliveryDate
-
-        // We'll assume a standard 1-day rental for now, or 3-day window (day before, day of, day after)
-        // For strict checking, let's just check the event date
         const startDate = eventDate
         const endDate = eventDate
 
-        for (const item of items) {
-            const product = totals.products.find(p => p.id === item.productId)
+        // Helper to aggregate required quantities per product ID
+        const requiredQuantities: Record<string, number> = {}
+
+        items.forEach(item => {
+            if (item.productId) {
+                requiredQuantities[item.productId] = (requiredQuantities[item.productId] || 0) + item.quantity
+            } else if (item.packageId) {
+                const pkg = packages.find(p => p.id === item.packageId)
+                if (pkg) {
+                    // Static items
+                    pkg.package_items?.forEach((pi: any) => {
+                        requiredQuantities[pi.product_id] = (requiredQuantities[pi.product_id] || 0) + (item.quantity * (pi.quantity || 1))
+                    })
+                    // Configurable items (Selections)
+                    if (item.packageSelections) {
+                        Object.values(item.packageSelections).flat().forEach(selectedProductId => {
+                            requiredQuantities[selectedProductId] = (requiredQuantities[selectedProductId] || 0) + item.quantity
+                        })
+                    }
+                }
+            }
+        })
+
+        // Check stock for aggregated quantities
+        for (const [productId, qty] of Object.entries(requiredQuantities)) {
+            let product = totals.products.find(p => p.id === productId)
+            if (!product) {
+                const { data } = await supabase.from('products').select('quantity_available, name').eq('id', productId).single()
+                product = data
+            }
+
             if (!product) continue
 
-            // Get total reserved quantity for this product on this date
             const { data: reservations } = await supabase
                 .from('rental_reservations')
                 .select('quantity')
-                .eq('product_id', item.productId)
+                .eq('product_id', productId)
                 .lte('start_date', endDate)
                 .gte('end_date', startDate)
 
             const totalReserved = reservations?.reduce((sum, r) => sum + r.quantity, 0) || 0
-            const available = product.quantity_available || 0 // Default to 0 if not set, or maybe 1? Schema says default 1.
+            const available = product.quantity_available || 1
 
-            if (totalReserved + item.quantity > available) {
+            if (totalReserved + qty > available) {
                 isOverbooked = true
-                console.log(`Overbooking detected for product ${product.name}: Requested ${item.quantity}, Reserved ${totalReserved}, Available ${available}`)
+                console.log(`Overbooking detected for product ${product.name}: Requested ${qty}, Reserved ${totalReserved}, Available ${available}`)
             }
         }
 
@@ -239,46 +306,73 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
             throw new Error('Failed to create order')
         }
 
-        // Create order items
-        const orderItems = items.map((item) => {
-            const product = totals.products.find((p) => p.id === item.productId)
-            const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
-                return acc + (curr.priceAdjustment || 0)
-            }, 0)
-            const priceAtTime = (product?.price || 0) + modifiersPrice
+        // Create order items (Decomposition)
+        const orderItems: any[] = []
 
-            return {
-                order_id: order.id,
-                product_id: item.productId,
-                quantity: item.quantity,
-                price_at_time: priceAtTime,
-                modifiers: item.modifiers || {}
+        items.forEach(item => {
+            if (item.productId) {
+                const product = totals.products.find((p) => p.id === item.productId)
+                const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
+                    return acc + (curr.priceAdjustment || 0)
+                }, 0)
+                const priceAtTime = (product?.price || 0) + modifiersPrice
+
+                orderItems.push({
+                    order_id: order.id,
+                    product_id: item.productId,
+                    quantity: item.quantity,
+                    price_at_time: priceAtTime,
+                    modifiers: item.modifiers || {}
+                })
+            } else if (item.packageId && item.packageData) {
+                const pkg = packages.find(p => p.id === item.packageId)
+                const constituentIds: string[] = []
+
+                if (pkg) {
+                    pkg.package_items?.forEach((pi: any) => constituentIds.push(pi.product_id))
+                }
+                if (item.packageSelections) {
+                    Object.values(item.packageSelections).flat().forEach(id => constituentIds.push(id))
+                }
+
+                if (constituentIds.length > 0) {
+                    const packagePrice = item.packageData.price
+
+                    constituentIds.forEach((prodId, index) => {
+                        orderItems.push({
+                            order_id: order.id,
+                            product_id: prodId,
+                            quantity: item.quantity,
+                            price_at_time: index === 0 ? packagePrice : 0,
+                        })
+                    })
+                }
             }
         })
 
-        const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
-
-        if (itemsError) {
-            console.error('Error creating order items:', itemsError)
-            throw new Error('Failed to create order items')
+        if (orderItems.length > 0) {
+            const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
+            if (itemsError) {
+                console.error('Error creating order items:', itemsError)
+                throw new Error('Failed to create order items')
+            }
         }
 
-        // Create rental reservations to block stock for this order
-        const reservations = items.map((item) => ({
-            product_id: item.productId,
+        // Create rental reservations
+        const reservations = Object.entries(requiredQuantities).map(([productId, qty]) => ({
+            product_id: productId,
             order_id: order.id,
             start_date: startDate,
             end_date: endDate,
-            quantity: item.quantity,
-            status: 'confirmed', // or pending
+            quantity: qty,
+            status: 'confirmed',
         }))
 
-        const { error: reservationError } = await supabase.from('rental_reservations').insert(reservations)
-
-        if (reservationError) {
-            console.error('Error creating reservations:', reservationError)
-            // We don't fail the order here, but we should log it. 
-            // In a real system we might want to rollback or alert admin.
+        if (reservations.length > 0) {
+            const { error: reservationError } = await supabase.from('rental_reservations').insert(reservations)
+            if (reservationError) {
+                console.error('Error creating reservations:', reservationError)
+            }
         }
 
         return {
