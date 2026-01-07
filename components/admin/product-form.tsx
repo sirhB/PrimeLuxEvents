@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 import { Plus, Trash, X } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
+import { ImageUpload } from './image-upload'
 
 
 interface Category {
@@ -46,6 +47,8 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     const router = useRouter()
     const supabase = createClient()
     const [loading, setLoading] = useState(false)
+    const [mainImage, setMainImage] = useState(product?.image_url ? [product.image_url] : [])
+    const [galleryImages, setGalleryImages] = useState<string[]>(product?.images || [])
     interface AssemblyItem {
         name: string
         quantity: number
@@ -185,7 +188,8 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             price: priceInCents,
             stock: parseInt(formData.get('stock') as string),
             category_id: (formData.get('category_id') as string) || null,
-            image_url: formData.get('image_url') as string,
+            image_url: mainImage[0] || null,
+            images: galleryImages,
             is_featured: formData.get('is_featured') === 'on',
             slug: formData.get('slug') as string,
             modifiers: modifiersInCents,
@@ -332,13 +336,12 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="image_url">Image URL</Label>
-                        <Input
-                            id="image_url"
-                            name="image_url"
-                            defaultValue={product?.image_url}
-                            placeholder="https://example.com/image.jpg"
+                    <div className="space-y-4">
+                        <Label>Main Product Image</Label>
+                        <ImageUpload
+                            value={mainImage}
+                            onChange={(urls) => setMainImage(urls)}
+                            multiple={false}
                         />
                     </div>
 
@@ -346,6 +349,20 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                         <Checkbox id="is_featured" name="is_featured" defaultChecked={product?.is_featured} />
                         <Label htmlFor="is_featured" className="!mb-0">Featured Product</Label>
                     </div>
+                </CardContent>
+            </Card>
+
+            {/* Product Gallery */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Product Gallery</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ImageUpload
+                        value={galleryImages}
+                        onChange={(urls) => setGalleryImages(urls)}
+                        multiple={true}
+                    />
                 </CardContent>
             </Card>
 

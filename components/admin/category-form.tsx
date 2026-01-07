@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { ImageUpload } from './image-upload'
 
 interface CategoryFormProps {
     category?: any
@@ -19,6 +20,7 @@ export function CategoryForm({ category }: CategoryFormProps) {
     const router = useRouter()
     const supabase = createClient()
     const [loading, setLoading] = useState(false)
+    const [imageUrl, setImageUrl] = useState(category?.image_url ? [category.image_url] : [])
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -29,7 +31,7 @@ export function CategoryForm({ category }: CategoryFormProps) {
             name: formData.get('name') as string,
             slug: formData.get('slug') as string,
             description: formData.get('description') as string,
-            image_url: formData.get('image_url') as string,
+            image_url: imageUrl[0] || null,
             is_featured: formData.get('is_featured') === 'on',
         }
 
@@ -97,12 +99,11 @@ export function CategoryForm({ category }: CategoryFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="image_url">Image URL</Label>
-                        <Input
-                            id="image_url"
-                            name="image_url"
-                            defaultValue={category?.image_url}
-                            placeholder="https://example.com/image.jpg"
+                        <Label>Category Image</Label>
+                        <ImageUpload
+                            value={imageUrl}
+                            onChange={(urls) => setImageUrl(urls)}
+                            multiple={false}
                         />
                     </div>
 
