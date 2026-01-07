@@ -37,6 +37,15 @@ export default function RentalAgreementPage() {
             color: black !important;
             background-color: transparent !important;
             border-color: #ddd !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+            transition: none !important;
+          }
+          .rental-agreement-container section {
+            overflow: visible !important;
+            height: auto !important;
+            min-height: 0 !important;
           }
           .rental-agreement-container .bg-gold,
           .rental-agreement-container .bg-gold\\/10,
@@ -71,7 +80,7 @@ export default function RentalAgreementPage() {
       <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden border-b border-white/5">
         <div className="container relative z-10 px-4 md:px-6 mx-auto text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 0 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="flex flex-col items-center"
@@ -111,14 +120,13 @@ export default function RentalAgreementPage() {
       <section className="relative py-24 md:py-32 z-10 print:py-0">
         <div className="container px-4 md:px-6 max-w-5xl mx-auto">
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
+            variants={containerVariants as any}
+            initial="visible"
+            animate="visible"
             className="grid gap-12"
           >
             {/* Introductory Clause */}
-            <motion.div variants={itemVariants} className="relative group">
+            <motion.div variants={itemVariants as any} className="relative group">
               <div className="absolute inset-0 bg-gold/5 rounded-[2rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 print:hidden" />
               <div className="relative p-10 md:p-12 rounded-[2rem] bg-white/[0.02] border border-white/5 backdrop-blur-xl print:bg-white print:border-black print:text-black">
                 <div className="flex flex-col md:flex-row gap-8 items-start">
@@ -139,7 +147,7 @@ export default function RentalAgreementPage() {
             </motion.div>
 
             {/* Section I: Financials */}
-            <motion.div variants={itemVariants} className="grid md:grid-cols-12 gap-8 items-start">
+            <motion.div variants={itemVariants as any} className="grid md:grid-cols-12 gap-8 items-start">
               <div className="md:col-span-4 sticky top-24 print:static">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="h-px w-8 bg-gold print:bg-black" />
@@ -175,12 +183,12 @@ export default function RentalAgreementPage() {
             </motion.div>
 
             {/* Divider */}
-            <motion.div variants={itemVariants} className="py-12">
+            <motion.div variants={itemVariants as any} className="py-12">
               <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             </motion.div>
 
             {/* Section II: Accountability */}
-            <motion.div variants={itemVariants} className="grid md:grid-cols-12 gap-8 items-start">
+            <motion.div variants={itemVariants as any} className="grid md:grid-cols-12 gap-8 items-start">
               <div className="md:col-span-4 md:order-2 md:sticky md:top-24 print:static">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="h-px w-8 bg-gold print:bg-black" />
@@ -216,7 +224,7 @@ export default function RentalAgreementPage() {
             </motion.div>
 
             {/* Section III: Logistics (Gold Card) */}
-            <motion.div variants={itemVariants} className="relative py-12 print:py-6">
+            <motion.div variants={itemVariants as any} className="relative py-12 print:py-6">
               <div className="p-10 md:p-16 rounded-[3rem] bg-gradient-to-br from-gold/10 to-transparent border border-gold/20 backdrop-blur-2xl print:bg-white print:border-black print:text-black">
                 <div className="flex flex-col lg:flex-row gap-12">
                   <div className="lg:w-1/3">
@@ -259,7 +267,7 @@ export default function RentalAgreementPage() {
             </motion.div>
 
             {/* Section IV: Post-Use */}
-            <motion.div variants={itemVariants} className="grid md:grid-cols-12 gap-8 items-start">
+            <motion.div variants={itemVariants as any} className="grid md:grid-cols-12 gap-8 items-start">
               <div className="md:col-span-4 sticky top-24 print:static">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="h-px w-8 bg-gold print:bg-black" />
@@ -291,7 +299,7 @@ export default function RentalAgreementPage() {
             </motion.div>
 
             {/* Final Notice & Warning */}
-            <motion.div variants={itemVariants} className="mt-12 text-center max-w-3xl mx-auto space-y-12">
+            <motion.div variants={itemVariants as any} className="mt-12 text-center max-w-3xl mx-auto space-y-12">
               <div className="p-1 border border-gold/20 rounded-full inline-block print:hidden">
                 <div className="px-6 py-2 bg-gold/10 rounded-full text-gold text-[10px] font-bold tracking-[0.3em] uppercase animate-pulse">
                   Legal Acknowledgement
