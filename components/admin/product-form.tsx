@@ -234,13 +234,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                                 const categorySelect = document.getElementsByName('category_id')[0] as HTMLSelectElement
 
                                 if (slugInput && (!slugInput.value || slugInput.value === product?.slug || slugInput.dataset.auto === 'true')) {
-                                    let categoryName = ''
-                                    if (categorySelect && categorySelect.value) {
-                                        const category = categories.find(c => c.id === categorySelect.value)
-                                        if (category) categoryName = category.name
-                                    }
-
-                                    const base = categoryName ? `${categoryName} ${name}` : name
+                                    const base = name
                                     slugInput.value = base
                                         .toLowerCase()
                                         .replace(/[^a-z0-9\s]/g, '')
@@ -313,10 +307,8 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                                     const nameInput = document.getElementById('name') as HTMLInputElement
                                     const slugInput = document.getElementById('slug') as HTMLInputElement
                                     if (nameInput && slugInput && (slugInput.dataset.auto === 'true' || !slugInput.value || slugInput.value === product?.slug)) {
-                                        const category = categories.find(c => c.id === value)
-                                        const categoryName = category ? category.name : ''
                                         const name = nameInput.value
-                                        const base = categoryName ? `${categoryName} ${name}` : name
+                                        const base = name
                                         slugInput.value = base
                                             .toLowerCase()
                                             .replace(/[^a-z0-9\s]/g, '')
