@@ -25,6 +25,14 @@ import { StripeProvider, stripePromise } from '@/components/providers/stripe-pro
 import { StripePaymentForm } from '@/components/checkout/stripe-payment-form'
 import { createPaymentIntent } from '@/app/actions/create-payment-intent'
 import { Elements } from '@stripe/react-stripe-js'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog"
 
 
 
@@ -1070,12 +1078,7 @@ export default function CheckoutPage() {
                                         </div>
                                     )}
 
-                                    {error && (
-                                        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-3 flex items-start gap-2">
-                                            <AlertCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
-                                            <p className="text-sm text-destructive">{error}</p>
-                                        </div>
-                                    )}
+
 
                                     {/* Rental Agreement Agreement */}
                                     <div className="space-y-4 p-6 bg-secondary/10 rounded-xl border border-border/40">
@@ -1135,6 +1138,24 @@ export default function CheckoutPage() {
                     </motion.div>
                 )}
             </div>
+            <Dialog open={!!error} onOpenChange={(open) => !open && setError(null)}>
+                <DialogContent className="sm:max-w-[425px] border-destructive/20">
+                    <DialogHeader>
+                        <div className="flex items-center gap-2 text-destructive mb-2">
+                            <AlertCircle className="h-6 w-6" />
+                            <DialogTitle className="text-xl">Error</DialogTitle>
+                        </div>
+                        <DialogDescription className="text-base pt-2">
+                            {error}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="mt-4">
+                        <Button onClick={() => setError(null)} variant="outline" className="w-full sm:w-auto">
+                            Close
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

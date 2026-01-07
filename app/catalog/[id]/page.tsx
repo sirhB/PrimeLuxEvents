@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useCart } from "@/components/providers/cart-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
 import { createClient } from "@/lib/supabase/client"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
@@ -151,8 +152,29 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const toggleCart = () => {
     if (isInCart) {
       if (cartItem) removeItem(cartItem.id)
+      toast.info("Removed from cart", {
+        description: `${product.name} has been removed from your quote.`
+      })
     } else {
       addItem(product.id, quantity, selectedModifiers)
+      toast.custom((t) => (
+        <div className="flex items-center gap-4 bg-background border border-border p-4 rounded-lg shadow-lg w-full max-w-md">
+          <div className="relative h-16 w-16 rounded-md overflow-hidden bg-secondary flex-shrink-0">
+            <Image
+              src={selectedGalleryImage || product.image_url}
+              alt={product.name}
+              fill
+              className="object-cover"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-medium text-foreground truncate">{product.name}</h4>
+            <p className="text-sm text-muted-foreground">
+              Added to quote • {quantity} {quantity === 1 ? 'unit' : 'units'}
+            </p>
+          </div>
+        </div>
+      ), { duration: 3000 })
     }
   }
 
@@ -248,308 +270,308 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             className="space-y-8 md:space-y-12"
           >
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
-          {/* Image Gallery */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
-            transition={{ duration: 0.6 }}
-            className="lg:sticky lg:top-24"
-          >
-            <ProductGallery
-              images={uniqueGalleryImages}
-              productName={product.name}
-              selectedImage={selectedGalleryImage}
-              className="shadow-2xl shadow-black/5"
-            />
-          </motion.div>
-
-          {/* Details Section */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate={isLoaded ? "visible" : "hidden"}
-            className="flex flex-col gap-6"
-          >
-            {/* Product Information */}
-            <motion.div variants={itemVariants} className="space-y-4">
-              <div>
-                <span className="text-gold text-sm font-medium tracking-[0.2em] uppercase block mb-2">
-                  {product.categories?.name || 'Premium Rental'}
-                </span>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif text-foreground font-medium tracking-tight">
-                  {product.name}
-                </h1>
-              </div>
-              <div className="flex items-baseline gap-3">
-                <span className="text-xl md:text-2xl font-medium text-foreground">
-                  {formatCurrency(basePrice)}
-                </span>
-              </div>
-              <p className="text-base text-muted-foreground leading-relaxed">
-                {product.description}
-              </p>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <Separator className="bg-border/40" />
-            </motion.div>
-
-
-            {/* Features */}
-            {product.features && product.features.length > 0 && (
-              <motion.div variants={itemVariants} className="flex flex-wrap gap-3">
-                {product.features.map((feature, idx) => (
-                  <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/60 bg-secondary/20 text-sm text-foreground/80">
-                    <Star className="h-3 w-3 text-gold fill-gold" />
-                    <span>{feature}</span>
-                  </div>
-                ))}
-              </motion.div>
-            )}
-
-            <motion.div variants={itemVariants}>
-              <Separator className="bg-border/40" />
-            </motion.div>
-
-
-            {/* Quantity Selector */}
-            <motion.div variants={itemVariants} className="space-y-4">
-              <Label className="text-base font-medium">Quantity</Label>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center border border-border/50 rounded-full p-1 bg-secondary/10">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={decrementQuantity}
-                    disabled={quantity <= 1}
-                    className="h-10 w-10 rounded-full hover:bg-gold/10 hover:text-gold transition-colors"
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={maxQuantity}
-                    value={quantity}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value)
-                      if (!isNaN(val) && val >= 1 && val <= maxQuantity) {
-                        setQuantity(val)
-                      }
-                    }}
-                    className="w-16 text-center h-10 text-lg bg-transparent border-none focus-visible:ring-0 p-0"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={incrementQuantity}
-                    disabled={quantity >= maxQuantity}
-                    className="h-10 w-10 rounded-full hover:bg-gold/10 hover:text-gold transition-colors"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  {product.quantity_available ? `${product.quantity_available} available` : 'In Stock'}
-                </span>
-              </div>
-            </motion.div>
-
-            {/* Modifiers Section */}
-            {product.modifiers && product.modifiers.length > 0 && (
-              <motion.div variants={itemVariants} className="space-y-8">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <Separator className="flex-1 bg-border/40" />
-                    <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Customization</span>
-                    <Separator className="flex-1 bg-border/40" />
-                  </div>
-
-                  {product.modifiers.map((modifier) => (
-                    <div key={modifier.id} className="space-y-4">
-                      <Label className="text-base font-medium text-foreground">
-                        {modifier.name}
-                      </Label>
-                      <RadioGroup
-                        onValueChange={(value: string) => handleModifierChange(modifier.id, value)}
-                        value={selectedModifiers[modifier.id]?.id}
-                      >
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {modifier.options?.map((option) => (
-                            <div
-                              key={option.id}
-                              className={cn(
-                                "relative flex items-center space-x-3 border rounded-xl p-4 transition-all duration-300 cursor-pointer overflow-hidden group",
-                                selectedModifiers[modifier.id]?.id === option.id
-                                  ? "border-gold bg-gold/5 shadow-lg shadow-gold/5"
-                                  : "border-border/40 hover:border-gold/30 hover:bg-secondary/20"
-                              )}
-                              onClick={() => handleModifierChange(modifier.id, option.id)}
-                            >
-                              <div className={cn(
-                                "absolute inset-0 bg-gradient-to-r from-gold/10 to-transparent opacity-0 transition-opacity duration-300",
-                                selectedModifiers[modifier.id]?.id === option.id ? "opacity-100" : "group-hover:opacity-50"
-                              )} />
-
-                              <RadioGroupItem value={option.id} id={option.id} className="text-gold border-muted-foreground/40 data-[state=checked]:border-gold z-10" />
-                              <Label htmlFor={option.id} className="cursor-pointer flex-1 font-medium z-10 text-base">
-                                <div className="flex justify-between items-center w-full">
-                                  <span>{option.label}</span>
-                                  {option.priceAdjustment > 0 && (
-                                    <span className="text-gold text-sm font-medium bg-gold/10 px-2 py-0.5 rounded-full">
-                                      +{formatCurrency(option.priceAdjustment)}
-                                    </span>
-                                  )}
-                                </div>
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
-                      </RadioGroup>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            <motion.div variants={itemVariants}>
-              <Separator className="bg-border/40" />
-            </motion.div>
-
-            {/* Pricing Summary */}
-            <motion.div variants={itemVariants} className="space-y-6">
-              <div className="bg-secondary/5 rounded-xl p-6 space-y-4">
-                {modifiersPrice > 0 && (
-                  <div className="flex justify-between items-center text-lg">
-                    <span className="text-muted-foreground">Customizations</span>
-                    <span className="font-medium text-gold">+{formatCurrency(modifiersPrice * quantity)}</span>
-                  </div>
-                )}
-                {setupFee > 0 && (
-                  <div className="flex justify-between items-center text-lg">
-                    <span className="text-muted-foreground">Setup Fee</span>
-                    <span className="font-medium">+{formatCurrency(setupFee)}</span>
-                  </div>
-                )}
-                <Separator className="bg-border/40" />
-                <div className="flex justify-between items-center text-xl font-medium">
-                  <span>Total</span>
-                  <span className="text-gold">{formatCurrency(totalPrice)}</span>
-                </div>
-              </div>
-
-              {/* Add to Cart Button */}
-              <Button
-                onClick={toggleCart}
-                disabled={!canAddToCart}
-                className={cn(
-                  "w-full h-12 text-lg font-medium rounded-full transition-all duration-300",
-                  isInCart
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-gold hover:bg-gold/90 text-black shadow-lg hover:shadow-xl"
-                )}
+              {/* Image Gallery */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
+                transition={{ duration: 0.6 }}
+                className="lg:sticky lg:top-24"
               >
-                {isInCart ? (
-                  <div className="flex items-center gap-2">
-                    <Check className="h-5 w-5" />
-                    Added to Cart
+                <ProductGallery
+                  images={uniqueGalleryImages}
+                  productName={product.name}
+                  selectedImage={selectedGalleryImage}
+                  className="shadow-2xl shadow-black/5"
+                />
+              </motion.div>
+
+              {/* Details Section */}
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate={isLoaded ? "visible" : "hidden"}
+                className="flex flex-col gap-6"
+              >
+                {/* Product Information */}
+                <motion.div variants={itemVariants} className="space-y-4">
+                  <div>
+                    <span className="text-gold text-sm font-medium tracking-[0.2em] uppercase block mb-2">
+                      {product.categories?.name || 'Premium Rental'}
+                    </span>
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-serif text-foreground font-medium tracking-tight">
+                      {product.name}
+                    </h1>
                   </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Plus className="h-5 w-5" />
-                    Add to Cart
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-xl md:text-2xl font-medium text-foreground">
+                      {formatCurrency(basePrice)}
+                    </span>
                   </div>
+                  <p className="text-base text-muted-foreground leading-relaxed">
+                    {product.description}
+                  </p>
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                  <Separator className="bg-border/40" />
+                </motion.div>
+
+
+                {/* Features */}
+                {product.features && product.features.length > 0 && (
+                  <motion.div variants={itemVariants} className="flex flex-wrap gap-3">
+                    {product.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/60 bg-secondary/20 text-sm text-foreground/80">
+                        <Star className="h-3 w-3 text-gold fill-gold" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </motion.div>
                 )}
-              </Button>
 
-              {/* Stock Information */}
-              <div className="text-center text-sm text-muted-foreground">
-                {product.stock > 0 ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-green-600" />
-                    <span>In Stock • Ships within 24 hours</span>
+                <motion.div variants={itemVariants}>
+                  <Separator className="bg-border/40" />
+                </motion.div>
+
+
+                {/* Quantity Selector */}
+                <motion.div variants={itemVariants} className="space-y-4">
+                  <Label className="text-base font-medium">Quantity</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center border border-border/50 rounded-full p-1 bg-secondary/10">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={decrementQuantity}
+                        disabled={quantity <= 1}
+                        className="h-10 w-10 rounded-full hover:bg-gold/10 hover:text-gold transition-colors"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={maxQuantity}
+                        value={quantity}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value)
+                          if (!isNaN(val) && val >= 1 && val <= maxQuantity) {
+                            setQuantity(val)
+                          }
+                        }}
+                        className="w-16 text-center h-10 text-lg bg-transparent border-none focus-visible:ring-0 p-0"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={incrementQuantity}
+                        disabled={quantity >= maxQuantity}
+                        className="h-10 w-10 rounded-full hover:bg-gold/10 hover:text-gold transition-colors"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {product.quantity_available ? `${product.quantity_available} available` : 'In Stock'}
+                    </span>
                   </div>
-                ) : (
-                  <span className="text-red-600">Out of Stock</span>
+                </motion.div>
+
+                {/* Modifiers Section */}
+                {product.modifiers && product.modifiers.length > 0 && (
+                  <motion.div variants={itemVariants} className="space-y-8">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-4">
+                        <Separator className="flex-1 bg-border/40" />
+                        <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">Customization</span>
+                        <Separator className="flex-1 bg-border/40" />
+                      </div>
+
+                      {product.modifiers.map((modifier) => (
+                        <div key={modifier.id} className="space-y-4">
+                          <Label className="text-base font-medium text-foreground">
+                            {modifier.name}
+                          </Label>
+                          <RadioGroup
+                            onValueChange={(value: string) => handleModifierChange(modifier.id, value)}
+                            value={selectedModifiers[modifier.id]?.id}
+                          >
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              {modifier.options?.map((option) => (
+                                <div
+                                  key={option.id}
+                                  className={cn(
+                                    "relative flex items-center space-x-3 border rounded-xl p-4 transition-all duration-300 cursor-pointer overflow-hidden group",
+                                    selectedModifiers[modifier.id]?.id === option.id
+                                      ? "border-gold bg-gold/5 shadow-lg shadow-gold/5"
+                                      : "border-border/40 hover:border-gold/30 hover:bg-secondary/20"
+                                  )}
+                                  onClick={() => handleModifierChange(modifier.id, option.id)}
+                                >
+                                  <div className={cn(
+                                    "absolute inset-0 bg-gradient-to-r from-gold/10 to-transparent opacity-0 transition-opacity duration-300",
+                                    selectedModifiers[modifier.id]?.id === option.id ? "opacity-100" : "group-hover:opacity-50"
+                                  )} />
+
+                                  <RadioGroupItem value={option.id} id={option.id} className="text-gold border-muted-foreground/40 data-[state=checked]:border-gold z-10" />
+                                  <Label htmlFor={option.id} className="cursor-pointer flex-1 font-medium z-10 text-base">
+                                    <div className="flex justify-between items-center w-full">
+                                      <span>{option.label}</span>
+                                      {option.priceAdjustment > 0 && (
+                                        <span className="text-gold text-sm font-medium bg-gold/10 px-2 py-0.5 rounded-full">
+                                          +{formatCurrency(option.priceAdjustment)}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </Label>
+                                </div>
+                              ))}
+                            </div>
+                          </RadioGroup>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
                 )}
-              </div>
-            </motion.div>
 
-            <motion.div variants={itemVariants}>
-              <Separator className="bg-border/40 hidden lg:block" />
-            </motion.div>
+                <motion.div variants={itemVariants}>
+                  <Separator className="bg-border/40" />
+                </motion.div>
 
-            {/* Additional Information */}
-            <motion.div variants={itemVariants}>
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="details" className="border-border/40">
-                  <AccordionTrigger className="text-lg font-serif hover:text-gold transition-colors py-6">
-                    Product Details
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-4 text-base text-muted-foreground pb-6">
-                    {product.sku && (
-                      <div className="flex justify-between py-2 border-b border-border/20 border-dashed">
-                        <span>SKU</span>
-                        <span className="font-medium text-foreground">{product.sku}</span>
+                {/* Pricing Summary */}
+                <motion.div variants={itemVariants} className="space-y-6">
+                  <div className="bg-secondary/5 rounded-xl p-6 space-y-4">
+                    {modifiersPrice > 0 && (
+                      <div className="flex justify-between items-center text-lg">
+                        <span className="text-muted-foreground">Customizations</span>
+                        <span className="font-medium text-gold">+{formatCurrency(modifiersPrice * quantity)}</span>
                       </div>
                     )}
-                    {product.weight && (
-                      <div className="flex justify-between py-2 border-b border-border/20 border-dashed">
-                        <span>Weight</span>
-                        <span className="font-medium text-foreground">{product.weight} lbs</span>
+                    {setupFee > 0 && (
+                      <div className="flex justify-between items-center text-lg">
+                        <span className="text-muted-foreground">Setup Fee</span>
+                        <span className="font-medium">+{formatCurrency(setupFee)}</span>
                       </div>
                     )}
-                    <div className="flex justify-between py-2">
-                      <span>Minimum Rental</span>
-                      <span className="font-medium text-foreground">
-                        {product.minimum_rental_days || 1} {(product.minimum_rental_days || 1) === 1 ? 'day' : 'days'}
-                      </span>
+                    <Separator className="bg-border/40" />
+                    <div className="flex justify-between items-center text-xl font-medium">
+                      <span>Total</span>
+                      <span className="text-gold">{formatCurrency(totalPrice)}</span>
                     </div>
-                  </AccordionContent>
-                </AccordionItem>
+                  </div>
 
-                {product.care_instructions && (
-                  <AccordionItem value="care" className="border-border/40">
-                    <AccordionTrigger className="text-lg font-serif hover:text-gold transition-colors py-6">
-                      Care Instructions
-                    </AccordionTrigger>
-                    <AccordionContent className="text-base text-muted-foreground leading-relaxed pb-6">
-                      {product.care_instructions}
-                    </AccordionContent>
-                  </AccordionItem>
-                )}
+                  {/* Add to Cart Button */}
+                  <Button
+                    onClick={toggleCart}
+                    disabled={!canAddToCart}
+                    className={cn(
+                      "w-full h-12 text-lg font-medium rounded-full transition-all duration-300",
+                      isInCart
+                        ? "bg-green-600 hover:bg-green-700 text-white"
+                        : "bg-gold hover:bg-gold/90 text-black shadow-lg hover:shadow-xl"
+                    )}
+                  >
+                    {isInCart ? (
+                      <div className="flex items-center gap-2">
+                        <Check className="h-5 w-5" />
+                        Added to Cart
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Plus className="h-5 w-5" />
+                        Add to Cart
+                      </div>
+                    )}
+                  </Button>
 
-                <AccordionItem value="rental" className="border-border/40">
-                  <AccordionTrigger className="text-lg font-serif hover:text-gold transition-colors py-6">
-                    Rental Information
-                  </AccordionTrigger>
-                  <AccordionContent className="space-y-4 text-base text-muted-foreground pb-6">
-                    <div className="flex gap-4 items-start">
-                      <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
-                      <p>Standard rental period includes 24-hour use</p>
-                    </div>
-                    <div className="flex gap-4 items-start">
-                      <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
-                      <p>Delivery typically occurs the day before your event</p>
-                    </div>
-                    <div className="flex gap-4 items-start">
-                      <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
-                      <p>Pickup scheduled for the day after your event</p>
-                    </div>
-                    <div className="flex gap-4 items-start">
-                      <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
-                      <p>Setup and installation available for additional fee</p>
-                    </div>
-                    <div className="flex gap-4 items-start">
-                      <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
-                      <p>Damage waiver included with all rentals</p>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </motion.div>
-          </motion.div>
-        </div>
+                  {/* Stock Information */}
+                  <div className="text-center text-sm text-muted-foreground">
+                    {product.stock > 0 ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <ShieldCheck className="h-4 w-4 text-green-600" />
+                        <span>In Stock • Ships within 24 hours</span>
+                      </div>
+                    ) : (
+                      <span className="text-red-600">Out of Stock</span>
+                    )}
+                  </div>
+                </motion.div>
+
+                <motion.div variants={itemVariants}>
+                  <Separator className="bg-border/40 hidden lg:block" />
+                </motion.div>
+
+                {/* Additional Information */}
+                <motion.div variants={itemVariants}>
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="details" className="border-border/40">
+                      <AccordionTrigger className="text-lg font-serif hover:text-gold transition-colors py-6">
+                        Product Details
+                      </AccordionTrigger>
+                      <AccordionContent className="space-y-4 text-base text-muted-foreground pb-6">
+                        {product.sku && (
+                          <div className="flex justify-between py-2 border-b border-border/20 border-dashed">
+                            <span>SKU</span>
+                            <span className="font-medium text-foreground">{product.sku}</span>
+                          </div>
+                        )}
+                        {product.weight && (
+                          <div className="flex justify-between py-2 border-b border-border/20 border-dashed">
+                            <span>Weight</span>
+                            <span className="font-medium text-foreground">{product.weight} lbs</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between py-2">
+                          <span>Minimum Rental</span>
+                          <span className="font-medium text-foreground">
+                            {product.minimum_rental_days || 1} {(product.minimum_rental_days || 1) === 1 ? 'day' : 'days'}
+                          </span>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {product.care_instructions && (
+                      <AccordionItem value="care" className="border-border/40">
+                        <AccordionTrigger className="text-lg font-serif hover:text-gold transition-colors py-6">
+                          Care Instructions
+                        </AccordionTrigger>
+                        <AccordionContent className="text-base text-muted-foreground leading-relaxed pb-6">
+                          {product.care_instructions}
+                        </AccordionContent>
+                      </AccordionItem>
+                    )}
+
+                    <AccordionItem value="rental" className="border-border/40">
+                      <AccordionTrigger className="text-lg font-serif hover:text-gold transition-colors py-6">
+                        Rental Information
+                      </AccordionTrigger>
+                      <AccordionContent className="space-y-4 text-base text-muted-foreground pb-6">
+                        <div className="flex gap-4 items-start">
+                          <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
+                          <p>Standard rental period includes 24-hour use</p>
+                        </div>
+                        <div className="flex gap-4 items-start">
+                          <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
+                          <p>Delivery typically occurs the day before your event</p>
+                        </div>
+                        <div className="flex gap-4 items-start">
+                          <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
+                          <p>Pickup scheduled for the day after your event</p>
+                        </div>
+                        <div className="flex gap-4 items-start">
+                          <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
+                          <p>Setup and installation available for additional fee</p>
+                        </div>
+                        <div className="flex gap-4 items-start">
+                          <div className="h-2 w-2 rounded-full bg-gold mt-2 flex-shrink-0" />
+                          <p>Damage waiver included with all rentals</p>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </motion.div>
+              </motion.div>
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>
