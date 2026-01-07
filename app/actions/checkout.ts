@@ -367,6 +367,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
 
                 if (packageContents.length > 0) {
                     const packagePrice = item.packageData.price
+                    const bundleId = crypto.randomUUID()
 
                     packageContents.forEach((content, index) => {
                         if (content.productId) {
@@ -375,7 +376,10 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                                 product_id: content.productId,
                                 quantity: item.quantity * content.quantity,
                                 price_at_time: index === 0 ? packagePrice : 0,
-                                modifiers: {}
+                                modifiers: {},
+                                package_id: item.packageId,
+                                package_name: item.packageData?.name,
+                                bundle_id: bundleId
                             })
                         }
                     })

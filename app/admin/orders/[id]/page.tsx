@@ -1,5 +1,7 @@
+import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import { Package } from 'lucide-react'
 import {
     Card,
     CardContent,
@@ -142,16 +144,74 @@ export default async function OrderDetailsPage({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {order.order_items.map((item: any) => (
-                                    <TableRow key={item.id} className="border-[var(--dashboard-border)] hover:bg-[var(--dashboard-card-hover)]">
-                                        <TableCell className="text-[var(--dashboard-text)]">{item.products?.name || 'Unknown Product'}</TableCell>
-                                        <TableCell className="text-[var(--dashboard-text)]">{item.quantity}</TableCell>
-                                        <TableCell className="text-[var(--dashboard-text)]">{formatCents(item.price_at_time)}</TableCell>
-                                        <TableCell className="text-right text-[var(--dashboard-text)]">
-                                            {formatCents(item.quantity * item.price_at_time)}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                {(() => {
+                                    const bundles: any[] = []
+                                    const standalone: any[] = []
+                                    const bundleMap = new Map()
+
+                                    order.order_items.forEach((item: any) => {
+                                        if (item.bundle_id) {
+                                            if (!bundleMap.has(item.bundle_id)) {
+                                                const b = { id: item.bundle_id, name: item.package_name || 'Package', price: 0, items: [] }
+                                                bundleMap.set(item.bundle_id, b)
+                                                bundles.push(b)
+                                            }
+                                            const b = bundleMap.get(item.bundle_id)
+                                            if (item.price_at_time > 0) b.price = item.price_at_time
+                                            b.items.push(item)
+                                        } else {
+                                            standalone.push(item)
+                                        }
+                                    })
+
+                                    return (
+                                        <>
+                                            {standalone.map((item: any) => (
+                                                <TableRow key={item.id} className="border-[var(--dashboard-border)] hover:bg-[var(--dashboard-card-hover)]">
+                                                    <TableCell className="text-[var(--dashboard-text)]">
+                                                        <div className="flex items-center gap-3">
+                                                            {item.products?.name || 'Unknown Product'}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-[var(--dashboard-text)]">{item.quantity}</TableCell>
+                                                    <TableCell className="text-[var(--dashboard-text)]">{formatCents(item.price_at_time)}</TableCell>
+                                                    <TableCell className="text-right text-[var(--dashboard-text)]">
+                                                        {formatCents(item.quantity * item.price_at_time)}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                            {bundles.map((bundle: any) => (
+                                                <React.Fragment key={bundle.id}>
+                                                    <TableRow className="border-[var(--dashboard-border)] bg-[var(--dashboard-card-hover)]/30">
+                                                        <TableCell className="text-[var(--dashboard-accent-gold)] font-medium">
+                                                            <div className="flex items-center gap-2">
+                                                                <Package className="h-4 w-4" />
+                                                                {bundle.name}
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell className="text-[var(--dashboard-text)]">-</TableCell>
+                                                        <TableCell className="text-[var(--dashboard-text)]">{formatCents(bundle.price)}</TableCell>
+                                                        <TableCell className="text-right text-[var(--dashboard-accent-gold)] font-bold">
+                                                            {formatCents(bundle.price)}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                    {bundle.items.map((subItem: any) => (
+                                                        <TableRow key={subItem.id} className="border-[var(--dashboard-border)] hover:bg-[var(--dashboard-card-hover)] opacity-70">
+                                                            <TableCell className="text-[var(--dashboard-text)] pl-10 text-xs italic">
+                                                                - {subItem.products?.name}
+                                                            </TableCell>
+                                                            <TableCell className="text-[var(--dashboard-text)] text-xs">{subItem.quantity}</TableCell>
+                                                            <TableCell className="text-[var(--dashboard-text)] text-xs">{formatCents(subItem.price_at_time)}</TableCell>
+                                                            <TableCell className="text-right text-[var(--dashboard-text)] text-xs">
+                                                                {formatCents(subItem.quantity * subItem.price_at_time)}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </React.Fragment>
+                                            ))}
+                                        </>
+                                    )
+                                })()}
                                 <TableRow className="border-[var(--dashboard-border)] hover:bg-transparent">
                                     <TableCell colSpan={3} className="font-bold text-right text-[var(--dashboard-text)] uppercase text-sm tracking-wider">
                                         Total Amount

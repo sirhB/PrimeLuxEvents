@@ -57,7 +57,6 @@ function OrderConfirmationContent() {
 
                     const particleCount = 50 * (timeLeft / duration)
 
-                    // since particles fall down, start a bit higher than random
                     confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } })
                     confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } })
                 }, 250)
@@ -68,6 +67,33 @@ function OrderConfirmationContent() {
 
         fetchOrder()
     }, [orderId])
+
+    // Derived variables for grouping
+    const bundles: any[] = []
+    const standalone: any[] = []
+    const bundleMap = new Map()
+
+    orderItems.forEach(item => {
+        if (item.bundle_id) {
+            if (!bundleMap.has(item.bundle_id)) {
+                const b = {
+                    id: item.bundle_id,
+                    name: item.package_name || 'Package',
+                    price: 0,
+                    items: []
+                }
+                bundleMap.set(item.bundle_id, b)
+                bundles.push(b)
+            }
+            const b = bundleMap.get(item.bundle_id)
+            if (item.price_at_time > 0) {
+                b.price = item.price_at_time
+            }
+            b.items.push(item)
+        } else {
+            standalone.push(item)
+        }
+    })
 
     if (isLoading) {
         return (
@@ -94,7 +120,6 @@ function OrderConfirmationContent() {
 
     return (
         <div className="min-h-screen bg-background py-12 relative overflow-hidden">
-            {/* Background decoration */}
             <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-amber-50/50 to-transparent -z-10" />
 
             <div className="container max-w-3xl mx-auto px-4">
@@ -128,7 +153,6 @@ function OrderConfirmationContent() {
                     transition={{ delay: 0.2, duration: 0.5 }}
                     className="space-y-6"
                 >
-                    {/* Order Summary Card */}
                     <Card className="overflow-hidden border-border/50 shadow-sm">
                         <CardHeader className="bg-muted/30 border-b border-border/50 pb-4">
                             <div className="flex items-center justify-between">
@@ -140,7 +164,7 @@ function OrderConfirmationContent() {
                         </CardHeader>
                         <CardContent className="p-0">
                             <div className="divide-y divide-border/50">
-                                {orderItems.map((item) => (
+                                {standalone.map((item) => (
                                     <div key={item.id} className="flex gap-4 p-6 hover:bg-muted/10 transition-colors">
                                         <div className="h-20 w-20 rounded-lg border bg-muted overflow-hidden flex-shrink-0">
                                             <img
@@ -156,6 +180,40 @@ function OrderConfirmationContent() {
                                         <div className="text-right">
                                             <p className="font-medium">{formatCurrency(item.price_at_time * item.quantity)}</p>
                                             <p className="text-sm text-muted-foreground">{formatCurrency(item.price_at_time)} ea</p>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {bundles.map((bundle) => (
+                                    <div key={bundle.id} className="p-6 hover:bg-muted/10 transition-colors border-t border-border/50 first:border-t-0">
+                                        <div className="flex gap-4 mb-4">
+                                            <div className="h-20 w-20 rounded-lg border bg-amber-50 flex items-center justify-center flex-shrink-0 text-amber-600">
+                                                <Package className="h-10 w-10" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <h4 className="font-medium text-base text-amber-900">{bundle.name}</h4>
+                                                        <p className="text-[10px] uppercase tracking-widest font-bold text-amber-600 mt-1">Package Deal</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="font-medium text-amber-900">{formatCurrency(bundle.price)}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="ml-24 space-y-2 pt-2 border-t border-border/10">
+                                            <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400 mb-2">Contents</p>
+                                            {bundle.items.map((item: any) => (
+                                                <div key={item.id} className="flex justify-between items-center text-sm">
+                                                    <span className="text-muted-foreground flex items-center gap-2">
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+                                                        {item.products?.name}
+                                                    </span>
+                                                    <span className="text-gray-400">x{item.quantity}</span>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 ))}
@@ -190,9 +248,7 @@ function OrderConfirmationContent() {
                         </CardContent>
                     </Card>
 
-                    {/* Details Grid */}
                     <div className="grid md:grid-cols-2 gap-6">
-                        {/* Delivery Details */}
                         <Card className="border-border/50 shadow-sm h-full">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg font-serif">
@@ -230,7 +286,6 @@ function OrderConfirmationContent() {
                             </CardContent>
                         </Card>
 
-                        {/* Contact Info */}
                         <Card className="border-border/50 shadow-sm h-full">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2 text-lg font-serif">
@@ -258,7 +313,6 @@ function OrderConfirmationContent() {
                         </Card>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
                         <Button asChild variant="outline" size="lg" className="h-12 px-8">
                             <Link href="/catalog">

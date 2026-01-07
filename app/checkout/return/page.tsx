@@ -60,13 +60,14 @@ function CheckoutReturnContent() {
                         sameDayPickup: parsedData.sameDayPickup,
                     }
 
-                    const cartItems: CartItem[] = items
-                        .filter(item => !!item.productId)
-                        .map((item) => ({
-                            productId: item.productId as string,
-                            quantity: item.quantity,
-                            modifiers: item.modifiers
-                        }))
+                    const cartItems: CartItem[] = items.map((item) => ({
+                        productId: item.productId,
+                        packageId: item.packageId,
+                        packageData: item.packageData,
+                        packageSelections: item.packageSelections,
+                        quantity: item.quantity,
+                        modifiers: item.modifiers
+                    }))
 
                     // Create the order
                     const result = await createOrder(finalFormData, cartItems, paymentIntentId)
