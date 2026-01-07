@@ -1020,7 +1020,6 @@ export default function CheckoutPage() {
                                         )
                                     })}
                                 </div>
-                                </div>
                             </div>
 
                             {/* Payment Method */}
@@ -1097,7 +1096,7 @@ export default function CheckoutPage() {
                                     <div className="p-8 bg-gold/5 rounded-[2rem] border border-gold/10 space-y-4">
                                         <div className="flex items-start gap-5">
                                             <div className="pt-0.5">
-                                                <div 
+                                                <div
                                                     onClick={() => setAgreesToRentalAgreement(!agreesToRentalAgreement)}
                                                     className={cn(
                                                         "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 cursor-pointer",
@@ -1148,7 +1147,7 @@ export default function CheckoutPage() {
                                         </Button>
                                     )}
 
-                                    <button 
+                                    <button
                                         onClick={handlePrevStep}
                                         className="w-full text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-gold transition-colors flex items-center justify-center gap-2 group py-4"
                                     >
