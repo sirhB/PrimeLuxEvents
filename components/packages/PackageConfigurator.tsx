@@ -141,7 +141,7 @@ export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
             }
         )
 
-        toast.success(`'${pkg.name}' added to your quote request!`)
+        toast.success(`'${pkg.name}' added to your cart!`)
         // Optional: Redirect to cart or keep exploring
     }
 
@@ -243,7 +243,7 @@ export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
                             disabled={!isValidStep}
                             className="bg-gold hover:bg-gold/90 text-black w-40"
                         >
-                            Add to Quote
+                            Add to Cart
                         </Button>
                     ) : (
                         <Button
@@ -307,12 +307,12 @@ export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
                             className="w-full mt-6 bg-gold hover:bg-gold/90 text-black h-12 text-lg"
                             disabled={!isLastStep || !isValidStep}
                         >
-                            Add to Quote Request
+                            Add to Cart
                         </Button>
 
                         {!isLastStep && (
                             <p className="text-xs text-center text-muted-foreground mt-2">
-                                Complete all steps to add to quote
+                                Complete all steps to add to cart
                             </p>
                         )}
                     </Card>

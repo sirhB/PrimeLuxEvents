@@ -18,7 +18,11 @@ export function CartSheet() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      if (items.length === 0) {
+      const productIds = items
+        .filter(item => item.productId)
+        .map(item => item.productId)
+
+      if (productIds.length === 0) {
         setProducts([])
         return
       }
@@ -27,7 +31,7 @@ export function CartSheet() {
       const { data } = await supabase
         .from('products')
         .select('*')
-        .in('id', items.map(item => item.productId))
+        .in('id', productIds)
 
       if (data) {
         setProducts(data)
@@ -89,6 +93,68 @@ export function CartSheet() {
             ) : (
               <div className="space-y-8">
                 {items.map((item) => {
+                  // Handle Package Items
+                  if (item.packageId && item.packageData) {
+                    const { name, price } = item.packageData
+                    const itemPrice = price // Price is already in cents and includes savings
+
+                    return (
+                      <motion.div
+                        key={item.id}
+                        layout
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="flex gap-6 group"
+                      >
+                        <div className="h-28 w-24 rounded-2xl overflow-hidden flex-shrink-0 shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-border/5 bg-white relative">
+                          <div className="absolute inset-0 bg-gold/5 flex items-center justify-center">
+                            <span className="text-xs text-gold font-bold uppercase tracking-widest">Package</span>
+                          </div>
+                        </div>
+                        <div className="flex-1 flex flex-col justify-between py-1">
+                          <div className="space-y-1">
+                            <div className="flex justify-between items-start gap-4">
+                              <div className="flex-1">
+                                <h3 className="font-serif text-lg font-bold text-gray-900 leading-tight">{name}</h3>
+                              </div>
+                              <button
+                                onClick={() => removeItem(item.id)}
+                                className="text-gray-300 hover:text-red-500 transition-colors p-1"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                            <div className="text-[10px] uppercase tracking-widest font-bold text-gray-400">
+                              Package Deal
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between mt-4">
+                            <div className="flex items-center gap-4 bg-white rounded-full px-3 py-1 shadow-sm border border-border/5">
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                disabled={item.quantity <= 1}
+                                className="text-gray-400 hover:text-gold disabled:opacity-30 transition-colors"
+                              >
+                                <Minus className="h-3 w-3" />
+                              </button>
+                              <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                className="text-gray-400 hover:text-gold transition-colors"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </button>
+                            </div>
+                            <p className="text-sm font-bold text-gray-900">{formatCurrency(itemPrice * item.quantity)}</p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )
+                  }
+
+                  // Handle Product Items
                   const product = products.find((p) => p.id === item.productId)
                   if (!product) return null
 
@@ -178,11 +244,21 @@ export function CartSheet() {
                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">Subtotal</span>
                 <span className="font-serif text-2xl font-light text-gray-900">
                   {formatCurrency(items.reduce((acc, item) => {
-                    const product = products.find(p => p.id === item.productId)
-                    if (!product) return acc
-                    const price = product.rental_price_daily || product.price
-                    const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
-                    return acc + (price + modifiersPrice) * item.quantity
+                    // Handle Package
+                    if (item.packageId && item.packageData) {
+                      return acc + (item.packageData.price * item.quantity)
+                    }
+
+                    // Handle Product
+                    if (item.productId) {
+                      const product = products.find(p => p.id === item.productId)
+                      if (!product) return acc
+                      const price = product.rental_price_daily || product.price
+                      const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
+                      return acc + (price + modifiersPrice) * item.quantity
+                    }
+
+                    return acc
                   }, 0))}
                 </span>
               </div>
