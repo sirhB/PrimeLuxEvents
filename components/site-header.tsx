@@ -59,10 +59,10 @@ export function SiteHeader() {
 
       <header
         className={cn(
-          "sticky top-0 z-50 w-full transition-all duration-500 border-b",
+          "sticky top-0 z-50 w-full transition-all duration-500",
           scrolled
-            ? "bg-[#FDFBF7]/90 backdrop-blur-xl py-3 border-border/10 shadow-sm"
-            : "bg-[#FDFBF7] py-6 border-transparent"
+            ? "bg-[#1A1A1A]/80 backdrop-blur-xl py-3 border-b border-white/5 shadow-2xl"
+            : "bg-transparent py-6 border-b border-transparent"
         )}
       >
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
@@ -70,13 +70,13 @@ export function SiteHeader() {
           <div className="flex lg:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="hover:bg-gold/10">
+                <Button variant="ghost" size="icon" className="hover:bg-gold/10 text-white">
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-full sm:w-[400px] bg-[#FDFBF7] border-r-0 p-0">
+              <SheetContent side="left" className="w-full sm:w-[400px] bg-[#1A1A1A] border-r border-white/5 p-0 text-white">
                 <div className="flex flex-col h-full">
-                  <div className="p-8 border-b border-border/10">
+                  <div className="p-8 border-b border-white/5">
                     <Link href="/" onClick={() => setIsOpen(false)} className="font-serif text-2xl font-light tracking-tighter">
                       PrimeLux<span className="text-gold">.</span>
                     </Link>
@@ -100,7 +100,7 @@ export function SiteHeader() {
                       Inquire
                     </Link>
                   </nav>
-                  <div className="p-8 border-t border-border/10 flex gap-6">
+                  <div className="p-8 border-t border-white/5 flex gap-6">
                     <Instagram className="h-5 w-5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer" />
                     <Facebook className="h-5 w-5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer" />
                   </div>
@@ -111,7 +111,7 @@ export function SiteHeader() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <span className="font-serif text-2xl md:text-3xl font-light tracking-tighter transition-colors group-hover:text-gold">
+            <span className="font-serif text-2xl md:text-3xl font-light tracking-tighter text-white transition-colors group-hover:text-gold">
               PrimeLux<span className="text-gold">.</span>
             </span>
           </Link>
@@ -124,7 +124,7 @@ export function SiteHeader() {
                 href={link.href}
                 className={cn(
                   "text-[11px] font-bold uppercase tracking-[0.2em] transition-all relative group",
-                  pathname === link.href ? "text-gold" : "text-gray-600 hover:text-black"
+                  pathname === link.href ? "text-gold" : "text-gray-400 hover:text-white"
                 )}
               >
                 {link.label}
@@ -138,18 +138,18 @@ export function SiteHeader() {
 
           {/* Actions */}
           <div className="flex items-center gap-2 md:gap-6">
-            <div className="hidden sm:block">
+            <div className="hidden sm:block text-white">
               <SearchTrigger onClick={() => setIsSearchOpen(true)} />
             </div>
 
             <Link
               href="/contact"
-              className="hidden md:block text-[11px] font-bold uppercase tracking-[0.2em] px-6 py-3 bg-[#1A1A1A] text-white rounded-full hover:bg-gold hover:text-black transition-all duration-300"
+              className="hidden md:block text-[11px] font-bold uppercase tracking-[0.2em] px-6 py-3 bg-gold text-black rounded-full hover:bg-white transition-all duration-500 hover:scale-105"
             >
               Inquire
             </Link>
 
-            <div className="relative">
+            <div className="relative text-white">
               <CartSheet />
             </div>
           </div>

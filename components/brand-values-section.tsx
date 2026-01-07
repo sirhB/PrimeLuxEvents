@@ -52,17 +52,18 @@ export function BrandValuesSection({
     : defaultValues
 
   return (
-    <section className="py-24 md:py-40 bg-[#FDFBF7] relative overflow-hidden">
-      {/* Decorative background element */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-24 bg-gradient-to-b from-gold/50 to-transparent" />
+    <section className="py-24 md:py-40 bg-[#1A1A1A] text-white relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gold/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-24">
+        <div className="text-center max-w-3xl mx-auto mb-24 md:mb-32">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-4 block"
+            className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-6 block"
           >
             Our Philosophy
           </motion.span>
@@ -71,7 +72,7 @@ export function BrandValuesSection({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-6xl font-serif font-light mb-8 tracking-tight"
+            className="text-4xl md:text-8xl font-serif font-light mb-8 tracking-tighter leading-[0.9]"
           >
             {title}
           </motion.h2>
@@ -80,13 +81,13 @@ export function BrandValuesSection({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-lg text-gray-500 font-light leading-relaxed"
+            className="text-xl text-gray-400 font-light leading-relaxed"
           >
             {description}
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16">
           {displayValues.map((value, index) => (
             <motion.div
               key={index}
@@ -96,11 +97,11 @@ export function BrandValuesSection({
               transition={{ delay: index * 0.1 + 0.3 }}
               className="flex flex-col items-center text-center group"
             >
-              <div className="h-20 w-20 rounded-full bg-white shadow-[0_10px_40px_rgba(0,0,0,0.03)] flex items-center justify-center mb-8 transition-all duration-500 group-hover:scale-110 group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.06)] border border-border/5">
-                <value.icon className="h-8 w-8 text-gold stroke-[1.5]" />
+              <div className="h-24 w-24 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-10 transition-all duration-500 group-hover:scale-110 group-hover:bg-gold group-hover:border-gold group-hover:rotate-6">
+                <value.icon className="h-10 w-10 text-gold transition-colors duration-500 group-hover:text-black stroke-[1.2]" />
               </div>
-              <h3 className="text-xl font-serif font-bold mb-4 tracking-tight group-hover:text-gold transition-colors">{value.title}</h3>
-              <p className="text-gray-500 font-light leading-relaxed text-sm">{value.description}</p>
+              <h3 className="text-2xl font-serif font-light mb-6 tracking-tight group-hover:text-gold transition-colors">{value.title}</h3>
+              <p className="text-gray-400 font-light leading-relaxed text-base">{value.description}</p>
             </motion.div>
           ))}
         </div>

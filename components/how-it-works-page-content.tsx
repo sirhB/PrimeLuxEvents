@@ -4,10 +4,12 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { CheckCircle2, ArrowRight, Sparkles, Clock, Shield } from "lucide-react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { CheckCircle2, ArrowRight, Sparkles, Clock, Shield, Search, MousePointerClick, CalendarCheck, PartyPopper } from "lucide-react"
+import { motion, useScroll, useTransform, useInView } from "framer-motion"
+import { useRef } from "react"
 import { EditableContent } from "@/components/admin/editable-content"
 import { EditableList } from "@/components/admin/editable-list"
+import { cn } from "@/lib/utils"
 
 interface HowItWorksPageContentProps {
     content: any
@@ -18,46 +20,72 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
     const steps = content['howitworks.steps.list'] || []
     const faqs = content['howitworks.faq.list'] || []
 
+    // Hardcoded images for a premium feel as per the new design
+    const processImages = [
+        "/images/luxury_furniture_collection_1767781427931.png",
+        "/images/luxury_selection_interface_1767781469895.png",
+        "/images/luxury-event-hero.png", // Use hero as a high-quality fallback for Step 3
+        "/images/luxury_event_setup_celebration_1767781442112.png"
+    ]
+
+    const containerRef = useRef<HTMLDivElement>(null)
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start start", "end end"]
+    })
+
     return (
-        <>
+        <div ref={containerRef} className="bg-[#1A1A1A] text-white selection:bg-gold selection:text-black">
             {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-secondary/20 via-background to-secondary/10">
-                {/* Background Pattern */}
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5" />
-                <motion.div
-                    className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.5 }}
-                />
+            <section className="relative h-screen flex items-center justify-center overflow-hidden">
+                {/* Background Elements */}
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-10 mix-blend-overlay" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-[#1A1A1A]" />
+                    <motion.div
+                        initial={{ opacity: 0, scale: 1.1 }}
+                        animate={{ opacity: 0.3, scale: 1 }}
+                        transition={{ duration: 2 }}
+                        className="absolute inset-0"
+                    >
+                        <Image
+                            src="/images/luxury_event_setup_celebration_1767781442112.png"
+                            alt="Luxury Event Background"
+                            fill
+                            className="object-cover"
+                        />
+                    </motion.div>
+                </div>
 
                 <div className="container relative z-10 px-4 md:px-6 text-center">
                     <motion.div
-                        initial={{ opacity: 0, y: 60 }}
+                        initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, ease: "easeOut" }}
-                        className="max-w-4xl mx-auto"
+                        className="max-w-5xl mx-auto"
                     >
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-sm font-medium mb-8"
+                            className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-12"
                         >
-                            <Sparkles className="h-4 w-4" />
-                            How It Works
+                            <Sparkles className="h-3 w-3" />
+                            Premium Experience
                         </motion.div>
 
-                        <EditableContent
-                            contentKey="howitworks.hero.title"
-                            initialValue={content['howitworks.hero.title']}
-                            isEditing={isEditing}
-                            as={motion.h1}
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.4 }}
-                            className="text-6xl md:text-8xl font-serif font-light tracking-tight text-foreground mb-6"
-                        />
+                        <div className="relative mb-8">
+                            <EditableContent
+                                contentKey="howitworks.hero.title"
+                                initialValue={content['howitworks.hero.title']}
+                                isEditing={isEditing}
+                                as={motion.h1}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.4 }}
+                                className="text-6xl md:text-9xl font-serif font-light tracking-tighter text-white mb-6 leading-[0.9]"
+                            />
+                        </div>
 
                         <EditableContent
                             contentKey="howitworks.hero.description"
@@ -68,26 +96,22 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.6 }}
-                            className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto mb-12"
+                            className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-2xl mx-auto mb-16"
                         />
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.8 }}
-                            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+                            className="flex flex-col sm:flex-row gap-8 justify-center items-center"
                         >
-                            <Button
-                                asChild
-                                size="lg"
-                                className="group border-border/50 hover:border-gold hover:bg-gold/5 transition-all duration-300"
+                            <Link
+                                href="#steps"
+                                className="group relative h-16 inline-flex items-center justify-center px-12 overflow-hidden rounded-full bg-gold text-black text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-500 hover:scale-105"
                             >
-                                <Link href="#steps" className="flex items-center gap-2">
-                                    <Clock className="h-4 w-4 group-hover:rotate-12 transition-transform" />
-                                    Explore Our Process
-                                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                            </Button>
+                                <span className="relative z-10">Explore Our Process</span>
+                                <div className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
+                            </Link>
                         </motion.div>
                     </motion.div>
                 </div>
@@ -96,233 +120,182 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 2 }}
-                    className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+                    transition={{ delay: 1.5, duration: 1 }}
+                    className="absolute bottom-12 left-1/2 -translate-x-1/2"
                 >
-                    <motion.div
-                        animate={{ y: [0, 10, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center"
-                    >
-                        <motion.div
-                            animate={{ y: [0, 12, 0] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="w-1 h-3 bg-muted-foreground/50 rounded-full mt-2"
-                        />
-                    </motion.div>
+                    <div className="flex flex-col items-center gap-4">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold/60">Scroll to Begin</span>
+                        <div className="w-px h-20 bg-gradient-to-b from-gold/60 to-transparent" />
+                    </div>
                 </motion.div>
             </section>
 
             {/* Steps Section */}
-            <section id="steps" className="py-24 md:py-32 bg-background">
-                <div className="container px-4 md:px-6">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
-                        className="text-center max-w-3xl mx-auto mb-20"
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            whileInView={{ scale: 1, opacity: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-sm font-medium mb-8"
-                        >
-                            <Shield className="h-4 w-4" />
-                            Our Process
-                        </motion.div>
-                        <h2 className="text-4xl md:text-5xl font-serif text-foreground mb-6">
-                            Seamless From Start to Finish
-                        </h2>
-                        <p className="text-xl text-muted-foreground font-light">
-                            Every step is designed to make your event planning effortless and elegant.
-                        </p>
-                    </motion.div>
+            <section id="steps" className="relative py-24 md:py-48 overflow-hidden">
+                <div className="absolute top-0 left-1/2 w-px h-full bg-white/5 -translate-x-1/2 z-0" />
+                <motion.div
+                    style={{ scaleY: scrollYProgress }}
+                    className="absolute top-0 left-1/2 w-px h-full bg-gradient-to-b from-gold via-gold to-transparent -translate-x-1/2 z-0 origin-top"
+                />
 
-                    <EditableList
-                        contentKey="howitworks.steps.list"
-                        items={steps}
-                        isEditing={isEditing}
-                        itemSchema={{
-                            title: { type: 'text', label: 'Title', placeholder: 'Step Title' },
-                            description: { type: 'textarea', label: 'Description', placeholder: 'Step Description' },
-                            image: { type: 'text', label: 'Image URL', placeholder: '/images/example.jpg' },
-                            details: { type: 'array', label: 'Key Details', placeholder: 'Detail 1\nDetail 2\nDetail 3' }
-                        }}
-                        renderItem={(step: any, index: number) => (
-                            <StepCard
-                                key={index}
-                                step={step}
-                                index={index}
-                            />
-                        )}
-                    />
-                </div>
-            </section>
-
-            {/* Concierge Service */}
-            <section className="py-24 md:py-32 bg-gradient-to-br from-gold via-gold to-gold/90 text-black relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay" />
                 <div className="container px-4 md:px-6 relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        className="text-center max-w-3xl mx-auto mb-16"
+                        className="text-center max-w-3xl mx-auto mb-32 md:mb-56"
                     >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            whileInView={{ scale: 1, opacity: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/10 border border-black/20 text-black text-sm font-medium mb-8"
-                        >
-                            <Sparkles className="h-4 w-4" />
-                            Premium Service
-                        </motion.div>
+                        <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">The Journey</span>
+                        <h2 className="text-4xl md:text-7xl font-serif font-light text-white mb-8 tracking-tighter">
+                            A Seamless Path to Luxury
+                        </h2>
+                        <p className="text-xl text-gray-400 font-light leading-relaxed">
+                            Every step of our process is meticulously crafted to ensure your event planning is as elegant as the celebration itself.
+                        </p>
                     </motion.div>
 
-                    <div className="grid lg:grid-cols-2 gap-16 items-center">
+                    <div className="space-y-32 md:space-y-64">
+                        {steps.map((step: any, index: number) => (
+                            <StepCard
+                                key={index}
+                                step={{
+                                    ...step,
+                                    image: processImages[index] || step.image
+                                }}
+                                index={index}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Concierge Service */}
+            <section className="py-24 md:py-48 bg-[#151515] relative overflow-hidden border-t border-white/5">
+                <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay" />
+                <div className="container px-4 md:px-6 relative z-10">
+                    <div className="grid lg:grid-cols-2 gap-24 items-center">
                         <motion.div
-                            initial={{ opacity: 0, x: -50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            className="space-y-8"
+                            transition={{ duration: 1 }}
+                            className="relative aspect-[4/5] overflow-hidden rounded-2xl"
                         >
-                            <EditableContent
-                                contentKey="howitworks.concierge.title"
-                                initialValue={content['howitworks.concierge.title']}
-                                isEditing={isEditing}
-                                as="h2"
-                                className="text-4xl md:text-6xl font-serif font-light"
+                            <Image
+                                src="/images/premium_concierge_service_1767781456386.png"
+                                alt="Concierge Service"
+                                fill
+                                className="object-cover"
                             />
-                            <EditableContent
-                                contentKey="howitworks.concierge.description"
-                                initialValue={content['howitworks.concierge.description']}
-                                type="textarea"
-                                isEditing={isEditing}
-                                as="p"
-                                className="text-black/80 text-xl leading-relaxed font-light"
-                            />
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.6, delay: 0.4 }}
-                            >
-                                <Button asChild size="lg" className="mt-4 bg-black text-white hover:bg-black/80 h-14 text-lg rounded-full px-8 border-2 border-transparent hover:border-black/20 transition-all duration-300">
-                                    <Link href="/contact">
-                                        <EditableContent
-                                            contentKey="howitworks.concierge.button"
-                                            initialValue={content['howitworks.concierge.button']}
-                                            isEditing={isEditing}
-                                            as="span"
-                                        />
-                                        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                                    </Link>
-                                </Button>
-                            </motion.div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                            <div className="absolute bottom-12 left-12">
+                                <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Personalized Support</span>
+                                <h3 className="text-3xl font-serif font-light text-white tracking-tight">Dedicated Consultation</h3>
+                            </div>
                         </motion.div>
 
                         <motion.div
                             initial={{ opacity: 0, x: 50 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.8, delay: 0.4 }}
-                            className="bg-black/5 p-10 rounded-xl backdrop-blur-sm border border-black/10 shadow-2xl"
+                            transition={{ duration: 0.8 }}
+                            className="space-y-12"
                         >
-                            <EditableContent
-                                contentKey="howitworks.concierge.list.title"
-                                initialValue={content['howitworks.concierge.list.title']}
-                                isEditing={isEditing}
-                                as="h3"
-                                className="text-2xl font-serif mb-8 text-black"
-                            />
-                            <ul className="space-y-6">
-                                <motion.li
-                                    initial={{ opacity: 0, x: -20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
+                            <div className="space-y-6">
+                                <motion.div
+                                    initial={{ scale: 0.9, opacity: 0 }}
+                                    whileInView={{ scale: 1, opacity: 1 }}
                                     viewport={{ once: true }}
-                                    transition={{ duration: 0.6, delay: 0.6 }}
-                                    className="flex items-center gap-4"
+                                    transition={{ duration: 0.6 }}
+                                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/10 border border-gold/20 text-gold text-[10px] font-bold uppercase tracking-[0.3em]"
                                 >
-                                    <div className="h-12 w-12 rounded-full bg-black/10 flex items-center justify-center shrink-0 font-serif font-bold text-black shadow-lg">1</div>
+                                    <Sparkles className="h-3 w-3" />
+                                    The Signature Service
+                                </motion.div>
+                                <EditableContent
+                                    contentKey="howitworks.concierge.title"
+                                    initialValue={content['howitworks.concierge.title']}
+                                    isEditing={isEditing}
+                                    as="h2"
+                                    className="text-4xl md:text-6xl font-serif font-light text-white tracking-tighter leading-tight"
+                                />
+                                <EditableContent
+                                    contentKey="howitworks.concierge.description"
+                                    initialValue={content['howitworks.concierge.description']}
+                                    type="textarea"
+                                    isEditing={isEditing}
+                                    as="p"
+                                    className="text-gray-400 text-xl leading-relaxed font-light"
+                                />
+                            </div>
+
+                            <div className="glass-card p-10 rounded-2xl border border-white/5 space-y-8">
+                                <EditableContent
+                                    contentKey="howitworks.concierge.list.title"
+                                    initialValue={content['howitworks.concierge.list.title']}
+                                    isEditing={isEditing}
+                                    as="h3"
+                                    className="text-xl font-serif text-white tracking-tight"
+                                />
+                                <ul className="space-y-8">
+                                    {[1, 2, 3].map((num) => (
+                                        <motion.li
+                                            key={num}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ duration: 0.6, delay: num * 0.1 }}
+                                            className="flex items-start gap-6 group"
+                                        >
+                                            <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-gold font-serif text-lg group-hover:bg-gold group-hover:text-black transition-all duration-500">
+                                                0{num}
+                                            </div>
+                                            <EditableContent
+                                                contentKey={`howitworks.concierge.list.item${num}`}
+                                                initialValue={content[`howitworks.concierge.list.item${num}`]}
+                                                isEditing={isEditing}
+                                                as="span"
+                                                className="text-lg font-light text-gray-300 mt-2 block"
+                                            />
+                                        </motion.li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            <Button asChild size="lg" className="h-16 px-12 rounded-full bg-gold text-black hover:bg-white transition-all duration-500 text-[11px] font-bold uppercase tracking-[0.2em]">
+                                <Link href="/contact" className="flex items-center gap-3">
                                     <EditableContent
-                                        contentKey="howitworks.concierge.list.item1"
-                                        initialValue={content['howitworks.concierge.list.item1']}
+                                        contentKey="howitworks.concierge.button"
+                                        initialValue={content['howitworks.concierge.button']}
                                         isEditing={isEditing}
                                         as="span"
-                                        className="text-lg font-light text-black/80"
                                     />
-                                </motion.li>
-                                <motion.li
-                                    initial={{ opacity: 0, x: -20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.6, delay: 0.7 }}
-                                    className="flex items-center gap-4"
-                                >
-                                    <div className="h-12 w-12 rounded-full bg-black/10 flex items-center justify-center shrink-0 font-serif font-bold text-black shadow-lg">2</div>
-                                    <EditableContent
-                                        contentKey="howitworks.concierge.list.item2"
-                                        initialValue={content['howitworks.concierge.list.item2']}
-                                        isEditing={isEditing}
-                                        as="span"
-                                        className="text-lg font-light text-black/80"
-                                    />
-                                </motion.li>
-                                <motion.li
-                                    initial={{ opacity: 0, x: -20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.6, delay: 0.8 }}
-                                    className="flex items-center gap-4"
-                                >
-                                    <div className="h-12 w-12 rounded-full bg-black/10 flex items-center justify-center shrink-0 font-serif font-bold text-black shadow-lg">3</div>
-                                    <EditableContent
-                                        contentKey="howitworks.concierge.list.item3"
-                                        initialValue={content['howitworks.concierge.list.item3']}
-                                        isEditing={isEditing}
-                                        as="span"
-                                        className="text-lg font-light text-black/80"
-                                    />
-                                </motion.li>
-                            </ul>
+                                    <ArrowRight className="h-4 w-4" />
+                                </Link>
+                            </Button>
                         </motion.div>
                     </div>
                 </div>
             </section>
 
-            {/* FAQ Preview */}
-            <section className="py-24 md:py-32 bg-secondary/20 border-t border-border/40">
-                <div className="container px-4 md:px-6 max-w-4xl mx-auto">
+            {/* FAQ Section */}
+            <section className="py-24 md:py-48 bg-[#1A1A1A] relative overflow-hidden">
+                <div className="container px-4 md:px-6 max-w-4xl mx-auto relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        className="text-center mb-20"
+                        className="text-center mb-24"
                     >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            whileInView={{ scale: 1, opacity: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6, delay: 0.2 }}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-sm font-medium mb-8"
-                        >
-                            <Shield className="h-4 w-4" />
-                            Common Questions
-                        </motion.div>
+                        <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Assistance</span>
                         <EditableContent
                             contentKey="howitworks.faq.title"
                             initialValue={content['howitworks.faq.title']}
                             isEditing={isEditing}
                             as="h2"
-                            className="text-4xl md:text-5xl font-serif mb-6 text-foreground"
+                            className="text-4xl md:text-7xl font-serif font-light text-white mb-8 tracking-tighter"
                         />
                         <EditableContent
                             contentKey="howitworks.faq.description"
@@ -330,164 +303,132 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                             type="textarea"
                             isEditing={isEditing}
                             as="p"
-                            className="text-xl text-muted-foreground font-light leading-relaxed"
+                            className="text-xl text-gray-400 font-light leading-relaxed max-w-2xl mx-auto"
                         />
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                        className="space-y-6"
-                    >
-                        <EditableList
-                            contentKey="howitworks.faq.list"
-                            items={faqs}
-                            isEditing={isEditing}
-                            itemSchema={{
-                                question: { type: 'text', label: 'Question', placeholder: 'Enter question' },
-                                answer: { type: 'textarea', label: 'Answer', placeholder: 'Enter answer' }
-                            }}
-                            renderItem={(faq: any, index: number) => (
-                                <motion.div
-                                    key={index}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.6, delay: index * 0.1 }}
-                                >
-                                    <Accordion type="single" collapsible className="w-full" key={index}>
-                                        <AccordionItem value={`item-${index}`} className="border border-border/40 rounded-xl px-6 bg-background/50 backdrop-blur-sm shadow-lg hover:shadow-gold/5 data-[state=open]:border-gold/30 transition-all duration-300">
-                                            <AccordionTrigger className="text-lg md:text-xl font-medium hover:text-gold transition-colors py-8 text-left">
-                                                {faq.question}
-                                            </AccordionTrigger>
-                                            <AccordionContent className="text-muted-foreground text-base md:text-lg leading-relaxed pb-8 font-light">
-                                                {faq.answer}
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                </motion.div>
-                            )}
-                        />
-                    </motion.div>
+                    <div className="space-y-4">
+                        {faqs.map((faq: any, index: number) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6, delay: index * 0.1 }}
+                            >
+                                <Accordion type="single" collapsible className="w-full">
+                                    <AccordionItem value={`item-${index}`} className="border-b border-white/5 last:border-0">
+                                        <AccordionTrigger className="text-xl md:text-2xl font-serif font-light text-white hover:text-gold transition-colors py-8 text-left uppercase tracking-tight">
+                                            {faq.question}
+                                        </AccordionTrigger>
+                                        <AccordionContent className="text-gray-400 text-lg leading-relaxed pb-8 font-light max-w-2xl">
+                                            {faq.answer}
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                            </motion.div>
+                        ))}
+                    </div>
 
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: 0.5 }}
-                        className="mt-20 text-center"
+                        className="mt-24 text-center"
                     >
-                        <Button asChild variant="outline" size="lg" className="h-14 px-10 rounded-full border-border/50 hover:border-gold hover:bg-gold/5 hover:text-gold transition-all duration-300 shadow-lg hover:shadow-gold/10">
-                            <Link href="/faq">
-                                <EditableContent
-                                    contentKey="howitworks.faq.button"
-                                    initialValue={content['howitworks.faq.button']}
-                                    isEditing={isEditing}
-                                    as="span"
-                                    className="text-base font-medium"
-                                />
-                                <ArrowRight className="ml-2 h-5 w-5" />
-                            </Link>
-                        </Button>
+                        <Link
+                            href="/faq"
+                            className="group inline-flex items-center gap-4 text-[11px] font-bold uppercase tracking-[0.3em] text-white hover:text-gold transition-colors"
+                        >
+                            <EditableContent
+                                contentKey="howitworks.faq.button"
+                                initialValue={content['howitworks.faq.button']}
+                                isEditing={isEditing}
+                                as="span"
+                            />
+                            <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-gold group-hover:translate-x-2 transition-all duration-500">
+                                <ArrowRight className="h-4 w-4" />
+                            </div>
+                        </Link>
                     </motion.div>
                 </div>
             </section>
-        </>
+        </div>
     )
 }
 
-// Step Card Component
 function StepCard({ step, index }: { step: any, index: number }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, delay: index * 0.2 }}
-            className={`grid lg:grid-cols-2 gap-12 lg:gap-24 items-center mb-24 ${
-                index % 2 === 1 ? 'lg:flex-row-reverse' : ''
-            }`}
-        >
-            {/* Image */}
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: index * 0.2 + 0.3 }}
-                className="relative group"
-            >
-                <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-lg bg-secondary shadow-2xl">
-                    {step.image && (
-                        <Image
-                            src={step.image}
-                            alt={step.title}
-                            fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                    )}
-                    <div className="absolute inset-0 border-2 border-white/10 m-4 rounded-lg pointer-events-none group-hover:border-gold/30 transition-colors duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </div>
+    const isEven = index % 2 === 0
 
-                {/* Step Number Overlay */}
-                <motion.div
-                    initial={{ scale: 0 }}
-                    whileInView={{ scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.2 + 0.5, type: "spring" }}
-                    className="absolute -top-6 -left-6 w-16 h-16 rounded-full bg-gold text-black flex items-center justify-center text-2xl font-serif font-bold shadow-xl shadow-gold/25"
-                >
-                    {index + 1}
-                </motion.div>
+    return (
+        <div className={cn(
+            "grid lg:grid-cols-2 gap-16 md:gap-32 items-center",
+            !isEven && "lg:flex-row-reverse"
+        )}>
+            {/* Image Side */}
+            <motion.div
+                initial={{ opacity: 0, x: isEven ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className={cn(
+                    "relative aspect-[4/5] rounded-3xl overflow-hidden group shadow-2xl",
+                    !isEven && "lg:order-2"
+                )}
+            >
+                <Image
+                    src={step.image}
+                    alt={step.title}
+                    fill
+                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700" />
+
+                {/* Step Number Badge */}
+                <div className="absolute top-8 left-8 w-16 h-16 rounded-full bg-[#1A1A1A]/80 backdrop-blur-md border border-white/10 flex items-center justify-center text-gold font-serif text-2xl z-20">
+                    0{index + 1}
+                </div>
             </motion.div>
 
-            {/* Content */}
+            {/* Content Side */}
             <motion.div
-                initial={{ opacity: 0, x: index % 2 === 1 ? 30 : -30 }}
+                initial={{ opacity: 0, x: isEven ? 50 : -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: index * 0.2 + 0.4 }}
-                className="space-y-8"
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                className={cn(
+                    "flex flex-col gap-8",
+                    !isEven && "lg:order-1"
+                )}
             >
-                <div>
-                    <h3 className="text-4xl md:text-5xl font-serif text-foreground mb-6">
+                <div className="space-y-6">
+                    <h3 className="text-4xl md:text-6xl font-serif font-light text-white tracking-tighter leading-tight uppercase">
                         {step.title}
                     </h3>
-                    <p className="text-muted-foreground text-xl leading-relaxed font-light">
+                    <p className="text-gray-400 text-xl leading-relaxed font-light">
                         {step.description}
                     </p>
                 </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.2 + 0.6 }}
-                    className="bg-secondary/30 p-8 rounded-lg border border-border/40 hover:border-gold/30 transition-all duration-300 hover:shadow-lg hover:shadow-gold/5"
-                >
-                    <h4 className="font-medium mb-6 flex items-center gap-3 text-lg text-foreground">
-                        <CheckCircle2 className="h-6 w-6 text-gold" />
-                        Key Details
-                    </h4>
-                    <ul className="space-y-4">
-                        {(step.details || []).map((detail: string, idx: number) => (
-                            <motion.li
-                                key={idx}
-                                initial={{ opacity: 0, x: -10 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.4, delay: index * 0.2 + 0.7 + idx * 0.1 }}
-                                className="text-muted-foreground text-base flex items-start gap-3"
-                            >
-                                <span className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 shrink-0" />
-                                {detail}
-                            </motion.li>
-                        ))}
-                    </ul>
-                </motion.div>
+                {step.details && (
+                    <div className="glass-card p-10 rounded-2xl border border-white/5 space-y-6">
+                        <div className="flex items-center gap-3 text-gold">
+                            <CheckCircle2 className="h-5 w-5" />
+                            <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Key Details</span>
+                        </div>
+                        <ul className="grid gap-4">
+                            {step.details.map((detail: string, idx: number) => (
+                                <li key={idx} className="flex items-start gap-4 text-gray-300 font-light">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-gold/60 mt-2 shrink-0" />
+                                    <span className="text-lg">{detail}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </motion.div>
-        </motion.div>
+        </div>
     )
 }
+

@@ -4,7 +4,8 @@ import { useState, useEffect } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { getSiteContentClient } from "@/lib/content-client"
 import { motion } from "framer-motion"
-import { HelpCircle, MessageCircle, Clock } from "lucide-react"
+import { HelpCircle, MessageCircle, Clock, Sparkles, ArrowRight } from "lucide-react"
+import Link from "next/link"
 
 export default function FAQPage() {
   const [content, setContent] = useState<any>({})
@@ -17,19 +18,19 @@ export default function FAQPage() {
       setFaqs(siteContent['faq.list'] || [
         {
           question: "How far in advance should I book?",
-          answer: "We recommend booking as soon as you have your date and venue secured. For peak seasons (spring and fall), we suggest booking 6-9 months in advance to ensure availability of your desired items."
+          answer: "For larger weddings and corporate galas, we recommend booking 12-18 months in advance. For social gatherings and smaller events, 6-9 months is typically sufficient. However, we always welcome last-minute inquiries and will do our best to accommodate your schedule."
         },
         {
-          question: "How long is the rental period?",
-          answer: "Our standard rental period is 24 hours. We typically deliver on the day of the event and pick up the following day."
+          question: "Do you offer full-service planning?",
+          answer: "Yes, we specialize in comprehensive, end-to-end planning. This includes venue selection, vendor management, design concept development, logistics, and on-site coordination. We also offer partial planning for clients who have already secured some elements."
         },
         {
-          question: "Do you offer delivery and setup?",
-          answer: "We offer professional delivery to your venue. Standard delivery includes drop-off at a designated area. Full setup and installation is available for an additional fee."
+          question: "What is your typical budget range?",
+          answer: "As a luxury event firm, our clients typically invest between $50,000 and $500,000+ per event. We work closely with you to maximize your investment and ensure every dollar contributes to an extraordinary guest experience."
         },
         {
-          question: "What is your cancellation policy?",
-          answer: "Orders cancelled more than 30 days prior to the event date are eligible for a full refund less a 10% administrative fee. Cancellations made within 30 days of the event are subject to a 50% cancellation fee."
+          question: "Can you help with destination events?",
+          answer: "Absolutely. Our team has extensive experience coordinating luxury events globally. Whether it's a private villa in Tuscany or a beachside celebration in St. Barts, we handle all travel logistics, local vendor vetting, and cultural considerations."
         }
       ])
     }
@@ -38,156 +39,102 @@ export default function FAQPage() {
   }, [])
 
   return (
-    <>
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-secondary/20 via-background to-secondary/10">
-        {/* Background Pattern */}
-        <motion.div
-          className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.5 }}
-        />
+    <main className="min-h-screen bg-[#1A1A1A] text-white selection:bg-gold selection:text-black pt-32 pb-24 md:pt-48 md:pb-40 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gold/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-gold/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
+      <div className="absolute inset-0 bg-[url('/images/luxury-texture.png')] opacity-5 mix-blend-overlay pointer-events-none" />
 
-        <div className="container relative z-10 px-4 md:px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="max-w-4xl mx-auto"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-sm font-medium mb-8"
-            >
-              <HelpCircle className="h-4 w-4" />
-              Frequently Asked Questions
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-6xl md:text-8xl font-serif font-light tracking-tight text-foreground text-center mb-6"
-            >
-              {content['faq.hero.title'] || 'Frequently Asked Questions'}
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="text-xl md:text-2xl text-muted-foreground font-light leading-relaxed max-w-3xl mx-auto text-center mb-12"
-            >
-              {content['faq.hero.description'] || 'Everything you need to know about renting with PrimeLux Events.'}
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6, delay: 1 }}
-                className="flex items-center gap-2 text-sm text-muted-foreground"
-              >
-                <Clock className="h-4 w-4" />
-                <span>Quick answers to common questions</span>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center"
-          >
-            <motion.div
-              animate={{ y: [0, 12, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-1 h-3 bg-muted-foreground/50 rounded-full mt-2"
-            />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-24 md:py-32 bg-background">
-        <div className="container px-4 md:px-6 max-w-4xl mx-auto">
+      <div className="container px-4 md:px-6 relative z-10">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center max-w-3xl mx-auto mb-20"
+            className="text-center mb-24 md:mb-32 space-y-8"
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-sm font-medium mb-8"
-            >
-              <MessageCircle className="h-4 w-4" />
-              Your Questions Answered
-            </motion.div>
-            <h2 className="text-4xl md:text-5xl font-serif text-foreground mb-6">
-              Everything You Need to Know
-            </h2>
-            <p className="text-xl text-muted-foreground font-light">
-              Find answers to common questions about our rental process and services.
+            <div className="flex items-center justify-center gap-3">
+              <span className="w-12 h-px bg-gold/30" />
+              <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Curated Intelligence</span>
+              <span className="w-12 h-px bg-gold/30" />
+            </div>
+
+            <h1 className="text-6xl md:text-9xl font-serif font-light tracking-tighter leading-[0.85]">
+              {content['faq.hero.title']?.split(' ')[0] || 'Frequently'} <br />
+              <span className="italic text-gold">{content['faq.hero.title']?.split(' ').slice(1).join(' ') || 'Asked'}</span>
+            </h1>
+
+            <p className="text-xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
+              {content['faq.hero.description'] || 'Discover the finer details of our bespoke event orchestration and concierge services.'}
             </p>
           </motion.div>
 
-          {faqs && faqs.length > 0 ? (
-            faqs.map((faq: any, index: number) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value={`item-${index}`} className="border border-border/40 rounded-xl px-6 bg-background/50 backdrop-blur-sm shadow-lg hover:shadow-gold/5 mb-6 data-[state=open]:border-gold/30 transition-all duration-300">
-                    <AccordionTrigger className="text-lg md:text-xl font-medium hover:text-gold transition-colors py-8 text-left">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground text-base md:text-lg leading-relaxed pb-8 font-light">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </motion.div>
-            ))
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center py-20"
-            >
-              <div className="max-w-md mx-auto">
-                <HelpCircle className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
-                <h3 className="text-xl font-serif mb-2">No FAQs found</h3>
-                <p className="text-muted-foreground">Check back soon for frequently asked questions.</p>
+          {/* FAQ Items */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="space-y-6"
+          >
+            <Accordion type="single" collapsible className="w-full space-y-6">
+              {faqs.map((faq, index) => (
+                <AccordionItem
+                  key={index}
+                  value={`item-${index}`}
+                  className="border border-white/5 rounded-2xl bg-[#1E1E1E]/50 backdrop-blur-sm overflow-hidden px-6 md:px-10 transition-all duration-300 hover:border-gold/20"
+                >
+                  <AccordionTrigger className="py-8 text-left hover:no-underline group">
+                    <div className="flex items-start gap-6">
+                      <span className="text-gold font-serif text-2xl opacity-40 group-hover:opacity-100 transition-opacity">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <span className="text-xl md:text-2xl font-serif font-light text-white group-hover:text-gold transition-colors duration-300 pr-8">
+                        {faq.question}
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-8 pl-14 text-lg text-gray-400 font-light leading-relaxed max-w-2xl">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+
+            {!faqs || faqs.length === 0 && (
+              <div className="text-center py-40">
+                <Sparkles className="h-16 w-16 text-gold/20 mx-auto mb-8" />
+                <h3 className="text-2xl font-serif text-white mb-4">The Curtain Rises Soon</h3>
+                <p className="text-gray-500 font-light">We are preparing our intelligence briefing.</p>
               </div>
-            </motion.div>
-          )}
+            )}
+          </motion.div>
+
+          {/* Support CTA */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-32 p-12 rounded-[2rem] border border-white/5 bg-gradient-to-br from-[#1E1E1E] to-transparent text-center relative group overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <HelpCircle className="w-12 h-12 text-gold mx-auto mb-8 stroke-[1]" />
+            <h2 className="text-3xl md:text-4xl font-serif font-light text-white mb-6">Still have questions?</h2>
+            <p className="text-gray-400 font-light mb-10 max-w-lg mx-auto leading-relaxed">
+              Our concierge team is available for private consultations to discuss your specific requirements in detail.
+            </p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-4 bg-gold text-black px-10 py-5 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-white transition-all duration-500 hover:scale-105 active:scale-95"
+            >
+              Inquire Now
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
         </div>
-      </section>
-    </>
+      </div>
+    </main>
   )
 }
+
