@@ -40,7 +40,7 @@ function SelectTrigger({
         "flex w-full items-center justify-between gap-2 rounded-[var(--radius)] border px-4 py-2 text-sm whitespace-nowrap shadow-sm transition-all duration-300",
         "border-border bg-muted/30 text-foreground",
         "data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground",
-        "focus:border-primary focus:ring-4 focus:ring-primary/10 focus:bg-background outline-none",
+        "focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none",
         "hover:border-border/80 hover:bg-muted/50",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "data-[size=default]:h-12 data-[size=sm]:h-10",

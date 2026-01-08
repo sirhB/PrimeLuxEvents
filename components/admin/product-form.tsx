@@ -436,9 +436,12 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                                             key={result.id}
                                             value={result.id}
                                             onSelect={() => handleSelectProduct(result)}
-                                            className="flex items-center gap-4 p-3 cursor-pointer aria-selected:bg-gold/10 aria-selected:text-gold border-b last:border-0 border-border/50 transition-colors"
+                                            className="group flex items-center gap-4 p-3 cursor-pointer aria-selected:bg-neutral-50 aria-selected:text-foreground border-b last:border-0 border-border/50 transition-colors relative"
                                         >
-                                            <div className="h-12 w-12 rounded-lg bg-muted overflow-hidden flex-shrink-0 relative border border-border shadow-sm">
+                                            {/* Selection Indicator Line */}
+                                            <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-gold opacity-0 group-aria-selected:opacity-100 transition-opacity" />
+
+                                            <div className="h-12 w-12 rounded-lg bg-muted overflow-hidden flex-shrink-0 relative border border-border shadow-sm ml-2">
                                                 {result.image_url ? (
                                                     // eslint-disable-next-line @next/next/no-img-element
                                                     <img src={result.image_url} alt={result.name} className="object-cover w-full h-full" />
@@ -449,7 +452,9 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                                                 )}
                                             </div>
                                             <div className="flex flex-col flex-1 min-w-0">
-                                                <span className="font-serif font-medium truncate">{result.name}</span>
+                                                <span className="font-serif font-medium truncate text-foreground group-aria-selected:font-semibold transition-all">
+                                                    {result.name}
+                                                </span>
                                                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                     {result.color && (
                                                         <span className="flex items-center gap-1">
@@ -458,14 +463,14 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                                                         </span>
                                                     )}
                                                     {result.group_id && (
-                                                        <span className="px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 text-[10px] font-medium uppercase tracking-wider">
+                                                        <span className="px-1.5 py-0.5 rounded-full bg-gold/10 text-amber-700 text-[10px] font-bold uppercase tracking-wider border border-gold/20">
                                                             Grouped
                                                         </span>
                                                     )}
                                                 </div>
                                             </div>
 
-                                            <div className="text-xs font-medium uppercase tracking-widest text-muted-foreground opacity-0 group-aria-selected:opacity-100 transition-opacity">
+                                            <div className="mr-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/0 group-aria-selected:text-gold transition-all">
                                                 Select
                                             </div>
                                         </CommandItem>
