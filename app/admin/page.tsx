@@ -3,12 +3,20 @@ import { TasksCard } from '@/components/admin/dashboard/tasks-card'
 import { MeetingsCard } from '@/components/admin/dashboard/meetings-card'
 import { UpcomingOrdersCard } from '@/components/admin/dashboard/upcoming-orders-card'
 import { AlertsCard } from '@/components/admin/dashboard/alerts-card'
-import { RecentTemplates } from '@/components/admin/dashboard/recent-templates'
-import { motion } from 'framer-motion'
+import { RecentActivityList } from '@/components/admin/dashboard/recent-activity-list'
+import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+    const supabase = await createClient()
+
+    // Fetch recent orders for RecentActivityList
+    const { data: recentOrders } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5)
     return (
         <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -47,7 +55,7 @@ export default function AdminDashboardPage() {
 
                     <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
                         <AlertsCard />
-                        <RecentTemplates />
+                        <RecentActivityList orders={recentOrders || []} />
                     </div>
                 </div>
             </div>
