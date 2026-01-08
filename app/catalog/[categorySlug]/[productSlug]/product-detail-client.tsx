@@ -67,14 +67,26 @@ interface Product {
     product_images?: ProductImage[]
     categories?: { name: string, slug?: string }
     slug?: string
+    group_id?: string
+    color?: string
+}
+
+interface ColorVariant {
+    id: string
+    slug: string
+    name: string
+    color: string
+    image_url: string
+    categories?: { slug: string }
 }
 
 interface ProductDetailClientProps {
     product: Product
     allProducts: Product[]
+    colorVariants?: ColorVariant[]
 }
 
-export function ProductDetailClient({ product, allProducts }: ProductDetailClientProps) {
+export function ProductDetailClient({ product, allProducts, colorVariants = [] }: ProductDetailClientProps) {
     const [selectedModifiers, setSelectedModifiers] = useState<Record<string, ModifierOption>>({})
     const [quantity, setQuantity] = useState(1)
     const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | undefined>(undefined)
@@ -280,6 +292,54 @@ export function ProductDetailClient({ product, allProducts }: ProductDetailClien
                                                 {feature}
                                             </Badge>
                                         ))}
+                                    </motion.div>
+                                )}
+
+                                {/* Color Variants Selector */}
+                                {colorVariants && colorVariants.length > 1 && (
+                                    <motion.div variants={itemVariants} className="space-y-5">
+                                        <Label className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">
+                                            Select Color: {product.color || 'Default'}
+                                        </Label>
+                                        <div className="flex flex-wrap gap-4">
+                                            {colorVariants.map((variant) => {
+                                                const isSelected = variant.id === product.id
+                                                const categorySlug = variant.categories?.slug || product.categories?.slug || 'uncategorized'
+
+                                                return (
+                                                    <Link
+                                                        key={variant.id}
+                                                        href={`/catalog/${categorySlug}/${variant.slug}`}
+                                                        className={cn(
+                                                            "relative flex items-center justify-center p-1 rounded-full border-2 transition-all duration-300 w-12 h-12 overflow-hidden",
+                                                            isSelected
+                                                                ? "border-gold scale-110 shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                                                                : "border-white/10 hover:border-gold/50 hover:scale-105"
+                                                        )}
+                                                        title={variant.color || variant.name}
+                                                    >
+                                                        <div className="relative w-full h-full rounded-full overflow-hidden bg-white/5">
+                                                            {/* Try to use image for color preview if available, otherwise just a colored dot or indicator */}
+                                                            {variant.image_url ? (
+                                                                <Image
+                                                                    src={variant.image_url}
+                                                                    alt={variant.color || variant.name}
+                                                                    fill
+                                                                    className="object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-white/10 flex items-center justify-center text-[8px]">
+                                                                    {variant.color?.substring(0, 2) || '?'}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        {isSelected && (
+                                                            <div className="absolute inset-0 rounded-full border border-gold" />
+                                                        )}
+                                                    </Link>
+                                                )
+                                            })}
+                                        </div>
                                     </motion.div>
                                 )}
 

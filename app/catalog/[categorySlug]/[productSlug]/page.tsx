@@ -88,6 +88,20 @@ export default async function ProductPage({ params }: { params: Promise<{ catego
         .limit(100)
         .order('created_at', { ascending: false })
 
+    // Fetch color variants if group_id exists
+    let colorVariants: any[] = []
+    if (product.group_id) {
+        const { data: variants } = await supabase
+            .from('products')
+            .select('id, slug, color, name, image_url, categories(slug)')
+            .eq('group_id', product.group_id)
+        // .neq('id', product.id) // We might want to include the current one to show as selected, or handle it in client
+
+        if (variants) {
+            colorVariants = variants
+        }
+    }
+
     // Combine data
     const productWithImages = {
         ...product,
@@ -99,6 +113,7 @@ export default async function ProductPage({ params }: { params: Promise<{ catego
         <ProductDetailClient
             product={productWithImages as any}
             allProducts={(rawRelatedProducts || []) as any}
+            colorVariants={colorVariants as any}
         />
     )
 }
