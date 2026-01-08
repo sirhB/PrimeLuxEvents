@@ -330,21 +330,24 @@ export default async function ConsultationsPage({
                                                     )}
 
                                                     {/* Actions */}
-                                                    <div className="pt-4 border-t border-[var(--dashboard-border)] flex items-center justify-between gap-2 mt-2">
-                                                        <div className="flex gap-1.5">
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]" asChild>
+                                                    <div className="pt-4 border-t border-[var(--dashboard-border)]/50 flex items-center justify-between mt-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)] transition-colors"
+                                                                asChild
+                                                            >
                                                                 <Link href={`/admin/consultations/${consultation.id}`}>
                                                                     <Eye className="h-4 w-4" />
                                                                 </Link>
                                                             </Button>
-                                                            <div className="scale-90 origin-left">
-                                                                <ConsultationCardActions
-                                                                    consultationId={consultation.id}
-                                                                    customerName={getDisplayName(consultation)}
-                                                                    customerEmail={consultation.customer_email}
-                                                                    customerPhone={consultation.customer_phone}
-                                                                />
-                                                            </div>
+                                                            <ConsultationCardActions
+                                                                consultationId={consultation.id}
+                                                                customerName={getDisplayName(consultation)}
+                                                                customerEmail={consultation.customer_email}
+                                                                customerPhone={consultation.customer_phone}
+                                                            />
                                                         </div>
 
                                                         {nextStage && (
@@ -354,10 +357,10 @@ export default async function ConsultationsPage({
                                                                 <Button
                                                                     size="sm"
                                                                     variant="outline"
-                                                                    className="h-8 text-[10px] font-bold uppercase tracking-widest px-3 rounded-lg border-[var(--dashboard-border)] hover:bg-[var(--dashboard-accent-gold)] hover:text-black hover:border-[var(--dashboard-accent-gold)] transition-all"
+                                                                    className="h-9 px-4 text-[11px] font-bold uppercase tracking-widest rounded-xl border-[var(--dashboard-border)] hover:bg-[var(--dashboard-accent-gold)] hover:text-black hover:border-[var(--dashboard-accent-gold)] hover:shadow-[0_0_15px_rgba(234,179,8,0.2)] transition-all group/btn"
                                                                 >
-                                                                    Advance
-                                                                    <ArrowRight className="ml-2 h-3 w-3" />
+                                                                    <span>Advance</span>
+                                                                    <ArrowRight className="ml-2 h-3.5 w-3.5 group-hover/btn:translate-x-1 transition-transform" />
                                                                 </Button>
                                                             </form>
                                                         )}
