@@ -38,6 +38,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from 'sonner'
+import { SignaturePad } from '@/components/signature-pad'
 
 function OrderDetailContent() {
     const params = useParams()
@@ -48,6 +49,7 @@ function OrderDetailContent() {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
+    const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false)
     const [clientSecret, setClientSecret] = useState<string | null>(null)
     const [isProcessingPayment, setIsProcessingPayment] = useState(false)
 
@@ -214,6 +216,15 @@ function OrderDetailContent() {
                                 Rental Agreement PDF
                             </a>
                         </Button>
+                        {!order.signature_url && (
+                            <Button
+                                onClick={() => setIsSignatureModalOpen(true)}
+                                className="rounded-full bg-black text-white hover:bg-gold hover:text-black flex items-center gap-2"
+                            >
+                                <FileText className="h-4 w-4" />
+                                Sign Agreement
+                            </Button>
+                        )}
                         {!isPaid && (
                             <Button
                                 onClick={handlePayBalance}
@@ -422,8 +433,49 @@ function OrderDetailContent() {
                                 </CardFooter>
                             </Card>
                         )}
+
+                        {!order.signature_url && (
+                            <Card className="border-gold/10 shadow-sm bg-white overflow-hidden border-dashed">
+                                <CardContent className="p-10 text-center space-y-4">
+                                    <div className="h-16 w-16 bg-gold/10 rounded-full flex items-center justify-center mx-auto text-gold">
+                                        <FileText className="h-8 w-8" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-serif text-lg font-bold">Awaiting Signature</h3>
+                                        <p className="text-sm text-muted-foreground">Please sign the rental agreement to confirm your booking.</p>
+                                    </div>
+                                    <Button
+                                        onClick={() => setIsSignatureModalOpen(true)}
+                                        className="bg-black text-white hover:bg-gold hover:text-black rounded-full"
+                                    >
+                                        Sign Now
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
                 </div>
+
+                {/* Modals */}
+                <Dialog open={isSignatureModalOpen} onOpenChange={setIsSignatureModalOpen}>
+                    <DialogContent className="sm:max-w-[600px] border-gold/10 p-0 overflow-hidden">
+                        <DialogHeader className="p-8 bg-gray-50/50 border-b border-gold/10">
+                            <DialogTitle className="text-2xl font-serif">Sign Rental Agreement</DialogTitle>
+                            <DialogDescription>
+                                Please draw your signature below to authorize the rental agreement.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="p-8">
+                            <SignaturePad
+                                orderId={order.id}
+                                onSigned={(url) => {
+                                    setOrder({ ...order, signature_url: url, signed_at: new Date().toISOString() })
+                                    setIsSignatureModalOpen(false)
+                                }}
+                            />
+                        </div>
+                    </DialogContent>
+                </Dialog>
                 <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
                     <DialogContent className="sm:max-w-[500px] rounded-[2rem] border-gold/10 p-0 overflow-hidden">
                         <DialogHeader className="p-8 bg-gray-50/50 border-b border-gold/10">

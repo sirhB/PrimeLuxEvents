@@ -4,6 +4,7 @@ import { MeetingsCard } from '@/components/admin/dashboard/meetings-card'
 import { UpcomingOrdersCard } from '@/components/admin/dashboard/upcoming-orders-card'
 import { AlertsCard } from '@/components/admin/dashboard/alerts-card'
 import { RecentActivityList } from '@/components/admin/dashboard/recent-activity-list'
+import { RevenueMiniChart } from '@/components/admin/dashboard/revenue-mini-chart'
 import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -45,6 +46,7 @@ export default async function AdminDashboardPage() {
             <div className="grid gap-8 grid-cols-1 xl:grid-cols-12">
                 {/* Left Column - Tasks & Meetings */}
                 <div className="xl:col-span-4 flex flex-col gap-8">
+                    <RevenueMiniChart />
                     <TasksCard />
                     <MeetingsCard />
                 </div>

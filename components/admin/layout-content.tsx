@@ -5,6 +5,7 @@ import { ModernSidebar } from '@/components/admin/modern-sidebar'
 import { AdminToastProvider } from '@/components/admin/toast-provider'
 import { AdminSearchFab } from '@/components/admin/admin-search-fab'
 import { AdminNotifications } from '@/components/admin/notifications'
+import { MobileAdminFAB } from '@/components/admin/mobile-fab'
 import { cn } from '@/lib/utils'
 import { Search, User } from 'lucide-react'
 
@@ -54,6 +55,7 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
             </div>
             <AdminToastProvider />
             <AdminSearchFab />
+            <MobileAdminFAB />
         </div>
     )
 }

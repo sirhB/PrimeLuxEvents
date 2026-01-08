@@ -7,16 +7,18 @@ import { SiteFooter } from "@/components/site-footer"
 export function SiteLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
     const isAdmin = pathname?.startsWith("/admin")
+    const isAccount = pathname?.startsWith("/account")
+    const isPortal = isAdmin || isAccount
 
     return (
         <div className="flex flex-col min-h-screen">
-            {!isAdmin && (
+            {!isPortal && (
                 <div className="print:hidden">
                     <SiteHeader />
                 </div>
             )}
             <main className="flex-1">{children}</main>
-            {!isAdmin && (
+            {!isPortal && (
                 <div className="print:hidden">
                     <SiteFooter />
                 </div>

@@ -24,7 +24,8 @@ import {
     UserCog,
     CheckSquare,
     QrCode,
-    Truck
+    Truck,
+    TrendingUp
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -37,6 +38,7 @@ const sidebarGroups = [
         title: "Overview",
         items: [
             { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
+            { icon: TrendingUp, label: 'Analytics', href: '/admin/analytics' },
         ]
     },
     {
@@ -46,6 +48,7 @@ const sidebarGroups = [
             { icon: FileText, label: 'Leads', href: '/admin/consultations' },
             { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments' },
             { icon: Truck, label: 'Logistics', href: '/admin/logistics' },
+            { icon: ShoppingBag, label: 'Bags', href: '/admin/bags' },
             { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks' },
             { icon: QrCode, label: 'Scan', href: '/admin/scan' },
             { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },

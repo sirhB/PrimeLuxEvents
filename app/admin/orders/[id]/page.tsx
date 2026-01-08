@@ -33,7 +33,8 @@ import { OrderStatusForm } from '@/components/admin/order-status-form'
 import { OrderInvoice } from '@/components/admin/order-invoice'
 import { formatCents, formatCentsWithCommas } from '@/lib/format-money'
 import { AdminQRCode } from '@/components/admin/qr-code'
-import { Truck, Search } from 'lucide-react'
+import { Truck, Search, ShoppingBag } from 'lucide-react'
+import { BagAssignmentManager } from '@/components/admin/bag-assignment-manager'
 
 export default async function OrderDetailsPage({
     params,
@@ -126,6 +127,10 @@ export default async function OrderDetailsPage({
                                         currentStatus={order.status}
                                         updateStatusAction={updateStatus}
                                     />
+
+                                    <div className="mt-8 pt-8 border-t border-[var(--dashboard-border)]">
+                                        <BagAssignmentManager orderId={order.id} orderItems={order.order_items} />
+                                    </div>
                                 </div>
                                 <div className="flex shrink-0">
                                     <AdminQRCode

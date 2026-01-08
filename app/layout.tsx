@@ -34,6 +34,8 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-icon.png",
   },
+  manifest: "/manifest.json",
+  themeColor: "#111111",
 }
 
 export default function RootLayout({
