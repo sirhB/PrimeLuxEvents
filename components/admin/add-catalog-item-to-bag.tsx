@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Search, Plus, Loader2 } from 'lucide-react'
+import { Search, Plus, Loader2, Package } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AddCatalogItemToBagProps {
@@ -80,19 +80,20 @@ export function AddCatalogItemToBag({ bagId, onSuccess }: AddCatalogItemToBagPro
                     Add Catalog Item
                 </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-[2rem] border-none shadow-2xl max-w-md">
+            <DialogContent className="rounded-[2.5rem] border-[var(--dashboard-border)] bg-[var(--dashboard-card)] text-[var(--dashboard-text)] shadow-2xl max-w-md p-8">
                 <DialogHeader>
-                    <DialogTitle className="font-serif text-2xl">Add to Bag</DialogTitle>
+                    <DialogTitle className="font-serif text-3xl mb-2">Add to Bag</DialogTitle>
+                    <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-[var(--dashboard-text-muted)]">Select products from catalog</p>
                 </DialogHeader>
-                <div className="space-y-4 py-4">
-                    <div className="flex gap-2">
+                <div className="space-y-6 py-6">
+                    <div className="flex gap-3">
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--dashboard-text-muted)]" />
                             <Input
                                 placeholder="Search products..."
                                 value={search}
                                 onChange={(e) => handleSearch(e.target.value)}
-                                className="pl-10 rounded-xl h-12"
+                                className="pl-12 rounded-2xl h-14 bg-black/20 border-[var(--dashboard-border)] focus:ring-2 focus:ring-gold/50"
                             />
                         </div>
                         <div className="w-24">
@@ -101,44 +102,55 @@ export function AddCatalogItemToBag({ bagId, onSuccess }: AddCatalogItemToBagPro
                                 min="1"
                                 value={quantity}
                                 onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                                className="rounded-xl h-12 text-center"
+                                className="rounded-2xl h-14 text-center bg-black/20 border-[var(--dashboard-border)] font-black"
                                 placeholder="Qty"
                             />
                         </div>
                     </div>
 
-                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
+                    <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
                         {loading ? (
-                            <div className="flex justify-center py-8">
-                                <Loader2 className="h-6 w-6 animate-spin text-gray-300" />
+                            <div className="flex flex-col items-center justify-center py-12 gap-3">
+                                <Loader2 className="h-8 w-8 animate-spin text-gold" />
+                                <p className="text-[10px] uppercase font-bold tracking-widest text-[var(--dashboard-text-muted)]">Searching Catalog...</p>
                             </div>
                         ) : products.length > 0 ? (
                             products.map((product) => (
-                                <div key={product.id} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
-                                    <div className="flex items-center gap-3">
+                                <div key={product.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-gold/30 hover:bg-gold/5 transition-all group">
+                                    <div className="flex items-center gap-4">
                                         {product.image_url ? (
-                                            <img src={product.image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                                            <img src={product.image_url} alt="" className="w-12 h-12 rounded-xl object-cover shadow-lg" />
                                         ) : (
-                                            <div className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center">
-                                                <Search className="h-4 w-4 text-gray-400" />
+                                            <div className="w-12 h-12 rounded-xl bg-black/20 flex items-center justify-center border border-[var(--dashboard-border)]">
+                                                <Search className="h-5 w-5 text-[var(--dashboard-text-muted)]" />
                                             </div>
                                         )}
-                                        <p className="text-sm font-bold truncate max-w-[150px]">{product.name}</p>
+                                        <div>
+                                            <p className="text-sm font-bold truncate max-w-[150px] text-[var(--dashboard-text)]">{product.name}</p>
+                                            <p className="text-[9px] uppercase font-bold tracking-widest text-[var(--dashboard-text-muted)] mt-0.5">Product Item</p>
+                                        </div>
                                     </div>
                                     <Button
                                         size="sm"
                                         variant="ghost"
-                                        className="rounded-lg h-8 w-8 p-0 hover:bg-black hover:text-white"
+                                        className="rounded-xl h-10 w-10 p-0 hover:bg-gold hover:text-black transition-all"
                                         onClick={() => addToBag(product.id)}
                                         disabled={adding === product.id}
                                     >
-                                        {adding === product.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                                        {adding === product.id ? <Loader2 className="h-5 w-5 animate-spin" /> : <Plus className="h-5 w-5" />}
                                     </Button>
                                 </div>
                             ))
                         ) : search.length >= 2 ? (
-                            <p className="text-center py-8 text-gray-400 text-sm">No products found.</p>
-                        ) : null}
+                            <div className="text-center py-12">
+                                <Package className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                                <p className="text-sm text-[var(--dashboard-text-muted)]">No products found matching "{search}"</p>
+                            </div>
+                        ) : (
+                            <div className="text-center py-12 border-2 border-dashed border-white/5 rounded-[2rem]">
+                                <p className="text-[10px] uppercase font-bold tracking-widest text-[var(--dashboard-text-muted)]">Type to start searching</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </DialogContent>

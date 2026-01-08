@@ -115,30 +115,36 @@ export default function BagDetailPage() {
 
             <div className="grid md:grid-cols-3 gap-8">
                 <div className="md:col-span-1 space-y-6">
-                    <Card className="rounded-3xl border-gray-200 shadow-sm overflow-hidden text-white">
+                    <Card className="rounded-[2rem] border-[var(--dashboard-border)] shadow-xl overflow-hidden bg-[var(--dashboard-card)] text-[var(--dashboard-text)]">
                         <div className={cn(
-                            "h-48 flex flex-col items-center justify-center gap-2",
-                            bag.color.toLowerCase() === 'black' ? 'bg-black' : `bg-${bag.color.toLowerCase()}-500`
-                        )} style={{ backgroundColor: bag.color.toLowerCase() === 'black' ? '#000' : (bag.color.toLowerCase() === 'white' ? '#f1f1f1' : bag.color.toLowerCase()), color: bag.color.toLowerCase() === 'white' ? '#000' : '#fff' }}>
-                            <span className="text-5xl font-black tracking-tighter">{bag.number}</span>
-                            <span className="text-[10px] uppercase font-bold tracking-[0.3em] opacity-70">{bag.color} Warehouse Bag</span>
+                            "h-48 flex flex-col items-center justify-center gap-2 relative overflow-hidden",
+                            bag.color.toLowerCase() === 'black' ? 'bg-black' :
+                                bag.color.toLowerCase() === 'white' ? 'bg-white text-black' : `bg-${bag.color.toLowerCase()}-500`
+                        )} style={{
+                            backgroundColor: bag.color.toLowerCase() === 'black' ? '#111' : (bag.color.toLowerCase() === 'white' ? '#fff' : bag.color.toLowerCase()),
+                            color: bag.color.toLowerCase() === 'white' ? '#000' : '#fff'
+                        }}>
+                            {/* Glossy overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent opacity-50" />
+                            <span className="text-6xl font-black tracking-tighter relative z-10">{bag.number}</span>
+                            <span className="text-[10px] uppercase font-bold tracking-[0.3em] opacity-70 relative z-10">{bag.color} Warehouse Bag</span>
                         </div>
-                        <CardContent className="p-6 text-black">
-                            <div className="space-y-4">
+                        <CardContent className="p-8">
+                            <div className="space-y-6">
                                 <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Inventory Status</p>
-                                    <div className="flex items-center gap-2">
-                                        <div className={cn("h-2 w-2 rounded-full", totalItems > 0 ? "bg-blue-500" : "bg-gray-300")} />
-                                        <span className="text-sm font-bold capitalize">{totalItems > 0 ? `${totalItems} Items Packed` : 'Empty'}</span>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)] mb-3">Inventory Status</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className={cn("h-3 w-3 rounded-full animate-pulse", totalItems > 0 ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" : "bg-gray-600")} />
+                                        <span className="text-sm font-bold tracking-tight">{totalItems > 0 ? `${totalItems} Items Packed` : 'Empty'}</span>
                                     </div>
                                 </div>
                                 {orderAssignments.length > 0 && (
-                                    <div className="p-3 rounded-xl bg-blue-50 border border-blue-100">
-                                        <div className="flex items-center gap-2 text-blue-700 mb-1">
-                                            <Info className="h-3 w-3" />
+                                    <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+                                        <div className="flex items-center gap-2 text-blue-400 mb-2">
+                                            <Info className="h-3.5 w-3.5" />
                                             <p className="text-[10px] font-bold uppercase tracking-widest leading-none">Order Assignment</p>
                                         </div>
-                                        <Link href={`/admin/orders/${orderAssignments[0].order_id}`} className="text-xs font-bold hover:underline block truncate">
+                                        <Link href={`/admin/orders/${orderAssignments[0].order_id}`} className="text-xs font-bold hover:underline block truncate text-blue-300">
                                             Order #{orderAssignments[0].order_id.slice(0, 8)}
                                         </Link>
                                     </div>
@@ -147,45 +153,49 @@ export default function BagDetailPage() {
                         </CardContent>
                     </Card>
 
-                    <Button variant="outline" className="w-full rounded-2xl h-12 border-gray-200 font-bold uppercase tracking-widest text-[10px]">
+                    <Button variant="outline" className="w-full rounded-2xl h-14 border-[var(--dashboard-border)] bg-[var(--dashboard-card)] font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-gold hover:text-black transition-all shadow-lg">
                         Print Bag Label
                     </Button>
                 </div>
 
                 <div className="md:col-span-2 space-y-6">
-                    <Card className="rounded-[2.5rem] border-gray-200 shadow-xl overflow-hidden min-h-[400px]">
-                        <CardHeader className="bg-gray-50/50 border-b p-8">
-                            <CardTitle className="text-xl font-serif">Manifest Contents</CardTitle>
+                    <Card className="rounded-[2.5rem] border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-2xl overflow-hidden min-h-[500px]">
+                        <CardHeader className="bg-white/5 border-b border-[var(--dashboard-border)] p-8">
+                            <CardTitle className="text-2xl font-serif text-[var(--dashboard-text)]">Manifest Contents</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0">
                             {totalItems === 0 ? (
-                                <div className="p-24 text-center text-gray-400">
-                                    <Package className="h-16 w-16 mx-auto mb-4 opacity-10" />
-                                    <p className="font-medium">This bag is currently empty.</p>
-                                    <p className="text-xs mt-1">Add items from the catalog or assign it to an order.</p>
+                                <div className="p-32 text-center text-[var(--dashboard-text-muted)]">
+                                    <Package className="h-20 w-20 mx-auto mb-6 opacity-20" />
+                                    <p className="text-lg font-light">This bag is currently empty.</p>
+                                    <p className="text-[10px] mt-2 uppercase tracking-[0.2em] font-bold opacity-50">Add items from the catalog or assign it to an order.</p>
                                 </div>
                             ) : (
-                                <div className="divide-y divide-gray-100">
+                                <div className="divide-y divide-[var(--dashboard-border)]">
                                     {/* Order-specific items */}
                                     {orderAssignments.map((assignment) => (
-                                        <div key={assignment.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors group">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-12 w-12 rounded-2xl bg-blue-50 flex items-center justify-center border border-blue-100">
-                                                    <ClipboardList className="h-6 w-6 text-blue-500" />
+                                        <div key={assignment.id} className="p-8 flex items-center justify-between hover:bg-white/5 transition-all group">
+                                            <div className="flex items-center gap-6">
+                                                <div className="h-14 w-14 rounded-[1.25rem] bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shadow-inner">
+                                                    <ClipboardList className="h-7 w-7 text-blue-400" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-sm tracking-tight">{assignment.order_items?.products?.name || 'Unknown Item'}</p>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-black uppercase">Order</span>
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-1">Qty:</span>
-                                                            <input
-                                                                type="number"
-                                                                min="1"
-                                                                value={assignment.quantity}
-                                                                onChange={(e) => updateOrderAssignmentQuantity(assignment.id, parseInt(e.target.value) || 1)}
-                                                                className="w-12 h-6 bg-transparent border-b border-gray-200 text-[10px] font-bold text-center focus:outline-none focus:border-blue-500"
-                                                            />
+                                                    <p className="font-bold text-lg tracking-tight text-[var(--dashboard-text)] mb-1">
+                                                        {assignment.order_items?.products?.name || 'Unknown Item'}
+                                                    </p>
+                                                    <div className="flex items-center gap-4">
+                                                        <span className="text-[9px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-black uppercase tracking-widest">Order</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-[10px] text-[var(--dashboard-text-muted)] font-bold uppercase tracking-widest">Quantity:</span>
+                                                            <div className="flex items-center gap-1 bg-black/20 rounded-lg border border-[var(--dashboard-border)] px-1">
+                                                                <input
+                                                                    type="number"
+                                                                    min="1"
+                                                                    value={assignment.quantity}
+                                                                    onChange={(e) => updateOrderAssignmentQuantity(assignment.id, parseInt(e.target.value) || 1)}
+                                                                    className="w-10 h-8 bg-transparent text-[11px] font-black text-center focus:outline-none text-[var(--dashboard-text)]"
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -194,33 +204,37 @@ export default function BagDetailPage() {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => removeOrderAssignment(assignment.id)}
-                                                className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 hover:text-red-500 rounded-xl"
+                                                className="opacity-0 group-hover:opacity-100 transition-all text-[var(--dashboard-text-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-2xl h-12 w-12"
                                             >
-                                                <Trash2 className="h-4 w-4" />
+                                                <Trash2 className="h-5 w-5" />
                                             </Button>
                                         </div>
                                     ))}
 
                                     {/* General catalog items */}
                                     {catalogItems.map((item) => (
-                                        <div key={item.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors group">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-12 w-12 rounded-2xl bg-amber-50 flex items-center justify-center border border-amber-100">
-                                                    <Package className="h-6 w-6 text-amber-500" />
+                                        <div key={item.id} className="p-8 flex items-center justify-between hover:bg-white/5 transition-all group">
+                                            <div className="flex items-center gap-6">
+                                                <div className="h-14 w-14 rounded-[1.25rem] bg-amber-500/10 flex items-center justify-center border border-amber-500/20 shadow-inner">
+                                                    <Package className="h-7 w-7 text-amber-400" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-sm tracking-tight">{item.products?.name || 'Unknown Item'}</p>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <span className="text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-black uppercase">Catalog</span>
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-1">Qty:</span>
-                                                            <input
-                                                                type="number"
-                                                                min="1"
-                                                                value={item.quantity}
-                                                                onChange={(e) => updateCatalogItemQuantity(item.id, parseInt(e.target.value) || 1)}
-                                                                className="w-12 h-6 bg-transparent border-b border-gray-200 text-[10px] font-bold text-center focus:outline-none focus:border-amber-500"
-                                                            />
+                                                    <p className="font-bold text-lg tracking-tight text-[var(--dashboard-text)] mb-1">
+                                                        {item.products?.name || 'Unknown Item'}
+                                                    </p>
+                                                    <div className="flex items-center gap-4">
+                                                        <span className="text-[9px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-black uppercase tracking-widest">Catalog</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-[10px] text-[var(--dashboard-text-muted)] font-bold uppercase tracking-widest">Quantity:</span>
+                                                            <div className="flex items-center gap-1 bg-black/20 rounded-lg border border-[var(--dashboard-border)] px-1">
+                                                                <input
+                                                                    type="number"
+                                                                    min="1"
+                                                                    value={item.quantity}
+                                                                    onChange={(e) => updateCatalogItemQuantity(item.id, parseInt(e.target.value) || 1)}
+                                                                    className="w-10 h-8 bg-transparent text-[11px] font-black text-center focus:outline-none text-[var(--dashboard-text)]"
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -229,9 +243,9 @@ export default function BagDetailPage() {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => removeCatalogItem(item.id)}
-                                                className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-300 hover:text-red-500 rounded-xl"
+                                                className="opacity-0 group-hover:opacity-100 transition-all text-[var(--dashboard-text-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-2xl h-12 w-12"
                                             >
-                                                <Trash2 className="h-4 w-4" />
+                                                <Trash2 className="h-5 w-5" />
                                             </Button>
                                         </div>
                                     ))}
