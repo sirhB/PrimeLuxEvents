@@ -92,3 +92,81 @@ export async function updatePortfolioImage(
         return { error: error.message }
     }
 }
+
+export async function createPortfolioCategory(data: {
+    name: string
+    slug: string
+    description?: string
+    cover_image?: string
+}) {
+    const supabase = await createClient()
+
+    try {
+        const { data: category, error } = await supabase
+            .from('portfolio_categories')
+            .insert(data)
+            .select()
+            .single()
+
+        if (error) {
+            return { error: error.message }
+        }
+
+        revalidatePath('/admin/portfolio')
+        return { success: true, data: category }
+    } catch (error: any) {
+        return { error: error.message }
+    }
+}
+
+export async function updatePortfolioCategory(
+    id: string,
+    data: {
+        name?: string
+        slug?: string
+        description?: string
+        cover_image?: string
+    }
+) {
+    const supabase = await createClient()
+
+    try {
+        const { error } = await supabase
+            .from('portfolio_categories')
+            .update({
+                ...data,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', id)
+
+        if (error) {
+            return { error: error.message }
+        }
+
+        revalidatePath('/admin/portfolio')
+        revalidatePath(`/admin/portfolio/${id}`)
+        return { success: true }
+    } catch (error: any) {
+        return { error: error.message }
+    }
+}
+
+export async function deletePortfolioCategory(id: string) {
+    const supabase = await createClient()
+
+    try {
+        const { error } = await supabase
+            .from('portfolio_categories')
+            .delete()
+            .eq('id', id)
+
+        if (error) {
+            return { error: error.message }
+        }
+
+        revalidatePath('/admin/portfolio')
+        return { success: true }
+    } catch (error: any) {
+        return { error: error.message }
+    }
+}
