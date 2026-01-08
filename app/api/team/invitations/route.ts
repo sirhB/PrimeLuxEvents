@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
         const supabase = await createClient()
         const body = await request.json()
-        const { email, role_ids } = body
+        const { email, role_ids, temp_password } = body
 
         if (!email || !role_ids || !Array.isArray(role_ids) || role_ids.length === 0) {
             return NextResponse.json(
@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
             .insert({
                 email: email.toLowerCase().trim(),
                 role_ids,
+                temp_password,
                 invitation_token,
                 expires_at: expires_at.toISOString(),
                 invited_by: user?.id

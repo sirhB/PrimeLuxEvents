@@ -3,37 +3,12 @@ import { TasksCard } from '@/components/admin/dashboard/tasks-card'
 import { MeetingsCard } from '@/components/admin/dashboard/meetings-card'
 import { UpcomingOrdersCard } from '@/components/admin/dashboard/upcoming-orders-card'
 import { AlertsCard } from '@/components/admin/dashboard/alerts-card'
-import { RecentActivityList } from '@/components/admin/dashboard/recent-activity-list'
-import { createClient } from '@/lib/supabase/server'
+import { RecentTemplates } from '@/components/admin/dashboard/recent-templates'
+import { motion } from 'framer-motion'
 
 export const dynamic = 'force-dynamic'
 
-export default async function AdminDashboardPage() {
-    const supabase = await createClient()
-
-    // Fetch data for alerts
-    const { count: lowStockCount } = await supabase
-        .from('products')
-        .select('*', { count: 'exact', head: true })
-        .lt('stock_quantity', 10)
-
-    const { count: pendingOrdersCount } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending')
-
-    const { count: pendingTasksCount } = await supabase
-        .from('tasks')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending')
-
-    // Fetch recent orders for activity list
-    const { data: recentOrders } = await supabase
-        .from('orders')
-        .select('id, customer_name, total_amount, status, created_at')
-        .order('created_at', { ascending: false })
-        .limit(5)
-
+export default function AdminDashboardPage() {
     return (
         <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -71,12 +46,8 @@ export default async function AdminDashboardPage() {
                     <UpcomingOrdersCard />
 
                     <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
-                        <AlertsCard
-                            pendingOrdersCount={pendingOrdersCount || 0}
-                            lowStockCount={lowStockCount || 0}
-                            pendingTasksCount={pendingTasksCount || 0}
-                        />
-                        <RecentActivityList orders={recentOrders || []} />
+                        <AlertsCard />
+                        <RecentTemplates />
                     </div>
                 </div>
             </div>

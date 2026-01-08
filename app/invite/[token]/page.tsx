@@ -14,6 +14,7 @@ interface InvitationData {
     email: string
     role_ids: string[]
     expires_at: string
+    requires_temp_password: boolean
 }
 
 export default function AcceptInvitationPage({ params }: { params: Promise<{ token: string }> }) {
@@ -24,7 +25,8 @@ export default function AcceptInvitationPage({ params }: { params: Promise<{ tok
     const [formData, setFormData] = useState({
         password: '',
         confirmPassword: '',
-        fullName: ''
+        fullName: '',
+        tempPassword: ''
     })
     const router = useRouter()
 
@@ -80,7 +82,8 @@ export default function AcceptInvitationPage({ params }: { params: Promise<{ tok
                 },
                 body: JSON.stringify({
                     password: formData.password,
-                    full_name: formData.fullName || null
+                    full_name: formData.fullName || null,
+                    temp_password: formData.tempPassword
                 })
             })
 
@@ -156,7 +159,6 @@ export default function AcceptInvitationPage({ params }: { params: Promise<{ tok
                                 This email address will be used for your account
                             </p>
                         </div>
-
                         <div>
                             <Label htmlFor="fullName">Full Name</Label>
                             <Input
@@ -166,6 +168,23 @@ export default function AcceptInvitationPage({ params }: { params: Promise<{ tok
                                 placeholder="Enter your full name"
                             />
                         </div>
+
+                        {invitation.requires_temp_password && (
+                            <div>
+                                <Label htmlFor="tempPassword">Temporary Password</Label>
+                                <Input
+                                    id="tempPassword"
+                                    type="text"
+                                    value={formData.tempPassword}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, tempPassword: e.target.value }))}
+                                    placeholder="Enter the temporary password provided by admin"
+                                    required
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    You should have received this from your administrator
+                                </p>
+                            </div>
+                        )}
 
                         <div>
                             <Label htmlFor="password">Password</Label>
@@ -214,6 +233,6 @@ export default function AcceptInvitationPage({ params }: { params: Promise<{ tok
                     </CardContent>
                 </form>
             </Card>
-        </div>
+        </div >
     )
 }

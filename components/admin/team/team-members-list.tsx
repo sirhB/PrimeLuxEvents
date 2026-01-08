@@ -57,11 +57,9 @@ export function TeamMembersList({ members, roles, canManage }: TeamMembersListPr
     const filteredMembers = members.filter(member => {
         const query = searchQuery.toLowerCase()
         return (
-            (member.full_name || '').toLowerCase().includes(query) ||
+            member.full_name?.toLowerCase().includes(query) ||
             member.email.toLowerCase().includes(query) ||
-            (member.job_title || '').toLowerCase().includes(query) ||
-            (member.department || '').toLowerCase().includes(query) ||
-            (member.user_roles || []).some(ur => (ur.roles?.display_name || '').toLowerCase().includes(query))
+            member.user_roles?.some(ur => ur.roles?.display_name.toLowerCase().includes(query))
         )
     })
 

@@ -25,6 +25,8 @@ interface InviteUserDialogProps {
 export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
     const [open, setOpen] = useState(false)
     const [email, setEmail] = useState('')
+    const [tempPassword, setTempPassword] = useState('')
+    const [invitationLink, setInvitationLink] = useState('')
     const [selectedRoles, setSelectedRoles] = useState<string[]>([])
     const [availableRoles, setAvailableRoles] = useState<Role[]>([])
     const [loading, setLoading] = useState(false)
@@ -59,6 +61,15 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
         }
     }
 
+    const generateTempPassword = () => {
+        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*'
+        let password = ''
+        for (let i = 0; i < 12; i++) {
+            password += chars.charAt(Math.floor(Math.random() * chars.length))
+        }
+        setTempPassword(password)
+    }
+
     const removeRole = (roleId: string) => {
         setSelectedRoles(selectedRoles.filter(id => id !== roleId))
     }
@@ -85,7 +96,8 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
                 },
                 body: JSON.stringify({
                     email: email.trim(),
-                    role_ids: selectedRoles
+                    role_ids: selectedRoles,
+                    temp_password: tempPassword
                 })
             })
 
@@ -95,10 +107,11 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
                 throw new Error(data.error || 'Failed to send invitation')
             }
 
-            toast.success('Invitation sent successfully!')
-            setEmail('')
-            setSelectedRoles([])
-            setOpen(false)
+            toast.success('Invitation created successfully!')
+            const url = `${window.location.origin}/invite/${data.invitation.invitation_token}`
+            setInvitationLink(url)
+            // Note: We don't clear email/tempPassword yet so the admin can copy the link
+            // setOpen(false)
 
             // Here you would typically send an email with the invitation link
             // For now, show the invitation URL that can be shared
@@ -129,7 +142,7 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
                 <DialogHeader>
                     <DialogTitle>Invite Team Member</DialogTitle>
                     <DialogDescription>
-                        Send an invitation to join your team. They'll receive an email with instructions to create their account.
+                        Create an invitation for a new team member. Set a temporary password they'll use to verify their identity.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -144,6 +157,31 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
                             placeholder="colleague@company.com"
                             required
                         />
+                    </div>
+
+                    <div>
+                        <Label htmlFor="tempPassword">Temporary Password</Label>
+                        <div className="flex gap-2">
+                            <Input
+                                id="tempPassword"
+                                type="text"
+                                value={tempPassword}
+                                onChange={(e) => setTempPassword(e.target.value)}
+                                placeholder="Temporary password"
+                                required
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={generateTempPassword}
+                                className="shrink-0"
+                            >
+                                Generate
+                            </Button>
+                        </div>
+                        <p className="text-[10px] text-[var(--dashboard-text-muted)] font-bold uppercase tracking-wider mt-1">
+                            The user will need this password to finalize their account.
+                        </p>
                     </div>
 
                     <div>
@@ -192,19 +230,54 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
                     </div>
 
                     <div className="flex justify-end gap-3 pt-4">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setOpen(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? 'Sending...' : 'Send Invitation'}
+                        <Button type="submit" disabled={loading || !!invitationLink}>
+                            {loading ? 'Creating...' : 'Create Invitation'}
                         </Button>
                     </div>
+
+                    {invitationLink && (
+                        <div className="mt-6 p-4 rounded-lg bg-black/20 border border-[var(--dashboard-accent-gold)]/20 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <Label className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-accent-gold)]">Invitation Link</Label>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 text-[10px]"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(invitationLink)
+                                        toast.success('Link copied to clipboard')
+                                    }}
+                                >
+                                    Copy Link
+                                </Button>
+                            </div>
+                            <div className="p-2 bg-black/40 rounded border border-white/5 break-all">
+                                <code className="text-xs text-[var(--dashboard-text)]">
+                                    {invitationLink}
+                                </code>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Temporary Password</span>
+                                <code className="text-sm text-[var(--dashboard-accent-gold)] font-mono">{tempPassword}</code>
+                            </div>
+                            <Button
+                                type="button"
+                                className="w-full mt-2"
+                                onClick={() => {
+                                    setOpen(false)
+                                    setEmail('')
+                                    setTempPassword('')
+                                    setInvitationLink('')
+                                    setSelectedRoles([])
+                                }}
+                            >
+                                Done
+                            </Button>
+                        </div>
+                    )}
                 </form>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     )
 }

@@ -48,7 +48,8 @@ export async function GET(
             valid: true,
             email: invitation.email,
             role_ids: invitation.role_ids,
-            expires_at: invitation.expires_at
+            expires_at: invitation.expires_at,
+            requires_temp_password: !!invitation.temp_password
         })
 
     } catch (error) {
@@ -68,7 +69,7 @@ export async function POST(
         const { token } = await params
         const supabase = await createClient()
         const body = await request.json()
-        const { password, full_name } = body
+        const { password, full_name, temp_password } = body
 
         if (!password || password.length < 6) {
             return NextResponse.json(
@@ -93,6 +94,14 @@ export async function POST(
             )
         }
 
+        // Verify temp password
+        if (invitation.temp_password && invitation.temp_password !== temp_password) {
+            return NextResponse.json(
+                { error: 'Incorrect temporary password' },
+                { status: 400 }
+            )
+        }
+
         // Create the user account
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email: invitation.email,
@@ -111,7 +120,8 @@ export async function POST(
             )
         }
 
-        if (!authData.user) {
+        const authUser = authData.user
+        if (!authUser) {
             return NextResponse.json(
                 { error: 'Failed to create user account' },
                 { status: 500 }
@@ -122,7 +132,7 @@ export async function POST(
         const { error: profileError } = await supabase
             .from('user_profiles')
             .insert({
-                id: authData.user.id,
+                id: authUser.id,
                 email: invitation.email,
                 full_name: full_name || null,
                 is_active: true
@@ -135,7 +145,7 @@ export async function POST(
 
         // Assign roles
         const roleInserts = invitation.role_ids.map((roleId: string) => ({
-            user_id: authData.user.id,
+            user_id: authUser.id,
             role_id: roleId,
             assigned_by: invitation.invited_by
         }))
@@ -161,8 +171,8 @@ export async function POST(
         return NextResponse.json({
             success: true,
             user: {
-                id: authData.user.id,
-                email: authData.user.email
+                id: authUser.id,
+                email: authUser.email
             }
         })
 

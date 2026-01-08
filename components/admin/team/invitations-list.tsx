@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { MoreVertical, Mail, Clock, CheckCircle, XCircle, RefreshCw } from 'lucide-react'
+import { MoreVertical, Mail, Clock, CheckCircle, XCircle, RefreshCw, Copy, Shield } from 'lucide-react'
+import { toast } from 'sonner'
 import { format } from 'date-fns'
 
 interface Invitation {
@@ -13,7 +14,9 @@ interface Invitation {
     status: 'pending' | 'accepted' | 'expired' | 'cancelled'
     expires_at: string
     created_at: string
+    invitation_token: string
     invited_by: string | null
+    temp_password?: string
 }
 
 interface InvitationsListProps {
@@ -58,13 +61,13 @@ export function InvitationsList({ invitations, canManage }: InvitationsListProps
 
     return (
         <Card>
-            <CardHeader>
-                <CardTitle>Pending Invitations</CardTitle>
-                <CardDescription>
+            <CardHeader className="border-b border-white/5 bg-white/5">
+                <CardTitle className="text-xl font-serif text-[var(--dashboard-text)]">Pending Invitations</CardTitle>
+                <CardDescription className="text-[var(--dashboard-text-muted)]">
                     Track and manage team member invitations
                 </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
                 {invitations.length === 0 ? (
                     <div className="text-center py-8">
                         <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -76,13 +79,13 @@ export function InvitationsList({ invitations, canManage }: InvitationsListProps
                 ) : (
                     <div className="space-y-4">
                         {invitations.map((invitation) => (
-                            <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-lg">
+                            <div key={invitation.id} className="flex items-center justify-between p-4 glass-card border-none hover:bg-white/5 transition-colors">
                                 <div className="flex items-center space-x-4">
                                     {getStatusIcon(invitation.status)}
 
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <h3 className="font-medium text-gray-900 truncate">
+                                            <h3 className="font-medium text-[var(--dashboard-text)] truncate">
                                                 {invitation.email}
                                             </h3>
                                             {getStatusBadge(invitation.status)}
@@ -93,13 +96,21 @@ export function InvitationsList({ invitations, canManage }: InvitationsListProps
                                             )}
                                         </div>
 
-                                        <div className="flex items-center gap-4 text-xs text-gray-500">
-                                            <span>
+                                        <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                            <span className="flex items-center gap-1">
+                                                <Mail className="h-3 w-3" />
                                                 Sent {format(new Date(invitation.created_at), 'MMM d, yyyy')}
                                             </span>
-                                            <span>
+                                            <span className="flex items-center gap-1">
+                                                <Clock className="h-3 w-3" />
                                                 Expires {format(new Date(invitation.expires_at), 'MMM d, yyyy')}
                                             </span>
+                                            {invitation.temp_password && (
+                                                <span className="flex items-center gap-1 text-[var(--dashboard-accent-gold)]">
+                                                    <Shield className="h-3 w-3" />
+                                                    Temp Pass Set
+                                                </span>
+                                            )}
                                             {invitation.invited_by && (
                                                 <span>
                                                     Invited by: {invitation.invited_by}
@@ -117,10 +128,21 @@ export function InvitationsList({ invitations, canManage }: InvitationsListProps
                                                 <span className="sr-only">Actions</span>
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem className="flex items-center gap-2">
+                                        <DropdownMenuContent align="end" className="glass-card border-white/10 bg-black/90 text-[var(--dashboard-text)]">
+                                            <DropdownMenuItem
+                                                className="flex items-center gap-2 cursor-pointer focus:bg-[var(--dashboard-accent-gold)] focus:text-black"
+                                                onClick={() => {
+                                                    const url = `${window.location.origin}/invite/${invitation.invitation_token}`
+                                                    navigator.clipboard.writeText(url)
+                                                    toast.success('Invitation link copied')
+                                                }}
+                                            >
+                                                <Copy className="h-4 w-4" />
+                                                Copy Invite Link
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem className="flex items-center gap-2 cursor-pointer focus:bg-[var(--dashboard-accent-gold)] focus:text-black">
                                                 <Mail className="h-4 w-4" />
-                                                Resend Invitation
+                                                Resend Email
                                             </DropdownMenuItem>
                                             <DropdownMenuItem className="flex items-center gap-2">
                                                 <RefreshCw className="h-4 w-4" />

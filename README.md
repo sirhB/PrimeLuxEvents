@@ -1,30 +1,50 @@
-# Event rental platform
+# PrimeLux Events
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+A premium event rental platform built with Next.js and Supabase.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/tactcamp-8321s-projects/v0-event-rental-platform)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/oJ8Yp3LeuoY)
+## Documentation
+- **[Features Guide](FEATURES.md)** - Overview of core platform functionality.
+- **[Admin Guide](ADMIN.md)** - Detailed look at administrative tools and management.
+- **[Future Roadmap](FUTURE_ROADMAPPING.md)** - Suggestions for expansion and future features.
 
-## Overview
+## Getting Started
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+### Prerequisites
+- Node.js (v18+)
+- Supabase Project
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd PrimeLuxEvents
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables:**
+   Create a `.env.local` file based on `.env.local.example` and fill in your Supabase credentials:
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=your-project-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+   ```
+
+4. **Database Setup:**
+   Apply the migrations found in `supabase/migrations` to your Supabase instance.
+
+5. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open the application:**
+   Visit `http://localhost:3000` to see the site.
 
 ## Deployment
 
-Your project is live at:
-
-**[https://vercel.com/tactcamp-8321s-projects/v0-event-rental-platform](https://vercel.com/tactcamp-8321s-projects/v0-event-rental-platform)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/oJ8Yp3LeuoY](https://v0.app/chat/oJ8Yp3LeuoY)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+This project is optimized for deployment on Vercel. Connect your repository to Vercel and ensure environment variables are configured.
