@@ -9,9 +9,10 @@ import { toast } from 'sonner'
 interface StripePaymentFormProps {
     onSuccess: (paymentIntentId: string) => void
     amount: number
+    disabled?: boolean
 }
 
-export function StripePaymentForm({ onSuccess, amount }: StripePaymentFormProps) {
+export function StripePaymentForm({ onSuccess, amount, disabled }: StripePaymentFormProps) {
     const stripe = useStripe()
     const elements = useElements()
     const [isProcessing, setIsProcessing] = useState(false)
@@ -68,7 +69,7 @@ export function StripePaymentForm({ onSuccess, amount }: StripePaymentFormProps)
 
             <Button
                 type="submit"
-                disabled={!stripe || isProcessing}
+                disabled={!stripe || isProcessing || disabled}
                 className="w-full h-14 text-lg bg-gold text-black hover:bg-gold/90 rounded-full font-medium shadow-lg hover:shadow-gold/20 transition-all duration-300"
             >
                 {isProcessing ? (

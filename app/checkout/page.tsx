@@ -33,6 +33,7 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog"
+import { SignatureCanvas } from '@/components/checkout/signature-canvas'
 
 
 
@@ -55,6 +56,7 @@ export default function CheckoutPage() {
     const [totals, setTotals] = useState<any>(null)
     const [isCalculating, setIsCalculating] = useState(false)
     const [agreesToRentalAgreement, setAgreesToRentalAgreement] = useState(false)
+    const [signatureData, setSignatureData] = useState<string | null>(null)
     const [clientSecret, setClientSecret] = useState<string | null>(null)
 
 
@@ -398,7 +400,33 @@ export default function CheckoutPage() {
                 sameDayPickup,
             }
 
-            const result = await createOrder(finalFormData, cartItems, paymentIntentId)
+            let signatureUrl = ''
+            if (signatureData) {
+                const supabase = createClient()
+                const fileName = `${paymentIntentId}-signature.png`
+                const base64Data = signatureData.split(',')[1]
+                const binaryData = atob(base64Data)
+                const array = []
+                for (let i = 0; i < binaryData.length; i++) {
+                    array.push(binaryData.charCodeAt(i))
+                }
+                const blob = new Blob([new Uint8Array(array)], { type: 'image/png' })
+
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('signatures')
+                    .upload(fileName, blob, { upsert: true })
+
+                if (uploadError) {
+                    console.error('Error uploading signature:', uploadError)
+                } else {
+                    const { data: publicUrl } = supabase.storage
+                        .from('signatures')
+                        .getPublicUrl(fileName)
+                    signatureUrl = publicUrl.publicUrl
+                }
+            }
+
+            const result = await createOrder(finalFormData, cartItems, paymentIntentId, signatureUrl)
 
             if (result.success) {
                 setIsSuccess(true)
@@ -426,6 +454,16 @@ export default function CheckoutPage() {
         if (!agreesToRentalAgreement) {
             setError("Please agree to the rental agreement terms before placing your order.")
             return
+        }
+
+        if (!signatureData) {
+            setError("Please sign the rental agreement before placing your order.")
+            return
+        }
+
+        // Mock payment for development if no clientSecret
+        if (!clientSecret) {
+            await handlePaymentSuccess('mock_pi_' + Math.random().toString(36).substring(7))
         }
     }
 
@@ -1151,6 +1189,7 @@ export default function CheckoutPage() {
                                             <StripePaymentForm
                                                 amount={totals?.totalAmount || 0}
                                                 onSuccess={handlePaymentSuccess}
+                                                disabled={!agreesToRentalAgreement || !signatureData}
                                             />
                                         </Elements>
                                     ) : (
@@ -1158,6 +1197,29 @@ export default function CheckoutPage() {
                                             <Loader2 className="h-10 w-10 animate-spin text-gold" />
                                             <p className="text-sm font-light text-gray-500">Initializing secure payment...</p>
                                         </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Signature Canvas */}
+                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
+                                <div className="p-10 border-b border-border/5">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
+                                            <Check className="h-6 w-6 text-gold" />
+                                        </div>
+                                        <h3 className="text-2xl font-serif font-bold text-gray-900">Sign Your Agreement</h3>
+                                    </div>
+                                </div>
+                                <div className="p-10">
+                                    <SignatureCanvas
+                                        onSave={setSignatureData}
+                                        onClear={() => setSignatureData(null)}
+                                    />
+                                    {!signatureData && (
+                                        <p className="text-red-500 text-[10px] mt-2 font-bold uppercase tracking-widest">
+                                            Signature is required to proceed.
+                                        </p>
                                     )}
                                 </div>
                             </div>
@@ -1247,7 +1309,7 @@ export default function CheckoutPage() {
                                         <Button
                                             className="w-full h-16 bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full text-[11px] font-bold uppercase tracking-[0.2em] shadow-2xl transition-all duration-500 group"
                                             onClick={handleSubmit}
-                                            disabled={isLoading || isCalculating || !totals || !agreesToRentalAgreement}
+                                            disabled={isLoading || isCalculating || !totals || !agreesToRentalAgreement || !signatureData}
                                         >
                                             {isLoading ? (
                                                 <>

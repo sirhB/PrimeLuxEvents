@@ -35,19 +35,63 @@ export async function POST(req: Request) {
             const paymentIntent = event.data.object
             console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`)
 
-            // Update order status in database
+            // First, get the current order to calculate new balance
+            let { data: order, error: fetchError } = await supabase
+                .from('orders')
+                .select('id, total_amount, balance_paid')
+                .eq('payment_intent_id', paymentIntent.id)
+                .single()
+
+            // If not found by ID, check metadata (for balance payments)
+            if (fetchError || !order) {
+                const orderIdFromMetadata = paymentIntent.metadata?.orderId
+                if (orderIdFromMetadata) {
+                    const { data: orderMeta, error: metaError } = await supabase
+                        .from('orders')
+                        .select('id, total_amount, balance_paid')
+                        .eq('id', orderIdFromMetadata)
+                        .single()
+
+                    if (!metaError && orderMeta) {
+                        order = orderMeta
+                        fetchError = null
+                    }
+                }
+            }
+
+            if (fetchError || !order) {
+                console.error('Error fetching order for webhook:', fetchError)
+                return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+            }
+
+            const newBalancePaid = (order.balance_paid || 0) + paymentIntent.amount_received
+            const newStatus = newBalancePaid >= order.total_amount ? 'paid' : 'partially_paid'
+
+            // Update order status and balance
             const { error: updateError } = await supabase
                 .from('orders')
                 .update({
-                    payment_status: 'succeeded',
-                    status: 'confirmed' // Or whatever your confirmed status is
+                    payment_status: newStatus,
+                    balance_paid: newBalancePaid,
+                    status: 'confirmed'
                 })
-                .eq('payment_intent_id', paymentIntent.id)
+                .eq('id', order.id)
 
             if (updateError) {
                 console.error('Error updating order status:', updateError)
                 return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
             }
+
+            // Record the payment
+            await supabase
+                .from('payments')
+                .insert({
+                    order_id: order.id,
+                    amount: paymentIntent.amount_received,
+                    payment_method: paymentIntent.payment_method_types?.[0],
+                    payment_status: 'succeeded',
+                    stripe_payment_intent_id: paymentIntent.id
+                })
             break
 
         case 'payment_intent.payment_failed':

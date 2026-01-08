@@ -164,7 +164,7 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
 /**
  * Create a new order
  */
-export async function createOrder(formData: CheckoutFormData, items: CartItem[], paymentIntentId?: string) {
+export async function createOrder(formData: CheckoutFormData, items: CartItem[], paymentIntentId?: string, signatureUrl?: string) {
     try {
         const supabase = await createClient()
 
@@ -337,6 +337,9 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 pickup_time: formData.pickupTime,
                 pickup_notes: formData.pickupNotes,
                 same_day_pickup: formData.sameDayPickup || false,
+                signature_url: signatureUrl,
+                signed_at: signatureUrl ? new Date().toISOString() : null,
+                balance_paid: paymentIntentId ? totals.totalAmount : 0,
             })
             .select()
             .single()
