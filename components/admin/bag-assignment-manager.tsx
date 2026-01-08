@@ -23,6 +23,7 @@ export function BagAssignmentManager({ orderId, orderItems }: BagAssignmentManag
     const [assignments, setAssignments] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
+    const [quantity, setQuantity] = useState(1)
     const supabase = createClient()
 
     useEffect(() => {
@@ -41,6 +42,10 @@ export function BagAssignmentManager({ orderId, orderItems }: BagAssignmentManag
     }, [orderId])
 
     const assignToBag = async (itemId: string, bagId: string) => {
+        if (quantity < 1) {
+            toast.error('Quantity must be at least 1')
+            return
+        }
         setIsSaving(true)
         try {
             const { data, error } = await supabase
@@ -49,7 +54,7 @@ export function BagAssignmentManager({ orderId, orderItems }: BagAssignmentManag
                     order_id: orderId,
                     item_id: itemId,
                     bag_id: bagId,
-                    quantity: 1 // Default to 1 for now
+                    quantity: quantity
                 })
                 .select()
                 .single()
@@ -57,6 +62,7 @@ export function BagAssignmentManager({ orderId, orderItems }: BagAssignmentManag
             if (error) throw error
             setAssignments([...assignments, data])
             toast.success('Item assigned to bag')
+            // Don't reset quantity here as user might want to pack more items with same qty
         } catch (err: any) {
             toast.error(err.message)
         } finally {
@@ -119,7 +125,19 @@ export function BagAssignmentManager({ orderId, orderItems }: BagAssignmentManag
                                         </div>
 
                                         <div className="pt-2 border-t border-gray-200/50">
-                                            <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-2">Available Bags</p>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <p className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Available Bags</p>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Qty:</span>
+                                                    <input
+                                                        type="number"
+                                                        min="1"
+                                                        value={quantity}
+                                                        onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                                                        className="w-12 h-6 rounded border border-gray-200 text-[10px] font-bold text-center focus:outline-none focus:border-black"
+                                                    />
+                                                </div>
+                                            </div>
                                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                                                 {bags.filter(b => b.status === 'empty' || b.last_order_id === orderId).slice(0, 12).map(bag => (
                                                     <button
@@ -149,21 +167,13 @@ export function BagAssignmentManager({ orderId, orderItems }: BagAssignmentManag
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {assignments.reduce((acc, curr) => {
+                    {Object.entries(assignments.reduce((acc: any, curr: any) => {
                         const bag = bags.find(b => b.id === curr.bag_id)
                         if (!bag) return acc
                         const key = `${bag.color} ${bag.number}`
                         if (!acc[key]) acc[key] = { bag, items: [] }
                         const item = orderItems.find(i => i.id === curr.item_id)
-                        acc[key].items.push(item?.products?.name || 'Unknown')
-                        return acc
-                    }, {} as any) && Object.entries(assignments.reduce((acc: any, curr: any) => {
-                        const bag = bags.find(b => b.id === curr.bag_id)
-                        if (!bag) return acc
-                        const key = `${bag.color} ${bag.number}`
-                        if (!acc[key]) acc[key] = { bag, items: [] }
-                        const item = orderItems.find(i => i.id === curr.item_id)
-                        acc[key].items.push(item?.products?.name || 'Unknown')
+                        acc[key].items.push({ name: item?.products?.name || item?.name || 'Unknown', quantity: curr.quantity })
                         return acc
                     }, {})).map(([key, data]: any) => (
                         <div key={key} className="p-4 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-start gap-4">
@@ -173,9 +183,14 @@ export function BagAssignmentManager({ orderId, orderItems }: BagAssignmentManag
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{data.bag.color} Bag</p>
-                                <p className="text-xs font-medium truncate mt-1">
-                                    {data.items.join(', ')}
-                                </p>
+                                <div className="mt-1 space-y-0.5">
+                                    {data.items.map((it: any, idx: number) => (
+                                        <p key={idx} className="text-xs font-medium truncate flex items-center justify-between">
+                                            <span>{it.name}</span>
+                                            <span className="text-[9px] text-gray-400 ml-2">Qty: {it.quantity}</span>
+                                        </p>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     ))}

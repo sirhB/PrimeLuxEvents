@@ -37,6 +37,28 @@ export default function BagDetailPage() {
         fetchBagData()
     }, [fetchBagData])
 
+    const updateCatalogItemQuantity = async (itemId: string, newQty: number) => {
+        if (newQty < 1) return
+        try {
+            const { error } = await supabase.from('bag_catalog_items').update({ quantity: newQty }).eq('id', itemId)
+            if (error) throw error
+            fetchBagData()
+        } catch (err: any) {
+            toast.error(err.message)
+        }
+    }
+
+    const updateOrderAssignmentQuantity = async (assignmentId: string, newQty: number) => {
+        if (newQty < 1) return
+        try {
+            const { error } = await supabase.from('bag_assignments').update({ quantity: newQty }).eq('id', assignmentId)
+            if (error) throw error
+            fetchBagData()
+        } catch (err: any) {
+            toast.error(err.message)
+        }
+    }
+
     const removeCatalogItem = async (itemId: string) => {
         try {
             const { error } = await supabase.from('bag_catalog_items').delete().eq('id', itemId)
@@ -155,7 +177,16 @@ export default function BagDetailPage() {
                                                     <p className="font-bold text-sm tracking-tight">{assignment.order_items?.products?.name || 'Unknown Item'}</p>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-black uppercase">Order</span>
-                                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Qty: {assignment.quantity}</span>
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-1">Qty:</span>
+                                                            <input
+                                                                type="number"
+                                                                min="1"
+                                                                value={assignment.quantity}
+                                                                onChange={(e) => updateOrderAssignmentQuantity(assignment.id, parseInt(e.target.value) || 1)}
+                                                                className="w-12 h-6 bg-transparent border-b border-gray-200 text-[10px] font-bold text-center focus:outline-none focus:border-blue-500"
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -181,7 +212,16 @@ export default function BagDetailPage() {
                                                     <p className="font-bold text-sm tracking-tight">{item.products?.name || 'Unknown Item'}</p>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <span className="text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-black uppercase">Catalog</span>
-                                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Qty: {item.quantity}</span>
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mr-1">Qty:</span>
+                                                            <input
+                                                                type="number"
+                                                                min="1"
+                                                                value={item.quantity}
+                                                                onChange={(e) => updateCatalogItemQuantity(item.id, parseInt(e.target.value) || 1)}
+                                                                className="w-12 h-6 bg-transparent border-b border-gray-200 text-[10px] font-bold text-center focus:outline-none focus:border-amber-500"
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

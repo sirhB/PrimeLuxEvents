@@ -24,6 +24,7 @@ export function AddCatalogItemToBag({ bagId, onSuccess }: AddCatalogItemToBagPro
     const [search, setSearch] = useState('')
     const [products, setProducts] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
+    const [quantity, setQuantity] = useState(1)
     const [adding, setAdding] = useState<string | null>(null)
     const supabase = createClient()
 
@@ -46,6 +47,10 @@ export function AddCatalogItemToBag({ bagId, onSuccess }: AddCatalogItemToBagPro
     }
 
     const addToBag = async (productId: string) => {
+        if (quantity < 1) {
+            toast.error('Quantity must be at least 1')
+            return
+        }
         setAdding(productId)
         try {
             const { error } = await supabase
@@ -53,12 +58,13 @@ export function AddCatalogItemToBag({ bagId, onSuccess }: AddCatalogItemToBagPro
                 .insert({
                     bag_id: bagId,
                     product_id: productId,
-                    quantity: 1
+                    quantity: quantity
                 })
 
             if (error) throw error
             toast.success('Product added to bag')
             onSuccess()
+            setQuantity(1) // Reset quantity
         } catch (err: any) {
             toast.error(err.message)
         } finally {
@@ -79,14 +85,26 @@ export function AddCatalogItemToBag({ bagId, onSuccess }: AddCatalogItemToBagPro
                     <DialogTitle className="font-serif text-2xl">Add to Bag</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                            placeholder="Search products..."
-                            value={search}
-                            onChange={(e) => handleSearch(e.target.value)}
-                            className="pl-10 rounded-xl h-12"
-                        />
+                    <div className="flex gap-2">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                                placeholder="Search products..."
+                                value={search}
+                                onChange={(e) => handleSearch(e.target.value)}
+                                className="pl-10 rounded-xl h-12"
+                            />
+                        </div>
+                        <div className="w-24">
+                            <Input
+                                type="number"
+                                min="1"
+                                value={quantity}
+                                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                                className="rounded-xl h-12 text-center"
+                                placeholder="Qty"
+                            />
+                        </div>
                     </div>
 
                     <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
@@ -105,7 +123,7 @@ export function AddCatalogItemToBag({ bagId, onSuccess }: AddCatalogItemToBagPro
                                                 <Search className="h-4 w-4 text-gray-400" />
                                             </div>
                                         )}
-                                        <p className="text-sm font-bold truncate max-w-[180px]">{product.name}</p>
+                                        <p className="text-sm font-bold truncate max-w-[150px]">{product.name}</p>
                                     </div>
                                     <Button
                                         size="sm"
