@@ -15,11 +15,11 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Plus, Trash, X, Search, Link as LinkIcon, AlertCircle } from 'lucide-react'
+import { Plus, Trash, X, Search, Link as LinkIcon, AlertCircle, Unlink } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ImageUpload } from './image-upload'
-import { createProductVariant } from '@/app/admin/products/actions'
+import { createProductVariant, linkProductVariant, unlinkProductVariant } from '@/app/admin/products/actions'
 import {
     Dialog,
     DialogContent,
@@ -28,7 +28,14 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
+import {
+    CommandDialog,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from '@/components/ui/command'
 
 
 interface Category {
@@ -110,6 +117,59 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
             console.error(error)
         } finally {
             setCreatingVariant(false)
+        }
+    }
+
+    // Link Existing Variant State
+    const [openLinkSearch, setOpenLinkSearch] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [searchResults, setSearchResults] = useState<any[]>([])
+    const [searching, setSearching] = useState(false)
+
+    const searchProducts = async (query: string) => {
+        setSearchQuery(query)
+        if (query.length < 2) {
+            setSearchResults([])
+            return
+        }
+
+        setSearching(true)
+        try {
+            const { data, error } = await supabase
+                .from('products')
+                .select('id, name, color, group_id, image_url')
+                .ilike('name', `%${query}%`)
+                .neq('id', product?.id || 'new')
+                .limit(5)
+
+            if (error) throw error
+            setSearchResults(data || [])
+        } catch (error) {
+            console.error('Error searching products:', error)
+        } finally {
+            setSearching(false)
+        }
+    }
+
+    const handleLinkProduct = async (targetProduct: any) => {
+        try {
+            await linkProductVariant(product.id, targetProduct.id);
+            toast.success(`Linked ${targetProduct.name} to this group`)
+            setOpenLinkSearch(false)
+        } catch (error) {
+            toast.error("Failed to link product")
+        }
+    }
+
+    const handleUnlinkProduct = async (e: React.MouseEvent, variantId: string) => {
+        e.stopPropagation()
+        if (!confirm("Unlink this product from the group? It will become a standalone product.")) return;
+
+        try {
+            await unlinkProductVariant(variantId);
+            toast.success("Product unlinked")
+        } catch (error) {
+            toast.error("Failed to unlink")
         }
     }
 
@@ -344,51 +404,144 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                             )}
 
                             {product?.id && (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    {/* Current Product Card */}
-                                    <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-3 relative overflow-hidden">
-                                        <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-bl-md font-medium uppercase">
-                                            Current
-                                        </div>
-                                        <div className="h-10 w-10 bg-background rounded overflow-hidden flex-shrink-0">
-                                            {mainImage[0] && (
-                                                // eslint-disable-next-line @next/next/no-img-element
-                                                <img src={mainImage[0]} alt="" className="w-full h-full object-cover" />
-                                            )}
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="text-sm font-medium truncate">{product.name}</p>
-                                            <p className="text-xs text-muted-foreground">Color: {product.color || 'Default'}</p>
-                                        </div>
+                                <div className="space-y-4">
+                                    <div className="flex gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full"
+                                            onClick={() => setIsAddVariantOpen(true)}
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Create New Variant
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            size="sm"
+                                            className="w-full"
+                                            onClick={() => setOpenLinkSearch(true)}
+                                        >
+                                            <LinkIcon className="mr-2 h-4 w-4" />
+                                            Link Existing Product
+                                        </Button>
                                     </div>
 
-                                    {/* Sibling Variants */}
-                                    {variants.filter(v => v.id !== product.id).map(variant => (
-                                        <div
-                                            key={variant.id}
-                                            className="p-3 bg-muted/30 border border-border rounded-lg flex items-center gap-3 hover:bg-muted/50 transition-colors cursor-pointer group"
-                                            onClick={() => router.push(`/admin/products/${variant.id}`)}
-                                        >
-                                            <div className="h-10 w-10 bg-background rounded overflow-hidden flex-shrink-0">
-                                                {variant.image_url && (
-                                                    // eslint-disable-next-line @next/next/no-img-element
-                                                    <img src={variant.image_url} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100" />
-                                                )}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                        {/* Current Product Card */}
+                                        <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg flex flex-col gap-3 relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-bl-md font-medium uppercase">
+                                                Current
                                             </div>
-                                            <div className="min-w-0 flex-1">
-                                                <div className="flex items-center justify-between">
-                                                    <p className="text-sm font-medium truncate text-muted-foreground group-hover:text-foreground transition-colors">
-                                                        {variant.color || 'No Color'}
-                                                    </p>
-                                                    <LinkIcon className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-50" />
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 bg-background rounded overflow-hidden flex-shrink-0">
+                                                    {mainImage[0] && (
+                                                        // eslint-disable-next-line @next/next/no-img-element
+                                                        <img src={mainImage[0]} alt="" className="w-full h-full object-cover" />
+                                                    )}
                                                 </div>
-                                                <p className="text-xs text-muted-foreground truncate opacity-70">{variant.name}</p>
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-medium truncate">{product.name}</p>
+                                                    <p className="text-xs text-muted-foreground">Editing this one</p>
+                                                </div>
+                                            </div>
+                                            <div className="pt-2 border-t border-primary/10">
+                                                <Label htmlFor="color" className="text-xs">Color Name</Label>
+                                                <Input
+                                                    id="color"
+                                                    name="color"
+                                                    defaultValue={product.color}
+                                                    placeholder="e.g. Gold"
+                                                    className="h-8 text-xs mt-1 bg-white dark:bg-black/20"
+                                                />
                                             </div>
                                         </div>
-                                    ))}
+
+                                        {/* Sibling Variants */}
+                                        {variants.filter(v => v.id !== product.id).map(variant => (
+                                            <div
+                                                key={variant.id}
+                                                className="p-3 bg-muted/30 border border-border rounded-lg flex items-center gap-3 hover:bg-muted/50 transition-colors cursor-pointer group relative"
+                                                onClick={() => router.push(`/admin/products/${variant.id}`)}
+                                            >
+                                                <div className="h-10 w-10 bg-background rounded overflow-hidden flex-shrink-0">
+                                                    {variant.image_url && (
+                                                        // eslint-disable-next-line @next/next/no-img-element
+                                                        <img src={variant.image_url} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100" />
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className="text-sm font-medium truncate text-muted-foreground group-hover:text-foreground transition-colors">
+                                                            {variant.color || 'No Color'}
+                                                        </p>
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground truncate opacity-70">{variant.name}</p>
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6 absolute top-1 right-1 opacity-0 group-hover:opacity-100 hover:text-destructive hover:bg-destructive/10"
+                                                    onClick={(e) => handleUnlinkProduct(e, variant.id)}
+                                                    title="Unlink from group"
+                                                >
+                                                    <Unlink className="h-3 w-3" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
+
+                        {/* Link Existing Dialog */}
+                        <CommandDialog
+                            open={openLinkSearch}
+                            onOpenChange={setOpenLinkSearch}
+                            commandProps={{ shouldFilter: false }}
+                        >
+                            <CommandInput
+                                placeholder="Search product to link..."
+                                value={searchQuery}
+                                onValueChange={searchProducts}
+                            />
+                            <CommandList>
+                                <CommandEmpty>
+                                    {searching ? 'Searching...' : 'No products found.'}
+                                </CommandEmpty>
+                                <CommandGroup heading="Suggestions">
+                                    {searchResults.map((result) => (
+                                        <CommandItem
+                                            key={result.id}
+                                            value={result.id}
+                                            onSelect={() => handleLinkProduct(result)}
+                                            className="group flex items-center gap-4 p-3 cursor-pointer aria-selected:bg-neutral-50 aria-selected:text-foreground border-b last:border-0 border-border/50 transition-colors relative"
+                                        >
+                                            <div className="h-10 w-10 rounded bg-muted overflow-hidden flex-shrink-0 relative border border-border shadow-sm">
+                                                {result.image_url ? (
+                                                    // eslint-disable-next-line @next/next/no-img-element
+                                                    <img src={result.image_url} alt={result.name} className="object-cover w-full h-full" />
+                                                ) : (
+                                                    <div className="w-full h-full bg-secondary text-[9px] flex items-center justify-center text-muted-foreground">No Img</div>
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col flex-1 min-w-0">
+                                                <span className="font-medium truncate">{result.name}</span>
+                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                    <span>{result.color || 'No Color'}</span>
+                                                    {result.group_id && <span className="text-amber-600 bg-amber-500/10 px-1 rounded text-[10px] uppercase font-bold">In Group</span>}
+                                                </div>
+                                            </div>
+                                            <div className="text-[10px] font-bold uppercase text-muted-foreground group-aria-selected:text-primary opacity-0 group-aria-selected:opacity-100">
+                                                Link
+                                            </div>
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            </CommandList>
+                        </CommandDialog>
 
                         {/* Add Variant Dialog */}
                         <Dialog open={isAddVariantOpen} onOpenChange={setIsAddVariantOpen}>
