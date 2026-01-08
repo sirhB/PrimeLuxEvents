@@ -416,39 +416,58 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                             </div>
                         </div>
 
-                        <CommandDialog open={openVariantSearch} onOpenChange={setOpenVariantSearch}>
+                        <CommandDialog
+                            open={openVariantSearch}
+                            onOpenChange={setOpenVariantSearch}
+                            commandProps={{ shouldFilter: false }}
+                        >
                             <CommandInput
-                                placeholder="Search products..."
+                                placeholder="Search by product name..."
                                 value={variantSearchQuery}
                                 onValueChange={searchProducts}
                             />
                             <CommandList>
-                                <CommandEmpty>No products found.</CommandEmpty>
+                                <CommandEmpty>
+                                    {searching ? 'Searching...' : 'No products found.'}
+                                </CommandEmpty>
                                 <CommandGroup heading="Suggestions">
                                     {searchResults.map((result) => (
                                         <CommandItem
                                             key={result.id}
+                                            value={result.id}
                                             onSelect={() => handleSelectProduct(result)}
-                                            className="flex items-center gap-3 p-2 cursor-pointer"
+                                            className="flex items-center gap-4 p-3 cursor-pointer aria-selected:bg-gold/10 aria-selected:text-gold border-b last:border-0 border-border/50 transition-colors"
                                         >
-                                            <div className="h-10 w-10 rounded bg-muted overflow-hidden flex-shrink-0 relative">
+                                            <div className="h-12 w-12 rounded-lg bg-muted overflow-hidden flex-shrink-0 relative border border-border shadow-sm">
                                                 {result.image_url ? (
                                                     // eslint-disable-next-line @next/next/no-img-element
                                                     <img src={result.image_url} alt={result.name} className="object-cover w-full h-full" />
                                                 ) : (
-                                                    <div className="w-full h-full bg-secondary" />
+                                                    <div className="w-full h-full bg-secondary flex items-center justify-center text-xs text-muted-foreground">
+                                                        No Img
+                                                    </div>
                                                 )}
                                             </div>
-                                            <div className="flex flex-col">
-                                                <span className="font-medium">{result.name}</span>
-                                                <span className="text-xs text-muted-foreground">
-                                                    {result.color ? `Color: ${result.color}` : 'No color set'}
-                                                    {result.group_id && ' • Has Group'}
-                                                </span>
+                                            <div className="flex flex-col flex-1 min-w-0">
+                                                <span className="font-serif font-medium truncate">{result.name}</span>
+                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                    {result.color && (
+                                                        <span className="flex items-center gap-1">
+                                                            <span className="w-2 h-2 rounded-full bg-neutral-400" />
+                                                            {result.color}
+                                                        </span>
+                                                    )}
+                                                    {result.group_id && (
+                                                        <span className="px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 text-[10px] font-medium uppercase tracking-wider">
+                                                            Grouped
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            {result.group_id && (
-                                                <Badge variant="outline" className="ml-auto text-[10px]">Existing Group</Badge>
-                                            )}
+
+                                            <div className="text-xs font-medium uppercase tracking-widest text-muted-foreground opacity-0 group-aria-selected:opacity-100 transition-opacity">
+                                                Select
+                                            </div>
                                         </CommandItem>
                                     ))}
                                 </CommandGroup>
