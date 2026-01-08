@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Pencil, MoreVertical, Trash2, Package as PackageIcon, AlertCircle } from 'lucide-react'
+import { Pencil, MoreVertical, Trash2, Package as PackageIcon, AlertCircle, QrCode } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import {
     Table,
     TableBody,
@@ -34,6 +35,7 @@ interface ProductsTableProps {
 
 export function ProductsTable({ products }: ProductsTableProps) {
     const [selectedIds, setSelectedIds] = useState<string[]>([])
+    const router = useRouter()
 
     const toggleAll = () => {
         if (selectedIds.length === products.length) {
@@ -72,6 +74,15 @@ export function ProductsTable({ products }: ProductsTableProps) {
                         </Button>
                         <Button size="sm" variant="ghost" className="hover:bg-primary/10 hover:text-primary rounded-full font-bold uppercase text-[10px] tracking-wider">
                             Change Category
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            className="hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)] rounded-full font-bold uppercase text-[10px] tracking-wider"
+                            onClick={() => router.push(`/admin/products/print-labels?ids=${selectedIds.join(',')}`)}
+                        >
+                            <QrCode className="h-3.5 w-3.5 mr-2" />
+                            Print QR Labels
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])} className="rounded-full font-bold uppercase text-[10px] tracking-wider">
                             Cancel

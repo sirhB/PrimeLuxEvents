@@ -25,6 +25,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { toast } from 'sonner'
+import { updateOrdersStatusBulk } from '@/app/admin/orders/actions'
 
 interface Order {
     id: string
@@ -75,10 +77,43 @@ export function OrdersTable({ orders }: OrdersTableProps) {
                             {selectedIds.length} Selected
                         </span>
                         <div className="w-px h-6 bg-border/50 mx-2" />
-                        <Button size="sm" variant="ghost" className="hover:bg-primary/10 hover:text-primary rounded-full font-bold uppercase text-[10px] tracking-wider">
-                            Update Status
-                        </Button>
-                        <Button size="sm" variant="ghost" className="hover:bg-primary/10 hover:text-primary rounded-full font-bold uppercase text-[10px] tracking-wider">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button size="sm" variant="ghost" className="hover:bg-primary/10 hover:text-primary rounded-full font-bold uppercase text-[10px] tracking-wider">
+                                    Update Status
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="center" className="glass-card bg-black/95 text-[var(--dashboard-text)] border-[var(--dashboard-border)]">
+                                {['pending', 'confirmed', 'processing', 'delivered', 'cancelled'].map((status) => (
+                                    <DropdownMenuItem
+                                        key={status}
+                                        className="capitalize hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]"
+                                        onClick={async () => {
+                                            const promise = updateOrdersStatusBulk(selectedIds, status)
+                                            toast.promise(promise, {
+                                                loading: `Updating ${selectedIds.length} orders...`,
+                                                success: () => {
+                                                    setSelectedIds([])
+                                                    return `Successfully updated ${selectedIds.length} orders to ${status}`
+                                                },
+                                                error: 'Failed to update orders'
+                                            })
+                                        }}
+                                    >
+                                        Mark as {status}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            className="hover:bg-primary/10 hover:text-primary rounded-full font-bold uppercase text-[10px] tracking-wider"
+                            onClick={() => {
+                                toast.info("Printing invoices for " + selectedIds.length + " orders...")
+                                // In a real app, this would trigger a PDF generation or print flow
+                            }}
+                        >
                             Print Invoices
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])} className="rounded-full font-bold uppercase text-[10px] tracking-wider">

@@ -112,13 +112,17 @@ export default async function ProductsPage({
                 </div>
             </div>
 
-            <Tabs defaultValue="all" className="w-full">
+            <Tabs defaultValue={stock_status === 'low_stock' || stock_status === 'out_of_stock' ? 'inventory' : 'all'} className="w-full">
                 <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
-                    <TabsTrigger value="all" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">All Products</TabsTrigger>
-                    <TabsTrigger value="inventory" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Inventory</TabsTrigger>
+                    <TabsTrigger value="all" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
+                        <Link href="/admin/products">All Products</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="inventory" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
+                        <Link href="/admin/products?stock_status=low_stock">Needs Attention</Link>
+                    </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="all" className="space-y-6 mt-6 animate-fade-in">
+                <div className="space-y-6 mt-6 animate-fade-in">
                     <div className="flex flex-col xxl:flex-row gap-6 items-start xxl:items-center justify-between glass-card p-6 rounded-3xl border-none">
                         <div className="w-full max-w-md">
                             <SearchInput placeholder="Search products..." />
@@ -139,17 +143,9 @@ export default async function ProductsPage({
                             />
                         </div>
                     )}
-                </TabsContent>
-
-                <TabsContent value="inventory" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
-                        <div className="text-center">
-                            <Package className="h-10 w-10 text-[var(--dashboard-text-muted)] opacity-30 mx-auto mb-4" />
-                            <p className="text-[var(--dashboard-text-muted)] font-light">Inventory management view coming soon</p>
-                        </div>
-                    </div>
-                </TabsContent>
+                </div>
             </Tabs>
+
         </div>
     )
 }

@@ -113,15 +113,23 @@ export default async function OrdersPage({
                 </div>
             </div>
 
-            <Tabs defaultValue="all" className="w-full">
+            <Tabs defaultValue={status || 'all'} className="w-full">
                 <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
-                    <TabsTrigger value="all" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">All Orders</TabsTrigger>
-                    <TabsTrigger value="pending" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Pending</TabsTrigger>
-                    <TabsTrigger value="completed" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Completed</TabsTrigger>
-                    <TabsTrigger value="cancelled" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Cancelled</TabsTrigger>
+                    <TabsTrigger value="all" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
+                        <Link href="/admin/orders">All Orders</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="pending" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
+                        <Link href="/admin/orders?status=pending">Pending</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="delivered" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
+                        <Link href="/admin/orders?status=delivered">Completed</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="cancelled" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
+                        <Link href="/admin/orders?status=cancelled">Cancelled</Link>
+                    </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="all" className="space-y-6 mt-6 animate-fade-in">
+                <div className="space-y-6 mt-6 animate-fade-in">
                     <div className="flex flex-col xxl:flex-row gap-6 items-start xxl:items-center justify-between glass-card p-6 rounded-3xl border-none">
                         <div className="w-full max-w-md">
                             <SearchInput placeholder="Search orders..." />
@@ -150,24 +158,9 @@ export default async function OrdersPage({
                             />
                         </div>
                     )}
-                </TabsContent>
-
-                <TabsContent value="pending" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
-                        <p className="text-[var(--dashboard-text-muted)] font-light text-center">Filtered views coming soon</p>
-                    </div>
-                </TabsContent>
-                <TabsContent value="completed" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
-                        <p className="text-[var(--dashboard-text-muted)] font-light text-center">Filtered views coming soon</p>
-                    </div>
-                </TabsContent>
-                <TabsContent value="cancelled" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
-                        <p className="text-[var(--dashboard-text-muted)] font-light text-center">Filtered views coming soon</p>
-                    </div>
-                </TabsContent>
+                </div>
             </Tabs>
+
         </div>
     )
 }

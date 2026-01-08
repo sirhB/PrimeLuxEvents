@@ -136,3 +136,23 @@ export async function updateOrderStatus(orderId: string, status: string) {
         return { success: false, error: message }
     }
 }
+export async function updateOrdersStatusBulk(orderIds: string[], status: string) {
+    try {
+        const supabase = await createClient()
+
+        const { error } = await supabase
+            .from('orders')
+            .update({ status })
+            .in('id', orderIds)
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        revalidatePath('/admin/orders')
+        return { success: true }
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error'
+        return { success: false, error: message }
+    }
+}
