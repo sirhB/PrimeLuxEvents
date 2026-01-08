@@ -330,21 +330,19 @@ export default async function ConsultationsPage({
                                                     )}
 
                                                     {/* Actions */}
-                                                    <div className="pt-4 border-t border-[var(--dashboard-border)] flex items-center justify-between gap-2 mt-2">
-                                                        <div className="flex gap-1.5">
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]" asChild>
+                                                    <div className="pt-4 mt-auto border-t border-[var(--dashboard-border)] flex items-center justify-between gap-3">
+                                                        <div className="flex items-center gap-1 -ml-2">
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-gray-100 text-gray-500" asChild title="View Details">
                                                                 <Link href={`/admin/consultations/${consultation.id}`}>
                                                                     <Eye className="h-4 w-4" />
                                                                 </Link>
                                                             </Button>
-                                                            <div className="scale-90 origin-left">
-                                                                <ConsultationCardActions
-                                                                    consultationId={consultation.id}
-                                                                    customerName={getDisplayName(consultation)}
-                                                                    customerEmail={consultation.customer_email}
-                                                                    customerPhone={consultation.customer_phone}
-                                                                />
-                                                            </div>
+                                                            <ConsultationCardActions
+                                                                consultationId={consultation.id}
+                                                                customerName={getDisplayName(consultation)}
+                                                                customerEmail={consultation.customer_email}
+                                                                customerPhone={consultation.customer_phone}
+                                                            />
                                                         </div>
 
                                                         {nextStage && (
@@ -353,11 +351,10 @@ export default async function ConsultationsPage({
                                                                 <input type="hidden" name="status" value={nextStage} />
                                                                 <Button
                                                                     size="sm"
-                                                                    variant="outline"
-                                                                    className="h-8 text-[10px] font-bold uppercase tracking-widest px-3 rounded-lg border-[var(--dashboard-border)] hover:bg-[var(--dashboard-accent-gold)] hover:text-black hover:border-[var(--dashboard-accent-gold)] transition-all"
+                                                                    className="h-8 text-[10px] font-bold uppercase tracking-widest px-4 rounded-full bg-[var(--dashboard-accent-gold)] text-black hover:bg-[var(--dashboard-accent-gold)]/90 transition-all shadow-sm"
                                                                 >
                                                                     Advance
-                                                                    <ArrowRight className="ml-2 h-3 w-3" />
+                                                                    <ArrowRight className="ml-1.5 h-3 w-3" />
                                                                 </Button>
                                                             </form>
                                                         )}
