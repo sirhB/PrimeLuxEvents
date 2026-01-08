@@ -71,21 +71,28 @@ export function CategoryForm({ category }: CategoryFormProps) {
                                 id="name"
                                 name="name"
                                 defaultValue={category?.name}
+                                onChange={(e) => {
+                                    const slugInput = document.getElementById('slug') as HTMLInputElement
+                                    if (slugInput && (!slugInput.value || slugInput.value === category?.slug)) {
+                                        slugInput.value = e.target.value
+                                            .toLowerCase()
+                                            .replace(/[^a-z0-9\s]/g, '')
+                                            .trim()
+                                            .replace(/\s+/g, '-')
+                                    }
+                                }}
                                 placeholder="Enter category name"
                                 required
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="slug">URL Slug</Label>
-                            <Input
-                                id="slug"
-                                name="slug"
-                                defaultValue={category?.slug}
-                                placeholder="category-url-slug"
-                                required
-                            />
-                        </div>
+                        <Input
+                            id="slug"
+                            name="slug"
+                            type="hidden"
+                            defaultValue={category?.slug}
+                            required
+                        />
                     </div>
 
                     <div className="space-y-2">

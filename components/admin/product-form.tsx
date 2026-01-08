@@ -360,20 +360,16 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="slug">Product Slug (URL)</Label>
-                        <Input
-                            id="slug"
-                            name="slug"
-                            defaultValue={product?.slug}
-                            onChange={(e) => {
-                                e.target.dataset.auto = 'false'
-                            }}
-                            placeholder="category-product-name"
-                            required
-                        />
-                        <p className="text-xs text-muted-foreground">This will be used in the URL: /catalog/category-slug/product-slug</p>
-                    </div>
+                    <Input
+                        id="slug"
+                        name="slug"
+                        type="hidden"
+                        defaultValue={product?.slug}
+                        onChange={(e) => {
+                            e.target.dataset.auto = 'false'
+                        }}
+                        required
+                    />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-4 pt-4 border-t border-border">
