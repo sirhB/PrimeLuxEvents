@@ -32,6 +32,8 @@ import { PrintButton } from '@/components/admin/print-button'
 import { OrderStatusForm } from '@/components/admin/order-status-form'
 import { OrderInvoice } from '@/components/admin/order-invoice'
 import { formatCents, formatCentsWithCommas } from '@/lib/format-money'
+import { AdminQRCode } from '@/components/admin/qr-code'
+import { Truck, Search } from 'lucide-react'
 
 export default async function OrderDetailsPage({
     params,
@@ -117,11 +119,21 @@ export default async function OrderDetailsPage({
                             <CardDescription className="text-[var(--dashboard-text-muted)]">Update the status of this order</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <OrderStatusForm
-                                orderId={order.id}
-                                currentStatus={order.status}
-                                updateStatusAction={updateStatus}
-                            />
+                            <div className="flex flex-col md:flex-row gap-6">
+                                <div className="flex-1">
+                                    <OrderStatusForm
+                                        orderId={order.id}
+                                        currentStatus={order.status}
+                                        updateStatusAction={updateStatus}
+                                    />
+                                </div>
+                                <div className="flex shrink-0">
+                                    <AdminQRCode
+                                        url={`/admin/orders/${id}`}
+                                        label="Order QR Slip"
+                                    />
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
