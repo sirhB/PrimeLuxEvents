@@ -15,8 +15,16 @@ export default async function EditProductPage({
         supabase.from('categories').select('*'),
     ])
 
-    if (productResult.error || !productResult.data) {
-        notFound()
+    // Fetch variants if this product is part of a group
+    let variants: any[] = []
+    if (productResult.data && productResult.data.group_id) {
+        const { data: variantsData } = await supabase
+            .from('products')
+            .select('id, name, color, image_url, slug')
+            .eq('group_id', productResult.data.group_id)
+            .order('created_at', { ascending: true })
+
+        variants = variantsData || []
     }
 
     return (
@@ -25,6 +33,7 @@ export default async function EditProductPage({
             <ProductForm
                 product={productResult.data}
                 categories={categoriesResult.data || []}
+                variants={variants}
             />
         </div>
     )

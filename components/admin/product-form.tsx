@@ -19,14 +19,15 @@ import { Plus, Trash, X, Search, Link as LinkIcon, AlertCircle } from 'lucide-re
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ImageUpload } from './image-upload'
+import { createProductVariant } from '@/app/admin/products/actions'
 import {
-    CommandDialog,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from '@/components/ui/command'
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 
 
@@ -50,9 +51,10 @@ interface Modifier {
 interface ProductFormProps {
     product?: any
     categories: Category[]
+    variants?: any[]
 }
 
-export function ProductForm({ product, categories }: ProductFormProps) {
+export function ProductForm({ product, categories, variants = [] }: ProductFormProps) {
     const router = useRouter()
     const supabase = createClient()
     const [loading, setLoading] = useState(false)
@@ -76,76 +78,39 @@ export function ProductForm({ product, categories }: ProductFormProps) {
 
     const [assemblyItems, setAssemblyItems] = useState<AssemblyItem[]>(parseAssemblyItems(product?.assembly_items))
 
-    // Variant Grouping State
-    const [openVariantSearch, setOpenVariantSearch] = useState(false)
-    const [variantSearchQuery, setVariantSearchQuery] = useState('')
-    const [searchResults, setSearchResults] = useState<any[]>([])
-    const [searching, setSearching] = useState(false)
-    const [linkedProduct, setLinkedProduct] = useState<any>(null) // The product we want to group with
+    // New Variant Management
+    const [isAddVariantOpen, setIsAddVariantOpen] = useState(false)
+    const [newVariantColor, setNewVariantColor] = useState('')
+    const [newVariantImage, setNewVariantImage] = useState<string[]>([])
+    const [creatingVariant, setCreatingVariant] = useState(false)
 
-    // Search for products to group with
-    const searchProducts = async (query: string) => {
-        setVariantSearchQuery(query)
-        if (query.length < 2) {
-            setSearchResults([])
+    const handleCreateVariant = async () => {
+        if (!newVariantColor) {
+            toast.error("Please enter a color name")
             return
         }
 
-        setSearching(true)
+        setCreatingVariant(true)
         try {
-            const { data, error } = await supabase
-                .from('products')
-                .select('id, name, color, group_id, image_url')
-                .ilike('name', `%${query}%`)
-                .neq('id', product?.id || 'new') // Exclude current product
-                .limit(5)
+            const result = await createProductVariant(
+                product,
+                newVariantColor,
+                newVariantImage[0] || null
+            )
 
-            if (error) throw error
-            setSearchResults(data || [])
-        } catch (error) {
-            console.error('Error searching products:', error)
-        } finally {
-            setSearching(false)
-        }
-    }
-
-    const handleSelectProduct = async (selectedProduct: any) => {
-        // If the selected product has a group_id, we use it.
-        // If it doesn't, we will generate one, assign it to OUR form, AND we need to update the other product.
-
-        let targetGroupId = selectedProduct.group_id
-
-        if (!targetGroupId) {
-            // Case 1: Target product has no group. We allow this, but we'll need to update it.
-            // For now, we'll generate a UUID and effectively "Propose" it. 
-            // The actual update of the OTHER product happens best if we do it now.
-
-            const newGroupId = crypto.randomUUID()
-
-            try {
-                // We update the OTHER product immediately to start the group
-                const { error } = await supabase
-                    .from('products')
-                    .update({ group_id: newGroupId, color: selectedProduct.color || 'Original' }) // Default color if missing
-                    .eq('id', selectedProduct.id)
-
-                if (error) throw error
-
-                targetGroupId = newGroupId
-                toast.success(`Created new variant group with ${selectedProduct.name}`)
-            } catch (error) {
-                toast.error("Failed to update the selected product. Please try again.")
-                return
+            if (result.success) {
+                toast.success(`Created ${newVariantColor} variant!`)
+                setIsAddVariantOpen(false)
+                setNewVariantColor('')
+                setNewVariantImage([])
+                // Optional: router.push to the new variant or just stay here and see it appear in the list (refresh happens in server action)
             }
-        } else {
-            toast.success(`Joining group with ${selectedProduct.name}`)
+        } catch (error) {
+            toast.error("Failed to create variant")
+            console.error(error)
+        } finally {
+            setCreatingVariant(false)
         }
-
-        // Set the group_id on our form
-        const input = document.getElementById('group_id') as HTMLInputElement
-        if (input) input.value = targetGroupId
-        setLinkedProduct(selectedProduct)
-        setOpenVariantSearch(false)
     }
 
     const addAssemblyItem = () => {
@@ -351,135 +316,123 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="group_id">Variant Group ID</Label>
-                            <div className="flex gap-2">
-                                <Input
-                                    id="group_id"
-                                    name="group_id"
-                                    defaultValue={product?.group_id || ''}
-                                    placeholder="UUID for grouping variants"
-                                />
+                        <div className="space-y-4 pt-4 border-t border-border">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <Label className="text-base">Color Variants</Label>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        Manage different colors of this product. Each color is a separate product linked by a Group ID.
+                                    </p>
+                                </div>
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    size="icon"
-                                    title="Generate New Group ID"
-                                    onClick={() => {
-                                        const input = document.getElementById('group_id') as HTMLInputElement;
-                                        if (input) input.value = crypto.randomUUID();
-                                    }}
+                                    size="sm"
+                                    onClick={() => setIsAddVariantOpen(true)}
+                                    disabled={!product?.id} // Can only add variants to existing saved products
                                 >
-                                    <Plus className="h-4 w-4" />
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Add Color
                                 </Button>
                             </div>
-                            <p className="text-xs text-muted-foreground">Products with the same Group ID will be linked as color variants.</p>
-                        </div>
 
-                        <div className="space-y-4 pt-2">
-                            <Label htmlFor="color">Color Variant</Label>
-                            <div className="grid gap-4">
-                                <div className="space-y-2">
-                                    <Input
-                                        id="color"
-                                        name="color"
-                                        defaultValue={product?.color || ''}
-                                        placeholder="Variant Name (e.g. Gold, Red)"
-                                    />
+                            {!product?.id && (
+                                <div className="bg-yellow-500/10 text-yellow-500 p-3 rounded-md text-sm flex items-center gap-2">
+                                    <AlertCircle className="h-4 w-4" />
+                                    Save this product first to add color variants.
                                 </div>
+                            )}
 
-                                <Card className="bg-muted/30 border-dashed">
-                                    <CardContent className="p-4 space-y-3">
-                                        <div className="flex items-center justify-between">
-                                            <Label className="text-muted-foreground text-xs uppercase tracking-wider">Group Assignment</Label>
-                                            {linkedProduct && (
-                                                <Badge variant="secondary" className="text-xs">
-                                                    Linked to: {linkedProduct.name}
-                                                </Badge>
+                            {product?.id && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {/* Current Product Card */}
+                                    <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg flex items-center gap-3 relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-bl-md font-medium uppercase">
+                                            Current
+                                        </div>
+                                        <div className="h-10 w-10 bg-background rounded overflow-hidden flex-shrink-0">
+                                            {mainImage[0] && (
+                                                // eslint-disable-next-line @next/next/no-img-element
+                                                <img src={mainImage[0]} alt="" className="w-full h-full object-cover" />
                                             )}
                                         </div>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium truncate">{product.name}</p>
+                                            <p className="text-xs text-muted-foreground">Color: {product.color || 'Default'}</p>
+                                        </div>
+                                    </div>
 
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            className="w-full justify-start text-muted-foreground hover:text-foreground"
-                                            onClick={() => setOpenVariantSearch(true)}
+                                    {/* Sibling Variants */}
+                                    {variants.filter(v => v.id !== product.id).map(variant => (
+                                        <div
+                                            key={variant.id}
+                                            className="p-3 bg-muted/30 border border-border rounded-lg flex items-center gap-3 hover:bg-muted/50 transition-colors cursor-pointer group"
+                                            onClick={() => router.push(`/admin/products/${variant.id}`)}
                                         >
-                                            <LinkIcon className="mr-2 h-4 w-4" />
-                                            {linkedProduct || product?.group_id
-                                                ? "Change Linked Product Group..."
-                                                : "Search for product to group with..."
-                                            }
-                                        </Button>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </div>
-
-                        <CommandDialog
-                            open={openVariantSearch}
-                            onOpenChange={setOpenVariantSearch}
-                            commandProps={{ shouldFilter: false }}
-                        >
-                            <CommandInput
-                                placeholder="Search by product name..."
-                                value={variantSearchQuery}
-                                onValueChange={searchProducts}
-                            />
-                            <CommandList>
-                                <CommandEmpty>
-                                    {searching ? 'Searching...' : 'No products found.'}
-                                </CommandEmpty>
-                                <CommandGroup heading="Suggestions">
-                                    {searchResults.map((result) => (
-                                        <CommandItem
-                                            key={result.id}
-                                            value={result.id}
-                                            onSelect={() => handleSelectProduct(result)}
-                                            className="group flex items-center gap-4 p-3 cursor-pointer aria-selected:bg-neutral-50 aria-selected:text-foreground border-b last:border-0 border-border/50 transition-colors relative"
-                                        >
-                                            {/* Selection Indicator Line */}
-                                            <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-gold opacity-0 group-aria-selected:opacity-100 transition-opacity" />
-
-                                            <div className="h-12 w-12 rounded-lg bg-muted overflow-hidden flex-shrink-0 relative border border-border shadow-sm ml-2">
-                                                {result.image_url ? (
+                                            <div className="h-10 w-10 bg-background rounded overflow-hidden flex-shrink-0">
+                                                {variant.image_url && (
                                                     // eslint-disable-next-line @next/next/no-img-element
-                                                    <img src={result.image_url} alt={result.name} className="object-cover w-full h-full" />
-                                                ) : (
-                                                    <div className="w-full h-full bg-secondary flex items-center justify-center text-xs text-muted-foreground">
-                                                        No Img
-                                                    </div>
+                                                    <img src={variant.image_url} alt="" className="w-full h-full object-cover opacity-80 group-hover:opacity-100" />
                                                 )}
                                             </div>
-                                            <div className="flex flex-col flex-1 min-w-0">
-                                                <span className="font-serif font-medium truncate text-foreground group-aria-selected:font-semibold transition-all">
-                                                    {result.name}
-                                                </span>
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                    {result.color && (
-                                                        <span className="flex items-center gap-1">
-                                                            <span className="w-2 h-2 rounded-full bg-neutral-400" />
-                                                            {result.color}
-                                                        </span>
-                                                    )}
-                                                    {result.group_id && (
-                                                        <span className="px-1.5 py-0.5 rounded-full bg-gold/10 text-amber-700 text-[10px] font-bold uppercase tracking-wider border border-gold/20">
-                                                            Grouped
-                                                        </span>
-                                                    )}
+                                            <div className="min-w-0 flex-1">
+                                                <div className="flex items-center justify-between">
+                                                    <p className="text-sm font-medium truncate text-muted-foreground group-hover:text-foreground transition-colors">
+                                                        {variant.color || 'No Color'}
+                                                    </p>
+                                                    <LinkIcon className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-50" />
                                                 </div>
+                                                <p className="text-xs text-muted-foreground truncate opacity-70">{variant.name}</p>
                                             </div>
-
-                                            <div className="mr-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/0 group-aria-selected:text-gold transition-all">
-                                                Select
-                                            </div>
-                                        </CommandItem>
+                                        </div>
                                     ))}
-                                </CommandGroup>
-                            </CommandList>
-                        </CommandDialog>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Add Variant Dialog */}
+                        <Dialog open={isAddVariantOpen} onOpenChange={setIsAddVariantOpen}>
+                            <DialogContent className="sm:max-w-[425px] bg-[#17171a] border-[var(--dashboard-border)]">
+                                <DialogHeader>
+                                    <DialogTitle className="text-xl font-serif">Add Color Variant</DialogTitle>
+                                    <DialogDescription>
+                                        Create a new version of this product in a different color.
+                                        Details like category and price will be copied.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-6 py-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="variant-color">New Color Name</Label>
+                                        <Input
+                                            id="variant-color"
+                                            value={newVariantColor}
+                                            onChange={(e) => setNewVariantColor(e.target.value)}
+                                            placeholder="e.g. Silver, Rose Gold"
+                                            className=""
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label>Variant Image (Optional)</Label>
+                                        <div className="h-32">
+                                            <ImageUpload
+                                                value={newVariantImage}
+                                                onChange={setNewVariantImage}
+                                                multiple={false}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <Button variant="outline" onClick={() => setIsAddVariantOpen(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button onClick={handleCreateVariant} disabled={creatingVariant || !newVariantColor}>
+                                        {creatingVariant ? 'Creating...' : 'Create Variant'}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </div>
-                    {/* Replaced old color input with new section above, removing this block to avoid duplicates if any */}
 
                     <div className="space-y-2">
                         <Label htmlFor="description">Description</Label>

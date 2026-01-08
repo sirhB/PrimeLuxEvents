@@ -92,7 +92,7 @@ export function PortfolioImageUploadDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px] bg-[var(--dashboard-card)] border-[var(--dashboard-border)]">
+            <DialogContent className="sm:max-w-[600px] bg-[#17171a] border-[var(--dashboard-border)]">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-serif text-[var(--dashboard-text)]">
                         Upload Portfolio Images
