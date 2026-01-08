@@ -48,8 +48,10 @@ export function RecentActivityList({ orders }: RecentActivityListProps) {
                                 #{order.id.slice(0, 6).toUpperCase()}
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="h-8 w-8 rounded bg-gray-100 flex-shrink-0" />
-                                <span className="text-sm font-medium truncate">Product Name</span>
+                                <div className="h-8 w-8 rounded bg-gray-100 flex-shrink-0 flex items-center justify-center text-xs font-bold text-gray-500">
+                                    {order.customer_name?.charAt(0) || 'C'}
+                                </div>
+                                <span className="text-sm font-medium truncate">{order.customer_name || 'Customer'}</span>
                             </div>
                             <div className="text-sm text-[var(--dashboard-text-muted)]">
                                 {new Date(order.created_at).toLocaleDateString()}
@@ -58,8 +60,15 @@ export function RecentActivityList({ orders }: RecentActivityListProps) {
                                 {formatCents(order.total_amount)}
                             </div>
                             <div>
-                                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--dashboard-accent-green)] bg-[var(--dashboard-accent-green)]/10 px-2 py-1 rounded-full">
-                                    Completed
+                                <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-full ${order.status === 'completed' || order.status === 'paid'
+                                    ? 'text-[var(--dashboard-accent-green)] bg-[var(--dashboard-accent-green)]/10'
+                                    : order.status === 'active' || order.status === 'confirmed'
+                                        ? 'text-blue-600 bg-blue-50'
+                                        : order.status === 'cancelled'
+                                            ? 'text-red-600 bg-red-50'
+                                            : 'text-yellow-600 bg-yellow-50'
+                                    }`}>
+                                    {order.status || 'Pending'}
                                 </span>
                             </div>
                         </div>
