@@ -15,10 +15,19 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Plus, Trash, X } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Plus, Trash, X, Search, Link as LinkIcon, AlertCircle } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ImageUpload } from './image-upload'
+import {
+    CommandDialog,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from '@/components/ui/command'
+import { Badge } from '@/components/ui/badge'
 
 
 interface Category {
@@ -66,6 +75,78 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     }
 
     const [assemblyItems, setAssemblyItems] = useState<AssemblyItem[]>(parseAssemblyItems(product?.assembly_items))
+
+    // Variant Grouping State
+    const [openVariantSearch, setOpenVariantSearch] = useState(false)
+    const [variantSearchQuery, setVariantSearchQuery] = useState('')
+    const [searchResults, setSearchResults] = useState<any[]>([])
+    const [searching, setSearching] = useState(false)
+    const [linkedProduct, setLinkedProduct] = useState<any>(null) // The product we want to group with
+
+    // Search for products to group with
+    const searchProducts = async (query: string) => {
+        setVariantSearchQuery(query)
+        if (query.length < 2) {
+            setSearchResults([])
+            return
+        }
+
+        setSearching(true)
+        try {
+            const { data, error } = await supabase
+                .from('products')
+                .select('id, name, color, group_id, image_url')
+                .ilike('name', `%${query}%`)
+                .neq('id', product?.id || 'new') // Exclude current product
+                .limit(5)
+
+            if (error) throw error
+            setSearchResults(data || [])
+        } catch (error) {
+            console.error('Error searching products:', error)
+        } finally {
+            setSearching(false)
+        }
+    }
+
+    const handleSelectProduct = async (selectedProduct: any) => {
+        // If the selected product has a group_id, we use it.
+        // If it doesn't, we will generate one, assign it to OUR form, AND we need to update the other product.
+
+        let targetGroupId = selectedProduct.group_id
+
+        if (!targetGroupId) {
+            // Case 1: Target product has no group. We allow this, but we'll need to update it.
+            // For now, we'll generate a UUID and effectively "Propose" it. 
+            // The actual update of the OTHER product happens best if we do it now.
+
+            const newGroupId = crypto.randomUUID()
+
+            try {
+                // We update the OTHER product immediately to start the group
+                const { error } = await supabase
+                    .from('products')
+                    .update({ group_id: newGroupId, color: selectedProduct.color || 'Original' }) // Default color if missing
+                    .eq('id', selectedProduct.id)
+
+                if (error) throw error
+
+                targetGroupId = newGroupId
+                toast.success(`Created new variant group with ${selectedProduct.name}`)
+            } catch (error) {
+                toast.error("Failed to update the selected product. Please try again.")
+                return
+            }
+        } else {
+            toast.success(`Joining group with ${selectedProduct.name}`)
+        }
+
+        // Set the group_id on our form
+        const input = document.getElementById('group_id') as HTMLInputElement
+        if (input) input.value = targetGroupId
+        setLinkedProduct(selectedProduct)
+        setOpenVariantSearch(false)
+    }
 
     const addAssemblyItem = () => {
         setAssemblyItems([...assemblyItems, { name: '', quantity: 1 }])
@@ -294,16 +375,87 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                             </div>
                             <p className="text-xs text-muted-foreground">Products with the same Group ID will be linked as color variants.</p>
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="color">Color Variant Name</Label>
-                            <Input
-                                id="color"
-                                name="color"
-                                defaultValue={product?.color || ''}
-                                placeholder="e.g. Gold, Red, Blue"
-                            />
+
+                        <div className="space-y-4 pt-2">
+                            <Label htmlFor="color">Color Variant</Label>
+                            <div className="grid gap-4">
+                                <div className="space-y-2">
+                                    <Input
+                                        id="color"
+                                        name="color"
+                                        defaultValue={product?.color || ''}
+                                        placeholder="Variant Name (e.g. Gold, Red)"
+                                    />
+                                </div>
+
+                                <Card className="bg-muted/30 border-dashed">
+                                    <CardContent className="p-4 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <Label className="text-muted-foreground text-xs uppercase tracking-wider">Group Assignment</Label>
+                                            {linkedProduct && (
+                                                <Badge variant="secondary" className="text-xs">
+                                                    Linked to: {linkedProduct.name}
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            className="w-full justify-start text-muted-foreground hover:text-foreground"
+                                            onClick={() => setOpenVariantSearch(true)}
+                                        >
+                                            <LinkIcon className="mr-2 h-4 w-4" />
+                                            {linkedProduct || product?.group_id
+                                                ? "Change Linked Product Group..."
+                                                : "Search for product to group with..."
+                                            }
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
+
+                        <CommandDialog open={openVariantSearch} onOpenChange={setOpenVariantSearch}>
+                            <CommandInput
+                                placeholder="Search products..."
+                                value={variantSearchQuery}
+                                onValueChange={searchProducts}
+                            />
+                            <CommandList>
+                                <CommandEmpty>No products found.</CommandEmpty>
+                                <CommandGroup heading="Suggestions">
+                                    {searchResults.map((result) => (
+                                        <CommandItem
+                                            key={result.id}
+                                            onSelect={() => handleSelectProduct(result)}
+                                            className="flex items-center gap-3 p-2 cursor-pointer"
+                                        >
+                                            <div className="h-10 w-10 rounded bg-muted overflow-hidden flex-shrink-0 relative">
+                                                {result.image_url ? (
+                                                    // eslint-disable-next-line @next/next/no-img-element
+                                                    <img src={result.image_url} alt={result.name} className="object-cover w-full h-full" />
+                                                ) : (
+                                                    <div className="w-full h-full bg-secondary" />
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="font-medium">{result.name}</span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {result.color ? `Color: ${result.color}` : 'No color set'}
+                                                    {result.group_id && ' • Has Group'}
+                                                </span>
+                                            </div>
+                                            {result.group_id && (
+                                                <Badge variant="outline" className="ml-auto text-[10px]">Existing Group</Badge>
+                                            )}
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            </CommandList>
+                        </CommandDialog>
                     </div>
+                    {/* Replaced old color input with new section above, removing this block to avoid duplicates if any */}
 
                     <div className="space-y-2">
                         <Label htmlFor="description">Description</Label>
