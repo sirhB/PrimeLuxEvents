@@ -194,6 +194,8 @@ export function ProductForm({ product, categories }: ProductFormProps) {
             slug: formData.get('slug') as string,
             modifiers: modifiersInCents,
             assembly_items: assemblyItems.filter(item => item.name.trim() !== ''),
+            group_id: (formData.get('group_id') as string) || null,
+            color: (formData.get('color') as string) || null,
         }
 
         try {
@@ -265,6 +267,42 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                             required
                         />
                         <p className="text-xs text-muted-foreground">This will be used in the URL: /catalog/category-slug/product-slug</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="group_id">Variant Group ID</Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    id="group_id"
+                                    name="group_id"
+                                    defaultValue={product?.group_id || ''}
+                                    placeholder="UUID for grouping variants"
+                                />
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    title="Generate New Group ID"
+                                    onClick={() => {
+                                        const input = document.getElementById('group_id') as HTMLInputElement;
+                                        if (input) input.value = crypto.randomUUID();
+                                    }}
+                                >
+                                    <Plus className="h-4 w-4" />
+                                </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">Products with the same Group ID will be linked as color variants.</p>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="color">Color Variant Name</Label>
+                            <Input
+                                id="color"
+                                name="color"
+                                defaultValue={product?.color || ''}
+                                placeholder="e.g. Gold, Red, Blue"
+                            />
+                        </div>
                     </div>
 
                     <div className="space-y-2">
