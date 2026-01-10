@@ -240,7 +240,7 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                 <ProductGallery
                                     images={uniqueGalleryImages}
                                     productName={product.name}
-                                    className="shadow-[0_40px_100px_rgba(0,0,0,0.4)] rounded-[2rem] overflow-hidden border border-white/5"
+                                    className="shadow-[0_40px_100px_rgba(0,0,0,0.4)]"
                                 >
                                 </ProductGallery>
                             </motion.div>
