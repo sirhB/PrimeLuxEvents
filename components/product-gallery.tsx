@@ -76,7 +76,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
             <div className={cn("space-y-6", className)}>
                 {/* Main Image Container */}
                 <div
-                    className="relative aspect-square w-full overflow-hidden rounded-[2.5rem] group shadow-[0_30px_90px_-20px_rgba(0,0,0,0.6)] hover:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)] transition-all duration-700"
+                    className="relative aspect-square w-full group"
                     onMouseEnter={() => setIsAutoPlaying(false)}
                     onMouseLeave={() => setIsAutoPlaying(true)}
                 >
