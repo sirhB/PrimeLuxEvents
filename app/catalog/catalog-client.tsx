@@ -87,7 +87,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
             filtered = filtered.filter(p =>
                 p.name.toLowerCase().includes(query) ||
                 p.description?.toLowerCase().includes(query) ||
-                p.categories?.name.toLowerCase().includes(query)
+                (p.categories?.name?.toLowerCase() || '').includes(query)
             )
         }
 
