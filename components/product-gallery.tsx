@@ -73,19 +73,13 @@ export function ProductGallery({ images, productName, className, selectedImage: 
 
     return (
         <>
-            <div className={cn("space-y-4", className)}>
+            <div className={cn("space-y-6", className)}>
                 {/* Main Image Container */}
                 <div
-                    className="relative aspect-square w-full overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-white/[0.03] via-white/[0.02] to-transparent group backdrop-blur-sm shadow-[0_30px_90px_-20px_rgba(0,0,0,0.6),0_0_1px_rgba(255,255,255,0.1)_inset] hover:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8),0_0_1px_rgba(255,255,255,0.15)_inset] transition-all duration-700"
+                    className="relative aspect-square w-full overflow-hidden rounded-[2.5rem] group shadow-[0_30px_90px_-20px_rgba(0,0,0,0.6)] hover:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.8)] transition-all duration-700"
                     onMouseEnter={() => setIsAutoPlaying(false)}
                     onMouseLeave={() => setIsAutoPlaying(true)}
                 >
-                    {/* Subtle ambient glow */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-gold/[0.02] via-transparent to-transparent pointer-events-none" />
-
-                    {/* Inner highlight for depth */}
-                    <div className="absolute inset-[1px] rounded-[2.4rem] bg-gradient-to-b from-white/[0.05] to-transparent pointer-events-none" />
-
                     <AnimatePresence initial={false} custom={direction}>
                         <motion.div
                             key={selectedImage}
