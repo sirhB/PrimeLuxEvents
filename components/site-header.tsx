@@ -180,7 +180,6 @@ export function SiteHeader() {
           {/* Actions */}
           <div className="flex items-center gap-2 md:gap-6">
             <div className={cn(
-              "hidden sm:block",
               headerTheme === 'dark' ? "text-white" : "text-black"
             )}>
               <SearchTrigger onClick={() => setIsSearchOpen(true)} />
