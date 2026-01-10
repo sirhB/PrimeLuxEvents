@@ -98,7 +98,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                                 src={images[selectedImage]}
                                 alt={`${productName} - Image ${selectedImage + 1}`}
                                 fill
-                                className="object-contain p-6 md:p-12 drop-shadow-2xl"
+                                className="object-contain p-6 md:p-12 drop-shadow-[0_30px_90px_rgba(0,0,0,0.6)] group-hover:drop-shadow-[0_40px_120px_rgba(0,0,0,0.8)] transition-all duration-700"
                                 priority
                             />
                         </motion.div>
