@@ -31,18 +31,21 @@ export function AdminNotifications() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-full hover:bg-gray-100">
+                <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-xl hover:bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] border border-transparent hover:border-[var(--dashboard-accent-gold)]/20 transition-all">
                     <Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
-                        <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white ring-2 ring-white">
+                        <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--dashboard-accent-gold)] text-[10px] font-bold text-black ring-2 ring-[var(--dashboard-background)]">
                             {unreadCount > 9 ? '9+' : unreadCount}
                         </span>
                     )}
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[380px] p-0 rounded-2xl overflow-hidden border-gray-200 shadow-xl">
-                <div className="flex items-center justify-between p-4 bg-gray-50/50 border-b">
-                    <h3 className="font-semibold text-sm">Notifications</h3>
+            <DropdownMenuContent align="end" className="w-[400px] p-0 rounded-3xl overflow-hidden glass-card border-[var(--dashboard-border)] shadow-[var(--dashboard-shadow-lg)] animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex items-center justify-between p-5 bg-black/40 border-b border-[var(--dashboard-border)]">
+                    <div>
+                        <h3 className="font-serif text-lg text-[var(--dashboard-text)]">Notifications</h3>
+                        <p className="text-[10px] text-[var(--dashboard-text-muted)] uppercase tracking-widest font-bold">Activity Feed</p>
+                    </div>
                     {unreadCount > 0 && (
                         <Button
                             variant="ghost"
@@ -51,7 +54,7 @@ export function AdminNotifications() {
                                 e.preventDefault()
                                 markAllAsRead()
                             }}
-                            className="text-xs h-7 text-gray-500 hover:text-black"
+                            className="text-[10px] h-8 font-bold uppercase tracking-widest text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/10"
                         >
                             Mark all as read
                         </Button>
@@ -66,50 +69,50 @@ export function AdminNotifications() {
                             <p className="text-sm text-gray-500">No notifications yet</p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-100">
+                        <div className="divide-y divide-[var(--dashboard-border)]">
                             {notifications.map((notification) => (
                                 <div
                                     key={notification.id}
                                     className={cn(
-                                        "p-4 transition-colors relative group",
-                                        notification.is_read ? "bg-white" : "bg-blue-50/30"
+                                        "p-5 transition-colors relative group",
+                                        notification.is_read ? "bg-transparent" : "bg-[var(--dashboard-accent-gold)]/[0.03]"
                                     )}
                                 >
                                     <div className="flex gap-4">
                                         <div className={cn(
-                                            "h-9 w-9 rounded-xl flex items-center justify-center border",
-                                            notification.type === 'overbooked' ? "bg-red-50 border-red-100" :
-                                                notification.type === 'low_stock' ? "bg-amber-50 border-amber-100" :
-                                                    "bg-gray-50 border-gray-100"
+                                            "h-10 w-10 rounded-2xl flex items-center justify-center border transition-transform group-hover:scale-110",
+                                            notification.type === 'overbooked' ? "bg-red-500/10 border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)]" :
+                                                notification.type === 'low_stock' ? "bg-amber-500/10 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.1)]" :
+                                                    "bg-[var(--dashboard-card)] border-[var(--dashboard-border)]"
                                         )}>
                                             {getIcon(notification.type)}
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-start mb-1">
-                                                <h4 className="font-medium text-sm leading-none">{notification.title}</h4>
+                                                <h4 className="font-medium text-sm text-[var(--dashboard-text)] leading-none">{notification.title}</h4>
                                                 {!notification.is_read && (
-                                                    <span className="h-2 w-2 rounded-full bg-blue-600" />
+                                                    <span className="h-2 w-2 rounded-full bg-[var(--dashboard-accent-gold)] shadow-[0_0_8px_var(--dashboard-accent-gold)]" />
                                                 )}
                                             </div>
-                                            <p className="text-sm text-gray-500 line-clamp-2 mb-2 leading-relaxed">
+                                            <p className="text-xs text-[var(--dashboard-text-muted)] line-clamp-2 mb-2 leading-relaxed">
                                                 {notification.message}
                                             </p>
                                             <div className="flex items-center justify-between">
-                                                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-tight">
+                                                <span className="text-[10px] text-[var(--dashboard-text-muted)]/60 font-medium uppercase tracking-widest">
                                                     {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                                                 </span>
                                                 {notification.link && !notification.is_read ? (
                                                     <Link
                                                         href={notification.link}
                                                         onClick={() => markAsRead(notification.id)}
-                                                        className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-tight"
+                                                        className="text-[10px] font-bold text-[var(--dashboard-accent-gold)] hover:underline uppercase tracking-widest"
                                                     >
                                                         Details
                                                     </Link>
                                                 ) : !notification.is_read ? (
                                                     <button
                                                         onClick={() => markAsRead(notification.id)}
-                                                        className="text-[10px] font-bold text-gray-400 hover:text-black uppercase tracking-tight"
+                                                        className="text-[10px] font-bold text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] uppercase tracking-widest transition-colors"
                                                     >
                                                         Mark as Read
                                                     </button>
@@ -122,10 +125,12 @@ export function AdminNotifications() {
                         </div>
                     )}
                 </ScrollArea>
-                <div className="p-3 border-t bg-gray-50/50 text-center">
-                    <Button variant="ghost" size="sm" className="w-full text-xs text-gray-500 font-medium">
-                        View All Notifications
-                    </Button>
+                <div className="p-4 border-t border-[var(--dashboard-border)] bg-black/40 text-center">
+                    <Link href="/admin/activity">
+                        <Button variant="ghost" size="sm" className="w-full text-[10px] text-[var(--dashboard-text-muted)] font-bold uppercase tracking-[0.2em] hover:text-[var(--dashboard-accent-gold)] hover:bg-transparent">
+                            View All Activity
+                        </Button>
+                    </Link>
                 </div>
             </DropdownMenuContent>
         </DropdownMenu>

@@ -35,12 +35,28 @@ export default async function TasksPage() {
         .select('*')
         .order('created_at', { ascending: false })
 
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // Fetch user roles to filter tasks assigned to roles
+    const { data: userRoles } = await supabase
+        .from('user_roles')
+        .select('role_id')
+        .eq('user_id', user?.id)
+
+    const roleIds = userRoles?.map(r => r.role_id) || []
+
     const now = new Date()
     now.setHours(0, 0, 0, 0) // Compare vs start of today
 
     const pendingTasks = tasks?.filter(t => t.status === 'pending') || []
     const inProgressTasks = tasks?.filter(t => t.status === 'in_progress') || []
     const completedTasks = tasks?.filter(t => t.status === 'completed') || []
+
+    // My Tasks Logic: Assigned directly to user OR assigned to one of their roles
+    const myTasks = tasks?.filter(t =>
+        (user?.id && t.assigned_to === user.id) ||
+        (t.assigned_role_id && roleIds.includes(t.assigned_role_id))
+    ) || []
 
     const overdueTasks = tasks?.filter(t => {
         if (!t.due_date) return false
@@ -243,15 +259,41 @@ export default async function TasksPage() {
                 </TabsContent>
 
                 <TabsContent value="my-tasks" className="mt-0">
-                    <div className="glass-card p-12 text-center text-[var(--dashboard-text-muted)]">
-                        <div className="mb-4 flex justify-center">
-                            <div className="p-4 rounded-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)]">
-                                <CheckCircle2 className="h-8 w-8 opacity-20" />
+                    <Card className="glass-card border-none overflow-hidden">
+                        <CardHeader className="border-b border-[var(--dashboard-border)] bg-black/10">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle className="text-lg font-serif">My Assignments</CardTitle>
+                                    <p className="text-xs text-[var(--dashboard-text-muted)]">Tasks assigned to you or your team</p>
+                                </div>
+                                <div className="px-3 py-1 rounded-full bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] text-xs font-bold uppercase tracking-wider border border-[var(--dashboard-accent-gold)]/20">
+                                    {myTasks.length} Active
+                                </div>
                             </div>
-                        </div>
-                        <h3 className="text-xl font-serif text-[var(--dashboard-text)] mb-2">My Tasks View</h3>
-                        <p className="max-w-sm mx-auto opacity-60">This view will display tasks specifically assigned to you or your role. Coming in the next update.</p>
-                    </div>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="divide-y divide-[var(--dashboard-border)]">
+                                {myTasks.length > 0 ? (
+                                    myTasks.map((task) => (
+                                        <TaskItem key={task.id} task={task} />
+                                    ))
+                                ) : (
+                                    <div className="p-16 text-center text-[var(--dashboard-text-muted)] flex flex-col items-center justify-center gap-4">
+                                        <div className="p-6 rounded-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] shadow-inner">
+                                            <CheckCircle2 className="h-10 w-10 text-[var(--dashboard-accent-green)] opacity-40" />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <h3 className="text-xl font-serif text-[var(--dashboard-text)]">All Caught Up</h3>
+                                            <p className="text-sm opacity-60 max-w-xs mx-auto">You have no pending tasks assigned to you at the moment.</p>
+                                        </div>
+                                        <div className="mt-4">
+                                            <CreateTaskDialog />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
         </div>
