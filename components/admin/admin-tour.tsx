@@ -77,7 +77,9 @@ export function AdminTour() {
         nextStep,
         prevStep,
         skipTour,
-        setTotalSteps
+        setTotalSteps,
+        completedSteps,
+        readinessData
     } = useTour()
 
     const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null)
@@ -85,6 +87,38 @@ export function AdminTour() {
     useEffect(() => {
         setTotalSteps(TOUR_STEPS.length)
     }, [setTotalSteps])
+
+    // Dynamic text based on readinessData
+    const getDynamicStepContent = (stepIndex: number, originalStep: TourStep) => {
+        if (originalStep.targetId === 'nav-products' && readinessData.hasProducts) {
+            return {
+                title: "Review Your Products",
+                description: "You already have products in your catalog! Use this section to review their details, inventory levels, and pricing."
+            }
+        }
+        if (originalStep.targetId === 'nav-logistics' && readinessData.hasLogistics) {
+            return {
+                title: "Review Logistics Hub",
+                description: "Your logistics system is active. Review your warehouse locations and bag assignments to ensure smooth delivery flows."
+            }
+        }
+        if (originalStep.targetId === 'admin-revenue' && readinessData.hasOrders) {
+            return {
+                title: "Revenue Overview",
+                description: "With orders already coming in, this chart shows your actual revenue growth and profit margins."
+            }
+        }
+        if (originalStep.targetId === 'admin-tasks' && readinessData.hasTasks) {
+            return {
+                title: "Task Review",
+                description: "Your team is already busy! Review active tasks and their statuses to keep the launch on track."
+            }
+        }
+        return {
+            title: originalStep.title,
+            description: originalStep.description
+        }
+    }
 
     const updateSpotlight = useCallback(() => {
         if (currentStep < 0 || currentStep >= TOUR_STEPS.length) return
@@ -96,7 +130,6 @@ export function AdminTour() {
                 setSpotlightRect(element.getBoundingClientRect())
                 element.scrollIntoView({ behavior: 'smooth', block: 'center' })
             } else {
-                // If element not found, default to center to avoid breaking the UI
                 setSpotlightRect(null)
             }
         } else {
@@ -118,11 +151,14 @@ export function AdminTour() {
 
     if (!isTourVisible || currentStep === -1) return null
 
-    const step = TOUR_STEPS[currentStep]
+    const originalStep = TOUR_STEPS[currentStep]
+    const step = getDynamicStepContent(currentStep, originalStep)
+    const position = originalStep.position
+
+    const progress = Math.round((completedSteps.length / TOUR_STEPS.length) * 100)
 
     return (
         <div className="fixed inset-0 z-[100] pointer-events-none overflow-hidden">
-            {/* Dark Backdrop with Spotlight */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -142,7 +178,6 @@ export function AdminTour() {
                 onClick={skipTour}
             />
 
-            {/* Tour Card */}
             <AnimatePresence mode="wait">
                 <motion.div
                     key={currentStep}
@@ -152,13 +187,13 @@ export function AdminTour() {
                         scale: 1,
                         y: 0,
                         x: spotlightRect ? (
-                            step.position === 'right' ? spotlightRect.right + 20 :
-                                step.position === 'left' ? spotlightRect.left - 340 :
+                            position === 'right' ? spotlightRect.right + 20 :
+                                position === 'left' ? spotlightRect.left - 340 :
                                     spotlightRect.left + (spotlightRect.width / 2) - 160
                         ) : 'calc(50vw - 160px)',
                         top: spotlightRect ? (
-                            step.position === 'bottom' ? spotlightRect.bottom + 20 :
-                                step.position === 'top' ? spotlightRect.top - 200 :
+                            position === 'bottom' ? spotlightRect.bottom + 20 :
+                                position === 'top' ? spotlightRect.top - 200 :
                                     spotlightRect.top + (spotlightRect.height / 2) - 100
                         ) : 'calc(50vh - 100px)'
                     }}
@@ -166,10 +201,10 @@ export function AdminTour() {
                     transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                     className="absolute w-[320px] bg-[var(--dashboard-card)] border border-[var(--dashboard-accent-gold)]/30 rounded-2xl p-6 shadow-2xl pointer-events-auto backdrop-blur-xl"
                 >
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2 text-[var(--dashboard-accent-gold)]">
                             <Sparkles className="h-4 w-4" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">Step {currentStep + 1} of {TOUR_STEPS.length}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-glow">Step {currentStep + 1} of {TOUR_STEPS.length}</span>
                         </div>
                         <button
                             onClick={skipTour}
@@ -179,8 +214,20 @@ export function AdminTour() {
                         </button>
                     </div>
 
-                    <h3 className="text-lg font-bold text-[var(--dashboard-text)] mb-2">
+                    {/* Readiness Progress Bar */}
+                    <div className="w-full h-1 bg-[var(--dashboard-border)] rounded-full mb-4 overflow-hidden">
+                        <motion.div
+                            className="h-full bg-[var(--dashboard-accent-gold)]"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                        />
+                    </div>
+
+                    <h3 className="text-lg font-bold text-[var(--dashboard-text)] mb-2 flex items-center gap-2">
                         {step.title}
+                        {completedSteps.includes(currentStep) && (
+                            <CheckCircle2 className="h-4 w-4 text-[var(--dashboard-accent-green)]" />
+                        )}
                     </h3>
                     <p className="text-sm text-[var(--dashboard-text-muted)] leading-relaxed mb-6">
                         {step.description}
@@ -193,7 +240,9 @@ export function AdminTour() {
                                     key={i}
                                     className={cn(
                                         "h-1 rounded-full transition-all duration-300",
-                                        i === currentStep ? "w-4 bg-[var(--dashboard-accent-gold)]" : "w-1 bg-[var(--dashboard-border)]"
+                                        i === currentStep ? "w-4 bg-[var(--dashboard-accent-gold)]" :
+                                            completedSteps.includes(i) ? "w-1 bg-[var(--dashboard-accent-green)]" :
+                                                "w-1 bg-[var(--dashboard-border)]"
                                     )}
                                 />
                             ))}
@@ -217,25 +266,24 @@ export function AdminTour() {
                                 className="h-8 bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-bold shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all hover:scale-105"
                             >
                                 {currentStep === TOUR_STEPS.length - 1 ? (
-                                    <>Finish <CheckCircle2 className="ml-1 h-3.5 w-3.5" /></>
+                                    <>Finish Launch Review <CheckCircle2 className="ml-1 h-3.5 w-3.5" /></>
                                 ) : (
-                                    <>Next <ChevronRight className="ml-1 h-4 w-4" /></>
+                                    <>Understand & Next <ChevronRight className="ml-1 h-4 w-4" /></>
                                 )}
                             </Button>
                         </div>
                     </div>
 
-                    {/* Arrow for the card */}
-                    {spotlightRect && step.position !== 'center' && (
+                    {spotlightRect && position !== 'center' && (
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             className={cn(
                                 "absolute w-4 h-4 bg-[var(--dashboard-card)] border-l border-t border-[var(--dashboard-accent-gold)]/30 rotate-45",
-                                step.position === 'bottom' && "-top-2 left-1/2 -translate-x-1/2",
-                                step.position === 'top' && "-bottom-2 left-1/2 -translate-x-1/2",
-                                step.position === 'right' && "-left-2 top-1/2 -translate-y-1/2",
-                                step.position === 'left' && "-right-2 top-1/2 -translate-y-1/2",
+                                position === 'bottom' && "-top-2 left-1/2 -translate-x-1/2",
+                                position === 'top' && "-bottom-2 left-1/2 -translate-x-1/2",
+                                position === 'right' && "-left-2 top-1/2 -translate-y-1/2",
+                                position === 'left' && "-right-2 top-1/2 -translate-y-1/2",
                             )}
                         />
                     )}
@@ -244,4 +292,5 @@ export function AdminTour() {
         </div>
     )
 }
+
 

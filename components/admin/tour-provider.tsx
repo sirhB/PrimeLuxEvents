@@ -6,13 +6,16 @@ import { createClient } from '@/lib/supabase/client'
 interface TourContextType {
     isTourVisible: boolean
     currentStep: number
+    completedSteps: number[]
     setStep: (step: number) => void
     nextStep: () => void
     prevStep: () => void
+    markStepAsVisited: (stepIndex: number) => Promise<void>
     completeTour: () => Promise<void>
     skipTour: () => Promise<void>
     totalSteps: number
     setTotalSteps: (count: number) => void
+    readinessData: Record<string, boolean>
 }
 
 const TourContext = createContext<TourContextType | undefined>(undefined)
@@ -20,8 +23,36 @@ const TourContext = createContext<TourContextType | undefined>(undefined)
 export function TourProvider({ children }: { children: React.ReactNode }) {
     const [isTourVisible, setIsTourVisible] = useState(false)
     const [currentStep, setCurrentStep] = useState(-1)
+    const [completedSteps, setCompletedSteps] = useState<number[]>([])
     const [totalSteps, setTotalSteps] = useState(0)
+    const [readinessData, setReadinessData] = useState<Record<string, boolean>>({})
+    const [hasCompletedFormalTour, setHasCompletedFormalTour] = useState(false)
     const supabase = createClient()
+
+    const fetchReadinessStatus = useCallback(async () => {
+        // Parallel checks for existing data
+        const [
+            { count: productCount },
+            { count: categoryCount },
+            { count: bagCount },
+            { count: orderCount },
+            { count: taskCount }
+        ] = await Promise.all([
+            supabase.from('products').select('*', { count: 'exact', head: true }),
+            supabase.from('categories').select('*', { count: 'exact', head: true }),
+            supabase.from('bags').select('*', { count: 'exact', head: true }),
+            supabase.from('orders').select('*', { count: 'exact', head: true }),
+            supabase.from('tasks').select('*', { count: 'exact', head: true })
+        ])
+
+        setReadinessData({
+            hasProducts: (productCount || 0) > 0,
+            hasCategories: (categoryCount || 0) > 0,
+            hasLogistics: (bagCount || 0) > 0,
+            hasOrders: (orderCount || 0) > 0,
+            hasTasks: (taskCount || 0) > 0
+        })
+    }, [supabase])
 
     useEffect(() => {
         const checkTourStatus = async () => {
@@ -30,36 +61,60 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
 
             const { data: profile } = await supabase
                 .from('user_profiles')
-                .select('has_completed_tour')
+                .select('has_completed_tour, completed_tour_steps')
                 .eq('id', user.id)
                 .single()
 
-            if (profile && !profile.has_completed_tour) {
-                // Check if it was dismissed in the current session (optional)
-                const isDismissed = sessionStorage.getItem('admin_tour_dismissed')
-                if (!isDismissed) {
-                    setTimeout(() => {
-                        setCurrentStep(0)
-                        setIsTourVisible(true)
-                    }, 1000)
+            if (profile) {
+                setHasCompletedFormalTour(profile.has_completed_tour)
+                setCompletedSteps(profile.completed_tour_steps || [])
+
+                if (!profile.has_completed_tour) {
+                    const isDismissed = sessionStorage.getItem('admin_tour_dismissed')
+                    if (!isDismissed) {
+                        setTimeout(() => {
+                            setCurrentStep(0)
+                            setIsTourVisible(true)
+                        }, 1000)
+                    }
                 }
             }
+
+            await fetchReadinessStatus()
         }
 
         checkTourStatus()
-    }, [supabase])
+    }, [supabase, fetchReadinessStatus])
 
-    const setStep = useCallback((step: number) => {
-        setCurrentStep(step)
-    }, [])
+    const markStepAsVisited = useCallback(async (stepIndex: number) => {
+        if (completedSteps.includes(stepIndex)) return
 
-    const nextStep = useCallback(() => {
+        const newCompletedSteps = [...completedSteps, stepIndex]
+        setCompletedSteps(newCompletedSteps)
+
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+            await supabase
+                .from('user_profiles')
+                .update({ completed_tour_steps: newCompletedSteps })
+                .eq('id', user.id)
+        }
+    }, [completedSteps, supabase])
+
+    const nextStep = useCallback(async () => {
+        if (currentStep >= 0) {
+            await markStepAsVisited(currentStep)
+        }
+
         if (currentStep < totalSteps - 1) {
             setCurrentStep(prev => prev + 1)
         } else {
-            completeTour()
+            // Check if all mandatory steps are done
+            if (completedSteps.length + 1 >= totalSteps) {
+                completeTour()
+            }
         }
-    }, [currentStep, totalSteps])
+    }, [currentStep, totalSteps, completedSteps, markStepAsVisited])
 
     const prevStep = useCallback(() => {
         if (currentStep > 0) {
@@ -72,31 +127,39 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
         if (user) {
             await supabase
                 .from('user_profiles')
-                .update({ has_completed_tour: true })
+                .update({
+                    has_completed_tour: true,
+                    readiness_completed: true // Mark readiness as done when tour is finished
+                })
                 .eq('id', user.id)
         }
         setIsTourVisible(false)
         setCurrentStep(-1)
+        setHasCompletedFormalTour(true)
     }
 
     const skipTour = async () => {
-        // Just hide it for this session if skipped? 
-        // User asked it to show UNTIL COMPLETED, so maybe skip should still save it?
-        // Let's make skip also mark as completed to avoid nagging.
-        await completeTour()
+        // For formal readiness, maybe we don't allow skipping easily? 
+        // User said "ensure the admin go through each step".
+        // Let's allow skipping but it won't mark as "completed" until they finish all steps.
+        setIsTourVisible(false)
+        sessionStorage.setItem('admin_tour_dismissed', 'true')
     }
 
     return (
         <TourContext.Provider value={{
             isTourVisible,
             currentStep,
-            setStep,
+            completedSteps,
+            setStep: setCurrentStep,
             nextStep,
             prevStep,
+            markStepAsVisited,
             completeTour,
             skipTour,
             totalSteps,
-            setTotalSteps
+            setTotalSteps,
+            readinessData
         }}>
             {children}
         </TourContext.Provider>

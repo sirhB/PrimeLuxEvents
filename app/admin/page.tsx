@@ -6,6 +6,7 @@ import { AlertsCard } from '@/components/admin/dashboard/alerts-card'
 import { RecentActivityList } from '@/components/admin/dashboard/recent-activity-list'
 import { RevenueMiniChart } from '@/components/admin/dashboard/revenue-mini-chart'
 import { SetupChecklist } from '@/components/admin/dashboard/setup-checklist'
+import { LaunchReadinessTracker } from '@/components/admin/dashboard/launch-readiness-tracker'
 import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -42,6 +43,9 @@ export default async function AdminDashboardPage() {
             </div>
 
             <DashboardHeader />
+
+            {/* Launch Readiness Tracker - Formal Step-by-Step Review */}
+            <LaunchReadinessTracker />
 
             {/* Setup Checklist - Only shows if not complete */}
             <SetupChecklist />
