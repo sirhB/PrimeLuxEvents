@@ -62,6 +62,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
     const { scrollY } = useScroll()
 
     const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid')
+    const [inputValue, setInputValue] = useState('')
     const [searchQuery, setSearchQuery] = useState('')
     const [sortBy, setSortBy] = useState<'name' | 'price-low' | 'price-high' | 'newest'>('name')
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -128,6 +129,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
         const params = new URLSearchParams(searchParams.toString())
         params.set('category', categoryName)
         params.delete('search')
+        setInputValue('')
+        setSearchQuery('')
         router.push(`${pathname}?${params.toString()}`)
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
@@ -136,23 +139,41 @@ export default function CatalogClient({ heroTitle, products, categories, package
         const params = new URLSearchParams(searchParams.toString())
         params.delete('category')
         params.delete('search')
+        setInputValue('')
+        setSearchQuery('')
         router.push(`${pathname}?${params.toString()}`)
     }
 
     const handleSearchChange = (value: string) => {
-        setSearchQuery(value)
-        const params = new URLSearchParams(searchParams.toString())
-        if (value.trim()) {
-            params.set('search', value)
-        } else {
-            params.delete('search')
-        }
-        router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+        setInputValue(value)
     }
 
+    // Debounce search updates
     useEffect(() => {
-        const searchParam = searchParams.get('search')
-        if (searchParam) {
+        const timer = setTimeout(() => {
+            setSearchQuery(inputValue)
+
+            const params = new URLSearchParams(searchParams.toString())
+            const currentSearch = params.get('search') || ''
+
+            if (inputValue.trim() !== currentSearch) {
+                if (inputValue.trim()) {
+                    params.set('search', inputValue)
+                } else {
+                    params.delete('search')
+                }
+                router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+            }
+        }, 300)
+
+        return () => clearTimeout(timer)
+    }, [inputValue, pathname, router, searchParams])
+
+    // Sync state with URL only on mount or external navigation
+    useEffect(() => {
+        const searchParam = searchParams.get('search') || ''
+        if (searchParam !== searchQuery) {
+            setInputValue(searchParam)
             setSearchQuery(searchParam)
         }
     }, [searchParams])
@@ -216,7 +237,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
             </div>
 
             {/* Sticky Search & Filter Bar */}
-            <div className="sticky top-[72px] z-40 bg-[#1A1A1A]/80 backdrop-blur-xl border-y border-white/5">
+            <div className="sticky top-[72px] z-40 bg-[#1A1A1A]/80 backdrop-blur-xl border-y border-white/5 transition-all duration-300" style={{ top: 'var(--header-height, 72px)' }}>
                 <div className="container mx-auto px-4 md:px-6 py-6 transition-all duration-300">
                     <div className="flex flex-col lg:flex-row gap-6 items-center">
                         {/* Search Input */}

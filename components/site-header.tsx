@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Menu, Search, X, Phone, Mail, Instagram, Facebook } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { CartSheet } from "@/components/cart-sheet"
@@ -18,6 +18,7 @@ export function SiteHeader() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+  const headerRef = useRef<HTMLElement>(null)
 
   const [settings, setSettings] = useState({
     company_email: "info@primeluxevents.com",
@@ -52,6 +53,30 @@ export function SiteHeader() {
 
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        document.documentElement.style.setProperty('--header-height', `${headerRef.current.offsetHeight}px`)
+      }
+    }
+
+    updateHeaderHeight()
+    window.addEventListener('resize', updateHeaderHeight)
+
+    // Check periodically during transition to ensure smoothness
+    const interval = setInterval(updateHeaderHeight, 50)
+    const timeout = setTimeout(() => {
+      clearInterval(interval)
+      updateHeaderHeight()
+    }, 600)
+
+    return () => {
+      window.removeEventListener('resize', updateHeaderHeight)
+      clearInterval(interval)
+      clearTimeout(timeout)
+    }
+  }, [scrolled])
 
   if (pathname?.startsWith('/admin')) {
     return null
@@ -88,6 +113,7 @@ export function SiteHeader() {
       </div>
 
       <header
+        ref={headerRef}
         className={cn(
           "sticky top-0 z-50 w-full transition-all duration-500 bg-[#1A1A1A]/90 backdrop-blur-xl border-b border-white/5 shadow-2xl",
           scrolled ? "py-3" : "py-6"
