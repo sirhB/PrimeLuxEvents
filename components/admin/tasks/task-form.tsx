@@ -8,11 +8,11 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { createClient } from '@/lib/supabase/client'
-import { Calendar, User, Flag, Truck, Briefcase, Home, Building, MapPin, Check, ChevronsUpDown } from 'lucide-react'
+import { Calendar, User, Flag, Truck, Briefcase, Home, Building, MapPin, Check, ChevronsUpDown, Shield } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { cn } from '@/lib/utils'
-import { Shield } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface TaskFormData {
     title: string
@@ -106,6 +106,7 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
             const selectedMember = teamMembers.find(m => m.id === formData.assigned_to)
             const selectedRole = roles.find(r => r.id === formData.assigned_role_id)
 
+            // Prepare task data with careful null handling
             const taskData = {
                 title: formData.title,
                 description: formData.description,
@@ -114,6 +115,7 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                 task_type: formData.task_type,
                 due_date: formData.due_date || null,
                 assigned_to: formData.assigned_to || null,
+                // Ensure assigned_role_id key is only present if we have logic for it, but table has column
                 assigned_role_id: formData.assigned_role_id || null,
                 assigned_to_text: selectedMember
                     ? (selectedMember.full_name || selectedMember.email)
@@ -141,10 +143,13 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
             }
 
             router.refresh()
+            toast.success(task ? 'Task updated successfully' : 'Task created successfully')
             onSuccess?.()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving task:', error)
-            setErrors({ submit: 'Failed to save task. Please try again.' })
+            const errorMessage = error.message || 'Failed to save task. Please try again.'
+            setErrors({ submit: errorMessage })
+            toast.error(errorMessage)
         } finally {
             setLoading(false)
         }

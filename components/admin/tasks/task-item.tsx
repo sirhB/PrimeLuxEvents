@@ -17,14 +17,21 @@ import {
     Home,
     Building,
     MapPin,
-    Shield
+    Shield,
+    RotateCw,
+    PlayCircle,
+    XCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuTrigger
+    DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubTrigger,
+    DropdownMenuSubContent,
+    DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -60,6 +67,7 @@ export function TaskItem({ task }: TaskItemProps) {
     const router = useRouter()
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
     const supabase = createClient()
 
     const handleDelete = async () => {
@@ -81,6 +89,29 @@ export function TaskItem({ task }: TaskItemProps) {
             toast.error('Failed to delete task')
         } finally {
             setIsDeleting(false)
+        }
+    }
+
+    const handleStatusChange = async (newStatus: string) => {
+        setIsUpdatingStatus(true)
+        try {
+            const { error } = await supabase
+                .from('tasks')
+                .update({
+                    status: newStatus,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', task.id)
+
+            if (error) throw error
+
+            toast.success(`Task marked as ${newStatus.replace('_', ' ')}`)
+            router.refresh()
+        } catch (error) {
+            console.error('Error updating status:', error)
+            toast.error('Failed to update status')
+        } finally {
+            setIsUpdatingStatus(false)
         }
     }
 
@@ -154,6 +185,34 @@ export function TaskItem({ task }: TaskItemProps) {
                                 <Pencil className="h-4 w-4 mr-2 text-[var(--dashboard-accent-gold)]" />
                                 Edit Task
                             </DropdownMenuItem>
+
+                            <DropdownMenuSub>
+                                <DropdownMenuSubTrigger className="hover:bg-[var(--dashboard-accent-gold)]/10 focus:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
+                                    <RotateCw className="h-4 w-4 mr-2 text-[var(--dashboard-accent-gold)]" />
+                                    Change Status
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent className="glass-card border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
+                                    <DropdownMenuItem onClick={() => handleStatusChange('pending')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
+                                        <Clock className="h-4 w-4 mr-2 text-yellow-400" />
+                                        Pending
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleStatusChange('in_progress')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
+                                        <PlayCircle className="h-4 w-4 mr-2 text-blue-400" />
+                                        In Progress
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleStatusChange('completed')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
+                                        <CheckCircle2 className="h-4 w-4 mr-2 text-green-400" />
+                                        Completed
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleStatusChange('cancelled')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
+                                        <XCircle className="h-4 w-4 mr-2 text-red-400" />
+                                        Cancelled
+                                    </DropdownMenuItem>
+                                </DropdownMenuSubContent>
+                            </DropdownMenuSub>
+
+                            <DropdownMenuSeparator className="bg-[var(--dashboard-border)]" />
+
                             <DropdownMenuItem
                                 className="text-red-400 focus:text-red-400 focus:bg-red-400/10 hover:bg-red-400/10 rounded-lg"
                                 onClick={handleDelete}
