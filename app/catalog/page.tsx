@@ -22,7 +22,7 @@ export default async function CatalogPage() {
 
   // Fetch products, categories, and packages separately to avoid relationship issues
   const [productsRes, categoriesRes, packagesRes] = await Promise.all([
-    supabase.from('products').select('*').order('created_at', { ascending: false }),
+    supabase.from('products').select('*').order('created_at', { ascending: false }).limit(50),
     supabase.from('categories').select('*').order('name'),
     supabase.from('packages').select('*').order('created_at', { ascending: false })
   ])

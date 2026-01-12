@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useTransition } from 'react'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { ProductCard } from '@/components/product-card'
 import { CategoryCard } from '@/components/catalog/category-card'
@@ -66,6 +66,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
     const [searchQuery, setSearchQuery] = useState('')
     const [sortBy, setSortBy] = useState<'name' | 'price-low' | 'price-high' | 'newest'>('name')
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const [isPending, startTransition] = useTransition()
+
+    // Initialize results with server-rendered initial products
+    const [searchResults, setSearchResults] = useState<Product[]>(products)
 
     const selectedCategory = searchParams.get('category')
 
@@ -73,41 +77,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
     const heroY = useTransform(scrollY, [0, 500], [0, 200])
     const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
 
-    // Enhanced filter logic
-    const filteredProducts = useMemo(() => {
-        let filtered = products
-
-        // Category filter
-        if (selectedCategory) {
-            filtered = filtered.filter(p => p.categories?.name === selectedCategory)
-        }
-
-        // Search filter
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase()
-            filtered = filtered.filter(p =>
-                p.name.toLowerCase().includes(query) ||
-                p.description?.toLowerCase().includes(query) ||
-                (p.categories?.name?.toLowerCase() || '').includes(query)
-            )
-        }
-
-        // Sort
-        filtered.sort((a, b) => {
-            switch (sortBy) {
-                case 'price-low':
-                    return (a.rental_price_daily || a.price) - (b.rental_price_daily || b.price)
-                case 'price-high':
-                    return (b.rental_price_daily || b.price) - (a.rental_price_daily || a.price)
-                case 'newest':
-                    return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-                default: // name
-                    return a.name.localeCompare(b.name)
-            }
-        })
-
-        return filtered
-    }, [products, selectedCategory, searchQuery, sortBy])
+    // Initial load sync
+    useEffect(() => {
+        setSearchResults(products)
+    }, [products])
 
     // Featured first then alphabetically
     const orderedCategories = useMemo(() => {
@@ -151,27 +124,35 @@ export default function CatalogClient({ heroTitle, products, categories, package
     // Debounce search updates
     useEffect(() => {
         const timer = setTimeout(() => {
-            setSearchQuery(inputValue)
-
             const params = new URLSearchParams(searchParams.toString())
             const currentSearch = params.get('search') || ''
 
-            if (inputValue.trim() !== currentSearch) {
+            // Only search if query changed or sort changed
+            if (inputValue.trim() !== currentSearch || sortBy) {
+
+                // 1. Update URL visually (history API)
                 if (inputValue.trim()) {
                     params.set('search', inputValue)
                 } else {
                     params.delete('search')
                 }
-
-                // Use window.history.replaceState instead of router.replace to avoid 
-                // triggering a Next.js server request/refresh on every keystroke
                 const newUrl = `${pathname}?${params.toString()}`
                 window.history.replaceState(null, '', newUrl)
+
+                // 2. Perform Server Search
+                startTransition(async () => {
+                    // Import dynamically to avoid build issues if mixed environment
+                    const { searchProducts } = await import('./actions')
+                    const results = await searchProducts(inputValue, sortBy, selectedCategory)
+                    setSearchResults(results as Product[])
+                })
+
+                setSearchQuery(inputValue)
             }
         }, 300)
 
         return () => clearTimeout(timer)
-    }, [inputValue, pathname, searchParams])
+    }, [inputValue, sortBy, selectedCategory, pathname, searchParams])
 
     // Sync state with URL only on mount or external navigation (like back button)
     useEffect(() => {
@@ -251,10 +232,15 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gold/40" />
                             <Input
                                 placeholder="Search markers..."
-                                value={searchQuery}
+                                value={inputValue}
                                 onChange={(e) => handleSearchChange(e.target.value)}
                                 className="pl-14 pr-6 h-14 border-white/5 focus:border-gold/30 rounded-full bg-white/5 transition-all duration-300 focus:bg-white/10 text-white placeholder:text-gray-600 font-light shadow-2xl"
                             />
+                            {isPending && (
+                                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                                    <div className="w-4 h-4 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+                                </div>
+                            )}
                         </div>
 
                         {/* Controls */}
@@ -455,7 +441,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
                                 {/* Grid */}
                                 <div className="flex-1">
-                                    {filteredProducts.length > 0 ? (
+                                    {searchResults.length > 0 ? (
                                         <motion.div
                                             layout
                                             className={cn(
@@ -465,7 +451,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                                     : "columns-2 md:columns-3 gap-6 md:gap-10 space-y-6 md:space-y-10"
                                             )}
                                         >
-                                            {filteredProducts.map((product, index) => (
+                                            {searchResults.map((product, index) => (
                                                 <motion.div
                                                     key={product.id}
                                                     layout
