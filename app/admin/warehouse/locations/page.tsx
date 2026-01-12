@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Plus, Trash2, MapPin, Printer, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { AdminQRCode } from '@/components/admin/qr-code'
+import { CreateLocationDialog } from '@/components/admin/warehouse/create-location-dialog'
 
 interface Location {
     id: string
@@ -75,10 +76,7 @@ export default function WarehouseLocationsPage() {
                         </p>
                     </div>
                 </div>
-                <Button className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium px-6">
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Location
-                </Button>
+                <CreateLocationDialog onSuccess={fetchLocations} />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -147,14 +147,62 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
     const taxableAmount = subtotal + setupFee
     const taxAmount = Math.round(taxableAmount * taxRate)
 
+    // --- TIERED DISCOUNTS LOGIC ---
+    let discountAmount = 0
+    let discountName = ''
+
+    // Fetch active discounts
+    const { data: discounts } = await supabase
+        .from('tiered_discounts')
+        .select('*')
+        .eq('is_active', true)
+        .order('min_cart_total', { ascending: false }) // Check highest threshold first
+
+    if (discounts && discounts.length > 0) {
+        // Find the best eligible discount
+        const cartValueCents = subtotal // Discount applies to subtotal (merchandise only usually)
+
+        for (const discount of discounts) {
+            if (cartValueCents >= discount.min_cart_total) {
+                if (discount.discount_type === 'percentage') {
+                    // value is percentage (e.g. 5 for 5%)
+                    discountAmount = Math.round(subtotal * (discount.discount_value / 100))
+                } else {
+                    // value is fixed amount in cents
+                    discountAmount = discount.discount_value
+                }
+
+                // Cap discount at subtotal to prevent negative or free shipping abuse if needed
+                if (discountAmount > subtotal) {
+                    discountAmount = subtotal
+                }
+
+                discountName = discount.name
+                break // Stop after finding the highest applicable tier
+            }
+        }
+    }
+    // ------------------------------
+
     // Calculate total
-    const totalAmount = subtotal + setupFee + taxAmount + deliveryFee
+    // Total = Subtotal - Discount + Setup + Tax + Delivery
+    // Note: Tax usually applies to the discounted price.
+    // Let's recalculate tax based on discounted taxable amount.
+
+    // Adjusted Taxable Amount
+    const discountedSubtotal = Math.max(0, subtotal - discountAmount)
+    const adjustedTaxableAmount = discountedSubtotal + setupFee
+    const adjustedTaxAmount = Math.round(adjustedTaxableAmount * taxRate)
+
+    const totalAmount = discountedSubtotal + setupFee + adjustedTaxAmount + deliveryFee
 
     return {
         subtotal,
+        discountAmount, // Add this
+        discountName,   // Add this
         setupFee,
         taxRate,
-        taxAmount,
+        taxAmount: adjustedTaxAmount, // Return the adjusted tax
         deliveryFee,
         totalAmount,
         products,
@@ -324,6 +372,8 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 delivery_time: formData.deliveryTime,
                 delivery_notes: formData.deliveryNotes,
                 subtotal: totals.subtotal,
+                discount_total: totals.discountAmount || 0, // Add this
+                discount_name: totals.discountName || null, // Add this
                 tax_rate: totals.taxRate,
                 tax_amount: totals.taxAmount,
                 delivery_fee: totals.deliveryFee,

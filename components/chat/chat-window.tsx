@@ -1,0 +1,164 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Send, Paperclip, Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
+import { format } from 'date-fns'
+
+interface Message {
+    id: string
+    content: string
+    sender_id: string
+    created_at: string
+}
+
+interface ChatWindowProps {
+    conversationId: string
+    currentUserId: string
+}
+
+export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
+    const [messages, setMessages] = useState<Message[]>([])
+    const [newMessage, setNewMessage] = useState('')
+    const [isSending, setIsSending] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
+    const scrollRef = useRef<HTMLDivElement>(null)
+    const supabase = createClient()
+
+    useEffect(() => {
+        fetchMessages()
+
+        const channel = supabase
+            .channel(`conversation:${conversationId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'messages',
+                    filter: `conversation_id=eq.${conversationId}`
+                },
+                (payload) => {
+                    const newMsg = payload.new as Message
+                    setMessages(prev => [...prev, newMsg])
+                    scrollToBottom()
+                }
+            )
+            .subscribe()
+
+        return () => {
+            supabase.removeChannel(channel)
+        }
+    }, [conversationId])
+
+    const fetchMessages = async () => {
+        setIsLoading(true)
+        const { data } = await supabase
+            .from('messages')
+            .select('*')
+            .eq('conversation_id', conversationId)
+            .order('created_at', { ascending: true })
+
+        if (data) setMessages(data)
+        setIsLoading(false)
+        scrollToBottom()
+    }
+
+    const scrollToBottom = () => {
+        setTimeout(() => {
+            if (scrollRef.current) {
+                scrollRef.current.scrollIntoView({ behavior: 'smooth' })
+            }
+        }, 100)
+    }
+
+    const handleSend = async (e?: React.FormEvent) => {
+        e?.preventDefault()
+        if (!newMessage.trim() || isSending) return
+
+        setIsSending(true)
+        const { error } = await supabase
+            .from('messages')
+            .insert({
+                conversation_id: conversationId,
+                sender_id: currentUserId,
+                content: newMessage.trim()
+            })
+
+        if (error) {
+            toast.error('Failed to send message')
+        } else {
+            setNewMessage('')
+            // Optimistic update handled by subscription mostly, but we can rely on it
+        }
+        setIsSending(false)
+    }
+
+    return (
+        <div className="flex flex-col h-full bg-transparent">
+            <ScrollArea className="flex-1 p-4">
+                <div className="space-y-4 max-w-3xl mx-auto pb-4">
+                    {isLoading ? (
+                        <div className="flex justify-center py-10">
+                            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                        </div>
+                    ) : (
+                        messages.map((msg, i) => {
+                            const isMe = msg.sender_id === currentUserId
+                            const showTime = i === 0 || new Date(msg.created_at).getTime() - new Date(messages[i - 1].created_at).getTime() > 1000 * 60 * 5 // 5 mins
+
+                            return (
+                                <div key={msg.id} className={cn("flex flex-col", isMe ? "items-end" : "items-start")}>
+                                    {showTime && (
+                                        <div className="text-[10px] text-gray-400 uppercase tracking-widest my-2 text-center w-full">
+                                            {format(new Date(msg.created_at), 'h:mm a')}
+                                        </div>
+                                    )}
+                                    <div
+                                        className={cn(
+                                            "max-w-[80%] rounded-2xl px-5 py-3 shadow-sm",
+                                            isMe
+                                                ? "bg-[var(--dashboard-accent-gold)] text-black rounded-tr-sm"
+                                                : "bg-white dark:bg-white/10 text-gray-900 dark:text-white rounded-tl-sm border border-border/10"
+                                        )}
+                                    >
+                                        <p className="text-sm leading-relaxed">{msg.content}</p>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    )}
+                    <div ref={scrollRef} />
+                </div>
+            </ScrollArea>
+
+            <div className="p-4 bg-white/50 dark:bg-black/20 border-t border-border/10 backdrop-blur-md">
+                <form onSubmit={handleSend} className="max-w-3xl mx-auto flex gap-3 items-end">
+                    <Button type="button" size="icon" variant="ghost" className="rounded-full text-gray-400 hover:text-[var(--dashboard-accent-gold)]">
+                        <Paperclip className="h-5 w-5" />
+                    </Button>
+                    <div className="flex-1 relative">
+                        <Input
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            placeholder="Type a message..."
+                            className="bg-white dark:bg-white/5 border-none rounded-2xl pr-12 h-12 py-3 shadow-inner focus-visible:ring-1 focus-visible:ring-[var(--dashboard-accent-gold)]"
+                        />
+                    </div>
+                    <Button
+                        type="submit"
+                        disabled={!newMessage.trim() || isSending}
+                        className="h-12 w-12 rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black shadow-lg hover:scale-105 transition-transform p-0 flex items-center justify-center"
+                    >
+                        {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 ml-1" />}
+                    </Button>
+                </form>
+            </div>
+        </div>
+    )
+}

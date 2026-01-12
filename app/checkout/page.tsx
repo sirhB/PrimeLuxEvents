@@ -1238,6 +1238,12 @@ export default function CheckoutPage() {
                                                     <span className="text-sm font-light text-gray-500">Subtotal</span>
                                                     <span className="text-base font-medium text-gray-900">{formatCurrency(totals.subtotal)}</span>
                                                 </div>
+                                                {totals.discountAmount > 0 && (
+                                                    <div className="flex justify-between items-center text-green-600">
+                                                        <span className="text-sm font-medium">{totals.discountName || 'Discount'}</span>
+                                                        <span className="text-base font-medium">-{formatCurrency(totals.discountAmount)}</span>
+                                                    </div>
+                                                )}
                                                 {totals.setupFee > 0 && (
                                                     <div className="flex justify-between items-center">
                                                         <span className="text-sm font-light text-gray-500">Setup Fee</span>
