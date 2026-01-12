@@ -158,7 +158,7 @@ export function TaskItem({ task }: TaskItemProps) {
                             {task.due_date && (
                                 <div className="flex items-center gap-1.5 text-[var(--dashboard-text-muted)] bg-[var(--dashboard-card)] px-2 py-0.5 rounded-full border border-[var(--dashboard-border)]">
                                     <Clock className="h-3 w-3 opacity-60" />
-                                    <span>Due {new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                                    <span suppressHydrationWarning>Due {new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                                 </div>
                             )}
 
