@@ -5,7 +5,6 @@ import { UpcomingOrdersCard } from '@/components/admin/dashboard/upcoming-orders
 import { AlertsCard } from '@/components/admin/dashboard/alerts-card'
 import { RecentActivityList } from '@/components/admin/dashboard/recent-activity-list'
 import { RevenueMiniChart } from '@/components/admin/dashboard/revenue-mini-chart'
-import { SetupChecklist } from '@/components/admin/dashboard/setup-checklist'
 import { LaunchReadinessTracker } from '@/components/admin/dashboard/launch-readiness-tracker'
 import { createClient } from '@/lib/supabase/server'
 
@@ -46,9 +45,6 @@ export default async function AdminDashboardPage() {
 
             {/* Launch Readiness Tracker - Formal Step-by-Step Review */}
             <LaunchReadinessTracker />
-
-            {/* Setup Checklist - Only shows if not complete */}
-            <SetupChecklist />
 
             {/* Main Content Grid */}
             <div className="grid gap-8 grid-cols-1 xl:grid-cols-12">
