@@ -162,17 +162,23 @@ export default function CatalogClient({ heroTitle, products, categories, package
                 } else {
                     params.delete('search')
                 }
-                router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+
+                // Use window.history.replaceState instead of router.replace to avoid 
+                // triggering a Next.js server request/refresh on every keystroke
+                const newUrl = `${pathname}?${params.toString()}`
+                window.history.replaceState(null, '', newUrl)
             }
         }, 300)
 
         return () => clearTimeout(timer)
-    }, [inputValue, pathname, router, searchParams])
+    }, [inputValue, pathname, searchParams])
 
-    // Sync state with URL only on mount or external navigation
+    // Sync state with URL only on mount or external navigation (like back button)
     useEffect(() => {
         const searchParam = searchParams.get('search') || ''
-        if (searchParam !== searchQuery) {
+        // Only update if the URL param is different from what we have
+        // This check prevents overwriting our local state when we manually update history
+        if (searchParam !== inputValue && searchParam !== searchQuery) {
             setInputValue(searchParam)
             setSearchQuery(searchParam)
         }
