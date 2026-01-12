@@ -49,6 +49,12 @@ interface UserProfile {
     email: string
 }
 
+interface Role {
+    id: string
+    name: string
+    display_name: string
+}
+
 interface ChatLayoutProps {
     currentUserEmail: string
     currentUserId: string
@@ -58,13 +64,15 @@ interface ChatLayoutProps {
 export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLayoutProps) {
     const [conversations, setConversations] = useState<Conversation[]>([])
     const [profiles, setProfiles] = useState<Record<string, UserProfile>>({})
+    const [roles, setRoles] = useState<Role[]>([])
     const [selectedId, setSelectedId] = useState<string | null>(null)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
 
     // New Chat State
     const [isNewChatOpen, setIsNewChatOpen] = useState(false)
-    const [newChatType, setNewChatType] = useState<'support' | 'direct'>('support')
+    const [newChatType, setNewChatType] = useState<'role' | 'direct'>('role')
+    const [selectedRoleId, setSelectedRoleId] = useState<string>('')
     const [recipientEmail, setRecipientEmail] = useState('')
     // const [subject, setSubject] = useState('') // Subject removed
     const [initialMessage, setInitialMessage] = useState('')
@@ -74,6 +82,7 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
 
     useEffect(() => {
         fetchConversations()
+        fetchRoles()
 
         // Subscribe to new messages/conversations
         const channel = supabase
@@ -87,6 +96,11 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             supabase.removeChannel(channel)
         }
     }, [])
+
+    const fetchRoles = async () => {
+        const { data } = await supabase.from('roles').select('id, name, display_name')
+        if (data) setRoles(data)
+    }
 
     const fetchConversations = async () => {
         // This is a complex query to get latest message and participants
@@ -187,13 +201,32 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                     return
                 }
                 participantIds = [userData.id]
+            } else if (newChatType === 'role') {
+                if (!selectedRoleId) {
+                    toast.error('Please select a role')
+                    setIsCreating(false)
+                    return
+                }
+                // Fetch all users with this role
+                const { data: roleUsers, error: roleError } = await supabase
+                    .from('user_roles')
+                    .select('user_id')
+                    .eq('role_id', selectedRoleId)
+
+                if (roleError || !roleUsers || roleUsers.length === 0) {
+                    toast.error('No users found with this role')
+                    setIsCreating(false)
+                    return
+                }
+                participantIds = roleUsers.map(u => u.user_id)
             }
 
             // Create Conversation via RPC
             const { data: conversationId, error } = await supabase
                 .rpc('create_new_conversation', {
-                    p_type: newChatType === 'direct' ? 'internal' : 'support',
-                    p_subject: null, // Subject Removed
+                    // Start as internal for everyone for now, or adapt if needed
+                    p_type: 'internal',
+                    p_subject: null,
                     p_message: initialMessage.trim() || null,
                     p_participant_ids: participantIds
                 })
@@ -207,9 +240,9 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                 setIsNewChatOpen(false)
                 // Reset form
                 setRecipientEmail('')
-                // setSubject('') 
                 setInitialMessage('')
-                setNewChatType('support')
+                setNewChatType('role')
+                setSelectedRoleId('')
             }
 
         } catch (err) {
@@ -240,42 +273,63 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                         </DialogHeader>
                         <form onSubmit={startNewChat} className="grid gap-4 py-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="type">To</Label>
+                                <Label htmlFor="type" className="text-white font-medium">To</Label>
                                 <Select
                                     value={newChatType}
-                                    onValueChange={(val: 'support' | 'direct') => setNewChatType(val)}
+                                    onValueChange={(val: 'role' | 'direct') => setNewChatType(val)}
                                 >
-                                    <SelectTrigger className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)]">
-                                        <SelectValue placeholder="Select recipient" />
+                                    <SelectTrigger className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] text-white">
+                                        <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="support">Support Team (Role)</SelectItem>
+                                        <SelectItem value="role">Role (Group)</SelectItem>
                                         <SelectItem value="direct">Specific Person (Email)</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
+                            {newChatType === 'role' && (
+                                <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
+                                    <Label htmlFor="role" className="text-white font-medium">Select Role</Label>
+                                    <Select
+                                        value={selectedRoleId}
+                                        onValueChange={setSelectedRoleId}
+                                    >
+                                        <SelectTrigger className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] text-white">
+                                            <SelectValue placeholder="Select a role" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {roles.map(role => (
+                                                <SelectItem key={role.id} value={role.id}>
+                                                    {role.display_name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
+
                             {newChatType === 'direct' && (
                                 <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
-                                    <Label htmlFor="email">Recipient Email</Label>
+                                    <Label htmlFor="email" className="text-white font-medium">Recipient Email</Label>
                                     <Input
                                         id="email"
                                         placeholder="user@example.com"
                                         value={recipientEmail}
                                         onChange={(e) => setRecipientEmail(e.target.value)}
-                                        className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)]"
+                                        className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] text-white placeholder:text-gray-400"
                                     />
                                 </div>
                             )}
 
                             <div className="grid gap-2">
-                                <Label htmlFor="message">Message</Label>
+                                <Label htmlFor="message" className="text-white font-medium">Message</Label>
                                 <Textarea
                                     id="message"
                                     placeholder="Type your message here..."
                                     value={initialMessage}
                                     onChange={(e) => setInitialMessage(e.target.value)}
-                                    className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] min-h-[100px]"
+                                    className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] min-h-[100px] text-white placeholder:text-gray-400"
                                 />
                             </div>
 
