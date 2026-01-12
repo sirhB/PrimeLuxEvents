@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, Search, Plus, MessageSquare } from 'lucide-react'
+import { Menu, Search, Plus, MessageSquare, MoreVertical } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDistanceToNow } from 'date-fns'
 import { ChatWindow } from './chat-window'
@@ -507,52 +507,59 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             <ScrollArea className="flex-1">
                 <div className="flex flex-col gap-1 p-2">
                     {filteredConversations.map(conv => (
-                        <DropdownMenu key={conv.id}>
-                            <DropdownMenuTrigger asChild>
-                                <button
-                                    onClick={() => {
-                                        setSelectedId(conv.id)
-                                        setIsMobileOpen(false)
-                                    }}
-                                    className={cn(
-                                        "w-full flex items-start gap-4 p-4 text-left rounded-xl transition-colors group relative",
-                                        selectedId === conv.id
-                                            ? "bg-[var(--dashboard-accent-gold)]/10"
-                                            : "hover:bg-[var(--dashboard-card-hover)]"
-                                    )}
-                                >
-                                    <Avatar className="h-10 w-10 border border-[var(--dashboard-border)]">
-                                        <AvatarFallback className="bg-[var(--dashboard-background)] text-[var(--dashboard-text-muted)]">
-                                            <MessageSquare className={cn(
-                                                "h-5 w-5 transition-colors",
-                                                selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]"
-                                            )} />
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1 overflow-hidden">
-                                        <div className="flex items-center justify-between mb-1">
-                                            <span className={cn(
-                                                "font-bold text-sm truncate transition-colors",
-                                                selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text)]"
-                                            )}>
-                                                {getConversationTitle(conv)}
-                                            </span>
-                                            <span className="text-[10px] text-[var(--dashboard-text-muted)] whitespace-nowrap">
-                                                {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
-                                            </span>
-                                        </div>
-                                        <p className="text-xs text-[var(--dashboard-text-muted)] truncate group-hover:text-[var(--dashboard-text)] transition-colors">
-                                            {conv.lastMessagePreview || "Click to view conversation"}
-                                        </p>
-                                    </div>
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={(e) => toggleArchive(conv.id, e)}>
-                                    {conv.is_archived ? 'Unarchive' : 'Archive'} Conversation
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div
+                            key={conv.id}
+                            onClick={() => {
+                                setSelectedId(conv.id)
+                                setIsMobileOpen(false)
+                            }}
+                            className={cn(
+                                "w-full flex items-center gap-3 p-3 text-left rounded-xl transition-colors group relative cursor-pointer",
+                                selectedId === conv.id
+                                    ? "bg-[var(--dashboard-accent-gold)]/10"
+                                    : "hover:bg-[var(--dashboard-card-hover)]"
+                            )}
+                        >
+                            <Avatar className="h-10 w-10 border border-[var(--dashboard-border)] shrink-0">
+                                <AvatarFallback className="bg-[var(--dashboard-background)] text-[var(--dashboard-text-muted)]">
+                                    <MessageSquare className={cn(
+                                        "h-5 w-5 transition-colors",
+                                        selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]"
+                                    )} />
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 overflow-hidden min-w-0 grid gap-0.5">
+                                <div className="flex items-center justify-between">
+                                    <span className={cn(
+                                        "font-bold text-sm truncate transition-colors",
+                                        selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text)]"
+                                    )}>
+                                        {getConversationTitle(conv)}
+                                    </span>
+                                    <span className="text-[10px] text-[var(--dashboard-text-muted)] whitespace-nowrap ml-2 shrink-0">
+                                        {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-[var(--dashboard-text-muted)] truncate group-hover:text-[var(--dashboard-text)] transition-colors">
+                                    {conv.lastMessagePreview || "Click to view conversation"}
+                                </p>
+                            </div>
+
+                            <div onClick={(e) => e.stopPropagation()}>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <MoreVertical className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
+                                        <DropdownMenuItem onClick={(e) => toggleArchive(conv.id, e)} className="hover:bg-[var(--dashboard-card-hover)] cursor-pointer">
+                                            {conv.is_archived ? 'Unarchive' : 'Archive'} Conversation
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                        </div>
                     ))}
                     {filteredConversations.length === 0 && !isLoading && (
                         <div className="p-8 text-center text-[var(--dashboard-text-muted)] text-sm">
