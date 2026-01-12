@@ -101,6 +101,7 @@ export function TaskItem({ task }: TaskItemProps) {
 
     const handleStatusChange = async (newStatus: string) => {
         setIsUpdatingStatus(true)
+        const toastId = toast.loading(`Updating status to ${newStatus.replace('_', ' ')}...`)
         try {
             const { error } = await supabase
                 .from('tasks')
@@ -112,11 +113,11 @@ export function TaskItem({ task }: TaskItemProps) {
 
             if (error) throw error
 
-            toast.success(`Task marked as ${newStatus.replace('_', ' ')}`)
+            toast.success(`Task marked as ${newStatus.replace('_', ' ')}`, { id: toastId })
             router.refresh()
         } catch (error) {
             console.error('Error updating status:', error)
-            toast.error('Failed to update status')
+            toast.error('Failed to update status', { id: toastId })
         } finally {
             setIsUpdatingStatus(false)
         }
@@ -208,19 +209,19 @@ export function TaskItem({ task }: TaskItemProps) {
                                     Change Status
                                 </DropdownMenuSubTrigger>
                                 <DropdownMenuSubContent className="glass-card border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
-                                    <DropdownMenuItem onClick={() => handleStatusChange('pending')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
+                                    <DropdownMenuItem onSelect={() => handleStatusChange('pending')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
                                         <Clock className="h-4 w-4 mr-2 text-yellow-400" />
                                         Pending
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleStatusChange('in_progress')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
+                                    <DropdownMenuItem onSelect={() => handleStatusChange('in_progress')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
                                         <PlayCircle className="h-4 w-4 mr-2 text-blue-400" />
                                         In Progress
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleStatusChange('completed')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
+                                    <DropdownMenuItem onSelect={() => handleStatusChange('completed')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
                                         <CheckCircle2 className="h-4 w-4 mr-2 text-green-400" />
                                         Completed
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => handleStatusChange('cancelled')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
+                                    <DropdownMenuItem onSelect={() => handleStatusChange('cancelled')} className="hover:bg-[var(--dashboard-accent-gold)]/10 rounded-lg">
                                         <XCircle className="h-4 w-4 mr-2 text-red-400" />
                                         Cancelled
                                     </DropdownMenuItem>
