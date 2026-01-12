@@ -105,6 +105,16 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
             return
         }
 
+        // Check if authenticated with Puter
+        const signedIn = await aiService.isSignedIn()
+        if (!signedIn) {
+            const user = await aiService.signIn()
+            if (!user) {
+                toast.error("Please sign in with Puter to use AI features.")
+                return
+            }
+        }
+
         setIsGeneratingDescription(true)
         try {
             const description = await aiService.generateProductDescription(name, categoryName)

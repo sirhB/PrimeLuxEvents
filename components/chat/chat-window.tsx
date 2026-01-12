@@ -125,6 +125,16 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
     const handleConsultSensei = async () => {
         if (isGeneratingAI) return
 
+        // Check if authenticated with Puter
+        const signedIn = await aiService.isSignedIn()
+        if (!signedIn) {
+            const user = await aiService.signIn()
+            if (!user) {
+                toast.error("Please sign in with Puter to consult the Sensei.")
+                return
+            }
+        }
+
         setIsGeneratingAI(true)
         try {
             // Get recent context (last 10 messages)
