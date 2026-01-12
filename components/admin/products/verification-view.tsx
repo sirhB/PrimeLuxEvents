@@ -13,12 +13,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Link from 'next/link'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 interface VerificationViewProps {
     products: any[]
+    categories: any[]
 }
 
-export function VerificationView({ products: initialProducts }: VerificationViewProps) {
+export function VerificationView({ products: initialProducts, categories }: VerificationViewProps) {
     const [products, setProducts] = useState(initialProducts)
     const [currentIndex, setCurrentIndex] = useState(0)
     const [isVerifying, setIsVerifying] = useState(false)
@@ -32,7 +40,8 @@ export function VerificationView({ products: initialProducts }: VerificationView
         description: '',
         price: '',
         cost: '',
-        stock: ''
+        stock: '',
+        category_id: ''
     })
 
     useEffect(() => {
@@ -42,7 +51,8 @@ export function VerificationView({ products: initialProducts }: VerificationView
                 description: currentProduct.description || '',
                 price: currentProduct.price ? (currentProduct.price / 100).toFixed(2) : '',
                 cost: currentProduct.cost ? (currentProduct.cost / 100).toFixed(2) : '',
-                stock: currentProduct.stock?.toString() || '0'
+                stock: currentProduct.stock?.toString() || '0',
+                category_id: currentProduct.category_id || ''
             })
         }
     }, [currentProduct])
@@ -57,7 +67,8 @@ export function VerificationView({ products: initialProducts }: VerificationView
                 description: formData.description,
                 price: Math.round(parseFloat(formData.price || '0') * 100),
                 cost: Math.round(parseFloat(formData.cost || '0') * 100),
-                stock: parseInt(formData.stock || '0')
+                stock: parseInt(formData.stock || '0'),
+                category_id: formData.category_id || null
             }
             await updateAndVerifyProduct(currentProduct.id, data)
             toast.success(`Verified: ${formData.name}`)
@@ -224,6 +235,25 @@ export function VerificationView({ products: initialProducts }: VerificationView
                                                 className="min-h-[120px] bg-white/5 border-none rounded-2xl resize-none focus-visible:ring-1 focus-visible:ring-[var(--dashboard-accent-gold)]/30 text-sm leading-relaxed"
                                                 placeholder="No description provided..."
                                             />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label className="text-[var(--dashboard-text-muted)] text-[10px] uppercase font-bold tracking-widest">Category</Label>
+                                            <Select
+                                                value={formData.category_id}
+                                                onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}
+                                            >
+                                                <SelectTrigger className="w-full bg-white/5 border-none rounded-xl h-12 text-sm">
+                                                    <SelectValue placeholder="Select a category" />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-xl">
+                                                    {categories.map((category) => (
+                                                        <SelectItem key={category.id} value={category.id} className="focus:bg-[var(--dashboard-accent-gold)] focus:text-black">
+                                                            {category.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4">

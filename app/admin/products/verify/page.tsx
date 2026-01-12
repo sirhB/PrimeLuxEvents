@@ -9,7 +9,7 @@ export default async function ProductVerificationPage() {
     await requirePermission('products.update')
     const supabase = await createClient()
 
-    // Fetch up to 100 unverified products to keep the progress manageable
+    // Fetch unverified products
     const { data: products, error } = await supabase
         .from('products')
         .select(`
@@ -18,7 +18,18 @@ export default async function ProductVerificationPage() {
         `)
         .eq('is_verified', false)
         .order('created_at', { ascending: false })
-        .limit(100)
+
+    // Fetch all categories for the dropdown
+    const { data: categories } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name')
+
+    // Fetch total count of unverified products (for accurate "Remaining" count)
+    const { count: totalUnverified } = await supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_verified', false)
 
     if (error) {
         throw new Error('Failed to fetch unverified products')
@@ -44,7 +55,7 @@ export default async function ProductVerificationPage() {
                 </div>
                 <div className="text-right">
                     <span className="text-2xl font-serif text-[var(--dashboard-accent-gold)]">
-                        {products?.length || 0}
+                        {totalUnverified || 0}
                     </span>
                     <p className="text-[var(--dashboard-text-muted)] text-[10px] uppercase tracking-wider font-bold">
                         Remaining
@@ -53,7 +64,7 @@ export default async function ProductVerificationPage() {
             </div>
 
             {products && products.length > 0 ? (
-                <VerificationView products={products} />
+                <VerificationView products={products} categories={categories || []} />
             ) : (
                 <div className="flex-1 flex flex-col items-center justify-center glass-card p-12 rounded-3xl border-none animate-fade-in">
                     <div className="h-20 w-20 rounded-full bg-[var(--dashboard-accent-gold)]/10 flex items-center justify-center mb-6">
