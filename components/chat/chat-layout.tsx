@@ -314,14 +314,14 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
 
         } catch (err) {
             console.error('Unexpected error:', err)
-            toast.error('An unexpected error occurred')
+            toast.error('Unexpected error occurred')
         } finally {
             setIsCreating(false)
         }
     }
 
-    const toggleArchive = async (conversationId: string, e: React.MouseEvent) => {
-        e.stopPropagation() // Prevent selecting the chat
+    const toggleArchive = async (conversationId: string, e?: React.MouseEvent) => {
+        e?.stopPropagation() // Prevent selecting the chat
 
         try {
             const { error } = await supabase.rpc('toggle_conversation_archive', { p_conversation_id: conversationId })
@@ -337,6 +337,18 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             console.error(err)
             toast.error('An error occurred')
         }
+    }
+
+    const getConversationTitle = (conv: Conversation) => {
+        if (conv.type === 'support') return 'Support Ticket'
+
+        const otherUserId = conv.participants?.find((p: any) => p.user_id !== currentUserId)?.user_id
+        const profile = otherUserId ? profiles[otherUserId] : null
+
+        if (profile?.full_name) return profile.full_name
+        if (profile?.email) return profile.email
+
+        return 'Direct Message'
     }
 
     const filteredConversations = conversations.filter(c =>
@@ -523,18 +535,7 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                                                 "font-bold text-sm truncate transition-colors",
                                                 selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text)]"
                                             )}>
-                                                {(() => {
-                                                    // Strategy: Real Name > Email > Type
-                                                    if (conv.type === 'support') return 'Support Ticket'
-
-                                                    const otherUserId = conv.participants?.find((p: any) => p.user_id !== currentUserId)?.user_id
-                                                    const profile = otherUserId ? profiles[otherUserId] : null
-
-                                                    if (profile?.full_name) return profile.full_name
-                                                    if (profile?.email) return profile.email
-
-                                                    return 'Direct Message'
-                                                })()}
+                                                {getConversationTitle(conv)}
                                             </span>
                                             <span className="text-[10px] text-[var(--dashboard-text-muted)] whitespace-nowrap">
                                                 {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
@@ -566,6 +567,8 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
         </div >
     )
 
+    const selectedConversation = conversations.find(c => c.id === selectedId)
+
     return (
         <div className="flex h-[calc(100vh-100px)] rounded-3xl overflow-hidden border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-2xl">
             {/* Desktop Sidebar */}
@@ -590,8 +593,14 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                     <span className="font-bold text-[var(--dashboard-text)]">Messages</span>
                 </div>
 
-                {selectedId ? (
-                    <ChatWindow conversationId={selectedId} currentUserId={currentUserId} />
+                {selectedId && selectedConversation ? (
+                    <ChatWindow
+                        conversationId={selectedId}
+                        currentUserId={currentUserId}
+                        title={getConversationTitle(selectedConversation)}
+                        isArchived={!!selectedConversation.is_archived}
+                        onArchive={() => toggleArchive(selectedId)}
+                    />
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-[var(--dashboard-text-muted)] p-8 text-center">
                         <div className="h-20 w-20 rounded-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] flex items-center justify-center mb-6">

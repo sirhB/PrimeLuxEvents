@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Send, Paperclip, Loader2 } from 'lucide-react'
+import { Send, Paperclip, Loader2, Archive, ArrowLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
@@ -20,9 +20,12 @@ interface Message {
 interface ChatWindowProps {
     conversationId: string
     currentUserId: string
+    title: string
+    isArchived: boolean
+    onArchive: () => void
 }
 
-export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
+export function ChatWindow({ conversationId, currentUserId, title, isArchived, onArchive }: ChatWindowProps) {
     const [messages, setMessages] = useState<Message[]>([])
     const [newMessage, setNewMessage] = useState('')
     const [isSending, setIsSending] = useState(false)
@@ -121,6 +124,29 @@ export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
 
     return (
         <div className="flex flex-col h-full bg-transparent">
+            {/* Header */}
+            <div className="h-16 border-b border-[var(--dashboard-border)] bg-[var(--dashboard-card)]/50 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-10">
+                <div className="flex items-center gap-3">
+                    <h2 className="font-semibold text-[var(--dashboard-text)] text-lg">
+                        {title}
+                    </h2>
+                    {isArchived && (
+                        <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                            Archived
+                        </span>
+                    )}
+                </div>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onArchive}
+                    className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-card-hover)]"
+                >
+                    <Archive className="h-4 w-4 mr-2" />
+                    {isArchived ? 'Unarchive' : 'Archive'}
+                </Button>
+            </div>
+
             <ScrollArea className="flex-1 p-4">
                 <div className="space-y-4 max-w-3xl mx-auto pb-4">
                     {isLoading ? (
@@ -166,13 +192,14 @@ export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
                         <Input
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
-                            placeholder="Type a message..."
-                            className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] placeholder:text-[var(--dashboard-text-muted)] rounded-2xl pr-12 h-12 py-3 shadow-inner focus-visible:ring-1 focus-visible:ring-[var(--dashboard-accent-gold)]"
+                            placeholder={isArchived ? "Conversation is archived" : "Type a message..."}
+                            disabled={isArchived}
+                            className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] placeholder:text-[var(--dashboard-text-muted)] rounded-2xl pr-12 h-12 py-3 shadow-inner focus-visible:ring-1 focus-visible:ring-[var(--dashboard-accent-gold)] disabled:opacity-50"
                         />
                     </div>
                     <Button
                         type="submit"
-                        disabled={!newMessage.trim() || isSending}
+                        disabled={!newMessage.trim() || isSending || isArchived}
                         className="h-12 w-12 rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black shadow-lg hover:scale-105 transition-transform p-0 flex items-center justify-center disabled:opacity-50"
                     >
                         {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 ml-1" />}
