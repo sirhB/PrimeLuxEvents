@@ -22,15 +22,24 @@ export function useAdminNotifications() {
     useEffect(() => {
         // Initial fetch
         async function fetchNotifications() {
-            const { data, error } = await supabase
-                .from('admin_notifications')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(20)
+            try {
+                const { data, error } = await supabase
+                    .from('admin_notifications')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(20)
 
-            if (data) {
-                setNotifications(data)
-                setUnreadCount(data.filter(n => !n.is_read).length)
+                if (error) {
+                    console.error('Error fetching admin notifications:', error)
+                    return
+                }
+
+                if (data) {
+                    setNotifications(data)
+                    setUnreadCount(data.filter(n => !n.is_read).length)
+                }
+            } catch (err) {
+                console.error('Unexpected error in admin notifications:', err)
             }
         }
 
