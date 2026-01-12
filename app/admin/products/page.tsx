@@ -9,11 +9,14 @@ import { ProductFilters } from '@/components/admin/product-filters'
 import { ProductsTable } from '@/components/admin/products-table'
 import { ProductStatsCards } from '@/components/admin/products/product-stats-cards'
 
+import { requirePermission } from '@/lib/auth/authorization'
+
 export default async function ProductsPage({
     searchParams,
 }: {
     searchParams: Promise<{ category_id?: string; page?: string; search?: string; sort?: string; stock_status?: string }>
 }) {
+    await requirePermission('products.view')
     const { category_id, page = '1', search, sort = 'newest', stock_status } = await searchParams
     const supabase = await createClient()
 

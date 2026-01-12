@@ -416,3 +416,37 @@ export async function updateUserProfile(
     }
 }
 
+// Get all members for a specific role
+export async function getRoleMembers(roleId: string): Promise<{ success: boolean; data?: any[]; error?: string }> {
+    try {
+        await requirePermission('users.view')
+
+        const supabase = await createClient()
+
+        const { data, error } = await supabase
+            .from('user_roles')
+            .select(`
+                user_profiles (
+                    id,
+                    email,
+                    full_name,
+                    avatar_url,
+                    job_title,
+                    department,
+                    is_active
+                )
+            `)
+            .eq('role_id', roleId)
+
+        if (error) {
+            return { success: false, error: error.message }
+        }
+
+        const members = data?.map((ur: any) => ur.user_profiles) || []
+        return { success: true, data: members }
+    } catch (error) {
+        console.error('Error fetching role members:', error)
+        return { success: false, error: 'Failed to fetch role members' }
+    }
+}
+

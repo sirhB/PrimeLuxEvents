@@ -13,11 +13,14 @@ interface Customer {
     lastOrderDate?: string
 }
 
+import { requirePermission } from '@/lib/auth/authorization'
+
 export default async function CustomersPage({
     searchParams,
 }: {
     searchParams: Promise<{ page?: string; search?: string }>
 }) {
+    await requirePermission('customers.view')
     const { page = '1', search } = await searchParams
     const supabase = await createClient()
 

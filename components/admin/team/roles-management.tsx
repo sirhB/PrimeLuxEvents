@@ -9,8 +9,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Shield, Users, Settings, Plus, Edit, Trash2, Save, X } from 'lucide-react'
-import { getRolesWithPermissions, getAllPermissions, getRoleStats, updateRolePermissions, createRole, updateRole, deleteRole, type Role, type Permission, type RoleWithStats } from '@/app/admin/actions'
+import { Shield, Users, Settings, Plus, Edit, Trash2, Save, X, User } from 'lucide-react'
+import { getRolesWithPermissions, getAllPermissions, getRoleStats, updateRolePermissions, createRole, updateRole, deleteRole, getRoleMembers, type Role, type Permission, type RoleWithStats } from '@/app/admin/actions'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { toast } from 'sonner'
 
 interface RolesManagementProps {
@@ -40,6 +41,8 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
     const [loading, setLoading] = useState(true)
     const [editDialogOpen, setEditDialogOpen] = useState(false)
     const [createDialogOpen, setCreateDialogOpen] = useState(false)
+    const [roleMembers, setRoleMembers] = useState<any[]>([])
+    const [loadingMembers, setLoadingMembers] = useState(false)
 
     const fetchRolesData = async () => {
         setLoading(true)
@@ -63,7 +66,7 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
         }
     }
 
-    const handleRoleClick = (role: RoleWithStats) => {
+    const handleRoleClick = async (role: RoleWithStats) => {
         setSelectedRole(role)
         // Initialize permission states for this role
         const permStates: Record<string, boolean> = {}
@@ -71,6 +74,22 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
             permStates[perm.id] = true
         })
         setPermissionStates(permStates)
+
+        // Fetch members for this role
+        setLoadingMembers(true)
+        try {
+            const result = await getRoleMembers(role.id)
+            if (result.success && result.data) {
+                setRoleMembers(result.data)
+            } else {
+                setRoleMembers([])
+            }
+        } catch (error) {
+            console.error('Error fetching role members:', error)
+            setRoleMembers([])
+        } finally {
+            setLoadingMembers(false)
+        }
     }
 
     const handleEditRole = (role: RoleWithStats) => {
@@ -331,13 +350,43 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
                             </TabsContent>
 
                             <TabsContent value="members" className="space-y-4">
-                                <div className="text-center py-8">
-                                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                    <p className="text-gray-500">Members list would be displayed here</p>
-                                    <p className="text-sm text-gray-400 mt-1">
-                                        Showing users assigned to this role
-                                    </p>
-                                </div>
+                                {loadingMembers ? (
+                                    <div className="text-center py-8">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--dashboard-accent-gold)] mx-auto"></div>
+                                        <p className="text-gray-500 mt-2">Loading members...</p>
+                                    </div>
+                                ) : roleMembers.length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                                        <p className="text-gray-500">No members assigned to this role</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                        {roleMembers.map((member) => (
+                                            <div key={member.id} className="flex items-center gap-3 p-3 border rounded-lg bg-gray-50/50">
+                                                <Avatar className="h-10 w-10">
+                                                    <AvatarImage src={member.avatar_url} />
+                                                    <AvatarFallback>
+                                                        {member.full_name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || member.email[0].toUpperCase()}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-gray-900 truncate">
+                                                        {member.full_name || 'Unnamed User'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 truncate">
+                                                        {member.email}
+                                                    </p>
+                                                    {member.job_title && (
+                                                        <p className="text-[10px] text-gray-400 mt-0.5 truncate uppercase tracking-wider font-bold">
+                                                            {member.job_title}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </TabsContent>
                         </Tabs>
                     </CardContent>

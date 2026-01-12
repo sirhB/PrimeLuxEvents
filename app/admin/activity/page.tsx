@@ -1,7 +1,10 @@
 import { ActivityFeed } from '@/components/admin/activity-feed'
 import { History } from 'lucide-react'
 
-export default function GlobalActivityPage() {
+import { requirePermission } from '@/lib/auth/authorization'
+
+export default async function GlobalActivityPage() {
+    await requirePermission('settings.view')
     return (
         <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">

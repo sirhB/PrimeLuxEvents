@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import Script from "next/script"
 import "./globals.css"
 import { CartProvider } from "@/components/providers/cart-provider"
 import { SiteLayout } from "@/components/site-layout"
@@ -89,6 +90,7 @@ export default function RootLayout({
         </CartProvider>
         <Analytics />
         <Toaster />
+        <Script src="https://js.puter.com/v2/" strategy="beforeInteractive" />
       </body>
     </html>
   )

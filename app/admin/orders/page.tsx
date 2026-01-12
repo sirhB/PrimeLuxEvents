@@ -11,11 +11,14 @@ import { OrderStatsCards } from '@/components/admin/orders/order-stats-cards'
 import { DashboardOrderList } from '@/components/admin/orders/dashboard-order-list'
 
 
+import { requirePermission } from '@/lib/auth/authorization'
+
 export default async function OrdersPage({
     searchParams,
 }: {
     searchParams: Promise<{ page?: string; search?: string; status?: string; sort?: string }>
 }) {
+    await requirePermission('orders.view')
     const { page = '1', search, status, sort = 'newest' } = await searchParams
     const supabase = await createClient()
 
