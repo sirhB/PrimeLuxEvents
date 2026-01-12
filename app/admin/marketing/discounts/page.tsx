@@ -14,6 +14,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { CreateDiscountDialog } from '@/components/admin/marketing/create-discount-dialog'
 import { ToggleActiveSwitch } from '@/components/admin/marketing/toggle-active-switch'
 import { DeleteDiscountButton } from '@/components/admin/marketing/delete-discount-button'
+import { EditDiscountDialog } from '@/components/admin/marketing/edit-discount-dialog'
 
 export default async function DiscountsPage() {
     const supabase = await createClient()
@@ -80,7 +81,10 @@ export default async function DiscountsPage() {
                                         <ToggleActiveSwitch id={discount.id} isActive={discount.is_active} />
                                     </TableCell>
                                     <TableCell className="pr-6 text-right">
-                                        <DeleteDiscountButton id={discount.id} />
+                                        <div className="flex items-center justify-end gap-2">
+                                            <EditDiscountDialog discount={discount} />
+                                            <DeleteDiscountButton id={discount.id} />
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}

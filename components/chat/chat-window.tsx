@@ -105,7 +105,7 @@ export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
                 <div className="space-y-4 max-w-3xl mx-auto pb-4">
                     {isLoading ? (
                         <div className="flex justify-center py-10">
-                            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                            <Loader2 className="h-6 w-6 animate-spin text-[var(--dashboard-text-muted)]" />
                         </div>
                     ) : (
                         messages.map((msg, i) => {
@@ -115,7 +115,7 @@ export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
                             return (
                                 <div key={msg.id} className={cn("flex flex-col", isMe ? "items-end" : "items-start")}>
                                     {showTime && (
-                                        <div className="text-[10px] text-gray-400 uppercase tracking-widest my-2 text-center w-full">
+                                        <div className="text-[10px] text-[var(--dashboard-text-muted)] uppercase tracking-widest my-2 text-center w-full">
                                             {format(new Date(msg.created_at), 'h:mm a')}
                                         </div>
                                     )}
@@ -124,7 +124,7 @@ export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
                                             "max-w-[80%] rounded-2xl px-5 py-3 shadow-sm",
                                             isMe
                                                 ? "bg-[var(--dashboard-accent-gold)] text-black rounded-tr-sm"
-                                                : "bg-white dark:bg-white/10 text-gray-900 dark:text-white rounded-tl-sm border border-border/10"
+                                                : "bg-[var(--dashboard-card)] text-[var(--dashboard-text)] rounded-tl-sm border border-[var(--dashboard-border)]"
                                         )}
                                     >
                                         <p className="text-sm leading-relaxed">{msg.content}</p>
@@ -137,9 +137,9 @@ export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
                 </div>
             </ScrollArea>
 
-            <div className="p-4 bg-white/50 dark:bg-black/20 border-t border-border/10 backdrop-blur-md">
+            <div className="p-4 bg-[var(--dashboard-background)]/80 border-t border-[var(--dashboard-border)] backdrop-blur-md">
                 <form onSubmit={handleSend} className="max-w-3xl mx-auto flex gap-3 items-end">
-                    <Button type="button" size="icon" variant="ghost" className="rounded-full text-gray-400 hover:text-[var(--dashboard-accent-gold)]">
+                    <Button type="button" size="icon" variant="ghost" className="rounded-full text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-card-hover)]">
                         <Paperclip className="h-5 w-5" />
                     </Button>
                     <div className="flex-1 relative">
@@ -147,13 +147,13 @@ export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             placeholder="Type a message..."
-                            className="bg-white dark:bg-white/5 border-none rounded-2xl pr-12 h-12 py-3 shadow-inner focus-visible:ring-1 focus-visible:ring-[var(--dashboard-accent-gold)]"
+                            className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] placeholder:text-[var(--dashboard-text-muted)] rounded-2xl pr-12 h-12 py-3 shadow-inner focus-visible:ring-1 focus-visible:ring-[var(--dashboard-accent-gold)]"
                         />
                     </div>
                     <Button
                         type="submit"
                         disabled={!newMessage.trim() || isSending}
-                        className="h-12 w-12 rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black shadow-lg hover:scale-105 transition-transform p-0 flex items-center justify-center"
+                        className="h-12 w-12 rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black shadow-lg hover:scale-105 transition-transform p-0 flex items-center justify-center disabled:opacity-50"
                     >
                         {isSending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5 ml-1" />}
                     </Button>
