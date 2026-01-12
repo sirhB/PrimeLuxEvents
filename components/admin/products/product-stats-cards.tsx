@@ -52,7 +52,7 @@ export function ProductStatsCards({
             <Card className="glass-card border-none">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)]">
-                        Catalog Value
+                        Inventory Cost
                     </CardTitle>
                     <DollarSign className="h-4 w-4 text-green-400" />
                 </CardHeader>
@@ -61,7 +61,7 @@ export function ProductStatsCards({
                         {formatCentsWithCommas(totalValue)}
                     </div>
                     <p className="text-xs text-[var(--dashboard-text-muted)]">
-                        Total inventory value
+                        Based on cost to buy
                     </p>
                 </CardContent>
             </Card>

@@ -343,6 +343,7 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
             assembly_items: assemblyItems.filter(item => item.name.trim() !== ''),
             group_id: (formData.get('group_id') as string) || null,
             color: (formData.get('color') as string) || null,
+            cost: Math.round(parseFloat(formData.get('cost') as string || '0') * 100),
         }
 
         try {
@@ -652,9 +653,9 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="price">Price ($)</Label>
+                            <Label htmlFor="price">Rental Price ($)</Label>
                             <Input
                                 id="price"
                                 name="price"
@@ -664,6 +665,18 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                                 defaultValue={product?.price ? (product.price / 100).toFixed(2) : ''}
                                 placeholder="0.00"
                                 required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="cost">Cost to Buy ($)</Label>
+                            <Input
+                                id="cost"
+                                name="cost"
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                defaultValue={product?.cost ? (product.cost / 100).toFixed(2) : ''}
+                                placeholder="0.00"
                             />
                         </div>
                         <div className="space-y-2">

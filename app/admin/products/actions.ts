@@ -44,6 +44,7 @@ export async function createProductVariant(
             group_id: groupId,
             color: newColor,
             modifiers: sourceProduct.modifiers,
+            cost: sourceProduct.cost,
         })
         .select()
         .single()

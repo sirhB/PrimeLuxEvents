@@ -29,12 +29,12 @@ export default async function ProductsPage({
     // Fetch all products for metrics
     const { data: allProducts } = await supabase
         .from('products')
-        .select('price, quantity_available')
+        .select('price, cost, quantity_available')
 
     // Calculate metrics
     const totalProducts = allProducts?.length || 0
     const lowStockCount = allProducts?.filter(p => (p.quantity_available || 0) <= 5).length || 0
-    const totalValue = allProducts?.reduce((sum, p) => sum + (p.price || 0) * (p.quantity_available || 0), 0) || 0
+    const totalValue = allProducts?.reduce((sum, p) => sum + (p.cost || 0) * (p.quantity_available || 0), 0) || 0
     const categoriesCount = categories?.length || 0
 
     const currentPage = parseInt(page)

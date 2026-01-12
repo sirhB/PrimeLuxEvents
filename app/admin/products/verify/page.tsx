@@ -6,7 +6,7 @@ import { ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default async function ProductVerificationPage() {
-    await requirePermission('products.edit')
+    await requirePermission('products.update')
     const supabase = await createClient()
 
     // Fetch up to 100 unverified products to keep the progress manageable
