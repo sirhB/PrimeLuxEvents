@@ -112,7 +112,6 @@ export function LaunchReadinessTracker() {
                         <button
                             key={index}
                             onClick={() => setStep(item.id)}
-                            disabled={item.isDone}
                             className={cn(
                                 "flex flex-col gap-3 p-4 rounded-2xl transition-all duration-300 text-left border relative group",
                                 item.isDone

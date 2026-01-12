@@ -40,7 +40,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
         ] = await Promise.all([
             supabase.from('products').select('*', { count: 'exact', head: true }),
             supabase.from('categories').select('*', { count: 'exact', head: true }),
-            supabase.from('bags').select('*', { count: 'exact', head: true }),
+            supabase.from('warehouse_bags').select('*', { count: 'exact', head: true }),
             supabase.from('orders').select('*', { count: 'exact', head: true }),
             supabase.from('tasks').select('*', { count: 'exact', head: true })
         ])
@@ -85,6 +85,11 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
 
         checkTourStatus()
     }, [supabase, fetchReadinessStatus])
+
+    const setStep = useCallback((step: number) => {
+        setCurrentStep(step)
+        setIsTourVisible(true)
+    }, [])
 
     const markStepAsVisited = useCallback(async (stepIndex: number) => {
         if (completedSteps.includes(stepIndex)) return
@@ -151,7 +156,7 @@ export function TourProvider({ children }: { children: React.ReactNode }) {
             isTourVisible,
             currentStep,
             completedSteps,
-            setStep: setCurrentStep,
+            setStep,
             nextStep,
             prevStep,
             markStepAsVisited,
