@@ -11,6 +11,25 @@ import { Menu, Search, Plus, MessageSquare } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDistanceToNow } from 'date-fns'
 import { ChatWindow } from './chat-window'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { toast } from "sonner"
 
 interface Conversation {
     id: string
@@ -19,8 +38,14 @@ interface Conversation {
     last_message_at: string
     participants: {
         user_id: string
-        email: string // We'll need to join this
+        email: string
     }[]
+}
+
+interface UserProfile {
+    id: string
+    full_name: string | null
+    email: string
 }
 
 interface ChatLayoutProps {
@@ -31,9 +56,18 @@ interface ChatLayoutProps {
 
 export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLayoutProps) {
     const [conversations, setConversations] = useState<Conversation[]>([])
+    const [profiles, setProfiles] = useState<Record<string, UserProfile>>({})
     const [selectedId, setSelectedId] = useState<string | null>(null)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
+
+    // New Chat State
+    const [isNewChatOpen, setIsNewChatOpen] = useState(false)
+    const [newChatType, setNewChatType] = useState<'support' | 'direct'>('support')
+    const [recipientEmail, setRecipientEmail] = useState('')
+    const [subject, setSubject] = useState('')
+    const [initialMessage, setInitialMessage] = useState('')
+    const [isCreating, setIsCreating] = useState(false)
 
     const supabase = createClient()
 
@@ -65,47 +99,92 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             .order('last_message_at', { ascending: false })
 
         if (data) {
-            // Transform data if needed, or fetch participant details
-            // For now, assume we have what we need or fetch details on select
             setConversations(data as any)
+
+            // Extract all user IDs from participants to fetch profiles
+            const userIds = new Set<string>()
+            data.forEach((conv: any) => {
+                conv.conversation_participants?.forEach((p: any) => {
+                    if (p.user_id !== currentUserId) {
+                        userIds.add(p.user_id)
+                    }
+                })
+            })
+
+            if (userIds.size > 0) {
+                const { data: profilesData } = await supabase
+                    .from('user_profiles')
+                    .select('id, full_name, email')
+                    .in('id', Array.from(userIds))
+
+                if (profilesData) {
+                    const profileMap: Record<string, UserProfile> = {}
+                    profilesData.forEach(p => {
+                        profileMap[p.id] = p
+                    })
+                    setProfiles(profileMap)
+                }
+            }
         }
         setIsLoading(false)
     }
 
-    const createConversation = async () => {
+    const startNewChat = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setIsCreating(true)
+
         try {
-            // Logic to create a new support thread
-            const { data: newConv, error } = await supabase
-                .from('conversations')
-                .insert({ type: isAdmin ? 'internal' : 'support' }) // Default to internal for admins, support for users
-                .select()
-                .single()
+            let participantIds: string[] = []
 
-            if (error) {
-                console.error('Error creating conversation:', error)
-                // If it's a permission error, maybe the table doesn't have the right policy
-                return
-            }
-
-            if (newConv) {
-                // Add self as participant
-                const { error: participantError } = await supabase.from('conversation_participants').insert({
-                    conversation_id: newConv.id,
-                    user_id: currentUserId
-                })
-
-                if (participantError) {
-                    console.error('Error adding participant:', participantError)
+            // If direct message, resolve email to ID
+            if (newChatType === 'direct') {
+                if (!recipientEmail.trim()) {
+                    toast.error('Please enter a recipient email')
+                    setIsCreating(false)
+                    return
                 }
 
-                // If client, maybe add a default admin/support user automatically? 
-                // Or wait for admin to join. For now, let's just create it.
+                // Cast response to allow 'id' access since RPC types might be loose
+                const { data: userData, error: userError } = await supabase
+                    .rpc('get_user_by_email', { email_input: recipientEmail.trim() })
+                    .single<any>()
 
-                setSelectedId(newConv.id)
-                fetchConversations()
+                if (userError || !userData) {
+                    toast.error('User not found. Please check the email.')
+                    setIsCreating(false)
+                    return
+                }
+                participantIds = [userData.id]
             }
+
+            // Create Conversation via RPC
+            const { data: conversationId, error } = await supabase
+                .rpc('create_new_conversation', {
+                    p_type: newChatType === 'direct' ? 'internal' : 'support',
+                    p_subject: subject.trim() || null,
+                    p_message: initialMessage.trim() || null,
+                    p_participant_ids: participantIds
+                })
+
+            if (error) {
+                console.error('Error creating chat:', error)
+                toast.error('Failed to create chat')
+            } else if (conversationId) {
+                setSelectedId(conversationId)
+                fetchConversations()
+                setIsNewChatOpen(false)
+                // Reset form
+                setRecipientEmail('')
+                setSubject('')
+                setInitialMessage('')
+                setNewChatType('support')
+            }
+
         } catch (err) {
-            console.error('Unexpected error creating conversation:', err)
+            console.error('Unexpected error:', err)
+            toast.error('An unexpected error occurred')
+        } finally {
+            setIsCreating(false)
         }
     }
 
@@ -113,9 +192,80 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
         <div className="flex flex-col h-full bg-[var(--dashboard-card)] border-r border-[var(--dashboard-border)]">
             <div className="p-4 border-b border-[var(--dashboard-border)] flex items-center justify-between">
                 <h2 className="font-serif text-lg font-bold text-[var(--dashboard-text)]">Messages</h2>
-                <Button size="icon" variant="ghost" onClick={createConversation} className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)]">
-                    <Plus className="h-5 w-5" />
-                </Button>
+
+                <Dialog open={isNewChatOpen} onOpenChange={setIsNewChatOpen}>
+                    <DialogTrigger asChild>
+                        <Button size="icon" variant="ghost" className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)]">
+                            <Plus className="h-5 w-5" />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px] bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
+                        <DialogHeader>
+                            <DialogTitle>New Message</DialogTitle>
+                            <DialogDescription className="text-[var(--dashboard-text-muted)]">
+                                Start a new conversation.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={startNewChat} className="grid gap-4 py-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="type">To</Label>
+                                <Select
+                                    value={newChatType}
+                                    onValueChange={(val: 'support' | 'direct') => setNewChatType(val)}
+                                >
+                                    <SelectTrigger className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)]">
+                                        <SelectValue placeholder="Select recipient" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="support">Support Team (Role)</SelectItem>
+                                        <SelectItem value="direct">Specific Person (Email)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {newChatType === 'direct' && (
+                                <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
+                                    <Label htmlFor="email">Recipient Email</Label>
+                                    <Input
+                                        id="email"
+                                        placeholder="user@example.com"
+                                        value={recipientEmail}
+                                        onChange={(e) => setRecipientEmail(e.target.value)}
+                                        className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)]"
+                                    />
+                                </div>
+                            )}
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="subject">Subject</Label>
+                                <Input
+                                    id="subject"
+                                    placeholder="Brief topic..."
+                                    value={subject}
+                                    onChange={(e) => setSubject(e.target.value)}
+                                    className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)]"
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="message">Message</Label>
+                                <Textarea
+                                    id="message"
+                                    placeholder="Type your message here..."
+                                    value={initialMessage}
+                                    onChange={(e) => setInitialMessage(e.target.value)}
+                                    className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] min-h-[100px]"
+                                />
+                            </div>
+
+                            <DialogFooter>
+                                <Button type="submit" disabled={isCreating} className="bg-[var(--dashboard-accent-gold)] text-black hover:bg-[var(--dashboard-accent-gold)]/90">
+                                    {isCreating ? 'Creating...' : 'Send Message'}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
             <div className="p-4">
                 <div className="relative">
@@ -156,7 +306,19 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                                         "font-bold text-sm truncate transition-colors",
                                         selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text)]"
                                     )}>
-                                        {conv.subject || (conv.type === 'support' ? 'Support Ticket' : 'Internal Chat')}
+                                        {(() => {
+                                            if (conv.subject) return conv.subject
+                                            if (conv.type === 'support') return 'Support Ticket'
+
+                                            // Find other participant for DM
+                                            const otherUserId = conv.participants?.find((p: any) => p.user_id !== currentUserId)?.user_id
+                                            const profile = otherUserId ? profiles[otherUserId] : null
+
+                                            if (profile?.full_name) return profile.full_name
+                                            if (profile?.email) return profile.email
+
+                                            return 'Direct Message'
+                                        })()}
                                     </span>
                                     <span className="text-[10px] text-[var(--dashboard-text-muted)] whitespace-nowrap">
                                         {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
@@ -171,7 +333,7 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                     {conversations.length === 0 && !isLoading && (
                         <div className="p-8 text-center text-[var(--dashboard-text-muted)] text-sm">
                             <p>No messages yet.</p>
-                            <Button variant="link" onClick={createConversation} className="text-[var(--dashboard-accent-gold)]">Start a chat</Button>
+                            <Button variant="link" onClick={() => setIsNewChatOpen(true)} className="text-[var(--dashboard-accent-gold)]">Start a chat</Button>
                         </div>
                     )}
                 </div>

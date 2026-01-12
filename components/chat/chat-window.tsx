@@ -45,7 +45,11 @@ export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
                 },
                 (payload) => {
                     const newMsg = payload.new as Message
-                    setMessages(prev => [...prev, newMsg])
+                    setMessages(prev => {
+                        // Prevent duplicates if we already added it manually
+                        if (prev.some(m => m.id === newMsg.id)) return prev
+                        return [...prev, newMsg]
+                    })
                     scrollToBottom()
                 }
             )
@@ -82,21 +86,37 @@ export function ChatWindow({ conversationId, currentUserId }: ChatWindowProps) {
         if (!newMessage.trim() || isSending) return
 
         setIsSending(true)
-        const { error } = await supabase
-            .from('messages')
-            .insert({
-                conversation_id: conversationId,
-                sender_id: currentUserId,
-                content: newMessage.trim()
-            })
+        try {
+            // Optimistic update - wait for server confirmation to be safe with IDs
+            // but we use select() to get the proper data back
+            const { data, error } = await supabase
+                .from('messages')
+                .insert({
+                    conversation_id: conversationId,
+                    sender_id: currentUserId,
+                    content: newMessage.trim()
+                })
+                .select()
+                .single()
 
-        if (error) {
+            if (error) {
+                toast.error('Failed to send message')
+                console.error(error)
+            } else if (data) {
+                setNewMessage('')
+                // Manually add to state if not already there (race condition with subscription)
+                setMessages(prev => {
+                    if (prev.some(m => m.id === data.id)) return prev
+                    return [...prev, data]
+                })
+                scrollToBottom()
+            }
+        } catch (err) {
+            console.error('Error sending message:', err)
             toast.error('Failed to send message')
-        } else {
-            setNewMessage('')
-            // Optimistic update handled by subscription mostly, but we can rely on it
+        } finally {
+            setIsSending(false)
         }
-        setIsSending(false)
     }
 
     return (
