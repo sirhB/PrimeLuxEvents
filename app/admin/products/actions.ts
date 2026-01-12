@@ -172,3 +172,23 @@ export async function unverifyProduct(id: string) {
     revalidatePath('/admin/products/verify')
 }
 
+export async function updateAndVerifyProduct(id: string, data: any) {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('products')
+        .update({
+            ...data,
+            is_verified: true,
+            verified_at: new Date().toISOString()
+        })
+        .eq('id', id)
+
+    if (error) {
+        console.error('Error updating and verifying product:', error)
+        throw new Error('Failed to update and verify product')
+    }
+
+    revalidatePath('/admin/products')
+    revalidatePath(`/admin/products/${id}`)
+    revalidatePath('/admin/products/verify')
+}
