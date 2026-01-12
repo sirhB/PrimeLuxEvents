@@ -16,7 +16,7 @@ export function AdminSearchFab() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setIsSearchOpen(true)}
-                className="fixed bottom-8 right-8 z-50 h-14 w-14 rounded-full bg-[var(--dashboard-accent-gold)] text-white shadow-lg flex items-center justify-center hover:bg-yellow-600 transition-colors"
+                className="fixed bottom-24 right-8 z-50 h-14 w-14 rounded-full bg-[var(--dashboard-accent-gold)] text-white shadow-lg flex items-center justify-center hover:bg-yellow-600 transition-colors md:hidden"
             >
                 <Search className="h-6 w-6" />
             </motion.button>

@@ -5,15 +5,17 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Send, Paperclip, Loader2, Archive, ArrowLeft } from 'lucide-react'
+import { Send, Paperclip, Loader2, Archive, ArrowLeft, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
+import { aiService } from '@/lib/ai/puter'
 
 interface Message {
     id: string
     content: string
-    sender_id: string
+    sender_id: string | null
+    is_ai: boolean
     created_at: string
 }
 
@@ -29,6 +31,7 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
     const [messages, setMessages] = useState<Message[]>([])
     const [newMessage, setNewMessage] = useState('')
     const [isSending, setIsSending] = useState(false)
+    const [isGeneratingAI, setIsGeneratingAI] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const scrollRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
@@ -90,8 +93,6 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
 
         setIsSending(true)
         try {
-            // Optimistic update - wait for server confirmation to be safe with IDs
-            // but we use select() to get the proper data back
             const { data, error } = await supabase
                 .from('messages')
                 .insert({
@@ -107,7 +108,6 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
                 console.error(error)
             } else if (data) {
                 setNewMessage('')
-                // Manually add to state if not already there (race condition with subscription)
                 setMessages(prev => {
                     if (prev.some(m => m.id === data.id)) return prev
                     return [...prev, data]
@@ -119,6 +119,50 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
             toast.error('Failed to send message')
         } finally {
             setIsSending(false)
+        }
+    }
+
+    const handleConsultSensei = async () => {
+        if (isGeneratingAI) return
+
+        setIsGeneratingAI(true)
+        try {
+            // Get recent context (last 10 messages)
+            const context = messages.slice(-10).map(m => ({
+                content: m.content,
+                role: (m.sender_id === currentUserId ? 'user' : 'assistant') as 'user' | 'assistant'
+            }))
+
+            const aiResponse = await aiService.getChatResponse(context)
+
+            if (aiResponse) {
+                const { data, error } = await supabase
+                    .from('messages')
+                    .insert({
+                        conversation_id: conversationId,
+                        sender_id: null,
+                        is_ai: true,
+                        content: aiResponse
+                    })
+                    .select()
+                    .single()
+
+                if (error) throw error
+
+                if (data) {
+                    setMessages(prev => {
+                        const newMsg = data as unknown as Message
+                        if (prev.some(m => m.id === newMsg.id)) return prev
+                        return [...prev, newMsg]
+                    })
+                    scrollToBottom()
+                }
+            }
+        } catch (err) {
+            console.error('Error getting Sensei response:', err)
+            toast.error('The Sensei is currently reflecting and couldn\'t answer.')
+        } finally {
+            setIsGeneratingAI(false)
         }
     }
 
@@ -170,7 +214,9 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
                                             "max-w-[80%] rounded-2xl px-5 py-3 shadow-sm",
                                             isMe
                                                 ? "bg-[var(--dashboard-accent-gold)] text-black rounded-tr-sm"
-                                                : "bg-[var(--dashboard-card)] text-[var(--dashboard-text)] rounded-tl-sm border border-[var(--dashboard-border)]"
+                                                : msg.is_ai
+                                                    ? "bg-gradient-to-br from-gold/20 to-amber-900/40 text-gold border border-gold/30 rounded-tl-sm backdrop-blur-md"
+                                                    : "bg-[var(--dashboard-card)] text-[var(--dashboard-text)] rounded-tl-sm border border-[var(--dashboard-border)]"
                                         )}
                                     >
                                         <p className="text-sm leading-relaxed">{msg.content}</p>
@@ -185,8 +231,16 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
 
             <div className="p-4 bg-[var(--dashboard-background)]/80 border-t border-[var(--dashboard-border)] backdrop-blur-md">
                 <form onSubmit={handleSend} className="max-w-3xl mx-auto flex gap-3 items-end">
-                    <Button type="button" size="icon" variant="ghost" className="rounded-full text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-card-hover)]">
-                        <Paperclip className="h-5 w-5" />
+                    <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={handleConsultSensei}
+                        disabled={isGeneratingAI || isArchived}
+                        className="rounded-full text-[var(--dashboard-accent-gold)] hover:bg-gold/10"
+                        title="Consult the Sensei (AI)"
+                    >
+                        {isGeneratingAI ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
                     </Button>
                     <div className="flex-1 relative">
                         <Input

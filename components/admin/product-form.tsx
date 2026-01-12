@@ -15,7 +15,8 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Plus, Trash, X, Search, Link as LinkIcon, AlertCircle, Unlink } from 'lucide-react'
+import { Plus, Trash, X, Search, Link as LinkIcon, AlertCircle, Unlink, Sparkles, Loader2 } from 'lucide-react'
+import { aiService } from '@/lib/ai/puter'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ImageUpload } from './image-upload'
@@ -90,6 +91,36 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
     const [newVariantColor, setNewVariantColor] = useState('')
     const [newVariantImage, setNewVariantImage] = useState<string[]>([])
     const [creatingVariant, setCreatingVariant] = useState(false)
+    const [isGeneratingDescription, setIsGeneratingDescription] = useState(false)
+
+    const handleGenerateDescription = async () => {
+        const nameInput = document.getElementById('name') as HTMLInputElement
+        const categorySelect = document.getElementsByName('category_id')[0] as HTMLSelectElement
+        const name = nameInput?.value
+        const categoryId = categorySelect?.value
+        const categoryName = categories.find(c => c.id === categoryId)?.name || 'Event Rental'
+
+        if (!name) {
+            toast.error("Please enter a product name first")
+            return
+        }
+
+        setIsGeneratingDescription(true)
+        try {
+            const description = await aiService.generateProductDescription(name, categoryName)
+            if (description) {
+                const descTextarea = document.getElementById('description') as HTMLTextAreaElement
+                if (descTextarea) {
+                    descTextarea.value = description
+                }
+                toast.success("Premium description generated!")
+            }
+        } catch (error) {
+            toast.error("Failed to generate description")
+        } finally {
+            setIsGeneratingDescription(false)
+        }
+    }
 
     const handleCreateVariant = async () => {
         if (!newVariantColor) {
@@ -584,12 +615,30 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <div className="flex items-center justify-between">
+                            <Label htmlFor="description">Description</Label>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleGenerateDescription}
+                                disabled={isGeneratingDescription}
+                                className="text-[var(--dashboard-accent-gold)] hover:text-gold hover:bg-gold/10"
+                            >
+                                {isGeneratingDescription ? (
+                                    <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+                                ) : (
+                                    <Sparkles className="h-3 w-3 mr-2" />
+                                )}
+                                AI Generate
+                            </Button>
+                        </div>
                         <Textarea
                             id="description"
                             name="description"
                             defaultValue={product?.description}
                             placeholder="Describe the product..."
+                            className="min-h-[120px]"
                         />
                     </div>
 
