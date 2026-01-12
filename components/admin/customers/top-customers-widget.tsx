@@ -6,7 +6,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { formatCents } from '@/lib/format-money'
+import { formatCentsWithCommas } from '@/lib/format-money'
 import { Crown } from 'lucide-react'
 
 interface TopCustomersWidgetProps {
@@ -62,7 +62,7 @@ export function TopCustomersWidget({ customers }: TopCustomersWidgetProps) {
                                     </TableCell>
                                     <TableCell className="px-2 py-3 text-right">
                                         <span className="text-[var(--dashboard-accent-gold)] font-bold font-mono">
-                                            {formatCents(customer.totalSpent)}
+                                            {formatCentsWithCommas(customer.totalSpent)}
                                         </span>
                                     </TableCell>
                                 </TableRow>

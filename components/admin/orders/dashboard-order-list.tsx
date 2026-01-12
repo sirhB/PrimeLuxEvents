@@ -7,7 +7,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { StatusBadge } from '@/components/ui/status-badge'
-import { formatCents } from '@/lib/format-money'
+import { formatCentsWithCommas } from '@/lib/format-money'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Eye } from 'lucide-react'
@@ -69,7 +69,7 @@ export function DashboardOrderList({
                                         {format(new Date(order.created_at), 'MMM d, yyyy')}
                                     </TableCell>
                                     <TableCell className="px-2 py-3 text-[var(--dashboard-text)]">
-                                        {formatCents(order.total_amount)}
+                                        {formatCentsWithCommas(order.total_amount)}
                                     </TableCell>
                                     <TableCell className="px-2 py-3">
                                         <StatusBadge status={order.status} />

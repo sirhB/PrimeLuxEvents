@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DollarSign, Package, Clock, Truck } from 'lucide-react'
-import { formatCents } from '@/lib/format-money'
+import { formatCentsWithCommas } from '@/lib/format-money'
 
 interface OrderStatsProps {
     totalRevenue: number
@@ -26,7 +26,7 @@ export function OrderStatsCards({
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold text-[var(--dashboard-text)]">
-                        {formatCents(totalRevenue)}
+                        {formatCentsWithCommas(totalRevenue)}
                     </div>
                     <p className="text-xs text-[var(--dashboard-text-muted)]">
                         Lifetime revenue
