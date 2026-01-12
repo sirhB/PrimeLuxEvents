@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import {
     LayoutDashboard,
-    ShoppingBag,
+    ShoppingCart,
     FileText,
     Package,
     Users,
@@ -15,10 +15,10 @@ import {
     LogOut,
     Menu,
     X,
-    Box,
+    Archive,
     Layers,
     ClipboardList,
-    Eye,
+    Image as ImageIcon,
     CalendarCheck,
     ChevronRight,
     UserCog,
@@ -27,7 +27,10 @@ import {
     Truck,
     TrendingUp,
     MessageSquare,
-    Tag
+    Tag,
+    Briefcase,
+    Eye,
+    Box
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
@@ -38,6 +41,15 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface SidebarItemProps {
     item: {
@@ -60,7 +72,7 @@ const SidebarItem = ({ item, isActive, isCollapsed, onClick }: SidebarItemProps)
             className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group overflow-hidden",
                 isActive
-                    ? "bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] shadow-[inset_0_0_10px_rgba(212,175,55,0.05)]"
+                    ? "bg-[var(--dashboard-accent-gold)]/15 text-[var(--dashboard-accent-gold)] shadow-[inset_0_0_15px_rgba(212,175,55,0.1)]"
                     : "text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)]"
             )}
         >
@@ -82,9 +94,9 @@ const SidebarItem = ({ item, isActive, isCollapsed, onClick }: SidebarItemProps)
             {isActive && (
                 <motion.div
                     layoutId="activeIndicator"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full bg-[var(--dashboard-accent-gold)] shadow-[0_0_12px_rgba(212,175,55,0.6)]"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-[var(--dashboard-accent-gold)] shadow-[0_0_12px_rgba(212,175,55,0.6)]"
                     initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 24 }}
+                    animate={{ opacity: 1, height: 20 }}
                     exit={{ opacity: 0, height: 0 }}
                 />
             )}
@@ -124,11 +136,11 @@ const sidebarGroups = [
     {
         title: "Sales & Operations",
         items: [
-            { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
+            { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
             { icon: FileText, label: 'Leads', href: '/admin/consultations' },
             { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments' },
             { icon: Truck, label: 'Logistics', href: '/admin/logistics' },
-            { icon: ShoppingBag, label: 'Bags', href: '/admin/bags' },
+            { icon: Briefcase, label: 'Bags', href: '/admin/bags' },
             { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks' },
             { icon: QrCode, label: 'Scan', href: '/admin/scan' },
             { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },
@@ -139,9 +151,9 @@ const sidebarGroups = [
         items: [
             { icon: Package, label: 'Products', href: '/admin/products' },
             { icon: Layers, label: 'Categories', href: '/admin/categories' },
+            { icon: Archive, label: 'Inventory', href: '/admin/inventory' },
+            { icon: ImageIcon, label: 'Portfolio', href: '/admin/portfolio' },
             { icon: Box, label: 'Packages', href: '/admin/packages' },
-            { icon: ClipboardList, label: 'Portfolio', href: '/admin/portfolio' },
-            { icon: Box, label: 'Inventory', href: '/admin/inventory' },
         ]
     },
     {
@@ -187,6 +199,18 @@ export function ModernSidebar() {
         getUser()
     }, [])
 
+    // Helper to determine if a route is active (handling nested routes)
+    const isRouteActive = (href: string) => {
+        if (href === '/admin' && pathname === '/admin') return true
+        if (href !== '/admin' && pathname.startsWith(href)) return true
+        return false
+    }
+
+    const handleSignOut = async () => {
+        await supabase.auth.signOut()
+        window.location.href = '/'
+    }
+
     return (
         <TooltipProvider>
             {/* Mobile Toggle Button (Fixed) */}
@@ -199,7 +223,7 @@ export function ModernSidebar() {
                 <Menu className="h-5 w-5" />
             </Button>
 
-            {/* Mobile Backdrop Overlay - CORRECTED: Using fixed inset-0 */}
+            {/* Mobile Backdrop Overlay */}
             <AnimatePresence>
                 {isMobileOpen && (
                     <motion.div
@@ -217,7 +241,7 @@ export function ModernSidebar() {
                 className={cn(
                     "fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
                     // Glassmorphism background
-                    "bg-[var(--dashboard-background)]/90 backdrop-blur-xl border-r border-[var(--dashboard-border)]",
+                    "bg-[var(--dashboard-background)]/95 backdrop-blur-xl border-r border-[var(--dashboard-border)]",
                     // Width logic
                     isCollapsed ? "w-20" : "w-64",
                     // Mobile slide-in logic
@@ -228,7 +252,7 @@ export function ModernSidebar() {
                 )}
             >
                 {/* Header Section */}
-                <div className="h-16 flex items-center justify-between px-4 lg:px-6 border-b border-[var(--dashboard-border)]/50">
+                <div className="h-16 flex items-center justify-between px-4 lg:px-6 border-b border-[var(--dashboard-border)]/50 shrink-0">
                     <div className={cn( // Logo container
                         "flex items-center gap-3 transition-opacity duration-300 overflow-hidden",
                         isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
@@ -282,7 +306,7 @@ export function ModernSidebar() {
                                         <SidebarItem
                                             key={item.href}
                                             item={item}
-                                            isActive={pathname === item.href}
+                                            isActive={isRouteActive(item.href)}
                                             isCollapsed={isCollapsed}
                                             onClick={() => setIsMobileOpen(false)}
                                         />
@@ -294,40 +318,52 @@ export function ModernSidebar() {
                 </div>
 
                 {/* Footer User Section */}
-                <div className="p-3 border-t border-[var(--dashboard-border)]/50 bg-black/10">
-                    <div className={cn(
-                        "flex items-center gap-3 p-2 rounded-xl hover:bg-[var(--dashboard-card-hover)] transition-all duration-200 group relative overflow-hidden",
-                        isCollapsed && "justify-center"
-                    )}>
-                        <div className="h-9 w-9 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10 flex items-center justify-center text-[var(--dashboard-text-muted)] shrink-0 shadow-inner">
-                            <Users className="h-4 w-4" />
-                        </div>
+                <div className="p-3 border-t border-[var(--dashboard-border)]/50 bg-black/10 shrink-0">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <button className={cn(
+                                "w-full flex items-center gap-3 p-2 rounded-xl hover:bg-[var(--dashboard-card-hover)] transition-all duration-200 group relative overflow-hidden outline-none",
+                                isCollapsed ? "justify-center" : "justify-start"
+                            )}>
+                                <Avatar className="h-9 w-9 border border-white/10 shadow-inner">
+                                    <AvatarFallback className="bg-gradient-to-br from-zinc-800 to-zinc-900 text-[var(--dashboard-text-muted)]">
+                                        <Users className="h-4 w-4" />
+                                    </AvatarFallback>
+                                </Avatar>
 
-                        {!isCollapsed && (
-                            <div className="flex-1 min-w-0">
-                                <p className="text-xs font-semibold text-[var(--dashboard-text)] truncate">
-                                    {user?.user_metadata?.full_name || "Admin"}
-                                </p>
-                                <p className="text-[10px] text-[var(--dashboard-text-muted)] truncate">
-                                    Administrator
-                                </p>
-                            </div>
-                        )}
-
-                        <button
-                            onClick={async () => {
-                                await supabase.auth.signOut()
-                                window.location.href = '/'
-                            }}
-                            className={cn(
-                                "flex items-center justify-center rounded-lg transition-colors text-[var(--dashboard-text-muted)] hover:text-red-400 hover:bg-red-400/10",
-                                isCollapsed ? "absolute inset-0 opacity-0 group-hover:opacity-100 bg-black/80 z-20" : "h-8 w-8"
-                            )}
-                            title="Sign Out"
-                        >
-                            <LogOut className="h-4 w-4" />
-                        </button>
-                    </div>
+                                {!isCollapsed && (
+                                    <>
+                                        <div className="flex-1 min-w-0 text-left">
+                                            <p className="text-xs font-semibold text-[var(--dashboard-text)] truncate">
+                                                {user?.user_metadata?.full_name || "Admin User"}
+                                            </p>
+                                            <p className="text-[10px] text-[var(--dashboard-text-muted)] truncate">
+                                                administrator
+                                            </p>
+                                        </div>
+                                        <Settings className="h-4 w-4 text-[var(--dashboard-text-muted)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </>
+                                )}
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent side={isCollapsed ? "right" : "top"} align={isCollapsed ? "start" : "center"} className="w-56 bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] backdrop-blur-xl">
+                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-[var(--dashboard-border)]" />
+                            <DropdownMenuItem className="focus:bg-[var(--dashboard-card-hover)] focus:text-[var(--dashboard-text)] cursor-pointer">
+                                <UserCog className="mr-2 h-4 w-4" />
+                                <span>Profile</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="focus:bg-[var(--dashboard-card-hover)] focus:text-[var(--dashboard-text)] cursor-pointer">
+                                <Settings className="mr-2 h-4 w-4" />
+                                <span>Settings</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-[var(--dashboard-border)]" />
+                            <DropdownMenuItem onClick={handleSignOut} className="text-red-400 focus:text-red-400 focus:bg-red-400/10 cursor-pointer">
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>Log out</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </aside>
         </TooltipProvider>
