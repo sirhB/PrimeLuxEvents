@@ -1,17 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
-import { Plus, Pencil, Trash2, Eye, FolderTree } from 'lucide-react'
+import { Plus, FolderTree } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
-import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
@@ -32,7 +23,7 @@ export default async function CategoriesPage({
 
     let query = supabase
         .from('categories')
-        .select('*', { count: 'exact' })
+        .select('*, products(count)', { count: 'exact' })
 
     if (search) {
         query = query.or(`name.ilike.%${search}%,slug.ilike.%${search}%,description.ilike.%${search}%`)
@@ -55,12 +46,32 @@ export default async function CategoriesPage({
             break
     }
 
-    const { data: categories, count } = await query.range(start, end)
+    const { data: rawCategories, count } = await query.range(start, end)
+
+    // Transform to flatten product count and match interface
+    // Interface expected: id, name, slug, description, image_url, is_featured, product_count, created_at
+    const categories = rawCategories?.map((cat: any) => ({
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug,
+        description: cat.description,
+        image_url: cat.image_url,
+        is_featured: cat.is_featured,
+        created_at: cat.created_at,
+        product_count: cat.products?.[0]?.count || 0
+    })) || []
 
     async function deleteCategory(id: string) {
         'use server'
         const supabase = await createClient()
         await supabase.from('categories').delete().eq('id', id)
+        revalidatePath('/admin/categories')
+    }
+
+    async function bulkDeleteCategories(ids: string[]) {
+        'use server'
+        const supabase = await createClient()
+        await supabase.from('categories').delete().in('id', ids)
         revalidatePath('/admin/categories')
     }
 
@@ -105,7 +116,11 @@ export default async function CategoriesPage({
                         </div>
                     </div>
 
-                    <CategoriesTable categories={categories || []} onDelete={deleteCategory} />
+                    <CategoriesTable
+                        categories={categories}
+                        onDelete={deleteCategory}
+                        onBulkDelete={bulkDeleteCategories}
+                    />
 
                     {count !== null && count > 0 && (
                         <div className="mt-8 flex justify-center">
