@@ -343,7 +343,7 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
         activeTab === 'archived' ? c.is_archived : !c.is_archived
     )
 
-    const SidebarContent = () => (
+    const sidebarContent = (
         <div className="flex flex-col h-full bg-[var(--dashboard-card)] border-r border-[var(--dashboard-border)]">
             <div className="p-4 border-b border-[var(--dashboard-border)] space-y-4">
                 <div className="flex items-center justify-between">
@@ -508,11 +508,6 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                                             ? "bg-[var(--dashboard-accent-gold)]/10"
                                             : "hover:bg-[var(--dashboard-card-hover)]"
                                     )}
-                                    onContextMenu={(e) => {
-                                        // Optional: Right click to open menu
-                                        // For now, trigger wraps the whole button which might interfere with left click.
-                                        // Better pattern: Wrap button in Trigger? No, trigger is the button.
-                                    }}
                                 >
                                     <Avatar className="h-10 w-10 border border-[var(--dashboard-border)]">
                                         <AvatarFallback className="bg-[var(--dashboard-background)] text-[var(--dashboard-text-muted)]">
@@ -575,13 +570,13 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
         <div className="flex h-[calc(100vh-100px)] rounded-3xl overflow-hidden border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-2xl">
             {/* Desktop Sidebar */}
             <div className="hidden md:block w-80 lg:w-96">
-                <SidebarContent />
+                {sidebarContent}
             </div>
 
             {/* Mobile Sheet */}
             <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
                 <SheetContent side="left" className="p-0 w-80 border-r border-[var(--dashboard-border)] bg-[var(--dashboard-card)]">
-                    <SidebarContent />
+                    {sidebarContent}
                 </SheetContent>
             </Sheet>
 

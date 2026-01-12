@@ -219,3 +219,24 @@ BEGIN
     up.full_name ILIKE '%' || search_term || '%';
 END;
 $$;
+
+-- 8. Trigger to Update Conversation Timestamp
+CREATE OR REPLACE FUNCTION update_conversation_timestamp()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    UPDATE conversations
+    SET last_message_at = NEW.created_at
+    WHERE id = NEW.conversation_id;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_update_conversation_timestamp ON messages;
+CREATE TRIGGER trigger_update_conversation_timestamp
+    AFTER INSERT ON messages
+    FOR EACH ROW
+    EXECUTE FUNCTION update_conversation_timestamp();
