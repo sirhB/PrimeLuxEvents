@@ -12,6 +12,21 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDistanceToNow } from 'date-fns'
 import { ChatWindow } from './chat-window'
 import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import {
     Dialog,
     DialogContent,
     DialogDescription,
@@ -20,6 +35,11 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -41,6 +61,7 @@ interface Conversation {
         email: string
     }[]
     lastMessagePreview?: string
+    is_archived?: boolean
 }
 
 interface UserProfile {
@@ -68,12 +89,17 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
     const [selectedId, setSelectedId] = useState<string | null>(null)
     const [isMobileOpen, setIsMobileOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
+    const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active')
 
     // New Chat State
     const [isNewChatOpen, setIsNewChatOpen] = useState(false)
     const [newChatType, setNewChatType] = useState<'role' | 'direct'>('role')
     const [selectedRoleId, setSelectedRoleId] = useState<string>('')
-    const [recipientEmail, setRecipientEmail] = useState('')
+    const [recipientEmail, setRecipientEmail] = useState('') // Still used for non-search fallback or visual
+    const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null)
+    const [userSearchOpen, setUserSearchOpen] = useState(false)
+    const [userSearchResults, setUserSearchResults] = useState<UserProfile[]>([])
+    const [isSearchingUsers, setIsSearchingUsers] = useState(false)
     // const [subject, setSubject] = useState('') // Subject removed
     const [initialMessage, setInitialMessage] = useState('')
     const [isCreating, setIsCreating] = useState(false)
@@ -84,10 +110,13 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
         fetchConversations()
         fetchRoles()
 
-        // Subscribe to new messages/conversations
+        // Subscribe to new messages/conversations AND participant updates (for archive status)
         const channel = supabase
             .channel('chat_updates')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => {
+                fetchConversations()
+            })
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'conversation_participants', filter: `user_id=eq.${currentUserId}` }, () => {
                 fetchConversations()
             })
             .subscribe()
@@ -96,6 +125,26 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             supabase.removeChannel(channel)
         }
     }, [])
+
+    const searchUsers = async (query: string) => {
+        if (!query || query.length < 2) {
+            setUserSearchResults([])
+            return
+        }
+
+        setIsSearchingUsers(true)
+        const { data, error } = await supabase.rpc('search_users', { search_term: query })
+
+        if (data) {
+            // Map result to UserProfile
+            setUserSearchResults(data.map((u: any) => ({
+                id: u.id,
+                email: u.email,
+                full_name: u.full_name
+            })))
+        }
+        setIsSearchingUsers(false)
+    }
 
     const fetchRoles = async () => {
         const { data } = await supabase.from('roles').select('id, name, display_name')
@@ -109,16 +158,31 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             .from('conversations')
             .select(`
                 *,
-                conversation_participants(user_id)
+                conversation_participants!inner(user_id, is_archived)
             `)
             .order('last_message_at', { ascending: false })
 
         if (data) {
+            // Filter and map based on participant status
+            // The !inner join on participants works for specific user filters, but here we get all participants for the convs 
+            // the user is in thanks to RLS.
+            // However, the structure returned by supabase will have conversation_participants as an array.
+
+            // We need to determine if THIS conversation is archived for THIS user.
+            const mappedConversations = data.map((conv: any) => {
+                const myParticipantRecord = conv.conversation_participants.find((p: any) => p.user_id === currentUserId)
+                return {
+                    ...conv,
+                    is_archived: myParticipantRecord?.is_archived || false,
+                    participants: conv.conversation_participants // keep all for display
+                }
+            })
+
             // Extract all user IDs from participants to fetch profiles AND conversation IDs for last messages
             const userIds = new Set<string>()
             const convIds: string[] = []
 
-            data.forEach((conv: any) => {
+            mappedConversations.forEach((conv: any) => {
                 convIds.push(conv.id)
                 conv.conversation_participants?.forEach((p: any) => {
                     if (p.user_id !== currentUserId) {
@@ -164,12 +228,12 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                     }
                 })
                 // Mutate conversations to add lastMessagePreview (not in type but fine for JS, or we update type)
-                data.forEach((c: any) => {
+                mappedConversations.forEach((c: any) => {
                     c.lastMessagePreview = lastMsgMap[c.id]
                 })
-                setConversations([...data] as any)
+                setConversations(mappedConversations as Conversation[])
             } else {
-                setConversations(data as any)
+                setConversations(mappedConversations as Conversation[])
             }
         }
         setIsLoading(false)
@@ -182,25 +246,27 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
         try {
             let participantIds: string[] = []
 
-            // If direct message, resolve email to ID
+            // If direct message, resolve email/user to ID
             if (newChatType === 'direct') {
-                if (!recipientEmail.trim()) {
-                    toast.error('Please enter a recipient email')
+                if (selectedUser) {
+                    participantIds = [selectedUser.id]
+                } else if (recipientEmail.trim()) {
+                    // Fallback to manual email logic if they didn't select from dropdown
+                    const { data: userData, error: userError } = await supabase
+                        .rpc('get_user_by_email', { email_input: recipientEmail.trim() })
+                        .single<any>()
+
+                    if (userError || !userData) {
+                        toast.error('User not found. Please check the email.')
+                        setIsCreating(false)
+                        return
+                    }
+                    participantIds = [userData.id]
+                } else {
+                    toast.error('Please select a user or enter an email')
                     setIsCreating(false)
                     return
                 }
-
-                // Cast response to allow 'id' access since RPC types might be loose
-                const { data: userData, error: userError } = await supabase
-                    .rpc('get_user_by_email', { email_input: recipientEmail.trim() })
-                    .single<any>()
-
-                if (userError || !userData) {
-                    toast.error('User not found. Please check the email.')
-                    setIsCreating(false)
-                    return
-                }
-                participantIds = [userData.id]
             } else if (newChatType === 'role') {
                 if (!selectedRoleId) {
                     toast.error('Please select a role')
@@ -224,7 +290,6 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             // Create Conversation via RPC
             const { data: conversationId, error } = await supabase
                 .rpc('create_new_conversation', {
-                    // Start as internal for everyone for now, or adapt if needed
                     p_type: 'internal',
                     p_subject: null,
                     p_message: initialMessage.trim() || null,
@@ -240,6 +305,8 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                 setIsNewChatOpen(false)
                 // Reset form
                 setRecipientEmail('')
+                setSelectedUser(null)
+                setUserSearchResults([])
                 setInitialMessage('')
                 setNewChatType('role')
                 setSelectedRoleId('')
@@ -253,96 +320,170 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
         }
     }
 
+    const toggleArchive = async (conversationId: string, e: React.MouseEvent) => {
+        e.stopPropagation() // Prevent selecting the chat
+
+        try {
+            const { error } = await supabase.rpc('toggle_conversation_archive', { p_conversation_id: conversationId })
+
+            if (error) {
+                console.error('Error toggling archive:', error)
+                toast.error('Failed to update archive status')
+            } else {
+                toast.success('Conversation updated')
+                fetchConversations()
+            }
+        } catch (err) {
+            console.error(err)
+            toast.error('An error occurred')
+        }
+    }
+
+    const filteredConversations = conversations.filter(c =>
+        activeTab === 'archived' ? c.is_archived : !c.is_archived
+    )
+
     const SidebarContent = () => (
         <div className="flex flex-col h-full bg-[var(--dashboard-card)] border-r border-[var(--dashboard-border)]">
-            <div className="p-4 border-b border-[var(--dashboard-border)] flex items-center justify-between">
-                <h2 className="font-serif text-lg font-bold text-[var(--dashboard-text)]">Messages</h2>
+            <div className="p-4 border-b border-[var(--dashboard-border)] space-y-4">
+                <div className="flex items-center justify-between">
+                    <h2 className="font-serif text-lg font-bold text-[var(--dashboard-text)]">Messages</h2>
 
-                <Dialog open={isNewChatOpen} onOpenChange={setIsNewChatOpen}>
-                    <DialogTrigger asChild>
-                        <Button size="icon" variant="ghost" className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)]">
-                            <Plus className="h-5 w-5" />
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px] bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
-                        <DialogHeader>
-                            <DialogTitle>New Message</DialogTitle>
-                            <DialogDescription className="text-[var(--dashboard-text-muted)]">
-                                Start a new conversation.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <form onSubmit={startNewChat} className="grid gap-4 py-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="type" className="text-white font-medium">To</Label>
-                                <Select
-                                    value={newChatType}
-                                    onValueChange={(val: 'role' | 'direct') => setNewChatType(val)}
-                                >
-                                    <SelectTrigger className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] text-white">
-                                        <SelectValue placeholder="Select type" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="role">Role (Group)</SelectItem>
-                                        <SelectItem value="direct">Specific Person (Email)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {newChatType === 'role' && (
-                                <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
-                                    <Label htmlFor="role" className="text-white font-medium">Select Role</Label>
+                    <Dialog open={isNewChatOpen} onOpenChange={setIsNewChatOpen}>
+                        <DialogTrigger asChild>
+                            <Button size="icon" variant="ghost" className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)]">
+                                <Plus className="h-5 w-5" />
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[500px] bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
+                            <DialogHeader>
+                                <DialogTitle>New Message</DialogTitle>
+                                <DialogDescription className="text-[var(--dashboard-text-muted)]">
+                                    Start a new conversation.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <form onSubmit={startNewChat} className="grid gap-4 py-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="type" className="text-white font-medium">To</Label>
                                     <Select
-                                        value={selectedRoleId}
-                                        onValueChange={setSelectedRoleId}
+                                        value={newChatType}
+                                        onValueChange={(val: 'role' | 'direct') => setNewChatType(val)}
                                     >
                                         <SelectTrigger className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] text-white">
-                                            <SelectValue placeholder="Select a role" />
+                                            <SelectValue placeholder="Select type" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {roles.map(role => (
-                                                <SelectItem key={role.id} value={role.id}>
-                                                    {role.display_name}
-                                                </SelectItem>
-                                            ))}
+                                            <SelectItem value="role">Role (Group)</SelectItem>
+                                            <SelectItem value="direct">Specific Person (Email/Search)</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
-                            )}
 
-                            {newChatType === 'direct' && (
-                                <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
-                                    <Label htmlFor="email" className="text-white font-medium">Recipient Email</Label>
-                                    <Input
-                                        id="email"
-                                        placeholder="user@example.com"
-                                        value={recipientEmail}
-                                        onChange={(e) => setRecipientEmail(e.target.value)}
-                                        className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] text-white placeholder:text-gray-400"
+                                {newChatType === 'role' && (
+                                    <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
+                                        <Label htmlFor="role" className="text-white font-medium">Select Role</Label>
+                                        <Select
+                                            value={selectedRoleId}
+                                            onValueChange={setSelectedRoleId}
+                                        >
+                                            <SelectTrigger className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] text-white">
+                                                <SelectValue placeholder="Select a role" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {roles.map(role => (
+                                                    <SelectItem key={role.id} value={role.id}>
+                                                        {role.display_name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                )}
+
+                                {newChatType === 'direct' && (
+                                    <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
+                                        <Label className="text-white font-medium">Recipient</Label>
+                                        <Popover open={userSearchOpen} onOpenChange={setUserSearchOpen}>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    role="combobox"
+                                                    aria-expanded={userSearchOpen}
+                                                    className="w-full justify-between bg-[var(--dashboard-background)] border-[var(--dashboard-border)] text-white hover:bg-[var(--dashboard-card-hover)] hover:text-white"
+                                                >
+                                                    {selectedUser ? selectedUser.full_name || selectedUser.email : (recipientEmail || "Search for a user...")}
+                                                    <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-[450px] p-0 bg-[var(--dashboard-card)] border-[var(--dashboard-border)]">
+                                                <Command shouldFilter={false}>
+                                                    <CommandInput
+                                                        placeholder="Search by name or email..."
+                                                        onValueChange={(val) => {
+                                                            setRecipientEmail(val) // Keep manual input sync
+                                                            searchUsers(val)
+                                                        }}
+                                                        className="text-white"
+                                                    />
+                                                    <CommandList>
+                                                        {isSearchingUsers && <div className="p-2 text-xs text-muted-foreground">Searching...</div>}
+                                                        <CommandEmpty>No users found.</CommandEmpty>
+                                                        <CommandGroup>
+                                                            {userSearchResults.map((user) => (
+                                                                <CommandItem
+                                                                    key={user.id}
+                                                                    value={user.email}
+                                                                    onSelect={() => {
+                                                                        setSelectedUser(user)
+                                                                        setRecipientEmail(user.email) // for visual fallback
+                                                                        setUserSearchOpen(false)
+                                                                    }}
+                                                                    className="text-white hover:bg-[var(--dashboard-accent-gold)]/20 cursor-pointer"
+                                                                >
+                                                                    <div className="flex flex-col">
+                                                                        <span className="font-medium">{user.full_name || 'Unknown Name'}</span>
+                                                                        <span className="text-xs text-muted-foreground">{user.email}</span>
+                                                                    </div>
+                                                                </CommandItem>
+                                                            ))}
+                                                        </CommandGroup>
+                                                    </CommandList>
+                                                </Command>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                )}
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="message" className="text-white font-medium">Initial Message</Label>
+                                    <Textarea
+                                        id="message"
+                                        placeholder="Type your first message..."
+                                        value={initialMessage}
+                                        onChange={(e) => setInitialMessage(e.target.value)}
+                                        className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] min-h-[100px] text-white placeholder:text-gray-400"
                                     />
                                 </div>
-                            )}
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="message" className="text-white font-medium">Message</Label>
-                                <Textarea
-                                    id="message"
-                                    placeholder="Type your message here..."
-                                    value={initialMessage}
-                                    onChange={(e) => setInitialMessage(e.target.value)}
-                                    className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)] min-h-[100px] text-white placeholder:text-gray-400"
-                                />
-                            </div>
+                                <DialogFooter>
+                                    <Button type="submit" disabled={isCreating} className="bg-[var(--dashboard-accent-gold)] text-black hover:bg-[var(--dashboard-accent-gold)]/90">
+                                        {isCreating ? 'Creating...' : 'Send Message'}
+                                    </Button>
+                                </DialogFooter>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
 
-                            <DialogFooter>
-                                <Button type="submit" disabled={isCreating} className="bg-[var(--dashboard-accent-gold)] text-black hover:bg-[var(--dashboard-accent-gold)]/90">
-                                    {isCreating ? 'Creating...' : 'Send Message'}
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'active' | 'archived')} className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 bg-[var(--dashboard-background)]">
+                        <TabsTrigger value="active">Active</TabsTrigger>
+                        <TabsTrigger value="archived">Archived</TabsTrigger>
+                    </TabsList>
+                </Tabs>
             </div>
-            <div className="p-4">
+
+            <div className="p-4 pt-0">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--dashboard-text-muted)]" />
                     <Input
@@ -353,66 +494,81 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             </div>
             <ScrollArea className="flex-1">
                 <div className="flex flex-col gap-1 p-2">
-                    {conversations.map(conv => (
-                        <button
-                            key={conv.id}
-                            onClick={() => {
-                                setSelectedId(conv.id)
-                                setIsMobileOpen(false)
-                            }}
-                            className={cn(
-                                "flex items-start gap-4 p-4 text-left rounded-xl transition-colors group",
-                                selectedId === conv.id
-                                    ? "bg-[var(--dashboard-accent-gold)]/10"
-                                    : "hover:bg-[var(--dashboard-card-hover)]"
-                            )}
-                        >
-                            <Avatar className="h-10 w-10 border border-[var(--dashboard-border)]">
-                                <AvatarFallback className="bg-[var(--dashboard-background)] text-[var(--dashboard-text-muted)]">
-                                    <MessageSquare className={cn(
-                                        "h-5 w-5 transition-colors",
-                                        selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]"
-                                    )} />
-                                </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 overflow-hidden">
-                                <div className="flex items-center justify-between mb-1">
-                                    <span className={cn(
-                                        "font-bold text-sm truncate transition-colors",
-                                        selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text)]"
-                                    )}>
-                                        {(() => {
-                                            // Strategy: Real Name > Email > Type
-                                            if (conv.type === 'support') return 'Support Ticket'
+                    {filteredConversations.map(conv => (
+                        <DropdownMenu key={conv.id}>
+                            <DropdownMenuTrigger asChild>
+                                <button
+                                    onClick={() => {
+                                        setSelectedId(conv.id)
+                                        setIsMobileOpen(false)
+                                    }}
+                                    className={cn(
+                                        "w-full flex items-start gap-4 p-4 text-left rounded-xl transition-colors group relative",
+                                        selectedId === conv.id
+                                            ? "bg-[var(--dashboard-accent-gold)]/10"
+                                            : "hover:bg-[var(--dashboard-card-hover)]"
+                                    )}
+                                    onContextMenu={(e) => {
+                                        // Optional: Right click to open menu
+                                        // For now, trigger wraps the whole button which might interfere with left click.
+                                        // Better pattern: Wrap button in Trigger? No, trigger is the button.
+                                    }}
+                                >
+                                    <Avatar className="h-10 w-10 border border-[var(--dashboard-border)]">
+                                        <AvatarFallback className="bg-[var(--dashboard-background)] text-[var(--dashboard-text-muted)]">
+                                            <MessageSquare className={cn(
+                                                "h-5 w-5 transition-colors",
+                                                selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]"
+                                            )} />
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1 overflow-hidden">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className={cn(
+                                                "font-bold text-sm truncate transition-colors",
+                                                selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text)]"
+                                            )}>
+                                                {(() => {
+                                                    // Strategy: Real Name > Email > Type
+                                                    if (conv.type === 'support') return 'Support Ticket'
 
-                                            const otherUserId = conv.participants?.find((p: any) => p.user_id !== currentUserId)?.user_id
-                                            const profile = otherUserId ? profiles[otherUserId] : null
+                                                    const otherUserId = conv.participants?.find((p: any) => p.user_id !== currentUserId)?.user_id
+                                                    const profile = otherUserId ? profiles[otherUserId] : null
 
-                                            if (profile?.full_name) return profile.full_name
-                                            if (profile?.email) return profile.email
+                                                    if (profile?.full_name) return profile.full_name
+                                                    if (profile?.email) return profile.email
 
-                                            return 'Direct Message'
-                                        })()}
-                                    </span>
-                                    <span className="text-[10px] text-[var(--dashboard-text-muted)] whitespace-nowrap">
-                                        {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
-                                    </span>
-                                </div>
-                                <p className="text-xs text-[var(--dashboard-text-muted)] truncate group-hover:text-[var(--dashboard-text)] transition-colors">
-                                    {conv.lastMessagePreview || "Click to view conversation"}
-                                </p>
-                            </div>
-                        </button>
+                                                    return 'Direct Message'
+                                                })()}
+                                            </span>
+                                            <span className="text-[10px] text-[var(--dashboard-text-muted)] whitespace-nowrap">
+                                                {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-[var(--dashboard-text-muted)] truncate group-hover:text-[var(--dashboard-text)] transition-colors">
+                                            {conv.lastMessagePreview || "Click to view conversation"}
+                                        </p>
+                                    </div>
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={(e) => toggleArchive(conv.id, e)}>
+                                    {conv.is_archived ? 'Unarchive' : 'Archive'} Conversation
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     ))}
-                    {conversations.length === 0 && !isLoading && (
+                    {filteredConversations.length === 0 && !isLoading && (
                         <div className="p-8 text-center text-[var(--dashboard-text-muted)] text-sm">
-                            <p>No messages yet.</p>
-                            <Button variant="link" onClick={() => setIsNewChatOpen(true)} className="text-[var(--dashboard-accent-gold)]">Start a chat</Button>
+                            <p>No {activeTab} messages.</p>
+                            {activeTab === 'active' && (
+                                <Button variant="link" onClick={() => setIsNewChatOpen(true)} className="text-[var(--dashboard-accent-gold)]">Start a chat</Button>
+                            )}
                         </div>
                     )}
                 </div>
             </ScrollArea>
-        </div>
+        </div >
     )
 
     return (

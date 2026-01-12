@@ -1,20 +1,3 @@
-# Chat System Fix Instructions
-
-To resolve the 400 errors, enable realtime updates, and **support starting chats with specific users**, please execute the following SQL.
-
-## Steps
-
-1.  Log in to your Supabase Dashboard.
-2.  Go to the **SQL Editor**.
-3.  Click **New Query**.
-4.  Copy and paste the entire SQL block below.
-5.  Click **Run**.
-
-## SQL to Run
-
-```sql
--- Refactor Chat System and Fix RLS
-
 -- 1. Reset RLS Policies to ensure clean state
 DROP POLICY IF EXISTS "Users can view conversations they participate in" ON conversations;
 DROP POLICY IF EXISTS "Authenticated users can create conversations" ON conversations;
@@ -236,4 +219,3 @@ BEGIN
     up.full_name ILIKE '%' || search_term || '%';
 END;
 $$;
-```
