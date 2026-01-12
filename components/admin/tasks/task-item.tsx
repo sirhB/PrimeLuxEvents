@@ -70,6 +70,13 @@ export function TaskItem({ task }: TaskItemProps) {
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false)
     const supabase = createClient()
 
+    // Determine overdue status
+    // A task is overdue if due_date is before today AND status is not completed/cancelled
+    const isOverdue = task.due_date &&
+        new Date(task.due_date) < new Date(new Date().setHours(0, 0, 0, 0)) &&
+        task.status !== 'completed' &&
+        task.status !== 'cancelled'
+
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this task?')) return
 
@@ -156,9 +163,18 @@ export function TaskItem({ task }: TaskItemProps) {
                             </div>
 
                             {task.due_date && (
-                                <div className="flex items-center gap-1.5 text-[var(--dashboard-text-muted)] bg-[var(--dashboard-card)] px-2 py-0.5 rounded-full border border-[var(--dashboard-border)]">
+                                <div className={cn(
+                                    "flex items-center gap-1.5 px-2 py-0.5 rounded-full border",
+                                    isOverdue
+                                        ? "text-red-400 bg-red-400/10 border-red-400/20 font-medium"
+                                        : "text-[var(--dashboard-text-muted)] bg-[var(--dashboard-card)] border-[var(--dashboard-border)]"
+                                )}>
                                     <Clock className="h-3 w-3 opacity-60" />
-                                    <span suppressHydrationWarning>Due {new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                                    <span suppressHydrationWarning>
+                                        {isOverdue && "Overdue: "}
+                                        {!isOverdue && "Due "}
+                                        {new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                    </span>
                                 </div>
                             )}
 

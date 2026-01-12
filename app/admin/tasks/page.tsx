@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CreateTaskDialog } from '@/components/admin/tasks/create-task-dialog'
-import { CheckCircle2, Clock, Flag, Briefcase, Truck, Home, Building, MapPin, Calendar } from 'lucide-react'
+import { CheckCircle2, Clock, Flag, Briefcase, Truck, Home, Building, MapPin, Calendar, AlertCircle } from 'lucide-react'
 import { TaskItem } from '@/components/admin/tasks/task-item'
 import { cn } from '@/lib/utils'
 
@@ -35,9 +35,27 @@ export default async function TasksPage() {
         .select('*')
         .order('created_at', { ascending: false })
 
+    const now = new Date()
+    now.setHours(0, 0, 0, 0) // Compare vs start of today
+
     const pendingTasks = tasks?.filter(t => t.status === 'pending') || []
     const inProgressTasks = tasks?.filter(t => t.status === 'in_progress') || []
     const completedTasks = tasks?.filter(t => t.status === 'completed') || []
+
+    const overdueTasks = tasks?.filter(t => {
+        if (!t.due_date) return false
+        // Date strings like "2023-12-25" are parsed as UTC. 
+        // We want to check if the due date is strictly before "today".
+        // A simple string comparison usually works for ISO dates if we format "now" correctly, 
+        // but creating a Date object is safer.
+        const dueDate = new Date(t.due_date)
+        // Add timezone offset to treat the date as local "end of day" effectively or just ignore time?
+        // Let's assume due date is "any time on that day". So it's overdue if today > due_date.
+        // Actually, dueDate object from "YYYY-MM-DD" is usually UTC 00:00.
+        // If we compare to local Now, we need to be careful.
+        // Let's stick to the same logic: strict past.
+        return dueDate < now && t.status !== 'completed' && t.status !== 'cancelled'
+    }) || []
 
     return (
         <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen admin-theme">
@@ -62,11 +80,25 @@ export default async function TasksPage() {
             </div>
 
             {/* Stats Overview */}
-            <div className="grid gap-6 md:grid-cols-3 animate-fade-in-up delay-100">
+            <div className="grid gap-6 md:grid-cols-4 animate-fade-in-up delay-100">
+                <Card className="glass-card border-none overflow-hidden relative group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider">Overdue</CardTitle>
+                        <div className="p-2 rounded-lg bg-red-400/10 text-red-400">
+                            <AlertCircle className="h-4 w-4" />
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-light text-[var(--dashboard-text)]">{overdueTasks.length}</div>
+                        <p className="text-xs text-[var(--dashboard-text-muted)] mt-1">Action required</p>
+                    </CardContent>
+                </Card>
+
                 <Card className="glass-card border-none overflow-hidden relative group">
                     <div className="absolute inset-0 bg-gradient-to-br from-[var(--dashboard-accent-orange)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider">Pending Tasks</CardTitle>
+                        <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider">Pending</CardTitle>
                         <div className="p-2 rounded-lg bg-[var(--dashboard-accent-orange)]/10 text-[var(--dashboard-accent-orange)]">
                             <Clock className="h-4 w-4" />
                         </div>
@@ -227,6 +259,7 @@ export default async function TasksPage() {
 }
 
 function TaskBoardItem({ task }: { task: any }) {
+    // Basic overdue check for board items just for visual hint is good too
     return (
         <Card className="glass-card border-[var(--dashboard-border)] hover:border-[var(--dashboard-accent-gold)]/30 transition-all cursor-pointer group">
             <CardContent className="p-4">
@@ -251,7 +284,11 @@ function TaskBoardItem({ task }: { task: any }) {
                         <span className="text-[10px] text-[var(--dashboard-text-muted)]">{task.assigned_to_text || 'Unassigned'}</span>
                     </div>
                     {task.due_date && (
-                        <div className="flex items-center gap-1 text-[10px] text-[var(--dashboard-text-muted)]">
+                        <div className={cn("flex items-center gap-1 text-[10px]",
+                            (new Date(task.due_date) < new Date(new Date().setHours(0, 0, 0, 0)) && task.status !== 'completed' && task.status !== 'cancelled')
+                                ? "text-red-400 font-medium"
+                                : "text-[var(--dashboard-text-muted)]"
+                        )}>
                             <Clock className="w-3 h-3" />
                             {new Date(task.due_date).toLocaleDateString()}
                         </div>
