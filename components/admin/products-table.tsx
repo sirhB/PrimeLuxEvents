@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Pencil, MoreVertical, Trash2, Package as PackageIcon, AlertCircle, QrCode } from 'lucide-react'
+import { Pencil, MoreVertical, Trash2, Package as PackageIcon, AlertCircle, QrCode, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import {
     Table,
@@ -114,6 +114,9 @@ export function ProductsTable({ products }: ProductsTableProps) {
                             <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
                                 <SortableHeader column="stock" label="Inventory" />
                             </TableHead>
+                            <TableHead className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                Status
+                            </TableHead>
                             <TableHead className="text-right text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] pr-6">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -171,6 +174,19 @@ export function ProductsTable({ products }: ProductsTableProps) {
                                                 <AlertCircle className="h-3 w-3 text-orange-500 animate-pulse" />
                                             )}
                                         </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        {product.is_verified ? (
+                                            <div className="flex items-center gap-1.5 text-emerald-500">
+                                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                                <span className="text-[10px] font-bold uppercase tracking-widest">Verified</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-1.5 text-[var(--dashboard-text-muted)] opacity-50">
+                                                <div className="h-1.5 w-1.5 rounded-full bg-current" />
+                                                <span className="text-[10px] font-bold uppercase tracking-widest">Pending</span>
+                                            </div>
+                                        )}
                                     </TableCell>
                                     <TableCell className="text-right pr-6">
                                         <div className="flex justify-end items-center gap-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300">

@@ -132,3 +132,42 @@ export async function deleteProduct(id: string) {
 
     revalidatePath('/admin/products')
 }
+
+export async function verifyProduct(id: string) {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('products')
+        .update({
+            is_verified: true,
+            verified_at: new Date().toISOString()
+        })
+        .eq('id', id)
+
+    if (error) {
+        throw new Error('Failed to verify product')
+    }
+
+    revalidatePath('/admin/products')
+    revalidatePath(`/admin/products/${id}`)
+    revalidatePath('/admin/products/verify')
+}
+
+export async function unverifyProduct(id: string) {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('products')
+        .update({
+            is_verified: false,
+            verified_at: null
+        })
+        .eq('id', id)
+
+    if (error) {
+        throw new Error('Failed to unverify product')
+    }
+
+    revalidatePath('/admin/products')
+    revalidatePath(`/admin/products/${id}`)
+    revalidatePath('/admin/products/verify')
+}
+

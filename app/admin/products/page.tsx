@@ -108,6 +108,11 @@ export default async function ProductsPage({
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
+                    <Button asChild variant="outline" className="rounded-full border-[var(--dashboard-accent-gold)] text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/10 font-medium px-6">
+                        <Link href="/admin/products/verify">
+                            Verification Mode
+                        </Link>
+                    </Button>
                     <Button asChild className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium px-6">
                         <Link href="/admin/products/new">
                             <Plus className="mr-2 h-4 w-4" />
