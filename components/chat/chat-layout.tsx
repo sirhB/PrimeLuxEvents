@@ -40,6 +40,7 @@ interface Conversation {
         user_id: string
         email: string
     }[]
+    lastMessagePreview?: string
 }
 
 interface UserProfile {
@@ -65,7 +66,7 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
     const [isNewChatOpen, setIsNewChatOpen] = useState(false)
     const [newChatType, setNewChatType] = useState<'support' | 'direct'>('support')
     const [recipientEmail, setRecipientEmail] = useState('')
-    const [subject, setSubject] = useState('')
+    // const [subject, setSubject] = useState('') // Subject removed
     const [initialMessage, setInitialMessage] = useState('')
     const [isCreating, setIsCreating] = useState(false)
 
@@ -99,11 +100,12 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             .order('last_message_at', { ascending: false })
 
         if (data) {
-            setConversations(data as any)
-
-            // Extract all user IDs from participants to fetch profiles
+            // Extract all user IDs from participants to fetch profiles AND conversation IDs for last messages
             const userIds = new Set<string>()
+            const convIds: string[] = []
+
             data.forEach((conv: any) => {
+                convIds.push(conv.id)
                 conv.conversation_participants?.forEach((p: any) => {
                     if (p.user_id !== currentUserId) {
                         userIds.add(p.user_id)
@@ -111,6 +113,7 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                 })
             })
 
+            // Fetch Profiles
             if (userIds.size > 0) {
                 const { data: profilesData } = await supabase
                     .from('user_profiles')
@@ -124,6 +127,35 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                     })
                     setProfiles(profileMap)
                 }
+            }
+
+            // Fetch Last Messages (One per conversation)
+            // Ideally we'd use a postgres function or view for this to be efficient
+            // but for now we will just fetch the last message for each displayed conversation
+            // This is N+1 but limited to the list size. Better approach: dedicated view.
+            // Let's try to get them in one go if possible.
+            const { data: messagesData } = await supabase
+                .from('messages')
+                .select('conversation_id, content, created_at')
+                .in('conversation_id', convIds)
+                .order('created_at', { ascending: false })
+
+            if (messagesData) {
+                // We only want the *latest* message per conversation
+                const lastMsgMap: Record<string, string> = {}
+                // Since it's ordered by time desc, the first one we see for a conv_id is the latest
+                messagesData.forEach(msg => {
+                    if (!lastMsgMap[msg.conversation_id]) {
+                        lastMsgMap[msg.conversation_id] = msg.content
+                    }
+                })
+                // Mutate conversations to add lastMessagePreview (not in type but fine for JS, or we update type)
+                data.forEach((c: any) => {
+                    c.lastMessagePreview = lastMsgMap[c.id]
+                })
+                setConversations([...data] as any)
+            } else {
+                setConversations(data as any)
             }
         }
         setIsLoading(false)
@@ -161,7 +193,7 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             const { data: conversationId, error } = await supabase
                 .rpc('create_new_conversation', {
                     p_type: newChatType === 'direct' ? 'internal' : 'support',
-                    p_subject: subject.trim() || null,
+                    p_subject: null, // Subject Removed
                     p_message: initialMessage.trim() || null,
                     p_participant_ids: participantIds
                 })
@@ -175,7 +207,7 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                 setIsNewChatOpen(false)
                 // Reset form
                 setRecipientEmail('')
-                setSubject('')
+                // setSubject('') 
                 setInitialMessage('')
                 setNewChatType('support')
             }
@@ -237,17 +269,6 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                             )}
 
                             <div className="grid gap-2">
-                                <Label htmlFor="subject">Subject</Label>
-                                <Input
-                                    id="subject"
-                                    placeholder="Brief topic..."
-                                    value={subject}
-                                    onChange={(e) => setSubject(e.target.value)}
-                                    className="bg-[var(--dashboard-background)] border-[var(--dashboard-border)]"
-                                />
-                            </div>
-
-                            <div className="grid gap-2">
                                 <Label htmlFor="message">Message</Label>
                                 <Textarea
                                     id="message"
@@ -307,10 +328,9 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                                         selectedId === conv.id ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text)]"
                                     )}>
                                         {(() => {
-                                            if (conv.subject) return conv.subject
+                                            // Strategy: Real Name > Email > Type
                                             if (conv.type === 'support') return 'Support Ticket'
 
-                                            // Find other participant for DM
                                             const otherUserId = conv.participants?.find((p: any) => p.user_id !== currentUserId)?.user_id
                                             const profile = otherUserId ? profiles[otherUserId] : null
 
@@ -325,7 +345,7 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                                     </span>
                                 </div>
                                 <p className="text-xs text-[var(--dashboard-text-muted)] truncate group-hover:text-[var(--dashboard-text)] transition-colors">
-                                    Click to view conversation
+                                    {conv.lastMessagePreview || "Click to view conversation"}
                                 </p>
                             </div>
                         </button>
