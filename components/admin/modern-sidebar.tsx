@@ -30,7 +30,8 @@ import {
     Tag,
     Briefcase,
     Eye,
-    Box
+    Box,
+    ChevronDown
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
@@ -125,6 +126,87 @@ const SidebarItem = ({ item, isActive, isCollapsed, onClick }: SidebarItemProps)
     return content
 }
 
+interface SidebarSectionProps {
+    title: string
+    items: any[]
+    isCollapsed: boolean
+    pathname: string
+    onItemClick: () => void
+}
+
+const SidebarSection = ({ title, items, isCollapsed, pathname, onItemClick }: SidebarSectionProps) => {
+    // Helper to determine if a route is active
+    const isRouteActive = (href: string) => {
+        if (href === '/admin' && pathname === '/admin') return true
+        if (href !== '/admin' && pathname.startsWith(href)) return true
+        return false
+    }
+
+    // Determine if any child is active
+    const isActiveGroup = items.some(item => isRouteActive(item.href))
+
+    // Internal state for collapse, initialized based on isActiveGroup
+    const [isOpen, setIsOpen] = useState(true) // Default to open for better discovery, or maybe based on active? Let's default true.
+
+    // Update open state if group becomes active (e.g. navigation by clicking)
+    useEffect(() => {
+        if (isActiveGroup && !isOpen) setIsOpen(true)
+    }, [isActiveGroup])
+
+    // If sidebar is collapsed (minimized), we render items flat or just icons.
+    if (isCollapsed) {
+        return (
+            <div className="space-y-1 pt-2 mb-2 border-t border-[var(--dashboard-border)]/30 first:border-0 first:pt-0">
+                {items.map((item) => (
+                    <SidebarItem
+                        key={item.href}
+                        item={item}
+                        isActive={isRouteActive(item.href)}
+                        isCollapsed={isCollapsed}
+                        onClick={onItemClick}
+                    />
+                ))}
+            </div>
+        )
+    }
+
+    return (
+        <div className="space-y-1 mb-1">
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between px-3 py-2 text-[10px] font-bold text-[var(--dashboard-text-muted)] uppercase tracking-[0.2em] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card)]/50 rounded-lg transition-all group/section opacity-80 hover:opacity-100"
+            >
+                <span>{title}</span>
+                <ChevronDown className={cn(
+                    "h-3 w-3 transition-transform duration-200",
+                    isOpen ? "rotate-0 text-[var(--dashboard-text-muted)]" : "-rotate-90 text-[var(--dashboard-text-muted)]/50"
+                )} />
+            </button>
+            <AnimatePresence initial={false}>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        className="space-y-1 overflow-hidden"
+                    >
+                        {items.map((item) => (
+                            <SidebarItem
+                                key={item.href}
+                                item={item}
+                                isActive={isRouteActive(item.href)}
+                                isCollapsed={isCollapsed}
+                                onClick={onItemClick}
+                            />
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    )
+}
+
 const sidebarGroups = [
     {
         title: "Overview",
@@ -198,13 +280,6 @@ export function ModernSidebar() {
         }
         getUser()
     }, [])
-
-    // Helper to determine if a route is active (handling nested routes)
-    const isRouteActive = (href: string) => {
-        if (href === '/admin' && pathname === '/admin') return true
-        if (href !== '/admin' && pathname.startsWith(href)) return true
-        return false
-    }
 
     const handleSignOut = async () => {
         await supabase.auth.signOut()
@@ -293,26 +368,16 @@ export function ModernSidebar() {
 
                 {/* Navigation Section */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[var(--dashboard-border)] scrollbar-track-transparent">
-                    <nav className="p-3 space-y-6">
+                    <nav className="p-3">
                         {sidebarGroups.map((group) => (
-                            <div key={group.title} className="space-y-1">
-                                {!isCollapsed && (
-                                    <h3 className="text-[10px] font-bold text-[var(--dashboard-text-muted)] uppercase tracking-[0.2em] px-3 mb-2 opacity-70">
-                                        {group.title}
-                                    </h3>
-                                )}
-                                <div className="space-y-1">
-                                    {group.items.map((item) => (
-                                        <SidebarItem
-                                            key={item.href}
-                                            item={item}
-                                            isActive={isRouteActive(item.href)}
-                                            isCollapsed={isCollapsed}
-                                            onClick={() => setIsMobileOpen(false)}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
+                            <SidebarSection
+                                key={group.title}
+                                title={group.title}
+                                items={group.items}
+                                isCollapsed={isCollapsed}
+                                pathname={pathname}
+                                onItemClick={() => setIsMobileOpen(false)}
+                            />
                         ))}
                     </nav>
                 </div>
