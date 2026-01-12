@@ -13,10 +13,40 @@ const _geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" })
 
 export const metadata: Metadata = {
-  title: "PrimeLux Events | Luxury Event Rentals",
-  description:
-    "Exquisite rentals for unforgettable events. Browse our curated collection of furniture, decor, and lighting.",
-  generator: "v0.app",
+  title: {
+    default: 'PrimeLux Events | Luxury Event Rentals',
+    template: '%s | PrimeLux Events',
+  },
+  description: 'Premium event rentals for weddings, corporate events, and luxury gatherings. Elevate your event with our curated collection of furniture, decor, and lighting.',
+  keywords: ['luxury event rentals', 'wedding rentals', 'event design', 'party rentals', 'furniture rental'],
+  manifest: '/manifest.json',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://primeluxevents.com',
+    siteName: 'PrimeLux Events',
+    title: 'PrimeLux Events | Luxury Event Rentals',
+    description: 'Elevate your event with our curated collection of luxury rentals.',
+    images: [
+      {
+        url: '/images/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'PrimeLux Events',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PrimeLux Events | Luxury Event Rentals',
+    description: 'Elevate your event with our curated collection of luxury rentals.',
+    images: ['/images/og-image.jpg'],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'PrimeLux Events',
+  },
   icons: {
     icon: [
       {
@@ -33,12 +63,6 @@ export const metadata: Metadata = {
       },
     ],
     apple: "/apple-icon.png",
-  },
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "PrimeLux Events",
   },
 }
 
