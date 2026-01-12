@@ -54,6 +54,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface SidebarItemProps {
     item: {
+        id?: string
         icon: React.ElementType
         label: string
         href: string
@@ -64,10 +65,11 @@ interface SidebarItemProps {
 }
 
 const SidebarItem = ({ item, isActive, isCollapsed, onClick }: SidebarItemProps) => {
-    const Icon = item.icon
+    const Icon = item.icon as any
 
     const content = (
         <Link
+            id={item.id}
             href={item.href}
             onClick={onClick}
             className={cn(
@@ -216,52 +218,35 @@ const sidebarGroups = [
         ]
     },
     {
-        title: "Sales & Operations",
+        title: "Sales & CRM",
         items: [
             { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
             { icon: FileText, label: 'Leads', href: '/admin/consultations' },
             { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments' },
-            { icon: Truck, label: 'Logistics', href: '/admin/logistics' },
-            { icon: Briefcase, label: 'Bags', href: '/admin/bags' },
-            { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks' },
-            { icon: QrCode, label: 'Scan', href: '/admin/scan' },
-            { icon: ClipboardList, label: 'Pack Slip', href: '/admin/pack-slip' },
-        ]
-    },
-    {
-        title: "Catalog",
-        items: [
-            { icon: Package, label: 'Products', href: '/admin/products' },
-            { icon: Layers, label: 'Categories', href: '/admin/categories' },
-            { icon: Archive, label: 'Inventory', href: '/admin/inventory' },
-            { icon: ImageIcon, label: 'Portfolio', href: '/admin/portfolio' },
-            { icon: Box, label: 'Packages', href: '/admin/packages' },
-        ]
-    },
-    {
-        title: "Management",
-        items: [
-            { icon: Users, label: 'Customers', href: '/admin/customers' },
-            { icon: UserCog, label: 'Team', href: '/admin/team' },
-        ]
-    },
-    {
-        title: "Communications",
-        items: [
             { icon: MessageSquare, label: 'Messages', href: '/admin/messages' },
+            { icon: Users, label: 'Customers', href: '/admin/customers' },
+            { icon: Tag, label: 'Discounts', href: '/admin/marketing/discounts' },
         ]
     },
     {
-        title: "Marketing",
+        title: "Operations",
         items: [
-            { icon: Tag, label: 'Discounts', href: '/admin/marketing/discounts' },
+            { id: "nav-logistics", icon: Truck, label: 'Logistics Hub', href: '/admin/logistics' },
+            { icon: CheckSquare, label: 'Team Tasks', href: '/admin/tasks' },
+        ]
+    },
+    {
+        title: "Store Catalog",
+        items: [
+            { id: "nav-products", icon: Package, label: 'Products', href: '/admin/products' },
+            { icon: ImageIcon, label: 'Portfolio', href: '/admin/portfolio' },
         ]
     },
     {
         title: "System",
         items: [
-            { icon: Eye, label: 'Visual Editor', href: '/admin/visual-editor' },
-            { icon: Settings, label: 'Settings', href: '/admin/settings' },
+            { icon: UserCog, label: 'Staff Management', href: '/admin/team' },
+            { icon: Settings, label: 'Global Settings', href: '/admin/settings' },
         ]
     }
 ]
@@ -313,6 +298,7 @@ export function ModernSidebar() {
 
             {/* Sidebar Container */}
             <aside
+                id="admin-sidebar"
                 className={cn(
                     "fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
                     // Glassmorphism background

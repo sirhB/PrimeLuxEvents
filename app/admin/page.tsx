@@ -50,8 +50,12 @@ export default async function AdminDashboardPage() {
             <div className="grid gap-8 grid-cols-1 xl:grid-cols-12">
                 {/* Left Column - Tasks & Meetings */}
                 <div className="xl:col-span-4 flex flex-col gap-8">
-                    <RevenueMiniChart />
-                    <TasksCard />
+                    <div id="admin-revenue">
+                        <RevenueMiniChart />
+                    </div>
+                    <div id="admin-tasks">
+                        <TasksCard />
+                    </div>
                     <MeetingsCard />
                 </div>
 

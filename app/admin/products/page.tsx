@@ -130,15 +130,35 @@ export default async function ProductsPage({
                 categoriesCount={categoriesCount}
             />
 
-            <Tabs defaultValue={stock_status === 'low_stock' || stock_status === 'out_of_stock' ? 'inventory' : 'all'} className="w-full">
-                <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
-                    <TabsTrigger value="all" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
-                        <Link href="/admin/products">All Products</Link>
+            <Tabs defaultValue="products" className="w-full">
+                <TabsList className="glass-card border-none p-1 bg-black/20 mb-8 w-fit h-auto">
+                    <TabsTrigger value="products" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/products">Products</Link>
                     </TabsTrigger>
-                    <TabsTrigger value="inventory" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
-                        <Link href="/admin/products?stock_status=low_stock">Needs Attention ({lowStockCount})</Link>
+                    <TabsTrigger value="categories" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/categories">Categories</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="inventory" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/inventory">Inventory Tracking</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="packages" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/packages">Packages</Link>
                     </TabsTrigger>
                 </TabsList>
+
+                <div className="flex items-center gap-2 mb-6">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Quick Filters:</span>
+                    <Tabs defaultValue={stock_status === 'low_stock' || stock_status === 'out_of_stock' ? 'inventory' : 'all'} className="w-auto">
+                        <TabsList className="bg-white/5 border-none p-0.5 h-8">
+                            <TabsTrigger value="all" asChild className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-[10px] uppercase font-bold tracking-widest px-4 h-7 rounded-lg">
+                                <Link href="/admin/products">All Products</Link>
+                            </TabsTrigger>
+                            <TabsTrigger value="inventory" asChild className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-[10px] uppercase font-bold tracking-widest px-4 h-7 rounded-lg">
+                                <Link href="/admin/products?stock_status=low_stock">Needs Attention ({lowStockCount})</Link>
+                            </TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                </div>
 
                 <div className="space-y-6 mt-6 animate-fade-in">
                     <div className="flex flex-col xxl:flex-row gap-6 items-start xxl:items-center justify-between glass-card p-6 rounded-3xl border-none">

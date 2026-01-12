@@ -103,10 +103,20 @@ export default async function CategoriesPage({
                 </div>
             </div>
 
-            <Tabs defaultValue="all" className="w-full">
-                <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
-                    <TabsTrigger value="all" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">All Categories</TabsTrigger>
-                    <TabsTrigger value="active" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Active</TabsTrigger>
+            <Tabs defaultValue="categories" className="w-full">
+                <TabsList className="glass-card border-none p-1 bg-black/20 mb-8 w-fit h-auto">
+                    <TabsTrigger value="products" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/products">Products</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="categories" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/categories">Categories</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="inventory" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/inventory">Inventory Tracking</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="packages" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/packages">Packages</Link>
+                    </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="all" className="space-y-6 mt-6 animate-fade-in">

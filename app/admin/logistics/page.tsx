@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Truck, MapPin, Calendar, Search, Filter, Map as MapIcon, List } from 'lucide-react'
+import { Truck, MapPin, Calendar, Search, Filter, Map as MapIcon, List, Package } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
 
@@ -99,6 +99,35 @@ export default function LogisticsPage() {
                                 <span className="text-gray-500">In Progress</span>
                                 <span className="font-bold text-blue-600">0</span>
                             </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="rounded-3xl border-gray-200 shadow-sm overflow-hidden border-gold/20 bg-gold/[0.02]">
+                        <CardHeader className="bg-gold/5 border-b border-gold/10 p-6">
+                            <CardTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2 text-gold">
+                                <Package className="h-4 w-4" />
+                                Operations Tools
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-4 space-y-2">
+                            <Button asChild variant="ghost" className="w-full justify-start gap-3 rounded-xl hover:bg-gold/10 hover:text-gold">
+                                <Link href="/admin/scan">
+                                    <Search className="h-4 w-4" />
+                                    Inventory Scanner
+                                </Link>
+                            </Button>
+                            <Button asChild variant="ghost" className="w-full justify-start gap-3 rounded-xl hover:bg-gold/10 hover:text-gold">
+                                <Link href="/admin/pack-slip">
+                                    <List className="h-4 w-4" />
+                                    Packing Slips
+                                </Link>
+                            </Button>
+                            <Button asChild variant="ghost" className="w-full justify-start gap-3 rounded-xl hover:bg-gold/10 hover:text-gold">
+                                <Link href="/admin/bags">
+                                    <Truck className="h-4 w-4" />
+                                    Warehouse Bags
+                                </Link>
+                            </Button>
                         </CardContent>
                     </Card>
                 </div>

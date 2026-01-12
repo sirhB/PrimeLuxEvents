@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, Check, Settings as SettingsIcon } from 'lucide-react'
+import { Loader2, Check, Settings as SettingsIcon, Eye, Palette } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getDistanceBetweenAddresses } from '@/lib/geocoding'
+import Link from 'next/link'
 
 export default function SettingsClient() {
     const [isLoading, setIsLoading] = useState(true)
@@ -178,9 +179,37 @@ export default function SettingsClient() {
                         Configure global settings for your store, tax, and delivery.
                     </p>
                 </div>
+                <div className="flex items-center gap-3">
+                    <Button asChild variant="outline" className="rounded-full border-[var(--dashboard-accent-gold)] text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/10 font-medium px-6">
+                        <Link href="/admin/visual-editor">
+                            <Eye className="mr-2 h-4 w-4" />
+                            Open Visual Editor
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
             <div className="grid gap-8 max-w-4xl">
+                {/* Branding & Appearance Shortcut */}
+                <Card className="border-none glass-card overflow-hidden border-gold/20 bg-gold/[0.02]">
+                    <CardHeader className="border-b border-gold/10 pb-6 bg-gold/5">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <CardTitle className="font-serif text-2xl text-gold">Appearance & Branding</CardTitle>
+                                <CardDescription className="text-gold/60">Customize your store's visual identity and landing pages</CardDescription>
+                            </div>
+                            <Palette className="h-8 w-8 text-gold/40" />
+                        </div>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                        <p className="text-sm text-[var(--dashboard-text-muted)] mb-6">
+                            Use the Visual Editor to modify your logo, brand colors, and section layouts in real-time. Changes are saved automatically and applied across your storefront.
+                        </p>
+                        <Button asChild className="rounded-full bg-gold hover:bg-gold/90 text-black font-bold uppercase text-[10px] tracking-widest px-8">
+                            <Link href="/admin/visual-editor">Launch Visual Editor</Link>
+                        </Button>
+                    </CardContent>
+                </Card>
                 {/* Tax Settings */}
                 <Card className="border-none glass-card overflow-hidden">
                     <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">

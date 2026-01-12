@@ -107,10 +107,25 @@ export default async function PackagesPage() {
             </div>
 
             {/* Main Content */}
-            <Tabs defaultValue="all" className="w-full">
-                <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
-                    <TabsTrigger value="all" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">All Packages</TabsTrigger>
-                    <TabsTrigger value="featured" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Featured Only</TabsTrigger>
+            <Tabs defaultValue="packages" className="w-full">
+                <TabsList className="glass-card border-none p-1 bg-black/20 mb-8 w-fit h-auto">
+                    <TabsTrigger value="products" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/products">Products</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="categories" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/categories">Categories</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="inventory" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/inventory">Inventory Tracking</Link>
+                    </TabsTrigger>
+                    <TabsTrigger value="packages" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
+                        <Link href="/admin/packages">Packages</Link>
+                    </TabsTrigger>
+                </TabsList>
+
+                <TabsList className="bg-white/5 border-none p-0.5 mb-6 w-fit h-8">
+                    <TabsTrigger value="all" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-[10px] uppercase font-bold tracking-widest px-4 h-7 rounded-lg">All Packages</TabsTrigger>
+                    <TabsTrigger value="featured" className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-[10px] uppercase font-bold tracking-widest px-4 h-7 rounded-lg">Featured Only</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="all" className="space-y-6 mt-6 animate-fade-in">
