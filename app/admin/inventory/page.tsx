@@ -13,21 +13,49 @@ import { Calendar, Package } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
+import { InventoryStatsCards } from '@/components/admin/inventory/inventory-stats-cards'
+import { LowStockWidget } from '@/components/admin/inventory/low-stock-widget'
 
 export default async function InventoryPage({
     searchParams,
 }: {
-    searchParams: Promise<{ page?: string; search?: string }>
+    searchParams: Promise<{ page?: string; search?: string; tab?: string }>
 }) {
-    const { page = '1', search } = await searchParams
+    const { page = '1', search, tab = 'all' } = await searchParams
     const supabase = await createClient()
 
+    // 1. Fetch Metrics (Parallel)
+    // Note: We need to calc total units from all products. 
+    // Since we can't do sum() easily without a view or rpc in simple select, we might fetch all id, qty_avail, qty_reserved for metrics if count is low, 
+    // or just use count for now.
+    // Let's rely on 'count' for Total Products.
+    // For Total Units and Reserved, we might need a separate query or assume approximate. 
+    // Let's try to get a sum via a small query if possible, or just exact counts for "Low Stock".
+
+    // We will do a full scan for metrics? No, that's heavy.
+    // Let's just count rows for "Total Products".
+    // For "Low Stock", count rows where available <= 2.
+    // For "Reserved", we can't easily sum without a function or fetching all. 
+    // Let's write a simple query to fetch *only* quantity columns for ALL products to aggregate in JS (assuming < 10k products, this is fine).
+
+    const metricsPromise = supabase
+        .from('products')
+        .select('quantity_available, quantity_reserved')
+
+    // 2. Fetch Low Stock Items (Limit 5 for widget)
+    const lowStockWidgetPromise = supabase
+        .from('products')
+        .select('id, name, sku, quantity_available, quantity_reserved')
+        .lte('quantity_available', 2)
+        .order('quantity_available', { ascending: true })
+        .limit(5)
+
+    // 3. Fetch Main Table Data
     const currentPage = parseInt(page)
     const pageSize = 10
     const start = (currentPage - 1) * pageSize
     const end = start + pageSize - 1
 
-    // Get products with availability info
     let query = supabase
         .from('products')
         .select('id, name, sku, quantity_available, quantity_reserved', { count: 'exact' })
@@ -37,7 +65,31 @@ export default async function InventoryPage({
         query = query.or(`name.ilike.%${search}%,sku.ilike.%${search}%`)
     }
 
-    const { data: products, count } = await query.range(start, end)
+    // If we are on low-stock tab, filter query
+    if (tab === 'low-stock') {
+        query = query.lte('quantity_available', 2)
+    }
+
+    const tablePromise = query.range(start, end)
+
+    const [
+        { data: allProductsMetrics },
+        { data: lowStockWidgetItems },
+        { data: products, count }
+    ] = await Promise.all([
+        metricsPromise,
+        lowStockWidgetPromise,
+        tablePromise
+    ])
+
+    // Calc aggregated metrics
+    const totalProducts = allProductsMetrics?.length || 0
+    const totalUnits = allProductsMetrics?.reduce((acc, p) => acc + p.quantity_available + p.quantity_reserved, 0) || 0
+    // Actually quantity_available is usually "on hand - reserved" or "total physical on hand"? 
+    // Usually Available = Total - Reserved. or Total = Available + Reserved.
+    // Let's assume Total Physical = Available + Reserved.
+    const totalReserved = allProductsMetrics?.reduce((acc, p) => acc + p.quantity_reserved, 0) || 0
+    const lowStockCount = allProductsMetrics?.filter(p => p.quantity_available <= 2).length || 0
 
     return (
         <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
@@ -57,21 +109,73 @@ export default async function InventoryPage({
                 </div>
             </div>
 
-            <Tabs defaultValue="all" className="w-full">
+            {/* Dashboard Statistics */}
+            <InventoryStatsCards
+                totalProducts={totalProducts}
+                totalUnits={totalUnits}
+                lowStockCount={lowStockCount}
+                totalReserved={totalReserved}
+            />
+
+            {/* Widgets Row - simplified for now, just header or maybe a chart later. 
+                For now we just have the Low Stock Widget. 
+                We can put it side by side with something else or full width?
+                Let's make it 1/3 width to the right, and maybe something else on left? 
+                Or just top level cards and then tabs.
+                Actually, the plan said "Middle Row: Low Stock Alert Widget".
+            */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Maybe a placeholder for 'Top Reserved' or 'Most Popular'? For now just take up space or be full width?
+                    Let's make low stock widget prominent.
+                 */}
+                <div className="lg:col-span-3">
+                    {/* For now, just render grid of widgets if we had more. 
+                         Since we only have one widget defined in plan, let's put it above tabs if it's important.
+                         But wait, if we have tabs, maybe the widget is redundant?
+                         No, dashboard view is nice.
+                     */}
+                </div>
+            </div>
+
+            {/* Let's put the Low Stock Widget in a grid with the stats? Or just below.
+                Let's put it in a 2-column layout with the table? No table is huge.
+                Let's just have it above the table for now, or maybe only show it if not searching.
+             */}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <LowStockWidget items={lowStockWidgetItems || []} />
+                {/* Placeholder for future widget */}
+                <Card className="glass-card border-none flex flex-col items-center justify-center p-6 text-[var(--dashboard-text-muted)]">
+                    <p>Most Popular Items (Coming Soon)</p>
+                </Card>
+            </div>
+
+
+            <Tabs defaultValue={tab || "all"} className="w-full">
                 <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
-                    <TabsTrigger value="all" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">All Inventory</TabsTrigger>
-                    <TabsTrigger value="low-stock" className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">Low Stock</TabsTrigger>
+                    <TabsTrigger value="all" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
+                        <a href="/admin/inventory?tab=all">All Inventory</a>
+                    </TabsTrigger>
+                    <TabsTrigger value="low-stock" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
+                        <a href="/admin/inventory?tab=low-stock">Low Stock ({lowStockCount})</a>
+                    </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="all" className="space-y-6 mt-6 animate-fade-in">
+                <div className="space-y-6 animate-fade-in">
                     <div className="flex items-center justify-between gap-4">
                         <SearchInput placeholder="Search inventory..." />
                     </div>
 
                     <Card className="border-none glass-card overflow-hidden">
                         <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">
-                            <CardTitle className="font-serif text-2xl">Product Availability</CardTitle>
-                            <CardDescription className="text-[var(--dashboard-text-muted)]">Current stock levels and rental reservations</CardDescription>
+                            <CardTitle className="font-serif text-2xl">
+                                {tab === 'low-stock' ? 'Low Stock Items' : 'Product Availability'}
+                            </CardTitle>
+                            <CardDescription className="text-[var(--dashboard-text-muted)]">
+                                {tab === 'low-stock'
+                                    ? 'Items with 2 or fewer units available'
+                                    : 'Current stock levels and rental reservations'}
+                            </CardDescription>
                         </CardHeader>
                         <CardContent className="p-0">
                             <Table>
@@ -86,7 +190,7 @@ export default async function InventoryPage({
                                 </TableHeader>
                                 <TableBody>
                                     {products?.map((product) => {
-                                        const available = product.quantity_available - product.quantity_reserved
+                                        const available = product.quantity_available
                                         const isLowStock = available <= 2
 
                                         return (
@@ -138,14 +242,9 @@ export default async function InventoryPage({
                             />
                         </div>
                     )}
-                </TabsContent>
-
-                <TabsContent value="low-stock" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
-                        <p className="text-[var(--dashboard-text-muted)] font-light">Low stock view coming soon</p>
-                    </div>
-                </TabsContent>
+                </div>
             </Tabs>
         </div>
     )
 }
+

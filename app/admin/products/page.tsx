@@ -1,22 +1,13 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
-import { Eye, MoreVertical, Pencil, Trash2, Plus, Package } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Plus } from 'lucide-react'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
 import { ProductFilters } from '@/components/admin/product-filters'
-import { DeleteProductButton } from '@/components/admin/delete-product-button'
 import { ProductsTable } from '@/components/admin/products-table'
+import { ProductStatsCards } from '@/components/admin/products/product-stats-cards'
 
 export default async function ProductsPage({
     searchParams,
@@ -26,16 +17,27 @@ export default async function ProductsPage({
     const { category_id, page = '1', search, sort = 'newest', stock_status } = await searchParams
     const supabase = await createClient()
 
-    const currentPage = parseInt(page)
-    const pageSize = 10
-    const start = (currentPage - 1) * pageSize
-    const end = start + pageSize - 1
-
     // Fetch categories for filter
     const { data: categories } = await supabase
         .from('categories')
         .select('id, name')
         .order('name')
+
+    // Fetch all products for metrics
+    const { data: allProducts } = await supabase
+        .from('products')
+        .select('price, quantity_available')
+
+    // Calculate metrics
+    const totalProducts = allProducts?.length || 0
+    const lowStockCount = allProducts?.filter(p => (p.quantity_available || 0) <= 5).length || 0
+    const totalValue = allProducts?.reduce((sum, p) => sum + (p.price || 0) * (p.quantity_available || 0), 0) || 0
+    const categoriesCount = categories?.length || 0
+
+    const currentPage = parseInt(page)
+    const pageSize = 10
+    const start = (currentPage - 1) * pageSize
+    const end = start + pageSize - 1
 
     let query = supabase
         .from('products')
@@ -52,11 +54,11 @@ export default async function ProductsPage({
 
     // Apply stock filtering
     if (stock_status === 'in_stock') {
-        query = query.gt('stock', 0)
+        query = query.gt('quantity_available', 5)
     } else if (stock_status === 'low_stock') {
-        query = query.gt('stock', 0).lte('stock', 5)
+        query = query.gt('quantity_available', 0).lte('quantity_available', 5)
     } else if (stock_status === 'out_of_stock') {
-        query = query.eq('stock', 0)
+        query = query.eq('quantity_available', 0)
     }
 
     // Apply sorting
@@ -112,13 +114,21 @@ export default async function ProductsPage({
                 </div>
             </div>
 
+            {/* Dashboard Statistics */}
+            <ProductStatsCards
+                totalProducts={totalProducts}
+                lowStockCount={lowStockCount}
+                totalValue={totalValue}
+                categoriesCount={categoriesCount}
+            />
+
             <Tabs defaultValue={stock_status === 'low_stock' || stock_status === 'out_of_stock' ? 'inventory' : 'all'} className="w-full">
                 <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
                     <TabsTrigger value="all" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
                         <Link href="/admin/products">All Products</Link>
                     </TabsTrigger>
                     <TabsTrigger value="inventory" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
-                        <Link href="/admin/products?stock_status=low_stock">Needs Attention</Link>
+                        <Link href="/admin/products?stock_status=low_stock">Needs Attention ({lowStockCount})</Link>
                     </TabsTrigger>
                 </TabsList>
 
@@ -149,3 +159,4 @@ export default async function ProductsPage({
         </div>
     )
 }
+

@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { CustomersClient } from './customers-client'
+import { CustomerStatsCards } from '@/components/admin/customers/customer-stats-cards'
+import { TopCustomersWidget } from '@/components/admin/customers/top-customers-widget'
 
 interface Customer {
     email: string
@@ -80,6 +82,19 @@ export default async function CustomersPage({
         (a, b) => b.totalSpent - a.totalSpent
     )
 
+    // Calculate metrics
+    const totalCustomers = customers.length
+    const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0)
+    const totalOrders = customers.reduce((sum, c) => sum + c.orderCount, 0)
+    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0
+
+    // Calculate new customers this month
+    const now = new Date()
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const newThisMonth = customers.filter(c =>
+        c.lastOrderDate && new Date(c.lastOrderDate) >= firstDayOfMonth
+    ).length
+
     const currentPage = parseInt(page)
     const pageSize = 10
 
@@ -99,11 +114,48 @@ export default async function CustomersPage({
     const paginatedCustomers = filteredCustomers.slice(start, start + pageSize)
 
     return (
-        <CustomersClient
-            customers={paginatedCustomers}
-            totalCount={totalCount}
-            currentPage={currentPage}
-            pageSize={pageSize}
-        />
+        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
+                            CRM
+                        </span>
+                    </div>
+                    <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
+                        Customers
+                    </h1>
+                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
+                        Customer insights and relationship management.
+                    </p>
+                </div>
+            </div>
+
+            {/* Dashboard Statistics */}
+            <CustomerStatsCards
+                totalCustomers={totalCustomers}
+                newThisMonth={newThisMonth}
+                totalRevenue={totalRevenue}
+                avgOrderValue={avgOrderValue}
+            />
+
+            {/* Top Customers Widget */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <TopCustomersWidget customers={customers} />
+                {/* Placeholder for future widget */}
+                <div className="glass-card border-none flex flex-col items-center justify-center p-6 text-[var(--dashboard-text-muted)]">
+                    <p>Recent Activity (Coming Soon)</p>
+                </div>
+            </div>
+
+            {/* Customer List */}
+            <CustomersClient
+                customers={paginatedCustomers}
+                totalCount={totalCount}
+                currentPage={currentPage}
+                pageSize={pageSize}
+            />
+        </div>
     )
 }
+
