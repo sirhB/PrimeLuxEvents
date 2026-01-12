@@ -85,7 +85,6 @@ export function SiteHeader() {
   const navLinks = [
     { href: "/catalog", label: "Collection" },
     { href: "/packages", label: "Packages" },
-    { href: "/inspiration/moodboard", label: "Mood Board" },
     { href: "/gallery", label: "Portfolio" },
     { href: "/how-it-works", label: "Process" },
     { href: "/about", label: "About" },
