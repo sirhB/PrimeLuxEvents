@@ -348,7 +348,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                             <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Complete Solutions</span>
                                             <h2 className="text-4xl md:text-7xl font-serif font-light text-white tracking-tighter">Curated Packages</h2>
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-12">
                                             {featuredPackages.slice(0, 3).map((pkg, index) => (
                                                 <motion.div
                                                     key={pkg.id}
