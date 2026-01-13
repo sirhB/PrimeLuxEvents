@@ -6,7 +6,8 @@ import { toast } from 'sonner'
 
 export type AdminNotification = {
     id: string
-    type: 'low_stock' | 'overbooked' | 'new_order' | 'payment_received'
+    user_id: string | null
+    type: 'low_stock' | 'overbooked' | 'new_order' | 'payment_received' | 'new_message' | 'task_assigned' | 'role_task_assigned'
     title: string
     message: string
     link?: string
@@ -26,6 +27,7 @@ export function useAdminNotifications() {
                 const { data, error } = await supabase
                     .from('admin_notifications')
                     .select('*')
+                    .or(`user_id.eq.${(await supabase.auth.getUser()).data.user?.id},user_id.is.null`)
                     .order('created_at', { ascending: false })
                     .limit(20)
 

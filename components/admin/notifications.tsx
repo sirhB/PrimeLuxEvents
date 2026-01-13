@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, Package, AlertTriangle, CreditCard, ShoppingCart, Check, Trash2 } from 'lucide-react'
+import { Bell, Package, AlertTriangle, CreditCard, ShoppingCart, Check, Trash2, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
@@ -24,6 +24,7 @@ export function AdminNotifications() {
             case 'overbooked': return <AlertTriangle className="h-4 w-4 text-red-500" />
             case 'payment_received': return <CreditCard className="h-4 w-4 text-green-500" />
             case 'new_order': return <ShoppingCart className="h-4 w-4 text-blue-500" />
+            case 'new_message': return <MessageSquare className="h-4 w-4 text-indigo-500" />
             default: return <Bell className="h-4 w-4 text-gray-500" />
         }
     }
