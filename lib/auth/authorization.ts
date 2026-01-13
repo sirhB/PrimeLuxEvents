@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import { cache } from 'react'
 
 export interface UserProfile {
@@ -50,7 +51,42 @@ export const getCurrentUser = cache(async (): Promise<UserProfile | null> => {
       .eq('is_active', true)
       .single()
 
-    if (profileError || !profile) return null
+    if (profileError || !profile) {
+      // If profile is missing, try to create it (self-healing)
+      // Use service role to ensure we can insert even if RLS is strict
+      const serviceRoleSupabase = createServiceRoleClient()
+      const { data: newProfile, error: createError } = await serviceRoleSupabase
+        .from('user_profiles')
+        .insert({
+          id: user.id,
+          email: user.email!,
+          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin User',
+          is_active: true
+        })
+        .select()
+        .single()
+
+      if (createError || !newProfile) {
+        console.error('Failed to auto-create profile:', createError)
+        return null
+      }
+
+      // Use the newly created profile
+      return {
+        id: newProfile.id,
+        email: newProfile.email,
+        full_name: newProfile.full_name,
+        avatar_url: newProfile.avatar_url,
+        phone: newProfile.phone,
+        job_title: newProfile.job_title,
+        department: newProfile.department,
+        hire_date: newProfile.hire_date,
+        is_active: newProfile.is_active,
+        last_login_at: newProfile.last_login_at,
+        roles: [],
+        permissions: []
+      }
+    }
 
     // 2. Get user roles
     const { data: userRoles, error: rolesError } = await supabase

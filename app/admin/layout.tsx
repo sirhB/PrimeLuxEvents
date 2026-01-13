@@ -1,5 +1,6 @@
 import { AdminSidebarProvider } from '@/components/admin/sidebar-context'
 import { AdminLayoutContent } from '@/components/admin/layout-content'
+import { ReadinessProvider } from '@/components/admin/readiness-provider'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,9 +11,11 @@ export default function AdminLayout({
 }) {
     return (
         <AdminSidebarProvider>
-            <AdminLayoutContent>
-                {children}
-            </AdminLayoutContent>
+            <ReadinessProvider>
+                <AdminLayoutContent>
+                    {children}
+                </AdminLayoutContent>
+            </ReadinessProvider>
         </AdminSidebarProvider>
     )
 }
