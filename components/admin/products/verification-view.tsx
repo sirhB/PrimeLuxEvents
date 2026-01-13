@@ -6,8 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
-import { Check, Edit2, Package, DollarSign, Archive, Image as ImageIcon, Search, ChevronRight } from 'lucide-react'
-import { updateAndVerifyProduct } from '@/app/admin/products/actions'
+import { Check, Edit2, Package, DollarSign, Archive, Image as ImageIcon, Search, ChevronRight, Trash2 } from 'lucide-react'
+import { updateAndVerifyProduct, deleteProduct } from '@/app/admin/products/actions'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
@@ -20,6 +20,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 interface VerificationViewProps {
     products: any[]
@@ -84,6 +95,30 @@ export function VerificationView({ products: initialProducts, categories }: Veri
             }
         } catch (error) {
             toast.error("Failed to verify product")
+        } finally {
+            setIsVerifying(false)
+        }
+    }
+
+    const handleDelete = async () => {
+        if (!currentProduct || isVerifying) return
+
+        setIsVerifying(true)
+        try {
+            await deleteProduct(currentProduct.id)
+            toast.success(`Deleted: ${currentProduct.name}`)
+
+            // Remove deleted product from list
+            const updatedProducts = products.filter(p => p.id !== currentProduct.id)
+            setProducts(updatedProducts)
+
+            // Adjust index
+            if (updatedProducts.length > 0) {
+                const newIndex = currentIndex >= updatedProducts.length ? updatedProducts.length - 1 : currentIndex
+                setCurrentIndex(newIndex)
+            }
+        } catch (error) {
+            toast.error("Failed to delete product")
         } finally {
             setIsVerifying(false)
         }
@@ -304,6 +339,35 @@ export function VerificationView({ products: initialProducts, categories }: Veri
                                     </div>
 
                                     <div className="flex items-center gap-4 pt-4">
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    disabled={isVerifying}
+                                                    className="h-16 w-16 rounded-full bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 flex-shrink-0"
+                                                >
+                                                    <Trash2 className="h-6 w-6" />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent className="bg-[#1A1A1A] border-white/10 text-white">
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Delete Product?</AlertDialogTitle>
+                                                    <AlertDialogDescription className="text-[var(--dashboard-text-muted)]">
+                                                        This will permanently remove <strong>{currentProduct.name}</strong> from the database. This action cannot be undone.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel className="bg-white/5 border-white/10 text-white hover:bg-white/10">Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction
+                                                        onClick={handleDelete}
+                                                        className="bg-red-500 hover:bg-red-600 text-white"
+                                                    >
+                                                        Delete Product
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+
                                         <Button
                                             onClick={handleVerify}
                                             disabled={isVerifying}

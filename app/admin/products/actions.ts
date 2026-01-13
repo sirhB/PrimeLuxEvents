@@ -132,6 +132,7 @@ export async function deleteProduct(id: string) {
     }
 
     revalidatePath('/admin/products')
+    revalidatePath('/admin/products/verify')
 }
 
 export async function verifyProduct(id: string) {

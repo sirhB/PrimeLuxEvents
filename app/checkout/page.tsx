@@ -58,6 +58,9 @@ export default function CheckoutPage() {
     const [agreesToRentalAgreement, setAgreesToRentalAgreement] = useState(false)
     const [signatureData, setSignatureData] = useState<string | null>(null)
     const [clientSecret, setClientSecret] = useState<string | null>(null)
+    const [paymentChoice, setPaymentChoice] = useState<'full' | 'deposit'>('full')
+    const [customAmount, setCustomAmount] = useState<string>('')
+    const [paidAmount, setPaidAmount] = useState<number>(0)
 
 
     // Form Data
@@ -347,7 +350,17 @@ export default function CheckoutPage() {
                     }))
 
                     const addressToUse = formData.deliveryAddress || formData.venueAddress
-                    const result = await createPaymentIntent(cartItems, addressToUse)
+
+                    // Default paidAmount is total totalAmount
+                    let initialPaidAmount = totals?.totalAmount || 0
+                    if (paymentChoice === 'deposit') {
+                        const minDeposit = Math.ceil(initialPaidAmount * 0.5)
+                        const enteredAmount = customAmount ? parseInt(customAmount.replace(/[^0-9]/g, '')) * 100 : 0
+                        initialPaidAmount = Math.max(minDeposit, enteredAmount)
+                    }
+                    setPaidAmount(initialPaidAmount)
+
+                    const result = await createPaymentIntent(cartItems, addressToUse, initialPaidAmount)
 
                     if (result.clientSecret) {
                         setClientSecret(result.clientSecret)
@@ -426,7 +439,7 @@ export default function CheckoutPage() {
                 }
             }
 
-            const result = await createOrder(finalFormData, cartItems, paymentIntentId, signatureUrl)
+            const result = await createOrder(finalFormData, cartItems, paymentIntentId, signatureUrl, paidAmount)
 
             if (result.success) {
                 setIsSuccess(true)
@@ -1173,6 +1186,113 @@ export default function CheckoutPage() {
                                 </div>
                             </div>
 
+                            {/* Payment Choice */}
+                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
+                                <div className="p-10 border-b border-border/5">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
+                                            <div className="font-serif font-bold text-gold text-xl">$</div>
+                                        </div>
+                                        <h3 className="text-2xl font-serif font-bold text-gray-900">Payment Amount</h3>
+                                    </div>
+                                </div>
+                                <div className="p-10 space-y-8">
+                                    <div className="grid sm:grid-cols-2 gap-6">
+                                        <button
+                                            onClick={() => {
+                                                setPaymentChoice('full')
+                                                const amount = totals?.totalAmount || 0
+                                                setPaidAmount(amount)
+                                                // Trigger payment intent update
+                                                setCurrentStep(2)
+                                                setTimeout(() => handleNextStep(), 10)
+                                            }}
+                                            className={cn(
+                                                "p-8 rounded-[2rem] border-2 text-left transition-all duration-300 space-y-2",
+                                                paymentChoice === 'full' ? "border-gold bg-gold/5 shadow-lg shadow-gold/5" : "border-gray-100 hover:border-gold/30 hover:bg-gray-50/50"
+                                            )}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Option 1</span>
+                                                {paymentChoice === 'full' && <Check className="h-4 w-4 text-gold" />}
+                                            </div>
+                                            <h4 className="text-xl font-serif font-bold text-gray-900">Pay in Full</h4>
+                                            <p className="text-sm text-gray-500 font-light">Settle your complete balance today.</p>
+                                            <p className="text-xl font-bold text-gold mt-4">{totals ? formatCurrency(totals.totalAmount) : '...'}</p>
+                                        </button>
+
+                                        <button
+                                            onClick={() => {
+                                                setPaymentChoice('deposit')
+                                                const minDeposit = Math.ceil((totals?.totalAmount || 0) * 0.5)
+                                                setPaidAmount(minDeposit)
+                                                setCustomAmount((minDeposit / 100).toString())
+                                                // Trigger payment intent update
+                                                setCurrentStep(2)
+                                                setTimeout(() => handleNextStep(), 10)
+                                            }}
+                                            className={cn(
+                                                "p-8 rounded-[2rem] border-2 text-left transition-all duration-300 space-y-2",
+                                                paymentChoice === 'deposit' ? "border-gold bg-gold/5 shadow-lg shadow-gold/5" : "border-gray-100 hover:border-gold/30 hover:bg-gray-50/50"
+                                            )}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Option 2</span>
+                                                {paymentChoice === 'deposit' && <Check className="h-4 w-4 text-gold" />}
+                                            </div>
+                                            <h4 className="text-xl font-serif font-bold text-gray-900">Pay Deposit</h4>
+                                            <p className="text-sm text-gray-500 font-light">Pay at least 50% now, balance later.</p>
+                                            <p className="text-xl font-bold text-gold mt-4">Min. {totals ? formatCurrency(Math.ceil(totals.totalAmount * 0.5)) : '...'}</p>
+                                        </button>
+                                    </div>
+
+                                    {paymentChoice === 'deposit' && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            className="space-y-4 pt-4 border-t border-border/5"
+                                        >
+                                            <Label htmlFor="custom-amount" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Custom Payment Amount ($)</Label>
+                                            <div className="relative">
+                                                <span className="absolute left-0 bottom-4 text-2xl font-light text-gray-400">$</span>
+                                                <Input
+                                                    id="custom-amount"
+                                                    type="number"
+                                                    value={customAmount}
+                                                    onChange={(e) => {
+                                                        setCustomAmount(e.target.value)
+                                                        const val = parseFloat(e.target.value) * 100
+                                                        const min = Math.ceil((totals?.totalAmount || 0) * 0.5)
+                                                        if (val >= min && val <= (totals?.totalAmount || 0)) {
+                                                            setPaidAmount(val)
+                                                            // Trigger payment intent update with debounce or separate button
+                                                        }
+                                                    }}
+                                                    onBlur={() => {
+                                                        // Update payment intent on blur to avoid too many requests
+                                                        setCurrentStep(2)
+                                                        setTimeout(() => handleNextStep(), 10)
+                                                    }}
+                                                    className="bg-transparent border-0 border-b border-gray-200 rounded-none pl-6 h-14 focus-visible:ring-0 focus-visible:border-gold transition-colors font-light text-2xl"
+                                                    placeholder={((totals?.totalAmount || 0) / 200).toString()}
+                                                />
+                                            </div>
+                                            {(parseFloat(customAmount) * 100) < Math.ceil((totals?.totalAmount || 0) * 0.5) && (
+                                                <p className="text-xs text-red-500 font-medium flex items-center gap-1">
+                                                    <AlertCircle className="h-3 w-3" /> Minimum deposit is 50% ({formatCurrency(Math.ceil((totals?.totalAmount || 0) * 0.5))})
+                                                </p>
+                                            )}
+                                        </motion.div>
+                                    )}
+
+                                    <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <p className="text-xs text-gray-600 leading-relaxed italic">
+                                            "The remaining balance must be settled according to our final settlement policy as outlined in the <Link href="/rental-agreement" target="_blank" className="text-gold font-bold hover:underline">Rental Agreement</Link>."
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Payment Method */}
                             <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
                                 <div className="p-10 border-b border-border/5">
@@ -1180,16 +1300,16 @@ export default function CheckoutPage() {
                                         <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
                                             <Truck className="h-6 w-6 text-gold" />
                                         </div>
-                                        <h3 className="text-2xl font-serif font-bold text-gray-900">Payment Method</h3>
+                                        <h3 className="text-2xl font-serif font-bold text-gray-900">Payment Details</h3>
                                     </div>
                                 </div>
                                 <div className="p-10">
                                     {clientSecret ? (
                                         <Elements stripe={stripePromise} options={{ clientSecret }}>
                                             <StripePaymentForm
-                                                amount={totals?.totalAmount || 0}
+                                                amount={paidAmount || totals?.totalAmount || 0}
                                                 onSuccess={handlePaymentSuccess}
-                                                disabled={!agreesToRentalAgreement || !signatureData}
+                                                disabled={!agreesToRentalAgreement || !signatureData || (paymentChoice === 'deposit' && paidAmount < Math.ceil((totals?.totalAmount || 0) * 0.5))}
                                             />
                                         </Elements>
                                     ) : (

@@ -274,16 +274,79 @@ export function CartSheet() {
                   }, 0))}
                 </span>
               </div>
-              <p className="text-[10px] text-gray-500 font-light leading-relaxed uppercase tracking-[0.2em] text-center">
-                Final pricing will be calculated at checkout.
-              </p>
+
+              {(() => {
+                const subtotal = items.reduce((acc, item) => {
+                  if (item.packageId && item.packageData) {
+                    return acc + (item.packageData.price * item.quantity)
+                  }
+                  if (item.productId) {
+                    const product = products.find(p => p.id === item.productId)
+                    if (!product) return acc
+                    const price = product.rental_price_daily || product.price
+                    const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
+                    return acc + (price + modifiersPrice) * item.quantity
+                  }
+                  return acc
+                }, 0)
+                const MINIMUM_ORDER = 15000 // $150.00 in cents
+                const remaining = MINIMUM_ORDER - subtotal
+
+                if (subtotal < MINIMUM_ORDER) {
+                  return (
+                    <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 space-y-2">
+                      <p className="text-xs font-bold text-red-400 uppercase tracking-wider text-center">
+                        Minimum Order: {formatCurrency(MINIMUM_ORDER)}
+                      </p>
+                      <p className="text-[10px] text-red-300 text-center">
+                        Add {formatCurrency(remaining)} more to checkout
+                      </p>
+                    </div>
+                  )
+                }
+
+                return (
+                  <p className="text-[10px] text-gray-500 font-light leading-relaxed uppercase tracking-[0.2em] text-center">
+                    Final pricing will be calculated at checkout.
+                  </p>
+                )
+              })()}
             </div>
             <Button
-              className="w-full h-16 bg-gold text-black rounded-full text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all duration-500 group shadow-2xl"
+              className="w-full h-16 bg-gold text-black rounded-full text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all duration-500 group shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gold"
               onClick={() => {
-                setIsOpen(false)
-                window.location.href = '/checkout'
+                const subtotal = items.reduce((acc, item) => {
+                  if (item.packageId && item.packageData) {
+                    return acc + (item.packageData.price * item.quantity)
+                  }
+                  if (item.productId) {
+                    const product = products.find(p => p.id === item.productId)
+                    if (!product) return acc
+                    const price = product.rental_price_daily || product.price
+                    const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
+                    return acc + (price + modifiersPrice) * item.quantity
+                  }
+                  return acc
+                }, 0)
+
+                if (subtotal >= 15000) {
+                  setIsOpen(false)
+                  window.location.href = '/checkout'
+                }
               }}
+              disabled={items.reduce((acc, item) => {
+                if (item.packageId && item.packageData) {
+                  return acc + (item.packageData.price * item.quantity)
+                }
+                if (item.productId) {
+                  const product = products.find(p => p.id === item.productId)
+                  if (!product) return acc
+                  const price = product.rental_price_daily || product.price
+                  const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
+                  return acc + (price + modifiersPrice) * item.quantity
+                }
+                return acc
+              }, 0) < 15000}
             >
               Secure Checkout <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>

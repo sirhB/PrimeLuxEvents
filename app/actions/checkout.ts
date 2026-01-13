@@ -247,7 +247,7 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
 /**
  * Create a new order
  */
-export async function createOrder(formData: CheckoutFormData, items: CartItem[], paymentIntentId?: string, signatureUrl?: string) {
+export async function createOrder(formData: CheckoutFormData, items: CartItem[], paymentIntentId?: string, signatureUrl?: string, paidAmount?: number) {
     try {
         const supabase = await createClient()
 
@@ -322,7 +322,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         if (!finalPaymentIntentId) {
             if (stripe) {
                 const paymentIntent = await stripe.paymentIntents.create({
-                    amount: totals.totalAmount,
+                    amount: paidAmount ?? totals.totalAmount,
                     currency: 'usd',
                     automatic_payment_methods: {
                         enabled: true,
@@ -330,7 +330,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 })
                 finalPaymentIntentId = paymentIntent.id
             } else {
-                const paymentIntent = await createMockPaymentIntent(totals.totalAmount)
+                const paymentIntent = await createMockPaymentIntent(paidAmount ?? totals.totalAmount)
                 finalPaymentIntentId = paymentIntent.id
             }
         }
@@ -424,7 +424,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 same_day_pickup: formData.sameDayPickup || false,
                 signature_url: signatureUrl,
                 signed_at: signatureUrl ? new Date().toISOString() : null,
-                balance_paid: paymentIntentId ? totals.totalAmount : 0,
+                balance_paid: paidAmount ?? (paymentIntentId ? totals.totalAmount : 0),
             })
             .select()
             .single()

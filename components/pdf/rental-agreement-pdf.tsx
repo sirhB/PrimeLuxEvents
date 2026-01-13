@@ -118,10 +118,13 @@ export const RentalAgreementPDF = ({ order, settings }: RentalAgreementProps) =>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>1. FINANCIAL COMMITMENTS</Text>
                     <Text style={styles.text}>
+                        <Text style={styles.bold}>Minimum Order Requirement:</Text> All orders must meet a minimum subtotal of $150.00 (excluding delivery fees and applicable taxes) to proceed to checkout. This ensures operational efficiency and maintains our service standards.
+                    </Text>
+                    <Text style={styles.text}>
                         <Text style={styles.bold}>Reservation Deposit:</Text> A non-refundable 50% deposit is required at point of engagement to secure curated items. This ensures inventory exclusivity for your event date.
                     </Text>
                     <Text style={styles.text}>
-                        <Text style={styles.bold}>Final Settlement:</Text> Remaining balances are due seven (7) days prior to delivery. Late settlements may trigger automatic cancellation without refund or incur statutory late charges.
+                        <Text style={styles.bold}>Final Settlement:</Text> Remaining balances are due fourteen (14) days prior to delivery. Late settlements may trigger automatic cancellation without refund or incur statutory late charges.
                     </Text>
                 </View>
 
