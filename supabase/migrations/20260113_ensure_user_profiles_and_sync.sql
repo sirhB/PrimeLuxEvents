@@ -9,7 +9,7 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_metadata->>'full_name', NEW.email),
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
     true
   )
   ON CONFLICT (id) DO UPDATE SET
@@ -30,7 +30,7 @@ INSERT INTO public.user_profiles (id, email, full_name, is_active)
 SELECT 
   id, 
   email, 
-  COALESCE(raw_user_metadata->>'full_name', email),
+  COALESCE(raw_user_meta_data->>'full_name', email),
   true
 FROM auth.users
 ON CONFLICT (id) DO NOTHING;

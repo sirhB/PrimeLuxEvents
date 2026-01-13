@@ -26,28 +26,54 @@ export async function POST(request: NextRequest) {
         // Get current user for invited_by
         const { data: { user } } = await supabase.auth.getUser()
 
-        const { data, error } = await supabase
+        // Check for existing invitation
+        const { data: existingInvitation } = await supabase
             .from('user_invitations')
-            .insert({
-                email: email.toLowerCase().trim(),
-                role_ids,
-                temp_password,
-                invitation_token,
-                expires_at: expires_at.toISOString(),
-                invited_by: user?.id
-            })
-            .select()
+            .select('id, status')
+            .eq('email', email.toLowerCase().trim())
             .single()
 
-        if (error) {
-            if (error.code === '23505') { // Unique constraint violation
-                return NextResponse.json(
-                    { error: 'An invitation for this email already exists' },
-                    { status: 409 }
-                )
-            }
-            throw error
+        if (existingInvitation?.status === 'accepted') {
+            return NextResponse.json(
+                { error: 'A user with this email has already joined the team' },
+                { status: 409 }
+            )
         }
+
+        const invitationData = {
+            email: email.toLowerCase().trim(),
+            role_ids,
+            temp_password,
+            invitation_token,
+            expires_at: expires_at.toISOString(),
+            invited_by: user?.id,
+            status: 'pending',
+            updated_at: new Date().toISOString()
+        }
+
+        let result;
+        if (existingInvitation) {
+            // Update existing invitation
+            result = await supabase
+                .from('user_invitations')
+                .update(invitationData)
+                .eq('id', existingInvitation.id)
+                .select()
+                .single()
+        } else {
+            // Create new invitation
+            result = await supabase
+                .from('user_invitations')
+                .insert(invitationData)
+                .select()
+                .single()
+        }
+
+        if (result.error) {
+            throw result.error
+        }
+
+        const data = result.data
 
         // TODO: Send invitation email
         // For now, just return success with the invitation details
