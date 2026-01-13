@@ -54,7 +54,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface SidebarItemProps {
     item: {
-        id?: string
         icon: React.ElementType
         label: string
         href: string
@@ -65,11 +64,10 @@ interface SidebarItemProps {
 }
 
 const SidebarItem = ({ item, isActive, isCollapsed, onClick }: SidebarItemProps) => {
-    const Icon = item.icon as any
+    const Icon = item.icon
 
     const content = (
         <Link
-            id={item.id}
             href={item.href}
             onClick={onClick}
             className={cn(
@@ -231,14 +229,14 @@ const sidebarGroups = [
     {
         title: "Operations",
         items: [
-            { id: "nav-logistics", icon: Truck, label: 'Logistics Hub', href: '/admin/logistics' },
+            { icon: Truck, label: 'Logistics Hub', href: '/admin/logistics' },
             { icon: CheckSquare, label: 'Team Tasks', href: '/admin/tasks' },
         ]
     },
     {
         title: "Store Catalog",
         items: [
-            { id: "nav-products", icon: Package, label: 'Products', href: '/admin/products' },
+            { icon: Package, label: 'Products', href: '/admin/products' },
             { icon: ImageIcon, label: 'Portfolio', href: '/admin/portfolio' },
         ]
     },
@@ -298,7 +296,6 @@ export function ModernSidebar() {
 
             {/* Sidebar Container */}
             <aside
-                id="admin-sidebar"
                 className={cn(
                     "fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
                     // Glassmorphism background
