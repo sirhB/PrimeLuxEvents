@@ -161,13 +161,21 @@ export async function POST(
         }
 
         // Mark invitation as accepted
-        await supabase
+        const { error: updateError } = await supabase
             .from('user_invitations')
             .update({
                 status: 'accepted',
                 accepted_at: new Date().toISOString()
             })
             .eq('id', invitation.id)
+
+        if (updateError) {
+            console.error('Error updating invitation status:', updateError)
+            return NextResponse.json(
+                { error: 'Failed to complete invitation process' },
+                { status: 500 }
+            )
+        }
 
         return NextResponse.json({
             success: true,

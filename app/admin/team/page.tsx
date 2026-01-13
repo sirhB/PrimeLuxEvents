@@ -24,7 +24,7 @@ export default async function TeamManagementPage() {
         .from('user_profiles')
         .select(`
             *,
-            user_roles (
+            user_roles!user_id (
                 roles (
                     id,
                     name,

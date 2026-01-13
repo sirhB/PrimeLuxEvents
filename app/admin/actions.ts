@@ -426,7 +426,7 @@ export async function getRoleMembers(roleId: string): Promise<{ success: boolean
         const { data, error } = await supabase
             .from('user_roles')
             .select(`
-                user_profiles (
+                user_profiles!user_id (
                     id,
                     email,
                     full_name,
