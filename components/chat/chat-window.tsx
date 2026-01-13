@@ -17,6 +17,11 @@ interface Message {
     sender_id: string | null
     is_ai: boolean
     created_at: string
+    sender?: {
+        full_name: string | null
+        avatar_url: string | null
+        email: string
+    }
 }
 
 interface ChatWindowProps {
@@ -33,6 +38,7 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
     const [isSending, setIsSending] = useState(false)
     const [isGeneratingAI, setIsGeneratingAI] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
+    const [senderProfiles, setSenderProfiles] = useState<Record<string, any>>({})
     const scrollRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
 
@@ -51,6 +57,10 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
                 },
                 (payload) => {
                     const newMsg = payload.new as Message
+                    // If it's a new message, we might need to fetch the sender profile if we don't have it
+                    if (newMsg.sender_id && !senderProfiles[newMsg.sender_id]) {
+                        fetchSenderProfile(newMsg.sender_id)
+                    }
                     setMessages(prev => {
                         // Prevent duplicates if we already added it manually
                         if (prev.some(m => m.id === newMsg.id)) return prev
@@ -68,15 +78,45 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
 
     const fetchMessages = async () => {
         setIsLoading(true)
-        const { data } = await supabase
+        const { data, error } = await supabase
             .from('messages')
-            .select('*')
+            .select(`
+                *,
+                sender:user_profiles!messages_sender_id_fkey (
+                    full_name,
+                    avatar_url,
+                    email
+                )
+            `)
             .eq('conversation_id', conversationId)
             .order('created_at', { ascending: true })
 
-        if (data) setMessages(data)
+        if (error) {
+            console.error('Error fetching messages:', error)
+            // Fallback to simple fetch if join fails
+            const { data: simpleData } = await supabase
+                .from('messages')
+                .select('*')
+                .eq('conversation_id', conversationId)
+                .order('created_at', { ascending: true })
+            if (simpleData) setMessages(simpleData)
+        } else if (data) {
+            setMessages(data as any)
+        }
         setIsLoading(false)
         scrollToBottom()
+    }
+
+    const fetchSenderProfile = async (userId: string) => {
+        const { data } = await supabase
+            .from('user_profiles')
+            .select('full_name, avatar_url, email')
+            .eq('id', userId)
+            .single()
+
+        if (data) {
+            setSenderProfiles(prev => ({ ...prev, [userId]: data }))
+        }
     }
 
     const scrollToBottom = () => {
@@ -210,26 +250,64 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
                     ) : (
                         messages.map((msg, i) => {
                             const isMe = msg.sender_id === currentUserId
-                            const showTime = i === 0 || new Date(msg.created_at).getTime() - new Date(messages[i - 1].created_at).getTime() > 1000 * 60 * 5 // 5 mins
+                            const sender = msg.sender || (msg.sender_id ? senderProfiles[msg.sender_id] : null)
+                            const showTimeDivider = i === 0 || new Date(msg.created_at).getTime() - new Date(messages[i - 1].created_at).getTime() > 1000 * 60 * 30 // 30 mins
+                            const showSenderName = !isMe && !msg.is_ai && (i === 0 || messages[i - 1].sender_id !== msg.sender_id)
 
                             return (
                                 <div key={msg.id} className={cn("flex flex-col", isMe ? "items-end" : "items-start")}>
-                                    {showTime && (
-                                        <div className="text-[10px] text-[var(--dashboard-text-muted)] uppercase tracking-widest my-2 text-center w-full">
-                                            {format(new Date(msg.created_at), 'h:mm a')}
+                                    {showTimeDivider && (
+                                        <div className="text-[10px] text-[var(--dashboard-text-muted)] uppercase tracking-widest my-4 text-center w-full opacity-50">
+                                            {format(new Date(msg.created_at), 'MMMM d, h:mm a')}
                                         </div>
                                     )}
-                                    <div
-                                        className={cn(
-                                            "max-w-[80%] rounded-2xl px-5 py-3 shadow-sm",
-                                            isMe
-                                                ? "bg-[var(--dashboard-accent-gold)] text-black rounded-tr-sm"
-                                                : msg.is_ai
-                                                    ? "bg-gradient-to-br from-gold/20 to-amber-900/40 text-gold border border-gold/30 rounded-tl-sm backdrop-blur-md"
-                                                    : "bg-[var(--dashboard-card)] text-[var(--dashboard-text)] rounded-tl-sm border border-[var(--dashboard-border)]"
+
+                                    <div className={cn(
+                                        "flex gap-2 max-w-[85%]",
+                                        isMe ? "flex-row-reverse" : "flex-row"
+                                    )}>
+                                        {!isMe && (
+                                            <div className="mt-1 shrink-0">
+                                                <div className="h-8 w-8 rounded-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] flex items-center justify-center overflow-hidden">
+                                                    {sender?.avatar_url ? (
+                                                        <img src={sender.avatar_url} alt="" className="h-full w-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-[10px] font-bold text-[var(--dashboard-text-muted)]">
+                                                            {(sender?.full_name || sender?.email || 'U').charAt(0).toUpperCase()}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
                                         )}
-                                    >
-                                        <p className="text-sm leading-relaxed">{msg.content}</p>
+
+                                        <div className={cn("flex flex-col", isMe ? "items-end" : "items-start")}>
+                                            {showSenderName && (
+                                                <span className="text-[10px] font-bold text-[var(--dashboard-text-muted)] mb-1 ml-1 uppercase tracking-tight">
+                                                    {sender?.full_name || sender?.email || 'Unknown User'}
+                                                </span>
+                                            )}
+
+                                            <div
+                                                className={cn(
+                                                    "rounded-2xl px-4 py-2.5 shadow-sm group relative",
+                                                    isMe
+                                                        ? "bg-[var(--dashboard-accent-gold)] text-black rounded-tr-sm"
+                                                        : msg.is_ai
+                                                            ? "bg-gradient-to-br from-gold/20 to-amber-900/40 text-gold border border-gold/30 rounded-tl-sm backdrop-blur-md"
+                                                            : "bg-[var(--dashboard-card)] text-[var(--dashboard-text)] rounded-tl-sm border border-[var(--dashboard-border)]"
+                                                )}
+                                            >
+                                                <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+
+                                                {/* Timestamp in bubble or below */}
+                                                <div className={cn(
+                                                    "text-[9px] mt-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap",
+                                                    isMe ? "text-black/60" : "text-[var(--dashboard-text-muted)]"
+                                                )}>
+                                                    {format(new Date(msg.created_at), 'h:mm a')}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )
