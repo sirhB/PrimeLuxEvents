@@ -95,3 +95,66 @@ export async function GET() {
         )
     }
 }
+
+export async function DELETE(request: NextRequest) {
+    try {
+        await requirePermission('users.update') // Use users.update for cancelling
+
+        const { searchParams } = new URL(request.url)
+        const id = searchParams.get('id')
+
+        if (!id) {
+            return NextResponse.json({ error: 'ID is required' }, { status: 400 })
+        }
+
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('user_invitations')
+            .update({ status: 'cancelled' })
+            .eq('id', id)
+
+        if (error) throw error
+
+        return NextResponse.json({ success: true })
+
+    } catch (error) {
+        console.error('Error cancelling invitation:', error)
+        return NextResponse.json(
+            { error: 'Failed to cancel invitation' },
+            { status: 500 }
+        )
+    }
+}
+
+export async function PATCH(request: NextRequest) {
+    try {
+        await requirePermission('users.update')
+
+        const body = await request.json()
+        const { id, expires_at } = body
+
+        if (!id || !expires_at) {
+            return NextResponse.json({ error: 'ID and expires_at are required' }, { status: 400 })
+        }
+
+        const supabase = await createClient()
+        const { error } = await supabase
+            .from('user_invitations')
+            .update({
+                expires_at,
+                status: 'pending' // Reset to pending if it was expired
+            })
+            .eq('id', id)
+
+        if (error) throw error
+
+        return NextResponse.json({ success: true })
+
+    } catch (error) {
+        console.error('Error updating invitation:', error)
+        return NextResponse.json(
+            { error: 'Failed to update invitation' },
+            { status: 500 }
+        )
+    }
+}

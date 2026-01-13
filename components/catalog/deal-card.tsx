@@ -41,37 +41,37 @@ export function DealCard({ name, description, price, imageUrl, onViewDetails, de
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
 
                     {/* Deal Badge */}
-                    <div className="absolute top-4 right-4 z-10">
-                        <div className="bg-gold text-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-2 border border-white/20">
-                            <Zap className="h-3 w-3 fill-current" />
-                            <span className="font-bold text-[10px] tracking-[0.2em] uppercase">{dealBadge}</span>
+                    <div className="absolute top-2 right-2 md:top-4 md:right-4 z-10">
+                        <div className="bg-gold text-black px-2 py-1 md:px-4 md:py-1.5 rounded-full shadow-lg flex items-center gap-1 md:gap-2 border border-white/20">
+                            <Zap className="h-2 w-2 md:h-3 md:w-3 fill-current" />
+                            <span className="font-bold text-[8px] md:text-[10px] tracking-widest md:tracking-[0.2em] uppercase">{dealBadge}</span>
                         </div>
                     </div>
 
                     {/* Limited Time Indicator */}
-                    <div className="absolute bottom-4 left-4 flex items-center gap-2 text-white/90 bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10">
-                        <Clock className="h-3 w-3" />
-                        <span className="text-[10px] font-bold tracking-wider uppercase">Limited Time</span>
+                    <div className="absolute bottom-2 left-2 md:bottom-4 md:left-4 flex items-center gap-1 md:gap-2 text-white/90 bg-black/40 backdrop-blur-md px-2 py-1 md:px-4 md:py-1.5 rounded-full border border-white/10">
+                        <Clock className="h-2 w-2 md:h-3 md:w-3" />
+                        <span className="text-[8px] md:text-[10px] font-bold tracking-wider uppercase">Limited Time</span>
                     </div>
                 </div>
 
                 {/* Content Section */}
-                <div className="p-8 flex flex-col flex-grow">
-                    <h3 className="text-2xl md:text-3xl font-serif font-light mb-3 text-foreground group-hover:text-gold transition-colors duration-300 tracking-tight">
+                <div className="p-4 md:p-8 flex flex-col flex-grow">
+                    <h3 className="text-lg md:text-3xl font-serif font-light mb-2 md:mb-3 text-foreground group-hover:text-gold transition-colors duration-300 tracking-tight line-clamp-1 md:line-clamp-none">
                         {name}
                     </h3>
 
-                    <p className="text-muted-foreground/70 text-sm mb-8 line-clamp-2 flex-grow font-light leading-relaxed">
+                    <p className="text-muted-foreground/70 text-[10px] md:text-sm mb-4 md:mb-8 line-clamp-2 flex-grow font-light leading-relaxed">
                         {description || "Exclusive deal - don't miss out on this premium selection."}
                     </p>
 
                     <div className="flex items-end justify-between mt-auto pt-6 border-t border-border/5">
                         <div>
-                            <div className="text-[10px] text-muted-foreground/50 line-through mb-1 uppercase tracking-widest font-medium">
+                            <div className="text-[8px] md:text-[10px] text-muted-foreground/50 line-through mb-0.5 md:mb-1 uppercase tracking-widest font-medium">
                                 Regular {formatCurrency(price * 1.3)}
                             </div>
                             <div className="flex items-baseline gap-2">
-                                <span className="text-3xl font-light text-foreground">
+                                <span className="text-xl md:text-3xl font-light text-foreground">
                                     {formatCurrency(price)}
                                 </span>
                             </div>

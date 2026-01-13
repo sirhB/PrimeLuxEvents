@@ -39,11 +39,11 @@ export default async function TeamManagementPage() {
         .select('*')
         .order('display_name')
 
-    // Fetch pending invitations
+    // Fetch pending and expired invitations
     const { data: invitations, error: invitationsError } = await supabase
         .from('user_invitations')
         .select('*')
-        .eq('status', 'pending')
+        .in('status', ['pending', 'expired'])
         .order('created_at', { ascending: false })
 
     if (membersError || rolesError || invitationsError) {

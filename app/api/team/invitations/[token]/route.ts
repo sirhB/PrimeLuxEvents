@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 
 export async function GET(
     request: NextRequest,
@@ -7,7 +8,7 @@ export async function GET(
 ) {
     try {
         const { token } = await params
-        const supabase = await createClient()
+        const supabase = createServiceRoleClient()
 
         // Find the invitation
         const { data: invitation, error: invitationError } = await supabase
@@ -67,7 +68,7 @@ export async function POST(
 ) {
     try {
         const { token } = await params
-        const supabase = await createClient()
+        const supabase = createServiceRoleClient()
         const body = await request.json()
         const { password, full_name, temp_password } = body
 

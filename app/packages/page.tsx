@@ -47,12 +47,12 @@ export default async function PackagesPage() {
 
             {/* Packages Grid */}
             <section className="container mx-auto px-4 md:px-6 relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-12">
                     {packages?.map((pkg, index) => (
                         <Link
                             href={`/packages/${pkg.id}`}
                             key={pkg.id}
-                            className="group relative flex flex-col h-full rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#1E1E1E]/50 backdrop-blur-sm transition-all duration-700 hover:border-gold/30 hover:-translate-y-2"
+                            className="group relative flex flex-col h-full rounded-3xl md:rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#1E1E1E]/50 backdrop-blur-sm transition-all duration-700 hover:border-gold/30 hover:-translate-y-2"
                         >
                             {/* Image Container */}
                             <div className="relative aspect-[4/5] overflow-hidden">
@@ -70,14 +70,14 @@ export default async function PackagesPage() {
                                 )}
 
                                 {/* Badges */}
-                                <div className="absolute top-6 left-6 flex flex-col gap-2 z-20">
+                                <div className="absolute top-4 left-4 md:top-6 md:left-6 flex flex-col gap-2 z-20">
                                     {pkg.is_featured && (
                                         <div className="bg-gold text-black px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center shadow-xl">
                                             <Star className="w-3 h-3 mr-1.5 fill-black" /> Featured
                                         </div>
                                     )}
                                     {pkg.savings_amount > 0 && (
-                                        <div className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                        <div className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-center">
                                             Save {formatCurrency(pkg.savings_amount)}
                                         </div>
                                     )}
@@ -86,28 +86,28 @@ export default async function PackagesPage() {
                             </div>
 
                             {/* Content */}
-                            <div className="flex flex-col flex-1 p-10">
-                                <h3 className="text-3xl font-serif font-light mb-4 group-hover:text-gold transition-colors tracking-tight text-white">
+                            <div className="flex flex-col flex-1 p-5 md:p-10">
+                                <h3 className="text-xl md:text-3xl font-serif font-light mb-2 md:mb-4 group-hover:text-gold transition-colors tracking-tight text-white line-clamp-1 md:line-clamp-none">
                                     {pkg.name}
                                 </h3>
-                                <p className="text-gray-400 line-clamp-2 mb-8 flex-1 font-light text-base leading-relaxed">
+                                <p className="text-xs md:text-base text-gray-400 line-clamp-2 mb-4 md:mb-8 flex-1 font-light leading-relaxed">
                                     {pkg.description}
                                 </p>
 
-                                <div className="pt-8 border-t border-white/5 flex items-center justify-between">
+                                <div className="pt-4 md:pt-8 border-t border-white/5 flex items-center justify-between">
                                     <div className="space-y-1">
                                         {pkg.original_price > pkg.price && (
                                             <div className="text-xs text-gray-500 line-through font-light">
                                                 {formatCurrency(pkg.original_price)}
                                             </div>
                                         )}
-                                        <div className="text-3xl font-serif font-light text-gold">
+                                        <div className="text-xl md:text-3xl font-serif font-light text-gold">
                                             {formatCurrency(pkg.price)}
                                         </div>
                                     </div>
 
-                                    <div className="h-12 w-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-gold group-hover:text-black transition-all duration-500">
-                                        <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                                    <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-gold group-hover:text-black transition-all duration-500">
+                                        <ArrowRight className="w-4 h-4 md:w-5 md:h-5 transition-transform group-hover:translate-x-1" />
                                     </div>
                                 </div>
                             </div>

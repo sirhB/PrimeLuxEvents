@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { MoreVertical, Mail, Clock, CheckCircle, XCircle, RefreshCw, Copy, Shield } from 'lucide-react'
 import { toast } from 'sonner'
-import { format } from 'date-fns'
+import { format, addDays } from 'date-fns'
+import { useRouter } from 'next/navigation'
 
 interface Invitation {
     id: string
@@ -25,6 +26,44 @@ interface InvitationsListProps {
 }
 
 export function InvitationsList({ invitations, canManage }: InvitationsListProps) {
+    const router = useRouter()
+
+    const handleCancel = async (id: string) => {
+        try {
+            const response = await fetch(`/api/team/invitations?id=${id}`, {
+                method: 'DELETE'
+            })
+
+            if (!response.ok) throw new Error('Failed to cancel invitation')
+
+            toast.success('Invitation cancelled')
+            router.refresh()
+        } catch (error) {
+            console.error('Error cancelling invitation:', error)
+            toast.error('Failed to cancel invitation')
+        }
+    }
+
+    const handleExtend = async (id: string, currentExpiry: string) => {
+        try {
+            // Extend by 7 more days from now
+            const newExpiry = addDays(new Date(), 7).toISOString()
+
+            const response = await fetch('/api/team/invitations', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, expires_at: newExpiry })
+            })
+
+            if (!response.ok) throw new Error('Failed to extend invitation')
+
+            toast.success('Invitation extended by 7 days')
+            router.refresh()
+        } catch (error) {
+            console.error('Error extending invitation:', error)
+            toast.error('Failed to extend invitation')
+        }
+    }
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'pending':
@@ -144,12 +183,18 @@ export function InvitationsList({ invitations, canManage }: InvitationsListProps
                                                 <Mail className="h-4 w-4" />
                                                 Resend Email
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem className="flex items-center gap-2">
+                                            <DropdownMenuItem
+                                                className="flex items-center gap-2 cursor-pointer focus:bg-[var(--dashboard-accent-gold)] focus:text-black"
+                                                onClick={() => handleExtend(invitation.id, invitation.expires_at)}
+                                            >
                                                 <RefreshCw className="h-4 w-4" />
                                                 Extend Expiry
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem className="flex items-center gap-2 text-red-600">
+                                            <DropdownMenuItem
+                                                className="flex items-center gap-2 text-red-600 cursor-pointer focus:bg-red-600 focus:text-white"
+                                                onClick={() => handleCancel(invitation.id)}
+                                            >
                                                 <XCircle className="h-4 w-4" />
                                                 Cancel Invitation
                                             </DropdownMenuItem>
