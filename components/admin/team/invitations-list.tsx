@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { MoreVertical, Mail, Clock, CheckCircle, XCircle, RefreshCw, Copy, Shield } from 'lucide-react'
+import { MoreVertical, Mail, Clock, CheckCircle, XCircle, RefreshCw, Copy, Shield, User } from 'lucide-react'
 import { toast } from 'sonner'
 import { format, addDays } from 'date-fns'
 import { useRouter } from 'next/navigation'
@@ -129,30 +129,31 @@ export function InvitationsList({ invitations, canManage }: InvitationsListProps
                                             </h3>
                                             {getStatusBadge(invitation.status)}
                                             {isExpired(invitation.expires_at) && invitation.status === 'pending' && (
-                                                <Badge variant="outline" className="text-xs text-red-600 border-red-200">
+                                                <Badge variant="outline" className="text-[10px] text-red-500 border-red-500/20 bg-red-500/5">
                                                     Expired
                                                 </Badge>
                                             )}
                                         </div>
 
-                                        <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
-                                            <span className="flex items-center gap-1">
-                                                <Mail className="h-3 w-3" />
+                                        <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] opacity-80">
+                                            <span className="flex items-center gap-1.5">
+                                                <Mail className="h-3 w-3 text-[var(--dashboard-accent-gold)]" />
                                                 Sent {format(new Date(invitation.created_at), 'MMM d, yyyy')}
                                             </span>
-                                            <span className="flex items-center gap-1">
-                                                <Clock className="h-3 w-3" />
+                                            <span className="flex items-center gap-1.5">
+                                                <Clock className="h-3 w-3 text-[var(--dashboard-accent-gold)]" />
                                                 Expires {format(new Date(invitation.expires_at), 'MMM d, yyyy')}
                                             </span>
                                             {invitation.temp_password && (
-                                                <span className="flex items-center gap-1 text-[var(--dashboard-accent-gold)]">
+                                                <span className="flex items-center gap-1.5 text-[var(--dashboard-accent-gold)]">
                                                     <Shield className="h-3 w-3" />
                                                     Temp Pass Set
                                                 </span>
                                             )}
                                             {invitation.invited_by && (
-                                                <span>
-                                                    Invited by: {invitation.invited_by}
+                                                <span className="flex items-center gap-1.5 font-bold uppercase tracking-[0.1em]">
+                                                    <User className="h-3 w-3 text-[var(--dashboard-accent-gold)]" />
+                                                    By: {invitation.invited_by.substring(0, 8)}
                                                 </span>
                                             )}
                                         </div>

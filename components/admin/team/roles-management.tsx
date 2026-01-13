@@ -160,13 +160,13 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
     return (
         <div className="space-y-6">
             {/* Roles Overview */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Shield className="h-5 w-5" />
+            <Card className="glass-card border-none overflow-hidden">
+                <CardHeader className="border-b border-white/5 bg-white/5">
+                    <CardTitle className="flex items-center gap-2 text-xl font-serif text-[var(--dashboard-text)]">
+                        <Shield className="h-5 w-5 text-[var(--dashboard-accent-gold)]" />
                         Roles & Permissions
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-[var(--dashboard-text-muted)]">
                         Manage roles and their associated permissions
                     </CardDescription>
                 </CardHeader>
@@ -175,16 +175,16 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
                         {rolesData.map((role) => (
                             <Card
                                 key={role.id}
-                                className={`cursor-pointer transition-colors hover:shadow-md ${selectedRole?.id === role.id ? 'ring-2 ring-blue-500' : ''
+                                className={`cursor-pointer transition-all duration-300 glass-card border-none hover:bg-white/5 ${selectedRole?.id === role.id ? 'ring-1 ring-[var(--dashboard-accent-gold)]' : ''
                                     }`}
                                 onClick={() => handleRoleClick(role)}
                             >
                                 <CardHeader className="pb-3">
                                     <div className="flex items-center justify-between">
-                                        <CardTitle className="text-lg">{role.display_name}</CardTitle>
+                                        <CardTitle className="text-lg text-[var(--dashboard-text)]">{role.display_name}</CardTitle>
                                         <div className="flex items-center gap-2">
                                             {role.is_system_role && (
-                                                <Badge variant="secondary" className="text-xs">
+                                                <Badge variant="secondary" className="text-[10px] bg-white/10 text-[var(--dashboard-text-muted)] border-white/5 uppercase tracking-widest font-bold">
                                                     System
                                                 </Badge>
                                             )}
@@ -192,7 +192,7 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-6 w-6"
+                                                    className="h-6 w-6 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-white/10"
                                                     onClick={(e) => {
                                                         e.stopPropagation()
                                                         handleEditRole(role)
@@ -204,19 +204,19 @@ export function RolesManagement({ roles: initialRoles, canManage }: RolesManagem
                                         </div>
                                     </div>
                                     {role.description && (
-                                        <CardDescription className="text-sm">
+                                        <CardDescription className="text-xs text-[var(--dashboard-text-muted)] leading-relaxed">
                                             {role.description}
                                         </CardDescription>
                                     )}
                                 </CardHeader>
                                 <CardContent>
                                     <div className="space-y-2">
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <Users className="h-4 w-4" />
+                                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                            <Users className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                                             {role.memberCount || 0} members
                                         </div>
-                                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                                            <Settings className="h-4 w-4" />
+                                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                            <Settings className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                                             {role.permissions?.length || 0} permissions
                                         </div>
                                     </div>

@@ -103,11 +103,11 @@ export function TeamMembersList({ members, roles, canManage }: TeamMembersListPr
     }
 
     return (
-        <Card>
-            <CardHeader className="flex flex-col md:flex-row md:items-center justify-between space-y-2 md:space-y-0">
+        <Card className="glass-card border-none overflow-hidden">
+            <CardHeader className="flex flex-col md:flex-row md:items-center justify-between space-y-2 md:space-y-0 border-b border-white/5 bg-white/5">
                 <div>
-                    <CardTitle>Team Members</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-xl font-serif text-[var(--dashboard-text)]">Team Members</CardTitle>
+                    <CardDescription className="text-[var(--dashboard-text-muted)]">
                         Manage your team members and their roles
                     </CardDescription>
                 </div>
@@ -133,7 +133,7 @@ export function TeamMembersList({ members, roles, canManage }: TeamMembersListPr
                 ) : (
                     <div className="space-y-4">
                         {filteredMembers.map((member) => (
-                            <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg">
+                            <div key={member.id} className="flex items-center justify-between p-5 glass-card border-none hover:bg-white/5 transition-all duration-300">
                                 <div className="flex items-center space-x-4">
                                     <Avatar className="h-12 w-12">
                                         <AvatarImage src={member.avatar_url || undefined} />
@@ -144,28 +144,28 @@ export function TeamMembersList({ members, roles, canManage }: TeamMembersListPr
 
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <h3 className="font-medium text-gray-900 truncate">
+                                            <h3 className="font-medium text-[var(--dashboard-text)] truncate">
                                                 {member.full_name || 'Unnamed User'}
                                             </h3>
                                             {!member.is_active && (
-                                                <Badge variant="secondary" className="text-xs">
+                                                <Badge variant="secondary" className="text-[10px] bg-red-500/10 text-red-500 border-red-500/20">
                                                     Inactive
                                                 </Badge>
                                             )}
                                         </div>
 
-                                        <p className="text-sm text-gray-500 truncate">{member.email}</p>
+                                        <p className="text-sm text-[var(--dashboard-text-muted)] truncate font-light">{member.email}</p>
 
-                                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                                        <div className="flex items-center gap-4 mt-2 text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)] opacity-80">
                                             {member.job_title && (
-                                                <span className="flex items-center gap-1">
-                                                    <Shield className="h-3 w-3" />
+                                                <span className="flex items-center gap-1.5">
+                                                    <Shield className="h-3 w-3 text-[var(--dashboard-accent-gold)]" />
                                                     {member.job_title}
                                                 </span>
                                             )}
                                             {member.last_login_at && (
-                                                <span className="flex items-center gap-1">
-                                                    <Calendar className="h-3 w-3" />
+                                                <span className="flex items-center gap-1.5">
+                                                    <Calendar className="h-3 w-3 text-[var(--dashboard-accent-gold)]" />
                                                     Last login: {formatLastLogin(member.last_login_at)}
                                                 </span>
                                             )}

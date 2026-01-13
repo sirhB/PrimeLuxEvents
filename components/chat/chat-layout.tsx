@@ -56,6 +56,7 @@ interface Conversation {
     type: 'support' | 'internal'
     subject?: string
     last_message_at: string
+    target_role_id?: string
     participants: {
         user_id: string
         email: string
@@ -158,7 +159,7 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             .from('conversations')
             .select(`
                 *,
-                conversation_participants!inner(user_id, is_archived)
+                conversation_participants(user_id, is_archived)
             `)
             .order('last_message_at', { ascending: false })
 
@@ -273,18 +274,9 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                     setIsCreating(false)
                     return
                 }
-                // Fetch all users with this role
-                const { data: roleUsers, error: roleError } = await supabase
-                    .from('user_roles')
-                    .select('user_id')
-                    .eq('role_id', selectedRoleId)
-
-                if (roleError || !roleUsers || roleUsers.length === 0) {
-                    toast.error('No users found with this role')
-                    setIsCreating(false)
-                    return
-                }
-                participantIds = roleUsers.map(u => u.user_id)
+                // We no longer need to fetch all users here because RLS/RPC will handle role access
+                // but we keep participantIds empty or just the current user (which is added by RPC)
+                participantIds = []
             }
 
             // Create Conversation via RPC
@@ -293,7 +285,8 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                     p_type: 'internal',
                     p_subject: null,
                     p_message: initialMessage.trim() || null,
-                    p_participant_ids: participantIds
+                    p_participant_ids: participantIds,
+                    p_target_role_id: newChatType === 'role' ? selectedRoleId : null
                 })
 
             if (error) {
@@ -341,6 +334,13 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
 
     const getConversationTitle = (conv: Conversation) => {
         if (conv.type === 'support') return 'Support Ticket'
+
+        // If it's a role-based chat, find the role name
+        if (conv.target_role_id) {
+            const role = roles.find(r => r.id === conv.target_role_id)
+            if (role) return `${role.display_name} Team`
+            return 'Team Chat'
+        }
 
         const otherUserId = conv.participants?.find((p: any) => p.user_id !== currentUserId)?.user_id
         const profile = otherUserId ? profiles[otherUserId] : null
