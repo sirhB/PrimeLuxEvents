@@ -82,7 +82,7 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
             .from('messages')
             .select(`
                 *,
-                sender:user_profiles!messages_sender_id_fkey (
+                sender:user_profiles!messages_sender_id_profile_fkey (
                     full_name,
                     avatar_url,
                     email
@@ -252,7 +252,8 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
                             const isMe = msg.sender_id === currentUserId
                             const sender = msg.sender || (msg.sender_id ? senderProfiles[msg.sender_id] : null)
                             const showTimeDivider = i === 0 || new Date(msg.created_at).getTime() - new Date(messages[i - 1].created_at).getTime() > 1000 * 60 * 30 // 30 mins
-                            const showSenderName = !isMe && !msg.is_ai && (i === 0 || messages[i - 1].sender_id !== msg.sender_id)
+                            // Show sender name if: Not me AND (first message OR sender changed OR status (AI/Human) changed)
+                            const showSenderName = !isMe && (i === 0 || messages[i - 1].sender_id !== msg.sender_id || messages[i - 1].is_ai !== msg.is_ai)
 
                             return (
                                 <div key={msg.id} className={cn("flex flex-col", isMe ? "items-end" : "items-start")}>
@@ -283,7 +284,7 @@ export function ChatWindow({ conversationId, currentUserId, title, isArchived, o
                                         <div className={cn("flex flex-col", isMe ? "items-end" : "items-start")}>
                                             {showSenderName && (
                                                 <span className="text-[10px] font-bold text-[var(--dashboard-text-muted)] mb-1 ml-1 uppercase tracking-tight">
-                                                    {sender?.full_name || sender?.email || 'Unknown User'}
+                                                    {msg.is_ai ? 'The Sensei' : (sender?.full_name || sender?.email || 'Unknown User')}
                                                 </span>
                                             )}
 
