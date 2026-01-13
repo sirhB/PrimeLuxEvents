@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import { requirePermission } from '@/lib/auth/authorization'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -16,9 +17,10 @@ export default async function TeamManagementPage() {
     await requirePermission('users.view')
 
     const supabase = await createClient()
+    const serviceRoleSupabase = createServiceRoleClient()
 
-    // Fetch team members
-    const { data: teamMembers, error: membersError } = await supabase
+    // Fetch team members using service role to bypass RLS issues in admin panel
+    const { data: teamMembers, error: membersError } = await serviceRoleSupabase
         .from('user_profiles')
         .select(`
             *,
@@ -34,13 +36,13 @@ export default async function TeamManagementPage() {
         .order('created_at', { ascending: false })
 
     // Fetch roles
-    const { data: roles, error: rolesError } = await supabase
+    const { data: roles, error: rolesError } = await serviceRoleSupabase
         .from('roles')
         .select('*')
         .order('display_name')
 
     // Fetch pending and expired invitations
-    const { data: invitations, error: invitationsError } = await supabase
+    const { data: invitations, error: invitationsError } = await serviceRoleSupabase
         .from('user_invitations')
         .select('*')
         .in('status', ['pending', 'expired'])
