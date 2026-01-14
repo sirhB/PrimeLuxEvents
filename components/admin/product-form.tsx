@@ -29,14 +29,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
-import {
-    CommandDialog,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from '@/components/ui/command'
+import { SearchDialog } from '@/components/ui/search-dialog'
+import { cn } from '@/lib/utils'
 
 
 interface Category {
@@ -163,18 +157,10 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
 
     // Link Existing Variant State
     const [openLinkSearch, setOpenLinkSearch] = useState(false)
-    const [searchQuery, setSearchQuery] = useState('')
-    const [searchResults, setSearchResults] = useState<any[]>([])
-    const [searching, setSearching] = useState(false)
 
-    const searchProducts = async (query: string) => {
-        setSearchQuery(query)
-        if (query.length < 2) {
-            setSearchResults([])
-            return
-        }
+    const searchProductsToLink = async (query: string) => {
+        if (query.length < 2) return []
 
-        setSearching(true)
         try {
             const { data, error } = await supabase
                 .from('products')
@@ -184,11 +170,10 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                 .limit(5)
 
             if (error) throw error
-            setSearchResults(data || [])
+            return data || []
         } catch (error) {
             console.error('Error searching products:', error)
-        } finally {
-            setSearching(false)
+            return []
         }
     }
 
@@ -535,51 +520,42 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                         </div>
 
                         {/* Link Existing Dialog */}
-                        <CommandDialog
+                        <SearchDialog
                             open={openLinkSearch}
                             onOpenChange={setOpenLinkSearch}
-                            commandProps={{ shouldFilter: false }}
-                        >
-                            <CommandInput
-                                placeholder="Search product to link..."
-                                value={searchQuery}
-                                onValueChange={searchProducts}
-                            />
-                            <CommandList>
-                                <CommandEmpty>
-                                    {searching ? 'Searching...' : 'No products found.'}
-                                </CommandEmpty>
-                                <CommandGroup heading="Suggestions">
-                                    {searchResults.map((result) => (
-                                        <CommandItem
-                                            key={result.id}
-                                            value={result.id}
-                                            onSelect={() => handleLinkProduct(result)}
-                                            className="group flex items-center gap-4 p-3 cursor-pointer aria-selected:bg-neutral-50 aria-selected:text-foreground border-b last:border-0 border-border/50 transition-colors relative"
-                                        >
-                                            <div className="h-10 w-10 rounded bg-muted overflow-hidden flex-shrink-0 relative border border-border shadow-sm">
-                                                {result.image_url ? (
-                                                    // eslint-disable-next-line @next/next/no-img-element
-                                                    <img src={result.image_url} alt={result.name} className="object-cover w-full h-full" />
-                                                ) : (
-                                                    <div className="w-full h-full bg-secondary text-[9px] flex items-center justify-center text-muted-foreground">No Img</div>
-                                                )}
-                                            </div>
-                                            <div className="flex flex-col flex-1 min-w-0">
-                                                <span className="font-medium truncate">{result.name}</span>
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                    <span>{result.color || 'No Color'}</span>
-                                                    {result.group_id && <span className="text-amber-600 bg-amber-500/10 px-1 rounded text-[10px] uppercase font-bold">In Group</span>}
-                                                </div>
-                                            </div>
-                                            <div className="text-[10px] font-bold uppercase text-muted-foreground group-aria-selected:text-primary opacity-0 group-aria-selected:opacity-100">
-                                                Link
-                                            </div>
-                                        </CommandItem>
-                                    ))}
-                                </CommandGroup>
-                            </CommandList>
-                        </CommandDialog>
+                            onSearch={searchProductsToLink}
+                            onSelect={handleLinkProduct}
+                            placeholder="Search product to link..."
+                            renderItem={(result, isSelected) => (
+                                <div className={cn(
+                                    "group flex items-center gap-4 p-3 rounded-lg transition-colors relative",
+                                    isSelected ? "bg-[var(--dashboard-accent-gold)]/10" : "hover:bg-[var(--dashboard-card-hover)]"
+                                )}>
+                                    <div className="h-10 w-10 rounded bg-muted overflow-hidden flex-shrink-0 relative border border-border shadow-sm">
+                                        {result.image_url ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
+                                            <img src={result.image_url} alt={result.name} className="object-cover w-full h-full" />
+                                        ) : (
+                                            <div className="w-full h-full bg-secondary text-[9px] flex items-center justify-center text-muted-foreground">No Img</div>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col flex-1 min-w-0">
+                                        <span className={cn("font-medium truncate", isSelected ? "text-[var(--dashboard-accent-gold)]" : "text-foreground")}>
+                                            {result.name}
+                                        </span>
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <span>{result.color || 'No Color'}</span>
+                                            {result.group_id && <span className="text-amber-600 bg-amber-500/10 px-1 rounded text-[10px] uppercase font-bold">In Group</span>}
+                                        </div>
+                                    </div>
+                                    {isSelected && (
+                                        <div className="text-[10px] font-bold uppercase text-[var(--dashboard-accent-gold)]">
+                                            Link
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        />
 
                         {/* Add Variant Dialog */}
                         <Dialog open={isAddVariantOpen} onOpenChange={setIsAddVariantOpen}>

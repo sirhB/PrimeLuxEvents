@@ -11,23 +11,17 @@ import {
     Code,
     Search,
     LayoutDashboard,
-    Tag,
-    MessageSquare,
-    Wrench
+    Wrench,
+    Loader2,
+    X,
+    ArrowRight
 } from 'lucide-react'
-import {
-    CommandDialog,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-    CommandSeparator,
-} from '@/components/ui/command'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { searchAdmin, type SearchResult } from '@/app/admin/actions'
 import { useRouter } from 'next/navigation'
+import { cn } from '@/lib/utils'
 
 const typeIcons = {
     product: Package,
@@ -80,6 +74,7 @@ export function AdminSearch() {
     const [results, setResults] = React.useState<SearchResult[]>([])
     const [loading, setLoading] = React.useState(false)
     const router = useRouter()
+    const inputRef = React.useRef<HTMLInputElement>(null)
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -92,6 +87,13 @@ export function AdminSearch() {
         document.addEventListener('keydown', down)
         return () => document.removeEventListener('keydown', down)
     }, [])
+
+    React.useEffect(() => {
+        if (open && inputRef.current) {
+            // Small timeout to ensure modal is mounted
+            setTimeout(() => inputRef.current?.focus(), 50)
+        }
+    }, [open])
 
     React.useEffect(() => {
         if (query.length < 2) {
@@ -131,6 +133,17 @@ export function AdminSearch() {
         return groups
     }, [results])
 
+    const quickLinks = [
+        { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
+        { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
+        { icon: FileText, label: 'Leads', href: '/admin/consultations' },
+        { icon: Package, label: 'Products', href: '/admin/products' },
+        { icon: Folder, label: 'Categories', href: '/admin/categories' },
+        { icon: Users, label: 'Customers', href: '/admin/customers' },
+        { icon: Settings, label: 'Settings', href: '/admin/settings' },
+        { icon: Code, label: 'CMS', href: '/admin/cms' },
+    ]
+
     return (
         <>
             <Button
@@ -144,111 +157,136 @@ export function AdminSearch() {
                     <span className="text-xs">⌘</span>K
                 </kbd>
             </Button>
-            <CommandDialog open={open} onOpenChange={setOpen}>
-                <CommandInput
-                    placeholder="Search for orders, products, customers, leads..."
-                    value={query}
-                    onValueChange={setQuery}
-                />
-                <CommandList>
-                    <CommandEmpty>
-                        {loading ? 'Searching...' : 'No results found. Try a different search term.'}
-                    </CommandEmpty>
 
-                    {Object.entries(groupedResults).map(([type, items]) => {
-                        const Icon = typeIcons[type as keyof typeof typeIcons]
-                        const label = typeLabels[type as keyof typeof typeLabels]
+            <AnimatePresence>
+                {open && (
+                    <>
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setOpen(false)}
+                            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
+                        />
 
-                        return (
-                            <CommandGroup key={type} heading={`${label} (${items.length})`}>
-                                {items.map((result) => (
-                                    <CommandItem
-                                        key={`${result.type}-${result.id}`}
-                                        value={`${result.title} ${result.subtitle || ''}`}
-                                        onSelect={() => {
-                                            runCommand(() => router.push(result.url))
-                                        }}
-                                        className="flex items-center gap-3 py-3"
-                                    >
-                                        <Icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                                        <div className="flex flex-col flex-1 min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-medium truncate">{result.title}</span>
-                                                {result.metadata?.status && (
-                                                    <Badge
-                                                        variant="secondary"
-                                                        className={`text-xs px-2 py-0 ${getStatusColor(result.metadata.status)}`}
-                                                    >
-                                                        {result.metadata.status}
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                            {result.subtitle && (
-                                                <span className="text-xs text-muted-foreground truncate">
-                                                    {result.subtitle}
-                                                </span>
-                                            )}
-                                            {(result.metadata?.amount || result.metadata?.date) && (
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                                                    {result.metadata.amount && (
-                                                        <span className="font-medium">{result.metadata.amount}</span>
-                                                    )}
-                                                    {result.metadata.date && (
-                                                        <span>• {result.metadata.date}</span>
-                                                    )}
-                                                </div>
-                                            )}
+                        {/* Modal */}
+                        <div className="fixed inset-0 z-[101] flex items-start justify-center pt-24 px-4 pointer-events-none">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                                className="w-full max-w-2xl bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] rounded-2xl shadow-2xl overflow-hidden pointer-events-auto flex flex-col max-h-[70vh]"
+                            >
+                                {/* Header / Input */}
+                                <div className="flex items-center px-4 py-3 border-b border-[var(--dashboard-border)] bg-[var(--dashboard-background)]/50">
+                                    <Search className="h-5 w-5 text-muted-foreground mr-3" />
+                                    <input
+                                        ref={inputRef}
+                                        value={query}
+                                        onChange={(e) => setQuery(e.target.value)}
+                                        placeholder="Type a command or search..."
+                                        className="flex-1 bg-transparent border-none outline-none text-[var(--dashboard-text)] placeholder:text-muted-foreground text-base h-10"
+                                    />
+                                    {loading ? (
+                                        <Loader2 className="h-4 w-4 animate-spin text-[var(--dashboard-accent-gold)] ml-2" />
+                                    ) : (
+                                        <div className="flex items-center gap-1 ml-2">
+                                            <span className="px-1.5 py-0.5 rounded border border-[var(--dashboard-border)] bg-[var(--dashboard-background)] text-[10px] text-muted-foreground font-mono">ESC</span>
                                         </div>
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
-                        )
-                    })}
+                                    )}
+                                </div>
 
-                    {results.length === 0 && !loading && query.length >= 2 && (
-                        <div className="py-6 text-center text-sm text-muted-foreground">
-                            <p>No results found for "{query}"</p>
-                            <p className="text-xs mt-1">Try searching for orders, products, customers, or leads</p>
+                                {/* Results Area */}
+                                <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+                                    {/* Empty Search / Quick Links */}
+                                    {query.length < 2 && (
+                                        <div className="space-y-1">
+                                            <h3 className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider opacity-70">
+                                                Quick Links
+                                            </h3>
+                                            {quickLinks.map((item) => (
+                                                <button
+                                                    key={item.label}
+                                                    onClick={() => runCommand(() => router.push(item.href))}
+                                                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)] transition-colors text-left group"
+                                                >
+                                                    <item.icon className="h-4 w-4 text-muted-foreground group-hover:text-[var(--dashboard-accent-gold)]" />
+                                                    <span>{item.label}</span>
+                                                    <ArrowRight className="h-3 w-3 text-muted-foreground ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Search Results */}
+                                    {Object.entries(groupedResults).map(([type, items]) => {
+                                        const Icon = typeIcons[type as keyof typeof typeIcons] || Package
+                                        const label = typeLabels[type as keyof typeof typeLabels] || type
+
+                                        return (
+                                            <div key={type} className="mb-4 last:mb-0">
+                                                <h3 className="px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider opacity-70 sticky top-0 bg-[var(--dashboard-card)]/95 backdrop-blur-sm z-10">
+                                                    {label}
+                                                </h3>
+                                                <div className="space-y-1">
+                                                    {items.map((result) => (
+                                                        <button
+                                                            key={`${result.type}-${result.id}`}
+                                                            onClick={() => runCommand(() => router.push(result.url))}
+                                                            className="w-full flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-[var(--dashboard-card-hover)] transition-colors text-left group"
+                                                        >
+                                                            <div className="mt-0.5 p-1.5 rounded-md bg-[var(--dashboard-background)] border border-[var(--dashboard-border)]">
+                                                                <Icon className="h-4 w-4 text-muted-foreground" />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2 mb-0.5">
+                                                                    <span className="font-medium text-sm text-[var(--dashboard-text)] truncate">{result.title}</span>
+                                                                    {result.metadata?.status && (
+                                                                        <span className={`text-[10px] px-1.5 py-0 rounded-sm font-medium ${getStatusColor(result.metadata.status)}`}>
+                                                                            {result.metadata.status}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                                {result.subtitle && (
+                                                                    <p className="text-xs text-muted-foreground truncate">{result.subtitle}</p>
+                                                                )}
+                                                                {(result.metadata?.amount || result.metadata?.date) && (
+                                                                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1">
+                                                                        {result.metadata.amount && <span>{result.metadata.amount}</span>}
+                                                                        {result.metadata.date && <span>• {result.metadata.date}</span>}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+
+                                    {query.length >= 2 && results.length === 0 && !loading && (
+                                        <div className="py-12 text-center text-muted-foreground">
+                                            <Search className="h-8 w-8 mx-auto mb-3 opacity-20" />
+                                            <p className="text-sm">No results found for "{query}"</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="px-4 py-2 border-t border-[var(--dashboard-border)] bg-[var(--dashboard-background)]/30">
+                                    <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                                        <div className="flex items-center gap-3">
+                                            <span className="flex items-center gap-1"><kbd className="px-1 bg-[var(--dashboard-background)] border rounded">↵</kbd> to select</span>
+                                            <span className="flex items-center gap-1"><kbd className="px-1 bg-[var(--dashboard-background)] border rounded">↑↓</kbd> to navigate</span>
+                                        </div>
+                                        <span>PrimeLux Search</span>
+                                    </div>
+                                </div>
+                            </motion.div>
                         </div>
-                    )}
-
-                    <CommandSeparator />
-                    <CommandGroup heading="Quick Links">
-                        <CommandItem onSelect={() => runCommand(() => router.push('/admin'))}>
-                            <LayoutDashboard className="mr-2 h-4 w-4" />
-                            <span>Dashboard</span>
-                        </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push('/admin/orders'))}>
-                            <ShoppingCart className="mr-2 h-4 w-4" />
-                            <span>Orders</span>
-                        </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push('/admin/consultations'))}>
-                            <FileText className="mr-2 h-4 w-4" />
-                            <span>Leads</span>
-                        </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push('/admin/products'))}>
-                            <Package className="mr-2 h-4 w-4" />
-                            <span>Products</span>
-                        </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push('/admin/categories'))}>
-                            <Folder className="mr-2 h-4 w-4" />
-                            <span>Categories</span>
-                        </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push('/admin/customers'))}>
-                            <Users className="mr-2 h-4 w-4" />
-                            <span>Customers</span>
-                        </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push('/admin/settings'))}>
-                            <Settings className="mr-2 h-4 w-4" />
-                            <span>Settings</span>
-                        </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push('/admin/cms'))}>
-                            <Code className="mr-2 h-4 w-4" />
-                            <span>CMS</span>
-                        </CommandItem>
-                    </CommandGroup>
-                </CommandList>
-            </CommandDialog>
+                    </>
+                )}
+            </AnimatePresence>
         </>
     )
 }

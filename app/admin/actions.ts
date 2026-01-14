@@ -4,6 +4,118 @@ import { createClient } from '@/lib/supabase/server'
 import { requirePermission } from '@/lib/auth/authorization'
 import { revalidatePath } from 'next/cache'
 
+export interface SearchResult {
+    id: string
+    type: 'product' | 'order' | 'consultation' | 'customer' | 'category' | 'setting' | 'content'
+    title: string
+    subtitle?: string
+    url: string
+    metadata?: {
+        status?: string
+        amount?: string
+        date?: string
+    }
+}
+
+export async function searchAdmin(query: string): Promise<SearchResult[]> {
+    if (!query || query.length < 2) return []
+
+    const supabase = await createClient()
+    const results: SearchResult[] = []
+
+    // Parallelize queries
+    const [products, orders, customers, consultations] = await Promise.all([
+        // Products
+        supabase.from('products')
+            .select('id, name, price, stock')
+            .ilike('name', `%${query}%`)
+            .limit(5),
+
+        // Orders
+        supabase.from('orders')
+            .select('id, total_amount, status, created_at')
+            .or(`id.eq.${query},id.ilike.%${query}%`) // Allow searching by ID
+            .limit(5),
+
+        // Customers (User Profiles)
+        supabase.from('user_profiles')
+            .select('id, full_name, email')
+            .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
+            .limit(5),
+
+        // Consultations
+        supabase.from('consultations')
+            .select('id, client_name, event_type, status, scheduled_date')
+            .or(`client_name.ilike.%${query}%,event_type.ilike.%${query}%`)
+            .limit(5)
+    ])
+
+    // Process Products
+    if (products.data) {
+        products.data.forEach(p => {
+            results.push({
+                id: p.id,
+                type: 'product',
+                title: p.name,
+                subtitle: `Stock: ${p.stock}`,
+                url: `/admin/products/${p.id}`,
+                metadata: {
+                    amount: `$${p.price}` // Basic formatting
+                }
+            })
+        })
+    }
+
+    // Process Orders
+    if (orders.data) {
+        orders.data.forEach(o => {
+            results.push({
+                id: o.id,
+                type: 'order',
+                title: `Order #${o.id.substring(0, 8)}`,
+                subtitle: new Date(o.created_at).toLocaleDateString(),
+                url: `/admin/orders/${o.id}`,
+                metadata: {
+                    status: o.status,
+                    amount: `$${o.total_amount}`
+                }
+            })
+        })
+    }
+
+    // Process Customers
+    if (customers.data) {
+        customers.data.forEach(c => {
+            results.push({
+                id: c.id,
+                type: 'customer',
+                title: c.full_name || 'Unknown Name',
+                subtitle: c.email,
+                url: `/admin/customers/${c.id}`
+            })
+        })
+    }
+
+    // Process Consultations
+    if (consultations.data) {
+        consultations.data.forEach(c => {
+            results.push({
+                id: c.id,
+                type: 'consultation',
+                title: c.client_name,
+                subtitle: c.event_type,
+                url: `/admin/consultations/${c.id}`,
+                metadata: {
+                    status: c.status,
+                    date: c.scheduled_date ? new Date(c.scheduled_date).toLocaleDateString() : undefined
+                }
+            })
+        })
+    }
+
+    return results
+}
+
 export interface Role {
     id: string
     name: string

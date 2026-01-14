@@ -11,6 +11,7 @@ import { Menu, Search, Plus, MessageSquare, MoreVertical } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDistanceToNow } from 'date-fns'
 import { ChatWindow } from './chat-window'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -129,22 +130,26 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
 
     const searchUsers = async (query: string) => {
         if (!query || query.length < 2) {
-            setUserSearchResults([])
-            return
+            return []
         }
 
-        setIsSearchingUsers(true)
         const { data, error } = await supabase.rpc('search_users', { search_term: query })
 
         if (data) {
-            // Map result to UserProfile
-            setUserSearchResults(data.map((u: any) => ({
+            return data.map((u: any) => ({
                 id: u.id,
-                email: u.email,
-                full_name: u.full_name
-            })))
+                label: u.full_name || 'Unknown Name',
+                subLabel: u.email,
+                value: {
+                    id: u.id,
+                    email: u.email,
+                    full_name: u.full_name
+                },
+                // Optional: add avatar URL if available in user profile
+                image: null
+            }))
         }
-        setIsSearchingUsers(false)
+        return []
     }
 
     const fetchRoles = async () => {
@@ -415,54 +420,23 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                                 {newChatType === 'direct' && (
                                     <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
                                         <Label className="text-white font-medium">Recipient</Label>
-                                        <Popover open={userSearchOpen} onOpenChange={setUserSearchOpen}>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant="outline"
-                                                    role="combobox"
-                                                    aria-expanded={userSearchOpen}
-                                                    className="w-full justify-between bg-[var(--dashboard-background)] border-[var(--dashboard-border)] text-white hover:bg-[var(--dashboard-card-hover)] hover:text-white"
-                                                >
-                                                    {selectedUser ? selectedUser.full_name || selectedUser.email : (recipientEmail || "Search for a user...")}
-                                                    <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-[450px] p-0 bg-[var(--dashboard-card)] border-[var(--dashboard-border)]">
-                                                <Command shouldFilter={false}>
-                                                    <CommandInput
-                                                        placeholder="Search by name or email..."
-                                                        onValueChange={(val) => {
-                                                            setRecipientEmail(val) // Keep manual input sync
-                                                            searchUsers(val)
-                                                        }}
-                                                        className="text-white"
-                                                    />
-                                                    <CommandList>
-                                                        {isSearchingUsers && <div className="p-2 text-xs text-muted-foreground">Searching...</div>}
-                                                        <CommandEmpty>No users found.</CommandEmpty>
-                                                        <CommandGroup>
-                                                            {userSearchResults.map((user) => (
-                                                                <CommandItem
-                                                                    key={user.id}
-                                                                    value={user.email}
-                                                                    onSelect={() => {
-                                                                        setSelectedUser(user)
-                                                                        setRecipientEmail(user.email) // for visual fallback
-                                                                        setUserSearchOpen(false)
-                                                                    }}
-                                                                    className="text-white hover:bg-[var(--dashboard-accent-gold)]/20 cursor-pointer"
-                                                                >
-                                                                    <div className="flex flex-col">
-                                                                        <span className="font-medium">{user.full_name || 'Unknown Name'}</span>
-                                                                        <span className="text-xs text-muted-foreground">{user.email}</span>
-                                                                    </div>
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
-                                                    </CommandList>
-                                                </Command>
-                                            </PopoverContent>
-                                        </Popover>
+                                        <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
+                                            <Label className="text-white font-medium">Recipient</Label>
+                                            <SearchableSelect
+                                                placeholder="Search by name or email..."
+                                                onSearch={searchUsers}
+                                                onSelect={(item) => {
+                                                    setSelectedUser(item.value)
+                                                    setRecipientEmail(item.value.email)
+                                                }}
+                                                initialValue={selectedUser ? {
+                                                    id: selectedUser.id,
+                                                    label: selectedUser.full_name || 'Unknown',
+                                                    subLabel: selectedUser.email,
+                                                    value: selectedUser
+                                                } : null}
+                                            />
+                                        </div>
                                     </div>
                                 )}
 

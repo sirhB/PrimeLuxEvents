@@ -7,11 +7,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { X, Plus, Check, ChevronsUpDown } from 'lucide-react'
+import { X, Plus } from 'lucide-react'
 import { assignUserRole, removeUserRole, updateUserProfile } from '@/app/admin/actions'
 import { toast } from 'sonner'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 import { cn } from '@/lib/utils'
 
 interface TeamMember {
@@ -255,56 +254,27 @@ export function EditMemberDialog({ member, roles, open, onOpenChange, onSuccess 
                             <div className="flex items-end gap-2">
                                 <div className="flex-1 space-y-2">
                                     <Label htmlFor="add_role">Add Role</Label>
-                                    <Popover open={rolePickerOpen} onOpenChange={setRolePickerOpen}>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                role="combobox"
-                                                aria-expanded={rolePickerOpen}
-                                                className="w-full justify-between font-normal"
-                                            >
-                                                {selectedRoleToAdd
-                                                    ? roles.find((role) => role.id === selectedRoleToAdd)?.display_name
-                                                    : "Search roles..."}
-                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                                            <Command>
-                                                <CommandInput placeholder="Search roles..." />
-                                                <CommandEmpty>No role found.</CommandEmpty>
-                                                <CommandList>
-                                                    <CommandGroup>
-                                                        {availableRoles.map((role) => (
-                                                            <CommandItem
-                                                                key={role.id}
-                                                                value={`${role.display_name} ${role.id}`}
-                                                                onSelect={() => {
-                                                                    setSelectedRoleToAdd(role.id)
-                                                                    setRolePickerOpen(false)
-                                                                }}
-                                                            >
-                                                                <Check
-                                                                    className={cn(
-                                                                        "mr-2 h-4 w-4",
-                                                                        selectedRoleToAdd === role.id ? "opacity-100" : "opacity-0"
-                                                                    )}
-                                                                />
-                                                                <div className="flex items-center gap-2">
-                                                                    <div
-                                                                        className="w-3 h-3 rounded"
-                                                                        style={{ backgroundColor: role.color }}
-                                                                    />
-                                                                    {role.display_name}
-                                                                </div>
-                                                            </CommandItem>
-                                                        ))}
-                                                    </CommandGroup>
-                                                </CommandList>
-                                            </Command>
-                                        </PopoverContent>
-                                    </Popover>
+                                    <SearchableSelect
+                                        key={selectedRoleToAdd || "reset"}
+                                        placeholder="Search roles..."
+                                        onSearch={async (query) => {
+                                            const lowerQuery = query.toLowerCase()
+                                            return availableRoles
+                                                .filter(r => r.display_name.toLowerCase().includes(lowerQuery))
+                                                .map(r => ({
+                                                    id: r.id,
+                                                    label: r.display_name,
+                                                    value: r,
+                                                    icon: () => <div className="w-3 h-3 rounded mr-2" style={{ backgroundColor: r.color }} />
+                                                }))
+                                        }}
+                                        onSelect={(item) => setSelectedRoleToAdd(item.id)}
+                                        initialValue={selectedRoleToAdd ? {
+                                            id: selectedRoleToAdd,
+                                            label: roles.find(r => r.id === selectedRoleToAdd)?.display_name || '',
+                                            value: roles.find(r => r.id === selectedRoleToAdd) as Role
+                                        } : null}
+                                    />
                                 </div>
                                 <Button
                                     onClick={handleAddRole}
