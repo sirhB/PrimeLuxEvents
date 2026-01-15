@@ -1,12 +1,23 @@
-import { MetricsOverview } from '@/components/admin/dashboard/metrics-overview'
-import { RevenueChartEnhanced } from '@/components/admin/dashboard/revenue-chart-enhanced'
-import { ActivityFeed } from '@/components/admin/dashboard/activity-feed'
-import { LaunchReadinessTracker } from '@/components/admin/dashboard/launch-readiness-tracker'
-import { QuickActionsWidget } from '@/components/admin/dashboard/quick-actions-widget'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import nextDynamic from 'next/dynamic'
 
+const MetricsOverview = nextDynamic(() => import('@/components/admin/dashboard/metrics-overview').then(m => m.MetricsOverview), {
+    loading: () => <div className="h-32 w-full animate-pulse bg-[var(--dashboard-card)] rounded-3xl" />
+})
+const RevenueChartEnhanced = nextDynamic(() => import('@/components/admin/dashboard/revenue-chart-enhanced').then(m => m.RevenueChartEnhanced), {
+    loading: () => <div className="h-[400px] w-full flex items-center justify-center bg-[var(--dashboard-card)] rounded-3xl"><Loader2 className="h-8 w-8 animate-spin text-[var(--dashboard-accent-gold)]" /></div>
+})
+const ActivityFeed = nextDynamic(() => import('@/components/admin/dashboard/activity-feed').then(m => m.ActivityFeed), {
+    loading: () => <div className="h-[400px] w-full animate-pulse bg-[var(--dashboard-card)] rounded-3xl" />
+})
+const LaunchReadinessTracker = nextDynamic(() => import('@/components/admin/dashboard/launch-readiness-tracker').then(m => m.LaunchReadinessTracker), {
+    loading: () => <div className="h-24 w-full animate-pulse bg-[var(--dashboard-card)] rounded-3xl" />
+})
+const QuickActionsWidget = nextDynamic(() => import('@/components/admin/dashboard/quick-actions-widget').then(m => m.QuickActionsWidget), {
+    loading: () => <div className="h-24 w-full animate-pulse bg-[var(--dashboard-card)] rounded-3xl" />
+})
 export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboardPage() {

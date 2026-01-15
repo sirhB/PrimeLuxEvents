@@ -1,11 +1,19 @@
 "use client"
 
 import { useRouter, usePathname } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
+import dynamic from "next/dynamic"
 import { Capacitor } from "@capacitor/core"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { useCapacitor } from "@/components/providers/capacitor-provider"
+import { cn } from "@/lib/utils"
+import { Toaster } from "sonner"
+
+const ThreeBackground = dynamic(
+    () => import("@/components/three-background").then((mod) => mod.ThreeBackground),
+    { ssr: false }
+)
 
 export function SiteLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
@@ -32,17 +40,24 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="flex flex-col min-h-screen">
+            {!isPortal && <ThreeBackground />}
             {!isPortal && !isNative && (
                 <div className="print:hidden">
                     <SiteHeader />
                 </div>
             )}
-            <main className="flex-1">{children}</main>
+            <main className={cn(
+                "flex-1",
+                isNative && isPortal && "pt-0" // Portal (Admin/Account) already handles safe area in layout-content.tsx
+            )}>
+                {children}
+            </main>
             {!isPortal && !isNative && (
                 <div className="print:hidden">
                     <SiteFooter />
                 </div>
             )}
+            {!isPortal && <Toaster />}
         </div>
     )
 }

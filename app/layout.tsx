@@ -5,10 +5,9 @@ import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
 import "./globals.css"
 import { CapacitorProvider } from "@/components/providers/capacitor-provider"
+import { NotificationsProvider } from "@/components/providers/notifications-provider"
 import { CartProvider } from "@/components/providers/cart-provider"
 import { SiteLayout } from "@/components/site-layout"
-import { ThreeBackground } from "@/components/three-background"
-import { Toaster } from "sonner"
 
 const _geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
 const _geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
@@ -78,22 +77,29 @@ export const viewport = {
   viewportFit: "cover",
 }
 
-export default function RootLayout({
+import { headers } from "next/headers"
+
+// ... (keep existing code)
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const headersList = await headers()
+  const isNative = headersList.get("x-is-native") === "true"
+
   return (
     <html lang="en">
       <body className={`font-sans antialiased ${playfair.variable} ${_geist.variable} ${_geistMono.variable}`}>
-        <ThreeBackground />
-        <CapacitorProvider>
-          <CartProvider>
-            <SiteLayout>{children}</SiteLayout>
-          </CartProvider>
+        <CapacitorProvider initialIsNative={isNative}>
+          <NotificationsProvider>
+            <CartProvider>
+              <SiteLayout>{children}</SiteLayout>
+            </CartProvider>
+          </NotificationsProvider>
         </CapacitorProvider>
         <Analytics />
-        <Toaster />
         <Script src="https://js.puter.com/v2/" strategy="beforeInteractive" />
       </body>
     </html>

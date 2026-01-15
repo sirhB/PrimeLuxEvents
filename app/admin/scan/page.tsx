@@ -11,6 +11,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { createClient } from '@/lib/supabase/client'
 import { updateProductStock } from './actions'
 import { toast } from 'sonner'
+import { BarcodeScanner, BarcodeFormat } from '@capacitor-mlkit/barcode-scanning'
+import { useCapacitor } from '@/components/providers/capacitor-provider'
 
 type ScanMode = 'navigation' | 'inventory' | 'picking'
 
@@ -26,8 +28,11 @@ export default function ScanPage() {
     const router = useRouter()
     const scannerRef = useRef<Html5QrcodeScanner | null>(null)
     const supabase = createClient()
+    const { isNative } = useCapacitor()
 
     useEffect(() => {
+        if (isNative) return;
+
         const scanner = new Html5QrcodeScanner(
             "reader",
             {
@@ -79,7 +84,7 @@ export default function ScanPage() {
                 });
             }
         }
-    }, [mode, selectedOrder])
+    }, [mode, selectedOrder, isNative])
 
     useEffect(() => {
         if (mode === 'picking') {
@@ -161,6 +166,48 @@ export default function ScanPage() {
         setIsLoading(false);
     }
 
+    async function handleNativeScan() {
+        try {
+            const { camera } = await BarcodeScanner.requestPermissions()
+            if (camera !== "granted") {
+                toast.error("Camera permission is required")
+                return
+            }
+
+            const { barcodes } = await BarcodeScanner.scan({
+                formats: [BarcodeFormat.QrCode],
+            })
+
+            if (barcodes.length > 0) {
+                const decodedText = barcodes[0].displayValue
+                setScanResult(decodedText)
+
+                if (mode === 'navigation') {
+                    setIsScanning(false)
+                    if (decodedText.includes('/admin/')) {
+                        const targetPath = decodedText.split('/admin/')[1]
+                        router.push(`/admin/${targetPath}`)
+                    } else if (decodedText.startsWith('/')) {
+                        router.push(decodedText)
+                    }
+                } else if (mode === 'inventory') {
+                    setIsScanning(false)
+                    await handleInventoryScan(decodedText)
+                } else if (mode === 'picking') {
+                    if (!selectedOrder) {
+                        toast.error("Please select an order first")
+                        return
+                    }
+                    setIsScanning(false)
+                    await handlePickingScan(decodedText)
+                }
+            }
+        } catch (error) {
+            console.error("Native scan error:", error)
+            toast.error("Failed to scan code")
+        }
+    }
+
     async function adjustStock(amount: number) {
         if (!scannedProduct) return;
         setIsLoading(true);
@@ -216,8 +263,26 @@ export default function ScanPage() {
                         {mode === 'navigation' ? 'Scan to view details' : mode === 'inventory' ? 'Scan a product to adjust stock' : 'Scan items for an order'}
                     </p>
                 </CardHeader>
-                <CardContent className="p-0 relative bg-black min-h-[400px]">
-                    <div id="reader" className="w-full overflow-hidden min-h-[400px]"></div>
+                <CardContent className="p-0 relative bg-black min-h-[400px] flex items-center justify-center">
+                    {!isNative && <div id="reader" className="w-full overflow-hidden min-h-[400px]"></div>}
+
+                    {isNative && isScanning && !scannedProduct && (!selectedOrder || mode !== 'picking') && (
+                        <div className="flex flex-col items-center gap-6 p-12 text-center">
+                            <div className="h-24 w-24 rounded-[2rem] bg-white/10 flex items-center justify-center animate-pulse border border-white/20">
+                                <Camera className="h-12 w-12 text-white" />
+                            </div>
+                            <div>
+                                <h3 className="text-white text-xl font-serif mb-2">Native Scanner Ready</h3>
+                                <p className="text-gray-400 text-sm max-w-[240px]">The native scanner provides faster and more reliable scanning on iOS.</p>
+                            </div>
+                            <Button
+                                className="bg-white text-black hover:bg-gold hover:text-black transition-colors h-14 px-10 rounded-2xl font-bold uppercase tracking-widest text-sm"
+                                onClick={handleNativeScan}
+                            >
+                                Open Camera
+                            </Button>
+                        </div>
+                    )}
 
                     {(!isScanning || scannedProduct || (mode === 'picking' && selectedOrder)) && (
                         <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-300">

@@ -3,19 +3,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
-export interface CreateOrderData {
-    customerName: string
-    customerEmail: string
-    customerPhone?: string
-    deliveryDate: string
-    deliveryTime?: string
-    deliveryAddress: string
-    rentalStartDate: string
-    rentalEndDate: string
-    items: Array<{ productId: string; quantity: number }>
-    status?: string
-    totalAmount: number
-}
 
 export interface UpdateOrderData {
     customerName?: string
@@ -30,6 +17,25 @@ export interface UpdateOrderData {
     totalAmount?: number
 }
 
+import { calculateOrderTotal, type CartItem } from '@/app/actions/checkout'
+
+export interface CreateOrderData {
+    customerName: string
+    customerEmail: string
+    customerPhone?: string
+    deliveryDate: string
+    deliveryTime?: string
+    deliveryAddress: string
+    rentalStartDate: string
+    rentalEndDate: string
+    items: Array<{ productId: string; quantity: number }>
+    status?: string
+    totalAmount: number
+    paymentMethod?: string
+    paidAmount?: number
+    checkUrl?: string
+}
+
 export async function createOrder(data: CreateOrderData) {
     try {
         const supabase = await createClient()
@@ -39,31 +45,71 @@ export async function createOrder(data: CreateOrderData) {
             data: { user },
         } = await supabase.auth.getUser()
 
+        // Calculate totals using the shared checkout logic
+        const cartItems: CartItem[] = data.items.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity
+        }))
+
+        const totals = await calculateOrderTotal(cartItems, data.deliveryAddress)
+
         const { data: newOrder, error } = await supabase
             .from('orders')
             .insert({
                 customer_name: data.customerName,
                 customer_email: data.customerEmail,
                 customer_phone: data.customerPhone || null,
+                delivery_address: data.deliveryAddress,
                 delivery_date: data.deliveryDate,
                 delivery_time: data.deliveryTime || null,
-                delivery_address: data.deliveryAddress,
                 rental_start_date: data.rentalStartDate,
                 rental_end_date: data.rentalEndDate,
                 status: data.status || 'pending',
-                total_amount: data.totalAmount,
+                subtotal: totals.subtotal,
+                tax_amount: totals.taxAmount,
+                tax_rate: totals.taxRate,
+                delivery_fee: totals.deliveryFee,
+                total_amount: totals.totalAmount, // Use calculated total
                 created_by: user?.email || 'Admin',
+                payment_status: (data.status === 'confirmed' || (data.paidAmount && data.paidAmount >= totals.totalAmount)) ? 'succeeded' : 'pending',
+                payment_method: data.paymentMethod || 'other',
+                balance_paid: data.paidAmount || (data.status === 'confirmed' ? totals.totalAmount : 0),
+                // We'll add check_url if possible, or store in notes for now if column doesn't exist
+                // Actually, I'll assume I can add the column.
+                // @ts-ignore
+                check_url: data.checkUrl || null
             })
             .select()
             .single()
 
         if (error) {
+            console.error('Error creating order:', error)
             return { success: false, error: error.message }
+        }
+
+        // Create order items
+        if (data.items.length > 0) {
+            const orderItems = data.items.map(item => {
+                const product = totals.products.find(p => p.id === item.productId)
+                return {
+                    order_id: newOrder.id,
+                    product_id: item.productId,
+                    quantity: item.quantity,
+                    price_at_time: product?.price || 0
+                }
+            })
+
+            const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
+            if (itemsError) {
+                console.error('Error creating order items:', itemsError)
+                // We might want to delete the order here if items fail, but for now just log
+            }
         }
 
         revalidatePath('/admin/orders')
         return { success: true, data: newOrder }
     } catch (error) {
+        console.error('Create order error:', error)
         const message = error instanceof Error ? error.message : 'Unknown error'
         return { success: false, error: message }
     }

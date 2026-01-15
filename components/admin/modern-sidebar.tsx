@@ -130,11 +130,12 @@ interface SidebarSectionProps {
     title: string
     items: any[]
     isCollapsed: boolean
+    forceShowLabels?: boolean
     pathname: string
     onItemClick: () => void
 }
 
-const SidebarSection = ({ title, items, isCollapsed, pathname, onItemClick }: SidebarSectionProps) => {
+const SidebarSection = ({ title, items, isCollapsed, forceShowLabels, pathname, onItemClick }: SidebarSectionProps) => {
     // Helper to determine if a route is active
     const isRouteActive = (href: string) => {
         if (href === '/admin' && pathname === '/admin') return true
@@ -162,7 +163,7 @@ const SidebarSection = ({ title, items, isCollapsed, pathname, onItemClick }: Si
                         key={item.href}
                         item={item}
                         isActive={isRouteActive(item.href)}
-                        isCollapsed={isCollapsed}
+                        isCollapsed={isCollapsed && !forceShowLabels}
                         onClick={onItemClick}
                     />
                 ))}
@@ -196,7 +197,7 @@ const SidebarSection = ({ title, items, isCollapsed, pathname, onItemClick }: Si
                                 key={item.href}
                                 item={item}
                                 isActive={isRouteActive(item.href)}
-                                isCollapsed={isCollapsed}
+                                isCollapsed={isCollapsed && !forceShowLabels}
                                 onClick={onItemClick}
                             />
                         ))}
@@ -251,8 +252,7 @@ const sidebarGroups = [
 
 export function ModernSidebar() {
     const pathname = usePathname()
-    const [isMobileOpen, setIsMobileOpen] = useState(false)
-    const { isCollapsed, setIsCollapsed } = useAdminSidebar()
+    const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } = useAdminSidebar()
     const [user, setUser] = useState<any>(null)
     const supabase = createClient()
 
@@ -271,15 +271,7 @@ export function ModernSidebar() {
 
     return (
         <TooltipProvider>
-            {/* Mobile Toggle Button (Fixed) */}
-            <Button
-                variant="ghost"
-                size="icon"
-                className="fixed top-3 left-4 z-50 md:hidden text-[var(--dashboard-text)] bg-[var(--dashboard-card)]/50 backdrop-blur-md border border-[var(--dashboard-border)] shadow-sm"
-                onClick={() => setIsMobileOpen(true)}
-            >
-                <Menu className="h-5 w-5" />
-            </Button>
+            {/* Mobile Toggle Button Removed (now in bottom bar) */}
 
             {/* Mobile Backdrop Overlay */}
             <AnimatePresence>
@@ -297,17 +289,18 @@ export function ModernSidebar() {
             {/* Sidebar Container */}
             <aside
                 className={cn(
-                    "fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
+                    "fixed inset-y-0 left-0 z-[70] flex flex-col transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
                     // Glassmorphism background
                     "bg-[var(--dashboard-background)]/95 backdrop-blur-xl border-r border-[var(--dashboard-border)]",
-                    // Width logic
-                    isCollapsed ? "w-20" : "w-64",
+                    // Width logic: Always wide on mobile, desktop follows collapse state
+                    isCollapsed ? "md:w-20" : "md:w-64",
+                    "w-64",
                     // Mobile slide-in logic
                     "md:translate-x-0",
                     isMobileOpen ? "translate-x-0" : "-translate-x-full",
                     // Shadow for depth
                     "shadow-[4px_0_24px_-12px_rgba(0,0,0,0.5)]",
-                    "pt-[env(safe-area-inset-top)]"
+                    "pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
                 )}
             >
                 {/* Header Section */}
@@ -351,14 +344,15 @@ export function ModernSidebar() {
                 </div>
 
                 {/* Navigation Section */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[var(--dashboard-border)] scrollbar-track-transparent">
-                    <nav className="p-3">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-[var(--dashboard-border)] scrollbar-track-transparent overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+                    <nav className="p-3 pb-12">
                         {sidebarGroups.map((group) => (
                             <SidebarSection
                                 key={group.title}
                                 title={group.title}
                                 items={group.items}
                                 isCollapsed={isCollapsed}
+                                forceShowLabels={isMobileOpen}
                                 pathname={pathname}
                                 onItemClick={() => setIsMobileOpen(false)}
                             />
@@ -372,7 +366,7 @@ export function ModernSidebar() {
                         <DropdownMenuTrigger asChild>
                             <button className={cn(
                                 "w-full flex items-center gap-3 p-2 rounded-xl hover:bg-[var(--dashboard-card-hover)] transition-all duration-200 group relative overflow-hidden outline-none",
-                                isCollapsed ? "justify-center" : "justify-start"
+                                (isCollapsed && !isMobileOpen) ? "justify-center" : "justify-start"
                             )}>
                                 <Avatar className="h-9 w-9 border border-white/10 shadow-inner">
                                     <AvatarFallback className="bg-gradient-to-br from-zinc-800 to-zinc-900 text-[var(--dashboard-text-muted)]">
@@ -380,7 +374,7 @@ export function ModernSidebar() {
                                     </AvatarFallback>
                                 </Avatar>
 
-                                {!isCollapsed && (
+                                {(!isCollapsed || isMobileOpen) && (
                                     <>
                                         <div className="flex-1 min-w-0 text-left">
                                             <p className="text-xs font-semibold text-[var(--dashboard-text)] truncate">

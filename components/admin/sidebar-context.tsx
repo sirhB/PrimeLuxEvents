@@ -5,12 +5,15 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 interface AdminSidebarContextType {
     isCollapsed: boolean
     setIsCollapsed: (value: boolean) => void
+    isMobileOpen: boolean
+    setIsMobileOpen: (value: boolean) => void
 }
 
 const AdminSidebarContext = createContext<AdminSidebarContextType | undefined>(undefined)
 
 export function AdminSidebarProvider({ children }: { children: React.ReactNode }) {
     const [isCollapsed, setIsCollapsed] = useState(false)
+    const [isMobileOpen, setIsMobileOpen] = useState(false)
 
     // Load preference from localStorage
     useEffect(() => {
@@ -26,7 +29,12 @@ export function AdminSidebarProvider({ children }: { children: React.ReactNode }
     }
 
     return (
-        <AdminSidebarContext.Provider value={{ isCollapsed, setIsCollapsed: handleSetCollapsed }}>
+        <AdminSidebarContext.Provider value={{
+            isCollapsed,
+            setIsCollapsed: handleSetCollapsed,
+            isMobileOpen,
+            setIsMobileOpen
+        }}>
             {children}
         </AdminSidebarContext.Provider>
     )

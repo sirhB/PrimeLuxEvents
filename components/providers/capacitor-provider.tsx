@@ -6,6 +6,7 @@ import { StatusBar, Style } from "@capacitor/status-bar"
 import { SplashScreen } from "@capacitor/splash-screen"
 import { Keyboard, KeyboardResize } from "@capacitor/keyboard"
 import { App } from "@capacitor/app"
+import { usePathname } from "next/navigation"
 
 type CapacitorContextType = {
     isNative: boolean
@@ -17,8 +18,9 @@ const CapacitorContext = createContext<CapacitorContextType>({
 
 export const useCapacitor = () => useContext(CapacitorContext)
 
-export function CapacitorProvider({ children }: { children: React.ReactNode }) {
-    const [isNative, setIsNative] = useState(false)
+export function CapacitorProvider({ children, initialIsNative = false }: { children: React.ReactNode, initialIsNative?: boolean }) {
+    const [isNative, setIsNative] = useState(initialIsNative)
+    const pathname = usePathname()
 
     useEffect(() => {
         // Check if running on a native platform
@@ -28,67 +30,84 @@ export function CapacitorProvider({ children }: { children: React.ReactNode }) {
         setIsNative(isNativePlatform)
 
         if (isNativePlatform) {
-            // Initialize Capacitor plugins
-            const initCapacitor = async () => {
+            // Hide splash screen after app load
+            SplashScreen.hide().catch(console.warn)
+
+            // Initial setup
+            const initPlugins = async () => {
                 try {
-                    // Hide splash screen after app load
-                    await SplashScreen.hide()
-
-                    // Configure Status Bar
-                    try {
-                        await StatusBar.setStyle({ style: Style.Dark })
-                        if (platform === 'android') {
-                            await StatusBar.setBackgroundColor({ color: '#111111' }) // Match theme color
-                            await StatusBar.setOverlaysWebView({ overlay: false })
-                        }
-                    } catch (e) {
-                        console.warn("StatusBar plugin error", e)
-                    }
-
-                    // Configure Keyboard
-                    try {
-                        await Keyboard.setResizeMode({ mode: KeyboardResize.Body })
-                        await Keyboard.setScroll({ isDisabled: false })
-                    } catch (e) {
-                        console.warn("Keyboard plugin error", e)
-                    }
-
-                    // Handle App State changes if needed
-                    App.addListener('appStateChange', ({ isActive }) => {
-                        console.log('App state changed. Is active?', isActive);
-                    });
-
-                    // Handle Back button on Android
-                    App.addListener('backButton', ({ canGoBack }) => {
-                        if (!canGoBack) {
-                            App.exitApp();
-                        } else {
-                            window.history.back();
-                        }
-                    });
-
-                } catch (error) {
-                    console.error("Error initializing Capacitor plugins:", error)
+                    await Keyboard.setResizeMode({ mode: KeyboardResize.Body })
+                    await Keyboard.setScroll({ isDisabled: false })
+                } catch (e) {
+                    console.warn("Keyboard plugin init error", e)
                 }
             }
+            initPlugins()
 
-            initCapacitor()
+            // Handle App State changes
+            App.addListener('appStateChange', ({ isActive }) => {
+                console.log('App state changed. Is active?', isActive);
+            });
+
+            // Handle Back button on Android
+            App.addListener('backButton', ({ canGoBack }) => {
+                if (!canGoBack) {
+                    App.exitApp();
+                } else {
+                    window.history.back();
+                }
+            });
         }
     }, [])
+
+    // Update Status Bar when pathname changes
+    useEffect(() => {
+        const platform = Capacitor.getPlatform()
+        const isNativePlatform = platform === "ios" || platform === "android"
+
+        if (isNativePlatform) {
+            const updateStatusBar = async () => {
+                try {
+                    const isAdmin = pathname.startsWith('/admin')
+
+                    // Show status bar if it was hidden
+                    await StatusBar.show()
+
+                    // In modern Capacitor (v5+):
+                    // Style.Dark = White text (for dark backgrounds/mode)
+                    // Style.Light = Black text (for light backgrounds/mode)
+                    await StatusBar.setStyle({
+                        style: isAdmin ? Style.Dark : Style.Light
+                    })
+
+                    if (platform === 'android') {
+                        await StatusBar.setBackgroundColor({ color: isAdmin ? '#0a0a0b' : '#FDFBF7' })
+                        await StatusBar.setOverlaysWebView({ overlay: true })
+                    }
+                } catch (e) {
+                    console.warn("StatusBar update error", e)
+                }
+            }
+            updateStatusBar()
+        }
+    }, [pathname])
+
+    const isAdmin = pathname.startsWith('/admin')
 
     return (
         <CapacitorContext.Provider value={{ isNative }}>
             <div
                 className={isNative ? "capacitor-app" : "web-app"}
                 style={{
-                    // Add safe area padding for native apps using CSS variables
-                    paddingTop: isNative ? "var(--safe-area-inset-top)" : "0px",
-                    paddingBottom: isNative ? "var(--safe-area-inset-bottom)" : "0px",
+                    paddingTop: (isNative && !isAdmin) ? "env(safe-area-inset-top)" : "0px",
+                    paddingBottom: isNative ? "env(safe-area-inset-bottom)" : "0px",
                     paddingLeft: isNative ? "var(--safe-area-inset-left)" : "0px",
                     paddingRight: isNative ? "var(--safe-area-inset-right)" : "0px",
                     minHeight: "100vh",
                     display: "flex",
-                    flexDirection: "column"
+                    flexDirection: "column",
+                    // For admin, use the dark dashboard background. For site, use the light background.
+                    background: isNative ? (isAdmin ? "#0a0a0b" : "#FDFBF7") : "transparent"
                 }}
             >
                 {children}

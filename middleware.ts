@@ -1,8 +1,22 @@
-import { type NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
-    return await updateSession(request)
+    const userAgent = request.headers.get('user-agent') || ''
+    const isNative = userAgent.includes('Capacitor') || userAgent.includes('Dante')
+
+    // Clone the request headers
+    const requestHeaders = new Headers(request.headers)
+    if (isNative) {
+        requestHeaders.set('x-is-native', 'true')
+    }
+
+    // Create a new request with the updated headers
+    const newRequest = new NextRequest(request, {
+        headers: requestHeaders,
+    })
+
+    return await updateSession(newRequest)
 }
 
 export const config = {
