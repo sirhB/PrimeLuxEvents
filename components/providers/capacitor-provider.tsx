@@ -7,6 +7,8 @@ import { SplashScreen } from "@capacitor/splash-screen"
 import { Keyboard, KeyboardResize } from "@capacitor/keyboard"
 import { App } from "@capacitor/app"
 import { usePathname } from "next/navigation"
+import { AppLoadingScreen } from "@/components/ui/app-loading-screen"
+import { AnimatePresence } from "framer-motion"
 
 type CapacitorContextType = {
     isNative: boolean
@@ -20,6 +22,7 @@ export const useCapacitor = () => useContext(CapacitorContext)
 
 export function CapacitorProvider({ children, initialIsNative = false }: { children: React.ReactNode, initialIsNative?: boolean }) {
     const [isNative, setIsNative] = useState(initialIsNative)
+    const [isLoading, setIsLoading] = useState(initialIsNative)
     const pathname = usePathname()
 
     useEffect(() => {
@@ -31,7 +34,14 @@ export function CapacitorProvider({ children, initialIsNative = false }: { child
 
         if (isNativePlatform) {
             // Hide splash screen after app load
-            SplashScreen.hide().catch(console.warn)
+            // We'll keep our custom loader visible for a bit longer
+            setTimeout(async () => {
+                await SplashScreen.hide().catch(console.warn)
+                // Add a small delay before removing the custom loader to ensure smooth transition
+                setTimeout(() => {
+                    setIsLoading(false)
+                }, 800)
+            }, 500)
 
             // Initial setup
             const initPlugins = async () => {
@@ -112,6 +122,9 @@ export function CapacitorProvider({ children, initialIsNative = false }: { child
             >
                 {children}
             </div>
+            <AnimatePresence>
+                {isLoading && isNative && <AppLoadingScreen key="loading-screen" />}
+            </AnimatePresence>
         </CapacitorContext.Provider>
     )
 }

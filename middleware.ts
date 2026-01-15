@@ -9,6 +9,11 @@ export async function middleware(request: NextRequest) {
     const requestHeaders = new Headers(request.headers)
     if (isNative) {
         requestHeaders.set('x-is-native', 'true')
+
+        // If it's a native app accessing the root, redirect to admin
+        if (request.nextUrl.pathname === '/') {
+            return NextResponse.redirect(new URL('/admin', request.url))
+        }
     }
 
     // Create a new request with the updated headers
