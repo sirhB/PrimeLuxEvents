@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { useCapacitor } from '@/components/providers/capacitor-provider'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,6 +18,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const router = useRouter()
+    const { isNative } = useCapacitor()
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -53,7 +56,25 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 dark:bg-gray-900">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 px-4 dark:bg-gray-900 gap-8">
+            {isNative && (
+                <div className="relative h-16 w-48">
+                    <Image
+                        src="/images/logo-dark-mode.png"
+                        alt="PrimeLux Events"
+                        fill
+                        className="object-contain dark:hidden"
+                        priority
+                    />
+                    <Image
+                        src="/images/logo-light-mode.png"
+                        alt="PrimeLux Events"
+                        fill
+                        className="hidden object-contain dark:block"
+                        priority
+                    />
+                </div>
+            )}
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>

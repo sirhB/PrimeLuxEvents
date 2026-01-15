@@ -4,6 +4,7 @@ import { Geist, Geist_Mono, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
 import "./globals.css"
+import { CapacitorProvider } from "@/components/providers/capacitor-provider"
 import { CartProvider } from "@/components/providers/cart-provider"
 import { SiteLayout } from "@/components/site-layout"
 import { ThreeBackground } from "@/components/three-background"
@@ -14,6 +15,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://primeluxevents.com'),
   title: {
     default: 'PrimeLux Events | Luxury Event Rentals',
     template: '%s | PrimeLux Events',
@@ -85,9 +87,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans antialiased ${playfair.variable} ${_geist.variable} ${_geistMono.variable}`}>
         <ThreeBackground />
-        <CartProvider>
-          <SiteLayout>{children}</SiteLayout>
-        </CartProvider>
+        <CapacitorProvider>
+          <CartProvider>
+            <SiteLayout>{children}</SiteLayout>
+          </CartProvider>
+        </CapacitorProvider>
         <Analytics />
         <Toaster />
         <Script src="https://js.puter.com/v2/" strategy="beforeInteractive" />

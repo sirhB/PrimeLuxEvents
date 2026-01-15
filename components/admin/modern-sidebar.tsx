@@ -306,7 +306,8 @@ export function ModernSidebar() {
                     "md:translate-x-0",
                     isMobileOpen ? "translate-x-0" : "-translate-x-full",
                     // Shadow for depth
-                    "shadow-[4px_0_24px_-12px_rgba(0,0,0,0.5)]"
+                    "shadow-[4px_0_24px_-12px_rgba(0,0,0,0.5)]",
+                    "pt-[env(safe-area-inset-top)]"
                 )}
             >
                 {/* Header Section */}

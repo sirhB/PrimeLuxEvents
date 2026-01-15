@@ -110,11 +110,13 @@ export function LaunchReadinessTracker() {
                         const Icon = item.icon
 
                         return (
-                            <button
+                            <div
                                 key={item.key}
                                 onClick={() => handleItemClick(item)}
+                                role="button"
+                                tabIndex={0}
                                 className={cn(
-                                    "flex flex-col gap-3 p-4 rounded-2xl transition-all duration-300 text-left border relative group/item",
+                                    "flex flex-col gap-3 p-4 rounded-2xl transition-all duration-300 text-left border relative group/item cursor-pointer",
                                     isDone
                                         ? "bg-[var(--dashboard-accent-green)]/5 border-[var(--dashboard-accent-green)]/20"
                                         : "bg-white/5 border-[var(--dashboard-border)] hover:bg-white/10 hover:border-[var(--dashboard-accent-gold)]/30"
@@ -146,7 +148,7 @@ export function LaunchReadinessTracker() {
                                         <ChevronRight className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                                     </div>
                                 )}
-                            </button>
+                            </div>
                         )
                     })}
                 </div>

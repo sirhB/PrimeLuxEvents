@@ -3,10 +3,9 @@
 import { useAdminSidebar } from '@/components/admin/sidebar-context'
 import { ModernSidebar } from '@/components/admin/modern-sidebar'
 import { AdminToastProvider } from '@/components/admin/toast-provider'
-import { AdminSearchFab } from '@/components/admin/admin-search-fab'
 import { AdminNotifications } from '@/components/admin/notifications'
-import { MobileAdminFAB } from '@/components/admin/mobile-fab'
 import { CommandPalette } from '@/components/admin/command-palette'
+import { AdminBottomBar } from '@/components/admin/admin-bottom-bar'
 import { cn } from '@/lib/utils'
 import { Search, User, Command } from 'lucide-react'
 import { useState, useEffect } from 'react'
@@ -27,17 +26,17 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
     }, [])
 
     return (
-        <div className="flex min-h-screen w-full bg-[var(--dashboard-background)] text-[var(--dashboard-text)] font-sans admin-theme">
+        <div className="flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--dashboard-background)] text-[var(--dashboard-text)] font-sans admin-theme">
             <div className="print:hidden">
                 <ModernSidebar />
             </div>
             <div className={cn(
-                "flex flex-1 flex-col transition-all duration-300",
+                "flex flex-1 flex-col transition-all duration-300 max-w-full overflow-x-hidden",
                 isCollapsed ? "md:pl-20" : "md:pl-64"
             )}>
                 {/* Admin Header / Top Bar */}
-                <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-[var(--dashboard-border)] bg-[var(--dashboard-background)]/80 backdrop-blur-md px-4 md:px-8">
-                    <div className="flex items-center gap-4">
+                <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between border-b border-[var(--dashboard-border)] bg-[var(--dashboard-background)]/80 backdrop-blur-md px-4 md:px-8 pt-[env(safe-area-inset-top)]">
+                    <div className="flex items-center gap-4 min-w-0">
                         <div className="hidden md:flex relative w-64 group cursor-pointer" onClick={() => setIsCommandPaletteOpen(true)}>
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-accent-gold)] transition-colors" />
                             <div className="w-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] rounded-xl py-2 pl-10 pr-4 text-xs text-[var(--dashboard-text-muted)]/50 flex items-center justify-between group-hover:border-[var(--dashboard-accent-gold)]/30 transition-all">
@@ -50,7 +49,7 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 md:gap-4">
+                    <div className="flex items-center gap-2 md:gap-4 shrink-0">
                         <AdminNotifications />
                         <div className="h-8 w-px bg-[var(--dashboard-border)] mx-1" />
                         <div className="flex items-center gap-3">
@@ -65,13 +64,12 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
                     </div>
                 </header>
 
-                <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+                <main className="flex-1 p-4 md:p-8 overflow-y-auto overflow-x-hidden pb-24 md:pb-8 max-w-full">
                     {children}
                 </main>
             </div>
+            <AdminBottomBar />
             <AdminToastProvider />
-            <AdminSearchFab />
-            <MobileAdminFAB />
             <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} />
         </div>
     )
