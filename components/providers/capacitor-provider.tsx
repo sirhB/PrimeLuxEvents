@@ -33,16 +33,6 @@ export function CapacitorProvider({ children, initialIsNative = false }: { child
         setIsNative(isNativePlatform)
 
         if (isNativePlatform) {
-            // Hide splash screen after app load
-            // We'll keep our custom loader visible for a bit longer
-            setTimeout(async () => {
-                await SplashScreen.hide().catch(console.warn)
-                // Add a small delay before removing the custom loader to ensure smooth transition
-                setTimeout(() => {
-                    setIsLoading(false)
-                }, 800)
-            }, 500)
-
             // Initial setup
             const initPlugins = async () => {
                 try {
@@ -53,6 +43,22 @@ export function CapacitorProvider({ children, initialIsNative = false }: { child
                 }
             }
             initPlugins()
+
+            // Hide native splash screen quickly and hand off to our custom loader
+            // or directly to the UI if navigation is fast.
+            const handleHandoff = async () => {
+                try {
+                    await SplashScreen.hide()
+                    // Small grace period for the first render to finish
+                    setTimeout(() => setIsLoading(false), 200)
+                } catch (e) {
+                    console.warn("SplashScreen hide error", e)
+                    setIsLoading(false)
+                }
+            }
+
+            handleHandoff()
+
 
             // Handle App State changes
             App.addListener('appStateChange', ({ isActive }) => {

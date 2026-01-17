@@ -68,93 +68,113 @@ export async function getUserProfileForMiddleware(supabase: any, userId: string)
     try {
         console.log('Middleware: Fetching profile for user:', userId)
 
-        // 1. Get user profile (simple query, no joins)
-        const { data: profile, error: profileError } = await supabase
+        // 1. Get user profile with roles and permissions in ONE query
+        const { data: profileData, error: profileError } = await supabase
             .from('user_profiles')
-            .select('*')
+            .select(`
+                *,
+                user_roles:user_roles!user_roles_user_id_fkey (
+                    roles (
+                        id,
+                        name,
+                        display_name,
+                        description,
+                        color,
+                        is_system_role,
+                        role_permissions (
+                            permissions (
+                                id,
+                                name,
+                                display_name,
+                                description,
+                                resource,
+                                action
+                            )
+                        )
+                    )
+                )
+            `)
             .eq('id', userId)
             .eq('is_active', true)
             .single()
 
-        if (profileError) {
-            console.error('Middleware: Error fetching profile:', profileError)
+        if (profileError || !profileData) {
+            console.error('Middleware: Error fetching profile or inactive:', profileError)
             return null
         }
 
-        if (!profile) {
-            console.error('Middleware: No profile found for user:', userId)
-            return null
-        }
+        // 2. Flatten and deduplicate roles and permissions
+        const roles: Role[] = []
+        const permissionsMap = new Map<string, Permission>()
 
-        // 2. Get user roles
-        const { data: userRoles, error: rolesError } = await supabase
-            .from('user_roles')
-            .select(`
-        roles (
-          id,
-          name,
-          display_name,
-          description,
-          color,
-          is_system_role
-        )
-      `)
-            .eq('user_id', userId)
+        // Access the relationship via the specific key returned by PostgREST
+        const userRoles = (profileData as any).user_roles || []
 
-        if (rolesError) {
-            console.error('Middleware: Error fetching roles:', rolesError)
-            // Continue without roles if that fails, but log it
-        }
+        userRoles.forEach((ur: any) => {
+            if (ur.roles) {
+                const role = ur.roles
+                roles.push({
+                    id: role.id,
+                    name: role.name,
+                    display_name: role.display_name,
+                    description: role.description,
+                    color: role.color,
+                    is_system_role: role.is_system_role
+                })
 
-        const roles = userRoles?.map((ur: any) => ur.roles) || []
-        console.log('Middleware: Profile found, roles count:', roles.length)
-
-        // 3. Get permissions for these roles
-        let permissions: Permission[] = []
-        if (roles.length > 0) {
-            const roleIds = roles.map((r: any) => r.id)
-            const { data: rolePermissions, error: permissionsError } = await supabase
-                .from('role_permissions')
-                .select(`
-            permissions (
-              id,
-              name,
-              display_name,
-              description,
-              resource,
-              action
-            )
-          `)
-                .in('role_id', roleIds)
-
-            if (!permissionsError && rolePermissions) {
-                // Flatten and deduplicate permissions
-                const permissionsMap = new Map<string, Permission>()
-                rolePermissions.forEach((rp: any) => {
+                role.role_permissions?.forEach((rp: any) => {
                     if (rp.permissions) {
                         permissionsMap.set(rp.permissions.name, rp.permissions)
                     }
                 })
-                permissions = Array.from(permissionsMap.values())
             }
-        }
+        })
+
+        const permissions = Array.from(permissionsMap.values())
+        console.log('Middleware: Profile found, roles count:', roles.length, 'permissions count:', permissions.length)
 
         return {
-            id: profile.id,
-            email: profile.email,
-            full_name: profile.full_name,
-            avatar_url: profile.avatar_url,
-            phone: profile.phone,
-            job_title: profile.job_title,
-            department: profile.department,
-            hire_date: profile.hire_date,
-            is_active: profile.is_active,
-            last_login_at: profile.last_login_at,
+            id: profileData.id,
+            email: profileData.email,
+            full_name: profileData.full_name,
+            avatar_url: profileData.avatar_url,
+            phone: profileData.phone,
+            job_title: profileData.job_title,
+            department: profileData.department,
+            hire_date: profileData.hire_date,
+            is_active: profileData.is_active,
+            last_login_at: profileData.last_login_at,
             roles: roles,
             permissions
         }
     } catch (error) {
         console.error('Error in getUserProfileForMiddleware:', error)
+        return null
+    }
+}
+
+/**
+ * Serializes minimal profile info for cookie-based caching in middleware.
+ * Focuses on authorization fields to keep cookie size small.
+ */
+export function serializeAuthCache(profile: UserProfile): string {
+    const minProfile = {
+        id: profile.id,
+        roles: profile.roles.map(r => r.name),
+        active: profile.is_active,
+        ts: Date.now()
+    }
+    return Buffer.from(JSON.stringify(minProfile)).toString('base64')
+}
+
+/**
+ * Deserializes profile info from middleware cookie.
+ */
+export function deserializeAuthCache(token: string): { id: string, roles: string[], active: boolean, ts: number } | null {
+    try {
+        const decoded = Buffer.from(token, 'base64').toString()
+        return JSON.parse(decoded)
+    } catch (e) {
         return null
     }
 }

@@ -20,40 +20,19 @@ export default async function ProductsPage({
     const { category_id, page = '1', search, sort = 'newest', stock_status } = await searchParams
     const supabase = await createClient()
 
-    // Fetch categories for filter
-    const { data: categories } = await supabase
-        .from('categories')
-        .select('id, name')
-        .order('name')
-
-    // Fetch all products for metrics
-    const { data: allProducts } = await supabase
-        .from('products')
-        .select('price, cost, quantity_available')
-
-    // Calculate metrics
-    const totalProducts = allProducts?.length || 0
-    const lowStockCount = allProducts?.filter(p => (p.quantity_available || 0) <= 5).length || 0
-    const totalValue = allProducts?.reduce((sum, p) => sum + (p.cost || 0) * (p.quantity_available || 0), 0) || 0
-    const categoriesCount = categories?.length || 0
-
     const currentPage = parseInt(page)
     const pageSize = 10
     const start = (currentPage - 1) * pageSize
     const end = start + pageSize - 1
 
+    // Prepare the main query
     let query = supabase
         .from('products')
         .select('*, categories(name)', { count: 'exact' })
 
     // Apply filters
-    if (category_id) {
-        query = query.eq('category_id', category_id)
-    }
-
-    if (search) {
-        query = query.ilike('name', `%${search}%`)
-    }
+    if (category_id) query = query.eq('category_id', category_id)
+    if (search) query = query.ilike('name', `%${search}%`)
 
     // Apply stock filtering
     if (stock_status === 'in_stock') {
@@ -66,28 +45,35 @@ export default async function ProductsPage({
 
     // Apply sorting
     switch (sort) {
-        case 'oldest':
-            query = query.order('created_at', { ascending: true })
-            break
-        case 'price_asc':
-            query = query.order('price', { ascending: true })
-            break
-        case 'price_desc':
-            query = query.order('price', { ascending: false })
-            break
-        case 'name_asc':
-            query = query.order('name', { ascending: true })
-            break
-        case 'name_desc':
-            query = query.order('name', { ascending: false })
-            break
+        case 'oldest': query = query.order('created_at', { ascending: true }); break
+        case 'price_asc': query = query.order('price', { ascending: true }); break
+        case 'price_desc': query = query.order('price', { ascending: false }); break
+        case 'name_asc': query = query.order('name', { ascending: true }); break
+        case 'name_desc': query = query.order('name', { ascending: false }); break
         case 'newest':
-        default:
-            query = query.order('created_at', { ascending: false })
-            break
+        default: query = query.order('created_at', { ascending: false }); break
     }
 
-    const { data: products, count } = await query.range(start, end)
+    // Execute all queries in parallel
+    const [categoriesRes, statsRes, lowStockRes, productsRes] = await Promise.all([
+        supabase.from('categories').select('id, name').order('name'),
+        // Only select cost and quantity for value calculation to keep payload small
+        supabase.from('products').select('cost, quantity_available'),
+        // Targeted count for low stock
+        supabase.from('products').select('*', { count: 'exact', head: true }).lte('quantity_available', 5),
+        // Paginated products
+        query.range(start, end)
+    ])
+
+    const categories = categoriesRes.data || []
+    const allProductsForStats = statsRes.data || []
+    const lowStockCount = lowStockRes.count || 0
+    const { data: products, count: totalProductsCount } = productsRes
+
+    // Calculate metrics
+    const totalProducts = totalProductsCount || 0
+    const totalValue = allProductsForStats.reduce((sum, p) => sum + (p.cost || 0) * (p.quantity_available || 0), 0)
+    const categoriesCount = categories.length
 
     return (
         <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
@@ -170,12 +156,12 @@ export default async function ProductsPage({
 
                     <ProductsTable products={products || []} />
 
-                    {count !== null && count > 0 && (
+                    {totalProductsCount !== null && totalProductsCount > 0 && (
                         <div className="mt-8 flex justify-center">
                             <PaginationControls
-                                hasNextPage={end < count}
+                                hasNextPage={end < totalProductsCount}
                                 hasPrevPage={start > 0}
-                                totalCount={count}
+                                totalCount={totalProductsCount}
                                 currentPage={currentPage}
                                 pageSize={pageSize}
                             />

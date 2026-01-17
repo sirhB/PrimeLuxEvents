@@ -4,10 +4,20 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { LeadRail } from '@/components/admin/consultations/lead-rail'
-import { LeadDetailsPane } from '@/components/admin/consultations/lead-details-pane'
-import { LeadInsights } from '@/components/admin/consultations/lead-insights'
-import { type Consultation, type ConsultationStatus } from '@/components/admin/consultations/types'
-import { createClient } from '@/lib/supabase/client' // Assuming this import path
+import { type Consultation } from '@/components/admin/consultations/types'
+import { createClient } from '@/lib/supabase/client'
+import dynamic from 'next/dynamic'
+
+// Dynamic imports for heavy components
+const LeadDetailsPane = dynamic(() => import('@/components/admin/consultations/lead-details-pane').then(m => m.LeadDetailsPane), {
+    ssr: false,
+    loading: () => <div className="flex-1 flex items-center justify-center bg-black/20 animate-pulse rounded-3xl" />
+})
+
+const LeadInsights = dynamic(() => import('@/components/admin/consultations/lead-insights').then(m => m.LeadInsights), {
+    ssr: false,
+    loading: () => <div className="h-24 w-full bg-black/20 animate-pulse rounded-3xl mb-4" />
+})
 
 interface LeadWorkspaceProps {
     initialLeads: Consultation[]

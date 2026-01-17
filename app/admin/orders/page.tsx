@@ -24,28 +24,15 @@ export default async function OrdersPage({
 
     // 1. Fetch Metrics (Parallel execution for performance)
     const metricsPromise = Promise.all([
-        supabase.from('orders').select('total_amount').eq('status', 'delivered'), // Revenue (approx, fully paid)
-        supabase.from('orders').select('id', { count: 'exact', head: true }), // Total Orders
-        supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending'), // Pending
-        supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'delivered'), // Delivered
+        // Only fetch total_amount for delivered orders to sum revenue
+        supabase.from('orders').select('total_amount').eq('status', 'delivered'),
+        // Accurate counts for the dashboard cards
+        supabase.from('orders').select('id', { count: 'exact', head: true }),
+        supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('orders').select('id', { count: 'exact', head: true }).eq('status', 'delivered'),
     ])
 
-    // 2. Fetch Recent Orders (Limit 5)
-    const recentOrdersPromise = supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5)
-
-    // 3. Fetch Action Required Orders (Pending, Limit 5)
-    const pendingOrdersPromise = supabase
-        .from('orders')
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: true }) // Oldest first for action items? Or newest? let's do oldest first to clear backlog
-        .limit(5)
-
-    // 4. Fetch Main Table Data
+    // 3. Prepare Main Table Query & Pagination
     const currentPage = parseInt(page)
     const pageSize = 10
     const start = (currentPage - 1) * pageSize
@@ -65,37 +52,19 @@ export default async function OrdersPage({
 
     // Apply sorting
     switch (sort) {
-        case 'id_asc':
-            query = query.order('id', { ascending: true })
-            break
-        case 'id_desc':
-            query = query.order('id', { ascending: false })
-            break
-        case 'customer_name_asc':
-            query = query.order('customer_name', { ascending: true })
-            break
-        case 'customer_name_desc':
-            query = query.order('customer_name', { ascending: false })
-            break
-        case 'total_amount_asc':
-            query = query.order('total_amount', { ascending: true })
-            break
-        case 'total_amount_desc':
-            query = query.order('total_amount', { ascending: false })
-            break
-        case 'created_at_asc':
-            query = query.order('created_at', { ascending: true })
-            break
+        case 'id_asc': query = query.order('id', { ascending: true }); break
+        case 'id_desc': query = query.order('id', { ascending: false }); break
+        case 'customer_name_asc': query = query.order('customer_name', { ascending: true }); break
+        case 'customer_name_desc': query = query.order('customer_name', { ascending: false }); break
+        case 'total_amount_asc': query = query.order('total_amount', { ascending: true }); break
+        case 'total_amount_desc': query = query.order('total_amount', { ascending: false }); break
+        case 'created_at_asc': query = query.order('created_at', { ascending: true }); break
         case 'created_at_desc':
         case 'newest':
-        default:
-            query = query.order('created_at', { ascending: false })
-            break
+        default: query = query.order('created_at', { ascending: false }); break
     }
 
-    const tablePromise = query.range(start, end)
-
-    // Await all data
+    // 4. Fetch Dashboard Lists and Table Data in parallel with metrics
     const [
         [revenueResult, totalOrdersResult, pendingOrdersResult, deliveredOrdersResult],
         { data: recentOrders },
@@ -103,12 +72,12 @@ export default async function OrdersPage({
         { data: orders, count }
     ] = await Promise.all([
         metricsPromise,
-        recentOrdersPromise,
-        pendingOrdersPromise,
-        tablePromise
+        supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(5),
+        supabase.from('orders').select('*').eq('status', 'pending').order('created_at', { ascending: true }).limit(5),
+        query.range(start, end)
     ])
 
-    // Calculate specific metrics
+    // Calculate metrics locally
     const totalRevenue = revenueResult.data?.reduce((sum, order) => sum + (order.total_amount || 0), 0) || 0
     const totalOrdersCount = totalOrdersResult.count || 0
     const pendingOrdersCount = pendingOrdersResult.count || 0

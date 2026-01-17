@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { getUserProfileForMiddleware } from '@/lib/auth/middleware-auth'
+import { getUserProfileForMiddleware, serializeAuthCache, deserializeAuthCache } from '@/lib/auth/middleware-auth'
 
 export async function updateSession(request: NextRequest) {
     let supabaseResponse = NextResponse.next({
@@ -30,13 +30,8 @@ export async function updateSession(request: NextRequest) {
         }
     )
 
-    // IMPORTANT: Avoid writing any logic between createServerClient and
-    // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-    // issues with users being randomly logged out.
-
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+    // Verify user identity
+    const { data: { user } } = await supabase.auth.getUser()
 
     // Check if user is accessing admin routes
     if (request.nextUrl.pathname.startsWith('/admin')) {
@@ -48,41 +43,54 @@ export async function updateSession(request: NextRequest) {
                 return NextResponse.redirect(url)
             }
         } else {
-            // User is authenticated, check if they have access to admin
+            // User is authenticated, check for cached permissions
             try {
-                const userProfile = await getUserProfileForMiddleware(supabase, user.id)
-                if (!userProfile || !userProfile.is_active) {
-                    // User profile not found or inactive, redirect to login
+                const cacheToken = request.cookies.get('admin-auth-cache')?.value
+                let authCache = cacheToken ? deserializeAuthCache(cacheToken) : null
+
+                // Validate cache (check if it belongs to current user and is < 5 mins old)
+                const CACHE_EXPIRY_MS = 1000 * 60 * 5 // 5 minutes
+                const isCacheValid = authCache &&
+                    authCache.id === user.id &&
+                    (Date.now() - authCache.ts) < CACHE_EXPIRY_MS
+
+                let hasAdminAccess = false
+                let isActive = false
+
+                if (isCacheValid && authCache) {
+                    // console.log('Middleware: Using cached auth for user:', user.id)
+                    isActive = authCache.active
+                    hasAdminAccess = authCache.roles.some((role: string) =>
+                        ['admin', 'manager', 'staff'].includes(role)
+                    )
+                } else {
+                    // Cache miss or stale: Database lookup
+                    const userProfile = await getUserProfileForMiddleware(supabase, user.id)
+                    if (userProfile) {
+                        isActive = userProfile.is_active
+                        hasAdminAccess = userProfile.roles.some((role: { name: string }) =>
+                            ['admin', 'manager', 'staff'].includes(role.name)
+                        )
+
+                        // Update cache for next time
+                        const newCacheToken = serializeAuthCache(userProfile)
+                        supabaseResponse.cookies.set('admin-auth-cache', newCacheToken, {
+                            httpOnly: true,
+                            secure: process.env.NODE_ENV === 'production',
+                            maxAge: 60 * 60, // 1 hour (though we check timestamp internally for 5 mins)
+                            path: '/',
+                        })
+                    }
+                }
+
+                if (!isActive || !hasAdminAccess) {
                     const url = request.nextUrl.clone()
-                    url.pathname = '/login'
+                    url.pathname = isActive ? '/unauthorized' : '/login'
                     return NextResponse.redirect(url)
                 }
 
-                // Check if user has permission to access admin
-                const hasAdminAccess = userProfile.roles.some((role: { name: string }) =>
-                    role.name === 'admin' || role.name === 'manager' || role.name === 'staff'
-                )
-
-                if (!hasAdminAccess) {
-                    // User doesn't have admin access, redirect to unauthorized page
-                    const url = request.nextUrl.clone()
-                    url.pathname = '/unauthorized'
-                    return NextResponse.redirect(url)
-                }
-
-                // Update last login time
-                try {
-                    await supabase
-                        .from('user_profiles')
-                        .update({ last_login_at: new Date().toISOString() })
-                        .eq('id', user.id)
-                } catch (error) {
-                    // Non-critical error, continue
-                    console.error('Error updating last login:', error)
-                }
             } catch (error) {
-                console.error('Error checking user permissions:', error)
-                // On error, redirect to login for safety
+                console.error('Error checking user permissions in middleware:', error)
                 const url = request.nextUrl.clone()
                 url.pathname = '/login'
                 return NextResponse.redirect(url)
