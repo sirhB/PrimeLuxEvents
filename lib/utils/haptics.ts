@@ -1,0 +1,80 @@
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics'
+import { Capacitor } from '@capacitor/core'
+
+/**
+ * Haptic feedback utility that safely handles platform checks.
+ * Falls back to no-op on web/non-native platforms.
+ */
+export const haptics = {
+    /**
+     * Trigger a subtle impact vibration
+     */
+    impact: async (style: ImpactStyle = ImpactStyle.Medium) => {
+        if (Capacitor.isNativePlatform()) {
+            try {
+                await Haptics.impact({ style })
+            } catch (e) {
+                console.warn('Haptics impact failed', e)
+            }
+        }
+    },
+
+    /**
+     * Trigger a notification vibration (success, warning, error)
+     */
+    notification: async (type: NotificationType = NotificationType.Success) => {
+        if (Capacitor.isNativePlatform()) {
+            try {
+                await Haptics.notification({ type })
+            } catch (e) {
+                console.warn('Haptics notification failed', e)
+            }
+        }
+    },
+
+    /**
+     * Trigger a light click vibration
+     */
+    vibrate: async () => {
+        if (Capacitor.isNativePlatform()) {
+            try {
+                await Haptics.vibrate()
+            } catch (e) {
+                console.warn('Haptics vibrate failed', e)
+            }
+        }
+    },
+
+    /**
+     * Selection changed (light vibration)
+     */
+    selectionStart: async () => {
+        if (Capacitor.isNativePlatform()) {
+            try {
+                await Haptics.selectionStart()
+            } catch (e) {
+                console.warn('Haptics selectionStart failed', e)
+            }
+        }
+    },
+
+    selectionChanged: async () => {
+        if (Capacitor.isNativePlatform()) {
+            try {
+                await Haptics.selectionChanged()
+            } catch (e) {
+                console.warn('Haptics selectionChanged failed', e)
+            }
+        }
+    },
+
+    selectionEnd: async () => {
+        if (Capacitor.isNativePlatform()) {
+            try {
+                await Haptics.selectionEnd()
+            } catch (e) {
+                console.warn('Haptics selectionEnd failed', e)
+            }
+        }
+    }
+}

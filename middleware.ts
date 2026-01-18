@@ -3,25 +3,38 @@ import { updateSession } from '@/lib/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || ''
-    const isNative = userAgent.includes('Capacitor') || userAgent.includes('Dante')
+    const isNativeHeader = request.headers.get('x-is-native') === 'true'
+    const isNative = isNativeHeader ||
+        userAgent.includes('Capacitor') ||
+        userAgent.includes('Dante') ||
+        userAgent.includes('NativeApp') ||
+        userAgent.includes('Bridge')
 
-    // Clone the request headers
+    // 1. Set native flag in request headers for server components
     const requestHeaders = new Headers(request.headers)
     if (isNative) {
         requestHeaders.set('x-is-native', 'true')
-
-        // If it's a native app accessing the root, redirect to admin
-        if (request.nextUrl.pathname === '/') {
-            return NextResponse.redirect(new URL('/admin', request.url))
-        }
     }
 
-    // Create a new request with the updated headers
-    const newRequest = new NextRequest(request, {
-        headers: requestHeaders,
-    })
+    // 2. Process session and auth cache
+    const newRequest = new NextRequest(request, { headers: requestHeaders })
+    const response = await updateSession(newRequest)
 
-    return await updateSession(newRequest)
+    // 3. Redirect root to admin for native apps
+    if (isNative && request.nextUrl.pathname === '/') {
+        console.log(`[Middleware] Native app detected (UA: ${userAgent}), redirecting / to /admin`)
+        const adminUrl = new URL('/admin', request.url)
+        const redirectResponse = NextResponse.redirect(adminUrl)
+
+        // Copy cookies from session update to redirect
+        response.cookies.getAll().forEach((c) => {
+            redirectResponse.cookies.set(c.name, c.value)
+        })
+        redirectResponse.headers.set('x-is-native', 'true')
+        return redirectResponse
+    }
+
+    return response
 }
 
 export const config = {

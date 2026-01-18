@@ -42,6 +42,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { haptics } from '@/lib/utils/haptics'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -69,7 +70,10 @@ const SidebarItem = ({ item, isActive, isCollapsed, onClick }: SidebarItemProps)
     const content = (
         <Link
             href={item.href}
-            onClick={onClick}
+            onClick={() => {
+                haptics.impact()
+                if (onClick) onClick()
+            }}
             className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 relative group overflow-hidden",
                 isActive
@@ -77,11 +81,11 @@ const SidebarItem = ({ item, isActive, isCollapsed, onClick }: SidebarItemProps)
                     : "text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)]"
             )}
         >
-            <Icon className={cn(
+            {(Icon as any) && <Icon className={cn(
                 "h-5 w-5 transition-transform duration-200 shrink-0 z-10",
                 "group-hover:scale-110",
                 isActive ? "text-[var(--dashboard-accent-gold)] scale-105" : "text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-text)]"
-            )} />
+            )} />}
 
             {!isCollapsed && (
                 <span className={cn(
@@ -327,7 +331,10 @@ export function ModernSidebar() {
                             "hidden md:flex text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)] transition-colors",
                             isCollapsed && "mx-auto"
                         )}
-                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        onClick={() => {
+                            haptics.impact()
+                            setIsCollapsed(!isCollapsed)
+                        }}
                     >
                         {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <X className="h-4 w-4" />}
                     </Button>

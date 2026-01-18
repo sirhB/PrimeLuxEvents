@@ -1,11 +1,13 @@
-import { HeroSection } from "@/components/hero-section"
-import { FeaturedCategories } from "@/components/featured-categories"
-import { InteractiveProcess } from "@/components/interactive-process"
-import { FeaturedCollection } from "@/components/featured-collection"
-import { BrandValuesSection } from "@/components/brand-values-section"
-import { TestimonialsSection } from "@/components/testimonials-section"
+import nextDynamic from "next/dynamic"
 import { getSiteContent } from "@/lib/content"
 import Link from "next/link"
+
+const HeroSection = nextDynamic(() => import("@/components/hero-section").then(m => m.HeroSection))
+const FeaturedCategories = nextDynamic(() => import("@/components/featured-categories").then(m => m.FeaturedCategories))
+const InteractiveProcess = nextDynamic(() => import("@/components/interactive-process").then(m => m.InteractiveProcess))
+const FeaturedCollection = nextDynamic(() => import("@/components/featured-collection").then(m => m.FeaturedCollection))
+const BrandValuesSection = nextDynamic(() => import("@/components/brand-values-section").then(m => m.BrandValuesSection))
+const TestimonialsSection = nextDynamic(() => import("@/components/testimonials-section").then(m => m.TestimonialsSection))
 
 export const dynamic = 'force-dynamic'
 

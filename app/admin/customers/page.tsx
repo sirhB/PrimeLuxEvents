@@ -1,7 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
-import { CustomersClient } from './customers-client'
-import { CustomerStatsCards } from '@/components/admin/customers/customer-stats-cards'
-import { TopCustomersWidget } from '@/components/admin/customers/top-customers-widget'
+import dynamic from 'next/dynamic'
+import { requirePermission } from '@/lib/auth/authorization'
+
+const CustomersClient = dynamic(() => import('./customers-client').then(mod => mod.CustomersClient))
+const CustomerStatsCards = dynamic(() => import('@/components/admin/customers/customer-stats-cards').then(mod => mod.CustomerStatsCards))
+const TopCustomersWidget = dynamic(() => import('@/components/admin/customers/top-customers-widget').then(mod => mod.TopCustomersWidget))
 
 interface Customer {
     email: string
@@ -13,8 +16,6 @@ interface Customer {
     lastOrderDate?: string
 }
 
-import { requirePermission } from '@/lib/auth/authorization'
-
 export default async function CustomersPage({
     searchParams,
 }: {
@@ -24,16 +25,24 @@ export default async function CustomersPage({
     const { page = '1', search } = await searchParams
     const supabase = await createClient()
 
-    // Aggregate customer data from orders and consultations
-    const { data: orders } = await supabase
-        .from('orders')
-        .select('customer_name, customer_email, total_amount, created_at')
+    // Parallelize aggregation data fetching
+    const [ordersRes, consultationsRes] = await Promise.all([
+        supabase
+            .from('orders')
+            .select('customer_name, customer_email, total_amount, created_at')
+            .order('created_at', { ascending: false })
+            .limit(2000), // Safety limit for dev aggregation
+        supabase
+            .from('consultations')
+            .select('customer_name, customer_email, customer_phone, total_amount, created_at')
+            .order('created_at', { ascending: false })
+            .limit(2000)
+    ])
 
-    const { data: consultations } = await supabase
-        .from('consultations')
-        .select('customer_name, customer_email, customer_phone, total_amount, created_at')
+    const orders = ordersRes.data
+    const consultations = consultationsRes.data
 
-    // Combine and aggregate customer data
+    // Combine and aggregate customer data (Keep logic same but faster thanks to parallelization and limits)
     const customerMap = new Map<string, Customer>()
 
     orders?.forEach((order) => {
@@ -145,7 +154,6 @@ export default async function CustomersPage({
             {/* Top Customers Widget */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <TopCustomersWidget customers={customers} />
-                {/* Placeholder for future widget */}
                 <div className="glass-card border-none flex flex-col items-center justify-center p-6 text-[var(--dashboard-text-muted)]">
                     <p>Recent Activity (Coming Soon)</p>
                 </div>

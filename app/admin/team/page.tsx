@@ -17,39 +17,53 @@ export default async function TeamManagementPage() {
     await requirePermission('users.view')
 
     const supabase = await createClient()
-    const serviceRoleSupabase = createServiceRoleClient()
+    let teamMembers: any[] = []
+    let roles: any[] = []
+    let invitations: any[] = []
+    let serviceRoleError = false
 
-    // Fetch team members using service role to bypass RLS issues in admin panel
-    const { data: teamMembers, error: membersError } = await serviceRoleSupabase
-        .from('user_profiles')
-        .select(`
-            *,
-            user_roles!user_id (
-                roles (
-                    id,
-                    name,
-                    display_name,
-                    color
+    try {
+        const serviceRoleSupabase = createServiceRoleClient()
+
+        // Fetch team members using service role to bypass RLS issues in admin panel
+        const { data: membersRes, error: membersError } = await serviceRoleSupabase
+            .from('user_profiles')
+            .select(`
+                *,
+                user_roles!user_id (
+                    roles (
+                        id,
+                        name,
+                        display_name,
+                        color
+                    )
                 )
-            )
-        `)
-        .order('created_at', { ascending: false })
+            `)
+            .order('created_at', { ascending: false })
 
-    // Fetch roles
-    const { data: roles, error: rolesError } = await serviceRoleSupabase
-        .from('roles')
-        .select('*')
-        .order('display_name')
+        // Fetch roles
+        const { data: rolesRes, error: rolesError } = await serviceRoleSupabase
+            .from('roles')
+            .select('*')
+            .order('display_name')
 
-    // Fetch pending and expired invitations
-    const { data: invitations, error: invitationsError } = await serviceRoleSupabase
-        .from('user_invitations')
-        .select('*')
-        .in('status', ['pending', 'expired'])
-        .order('created_at', { ascending: false })
+        // Fetch pending and expired invitations
+        const { data: invitationsRes, error: invitationsError } = await serviceRoleSupabase
+            .from('user_invitations')
+            .select('*')
+            .in('status', ['pending', 'expired'])
+            .order('created_at', { ascending: false })
 
-    if (membersError || rolesError || invitationsError) {
-        console.error('Error fetching team data:', membersError || rolesError || invitationsError)
+        if (membersError || rolesError || invitationsError) {
+            console.error('Error fetching team data:', membersError || rolesError || invitationsError)
+        }
+
+        teamMembers = membersRes || []
+        roles = rolesRes || []
+        invitations = invitationsRes || []
+    } catch (e) {
+        console.error('Service Role initialization failed:', e)
+        serviceRoleError = true
     }
 
     // Get current user for invited_by display
@@ -79,6 +93,13 @@ export default async function TeamManagementPage() {
                     {canInviteUsers && <InviteUserDialog />}
                 </div>
             </div>
+
+            {serviceRoleError && (
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-sm">
+                    <p className="font-bold">Configuration Error</p>
+                    <p>The <code className="bg-red-500/20 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> is missing from your environment variables. Please add it to your <code className="bg-red-500/20 px-1 rounded">.env.local</code> file to manage team members.</p>
+                </div>
+            )}
 
             {/* Stats Cards */}
             <div className="grid gap-6 md:grid-cols-4">

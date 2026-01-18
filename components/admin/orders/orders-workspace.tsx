@@ -3,49 +3,54 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { LeadRail } from '@/components/admin/consultations/lead-rail'
 import { createClient } from '@/lib/supabase/client'
 import dynamic from 'next/dynamic'
 import { LayoutGrid, Columns2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { LeadKanban } from './lead-kanban'
-import { type ConsultationStatus } from './types'
+import { haptics } from '@/lib/utils/haptics'
+import { OrderRail } from './order-rail'
+import { OrderKanban } from './order-kanban'
 
 // Dynamic imports for heavy components
-const LeadDetailsPane = dynamic(() => import('@/components/admin/consultations/lead-details-pane').then(m => m.LeadDetailsPane), {
+const OrderDetailsPane = dynamic(() => import('./order-details-pane').then(m => m.OrderDetailsPane), {
     ssr: false,
     loading: () => <div className="flex-1 flex items-center justify-center bg-black/20 animate-pulse rounded-3xl" />
 })
 
-const LeadInsights = dynamic(() => import('@/components/admin/consultations/lead-insights').then(m => m.LeadInsights), {
-    ssr: false,
-    loading: () => <div className="h-24 w-full bg-black/20 animate-pulse rounded-3xl mb-4" />
-})
-
-interface LeadWorkspaceProps {
-    initialLeads: Consultation[]
+interface Order {
+    id: string
+    customer_name: string
+    customer_email: string
+    created_at: string
+    total_amount: number
+    status: string
+    is_overbooked: boolean
 }
 
-export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
-    const [leads, setLeads] = useState<Consultation[]>(initialLeads)
-    const [selectedLeadId, setSelectedLeadId] = useState<string | null>(initialLeads[0]?.id || null)
+interface OrdersWorkspaceProps {
+    initialOrders: Order[]
+}
+
+export function OrdersWorkspace({ initialOrders }: OrdersWorkspaceProps) {
+    const [orders, setOrders] = useState<Order[]>(initialOrders)
+    const [selectedOrderId, setSelectedOrderId] = useState<string | null>(initialOrders[0]?.id || null)
     const [viewMode, setViewMode] = useState<'dossier' | 'pipeline'>('dossier')
     const supabase = createClient()
 
     useEffect(() => {
         const channel = supabase
-            .channel('lead-workspace-sync')
+            .channel('order-workspace-sync')
             .on('postgres_changes', {
                 event: '*',
                 schema: 'public',
-                table: 'consultations'
+                table: 'orders'
             }, (payload) => {
                 if (payload.eventType === 'UPDATE') {
-                    setLeads(prev => prev.map(l => l.id === payload.new.id ? { ...l, ...payload.new as Consultation } : l))
+                    setOrders(prev => prev.map(o => o.id === payload.new.id ? { ...o, ...payload.new as Order } : o))
                 } else if (payload.eventType === 'INSERT') {
-                    setLeads(prev => [payload.new as Consultation, ...prev])
+                    setOrders(prev => [payload.new as Order, ...prev])
                 } else if (payload.eventType === 'DELETE') {
-                    setLeads(prev => prev.filter(l => l.id !== payload.old.id))
+                    setOrders(prev => prev.filter(o => o.id !== payload.old.id))
                 }
             })
             .subscribe()
@@ -55,21 +60,18 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
         }
     }, [supabase])
 
-    const selectedLead = useMemo(() =>
-        leads.find(l => l.id === selectedLeadId),
-        [leads, selectedLeadId])
+    const selectedOrder = useMemo(() =>
+        orders.find(o => o.id === selectedOrderId),
+        [orders, selectedOrderId])
 
-    const handleStatusChange = (id: string, newStatus: ConsultationStatus) => {
-        setLeads(prev => prev.map(l => l.id === id ? { ...l, status: newStatus } : l))
+    const handleStatusChange = (id: string, newStatus: string) => {
+        setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o))
     }
 
     return (
         <div className="flex flex-col gap-4 md:gap-6 h-[900px] md:h-[calc(100vh-160px)] min-h-[500px]">
-            {/* Top Insights & View Toggle */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex-1">
-                    <LeadInsights leads={leads} />
-                </div>
+            {/* View Toggle */}
+            <div className="flex justify-end">
                 <div className="flex items-center gap-1 p-1 bg-black/20 border border-white/5 rounded-2xl shrink-0">
                     <Button
                         variant="ghost"
@@ -111,37 +113,37 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
             <div className="flex flex-1 gap-6 min-h-0 relative overflow-hidden">
                 {viewMode === 'dossier' ? (
                     <>
-                        {/* Left Side: Lead Rail */}
+                        {/* Left Side: Order Rail */}
                         <Card className={cn(
                             "flex flex-col border-none glass-card overflow-hidden bg-black/40 transition-all duration-300",
                             "w-full lg:w-80 xl:w-96",
-                            selectedLeadId ? "hidden lg:flex" : "flex"
+                            selectedOrderId ? "hidden lg:flex" : "flex"
                         )}>
-                            <LeadRail
-                                leads={leads}
-                                selectedId={selectedLeadId}
-                                onSelect={setSelectedLeadId}
+                            <OrderRail
+                                orders={orders}
+                                selectedId={selectedOrderId}
+                                onSelect={setSelectedOrderId}
                             />
                         </Card>
 
                         {/* Right Side: Immersive Details */}
                         <Card className={cn(
                             "flex-1 flex flex-col border-none glass-card overflow-hidden relative bg-black/40 transition-all duration-300",
-                            selectedLeadId ? "flex" : "hidden lg:flex"
+                            selectedOrderId ? "flex" : "hidden lg:flex"
                         )}>
-                            {selectedLead ? (
-                                <LeadDetailsPane
-                                    lead={selectedLead}
-                                    onBack={() => setSelectedLeadId(null)}
+                            {selectedOrder ? (
+                                <OrderDetailsPane
+                                    order={selectedOrder}
+                                    onBack={() => setSelectedOrderId(null)}
                                 />
                             ) : (
                                 <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-[var(--dashboard-text-muted)]">
                                     <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
                                         <span className="text-2xl opacity-50">✦</span>
                                     </div>
-                                    <h3 className="text-xl font-serif font-medium text-[var(--dashboard-text)] mb-2">No Lead Selected</h3>
+                                    <h3 className="text-xl font-serif font-medium text-[var(--dashboard-text)] mb-2">No Order Selected</h3>
                                     <p className="max-w-xs mx-auto text-sm opacity-70">
-                                        Select a lead from the rail on the left to view full dossier and manage workflow.
+                                        Select an order from the rail on the left to view full details and manage workflow.
                                     </p>
                                 </div>
                             )}
@@ -149,8 +151,8 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
                     </>
                 ) : (
                     <div className="flex-1 min-h-0">
-                        <LeadKanban
-                            leads={leads}
+                        <OrderKanban
+                            orders={orders}
                             onStatusChange={handleStatusChange}
                         />
                     </div>

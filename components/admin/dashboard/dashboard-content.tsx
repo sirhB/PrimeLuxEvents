@@ -2,6 +2,8 @@
 
 import { Loader2 } from 'lucide-react'
 import nextDynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation'
+import { PullToRefresh } from '@/components/admin/pull-to-refresh'
 
 const MetricsOverview = nextDynamic(() => import('@/components/admin/dashboard/metrics-overview').then(m => m.MetricsOverview), {
     loading: () => <div className="h-32 w-full animate-pulse bg-[var(--dashboard-card)] rounded-3xl" />,
@@ -25,8 +27,16 @@ const QuickActionsWidget = nextDynamic(() => import('@/components/admin/dashboar
 })
 
 export function DashboardContent() {
+    const router = useRouter()
+
+    const handleRefresh = async () => {
+        router.refresh()
+        // Simulate a small delay for smoother transition
+        await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+
     return (
-        <>
+        <PullToRefresh onRefresh={handleRefresh}>
             {/* Metrics Overview */}
             <MetricsOverview />
 
@@ -48,6 +58,6 @@ export function DashboardContent() {
 
             {/* Quick Actions */}
             <QuickActionsWidget />
-        </>
+        </PullToRefresh>
     )
 }

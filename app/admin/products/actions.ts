@@ -193,3 +193,29 @@ export async function updateAndVerifyProduct(id: string, data: any) {
     revalidatePath(`/admin/products/${id}`)
     revalidatePath('/admin/products/verify')
 }
+
+export async function deleteProductsBulk(ids: string[]) {
+    const supabase = await createClient()
+    const { error } = await supabase.from('products').delete().in('id', ids)
+
+    if (error) {
+        throw new Error('Failed to delete products')
+    }
+
+    revalidatePath('/admin/products')
+    revalidatePath('/admin/products/verify')
+}
+
+export async function updateProductsCategoryBulk(ids: string[], categoryId: string) {
+    const supabase = await createClient()
+    const { error } = await supabase
+        .from('products')
+        .update({ category_id: categoryId })
+        .in('id', ids)
+
+    if (error) {
+        throw new Error('Failed to update products category')
+    }
+
+    revalidatePath('/admin/products')
+}

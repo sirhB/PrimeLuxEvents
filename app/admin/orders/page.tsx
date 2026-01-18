@@ -2,15 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { SearchInput } from '@/components/admin/search-input'
-import { PaginationControls } from '@/components/admin/pagination-controls'
-import { StatusFilter } from '@/components/admin/status-filter'
-import { OrdersTable } from '@/components/admin/orders-table'
-import { OrderStatsCards } from '@/components/admin/orders/order-stats-cards'
-import { DashboardOrderList } from '@/components/admin/orders/dashboard-order-list'
-
-
+import { OrdersContent } from '@/components/admin/orders/orders-content'
 import { requirePermission } from '@/lib/auth/authorization'
 
 export default async function OrdersPage({
@@ -111,82 +103,21 @@ export default async function OrdersPage({
                 </div>
             </div>
 
-            {/* Dashboard Statistics */}
-            <OrderStatsCards
+            <OrdersContent
                 totalRevenue={totalRevenue}
-                totalOrders={totalOrdersCount}
-                pendingOrders={pendingOrdersCount}
-                deliveredOrders={deliveredOrdersCount}
+                totalOrdersCount={totalOrdersCount}
+                pendingOrdersCount={pendingOrdersCount}
+                deliveredOrdersCount={deliveredOrdersCount}
+                recentOrders={recentOrders || []}
+                pendingOrders={pendingOrders || []}
+                orders={orders || []}
+                count={count}
+                status={status}
+                currentPage={currentPage}
+                pageSize={pageSize}
+                start={start}
+                end={end}
             />
-
-            {/* Dashboard Widgets */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <DashboardOrderList
-                    title="Recent Orders"
-                    orders={recentOrders || []}
-                    viewAllLink="/admin/orders"
-                />
-                <DashboardOrderList
-                    title="Needs Confirmation"
-                    orders={pendingOrders || []}
-                    emptyMessage="All caught up! No pending orders."
-                    viewAllLink="/admin/orders?status=pending"
-                />
-            </div>
-
-            {/* Main Orders List (Collapsible/Tabbed) */}
-            <div className="space-y-4">
-                <h2 className="text-2xl font-serif text-[var(--dashboard-text)] mt-8">All Orders</h2>
-
-                <Tabs defaultValue={status || 'all'} className="w-full">
-                    <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit h-auto">
-                        <TabsTrigger value="all" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
-                            <Link href="/admin/orders">All Orders</Link>
-                        </TabsTrigger>
-                        <TabsTrigger value="pending" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
-                            <Link href="/admin/orders?status=pending">Pending</Link>
-                        </TabsTrigger>
-                        <TabsTrigger value="delivered" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
-                            <Link href="/admin/orders?status=delivered">Completed</Link>
-                        </TabsTrigger>
-                        <TabsTrigger value="cancelled" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6">
-                            <Link href="/admin/orders?status=cancelled">Cancelled</Link>
-                        </TabsTrigger>
-                    </TabsList>
-
-                    <div className="space-y-6 animate-fade-in">
-                        <div className="flex flex-col xxl:flex-row gap-6 items-start xxl:items-center justify-between glass-card p-6 rounded-3xl border-none">
-                            <div className="w-full max-w-md">
-                                <SearchInput placeholder="Search orders..." />
-                            </div>
-                            <StatusFilter
-                                statuses={[
-                                    { value: 'pending', label: 'Pending' },
-                                    { value: 'confirmed', label: 'Confirmed' },
-                                    { value: 'processing', label: 'Processing' },
-                                    { value: 'delivered', label: 'Delivered' },
-                                    { value: 'cancelled', label: 'Cancelled' },
-                                ]}
-                            />
-                        </div>
-
-                        <OrdersTable orders={orders || []} />
-
-                        {count !== null && count > 0 && (
-                            <div className="mt-8 flex justify-center">
-                                <PaginationControls
-                                    hasNextPage={end < count}
-                                    hasPrevPage={start > 0}
-                                    totalCount={count}
-                                    currentPage={currentPage}
-                                    pageSize={pageSize}
-                                />
-                            </div>
-                        )}
-                    </div>
-                </Tabs>
-            </div>
-
         </div>
     )
 }

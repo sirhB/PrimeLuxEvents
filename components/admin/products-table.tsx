@@ -20,6 +20,14 @@ import { SortableHeader } from '@/components/admin/sortable-header'
 import { formatCents, formatCentsWithCommas } from '@/lib/format-money'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
+import { deleteProductsBulk, updateProductsCategoryBulk } from '@/app/admin/products/actions'
+import { toast } from 'sonner'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 interface Product {
     id: string
@@ -31,9 +39,10 @@ interface Product {
 
 interface ProductsTableProps {
     products: any[]
+    categories?: { id: string, name: string }[]
 }
 
-export function ProductsTable({ products }: ProductsTableProps) {
+export function ProductsTable({ products, categories }: ProductsTableProps) {
     const [selectedIds, setSelectedIds] = useState<string[]>([])
     const router = useRouter()
 
@@ -68,13 +77,56 @@ export function ProductsTable({ products }: ProductsTableProps) {
                             {selectedIds.length} Selected
                         </span>
                         <div className="w-px h-6 bg-border/50 mx-2" />
-                        <Button size="sm" variant="ghost" className="hover:bg-red-500/10 hover:text-red-500 rounded-full font-bold uppercase text-[10px] tracking-wider">
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            className="hover:bg-red-500/10 hover:text-red-500 rounded-full font-bold uppercase text-[10px] tracking-wider"
+                            onClick={async () => {
+                                if (confirm(`Are you sure you want to delete ${selectedIds.length} products?`)) {
+                                    const promise = deleteProductsBulk(selectedIds)
+                                    toast.promise(promise, {
+                                        loading: 'Deleting products...',
+                                        success: () => {
+                                            setSelectedIds([])
+                                            return `Deleted ${selectedIds.length} products`
+                                        },
+                                        error: 'Failed to delete products'
+                                    })
+                                }
+                            }}
+                        >
                             <Trash2 className="h-3.5 w-3.5 mr-2" />
                             Delete
                         </Button>
-                        <Button size="sm" variant="ghost" className="hover:bg-primary/10 hover:text-primary rounded-full font-bold uppercase text-[10px] tracking-wider">
-                            Change Category
-                        </Button>
+                        {categories && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button size="sm" variant="ghost" className="hover:bg-primary/10 hover:text-primary rounded-full font-bold uppercase text-[10px] tracking-wider">
+                                        Change Category
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="glass-card bg-black/95 text-white border-white/10">
+                                    {categories.map(cat => (
+                                        <DropdownMenuItem
+                                            key={cat.id}
+                                            onClick={async () => {
+                                                const promise = updateProductsCategoryBulk(selectedIds, cat.id)
+                                                toast.promise(promise, {
+                                                    loading: 'Updating categories...',
+                                                    success: () => {
+                                                        setSelectedIds([])
+                                                        return `Updated ${selectedIds.length} products`
+                                                    },
+                                                    error: 'Failed to update products'
+                                                })
+                                            }}
+                                        >
+                                            {cat.name}
+                                        </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
                         <Button
                             size="sm"
                             variant="ghost"

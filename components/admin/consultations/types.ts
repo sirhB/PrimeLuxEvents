@@ -12,6 +12,7 @@ export type Consultation = {
     event_date: string | null
     budget_range: string | null
     message: string | null
+    internal_notes: string | null
     created_at: string
     updated_at: string
 }

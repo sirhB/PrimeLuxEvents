@@ -140,6 +140,7 @@ export async function updateConsultation(
         budgetRange?: string
         message?: string
         status?: string
+        internal_notes?: string
     }
 ) {
     try {
@@ -157,6 +158,7 @@ export async function updateConsultation(
         if (data.budgetRange !== undefined) updateData.budget_range = data.budgetRange
         if (data.message !== undefined) updateData.message = data.message
         if (data.status !== undefined) updateData.status = data.status
+        if (data.internal_notes !== undefined) updateData.internal_notes = data.internal_notes
 
         const { error } = await supabase.from('consultations').update(updateData).eq('id', consultationId)
 

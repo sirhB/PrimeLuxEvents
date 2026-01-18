@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { LeadWorkspace } from '@/components/admin/consultations/lead-workspace'
+import { ConsultationsContent } from '@/components/admin/consultations/consultations-content'
 import { type Consultation } from '@/components/admin/consultations/types'
 
 export const dynamic = 'force-dynamic'
@@ -34,7 +34,7 @@ export default async function ConsultationsPage() {
             </header>
 
             {/* Immersive Workspace */}
-            <LeadWorkspace initialLeads={leads} />
+            <ConsultationsContent leads={leads} />
         </div>
     )
 }

@@ -3,49 +3,61 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { LeadRail } from '@/components/admin/consultations/lead-rail'
 import { createClient } from '@/lib/supabase/client'
 import dynamic from 'next/dynamic'
 import { LayoutGrid, Columns2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { LeadKanban } from './lead-kanban'
-import { type ConsultationStatus } from './types'
+import { haptics } from '@/lib/utils/haptics'
+import { AppointmentsRail } from './appointments-rail'
+import { AppointmentKanban } from './appointment-kanban'
+
+interface Appointment {
+    id: string
+    client_name: string
+    client_email: string | null
+    client_phone: string | null
+    appointment_date: string
+    appointment_time: string
+    location: string | null
+    notes: string | null
+    status: 'scheduled' | 'completed' | 'cancelled'
+    consultation_id: string | null
+    created_at: string
+}
 
 // Dynamic imports for heavy components
-const LeadDetailsPane = dynamic(() => import('@/components/admin/consultations/lead-details-pane').then(m => m.LeadDetailsPane), {
+const AppointmentDetailsPane = dynamic<{
+    appointment: Appointment;
+    onBack?: () => void;
+}>(() => import('./appointment-details-pane').then(m => m.AppointmentDetailsPane), {
     ssr: false,
     loading: () => <div className="flex-1 flex items-center justify-center bg-black/20 animate-pulse rounded-3xl" />
 })
 
-const LeadInsights = dynamic(() => import('@/components/admin/consultations/lead-insights').then(m => m.LeadInsights), {
-    ssr: false,
-    loading: () => <div className="h-24 w-full bg-black/20 animate-pulse rounded-3xl mb-4" />
-})
-
-interface LeadWorkspaceProps {
-    initialLeads: Consultation[]
+interface AppointmentsWorkspaceProps {
+    initialAppointments: Appointment[]
 }
 
-export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
-    const [leads, setLeads] = useState<Consultation[]>(initialLeads)
-    const [selectedLeadId, setSelectedLeadId] = useState<string | null>(initialLeads[0]?.id || null)
+export function AppointmentsWorkspace({ initialAppointments }: AppointmentsWorkspaceProps) {
+    const [appointments, setAppointments] = useState<Appointment[]>(initialAppointments)
+    const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(initialAppointments[0]?.id || null)
     const [viewMode, setViewMode] = useState<'dossier' | 'pipeline'>('dossier')
     const supabase = createClient()
 
     useEffect(() => {
         const channel = supabase
-            .channel('lead-workspace-sync')
+            .channel('appointment-workspace-sync')
             .on('postgres_changes', {
                 event: '*',
                 schema: 'public',
-                table: 'consultations'
+                table: 'appointments'
             }, (payload) => {
                 if (payload.eventType === 'UPDATE') {
-                    setLeads(prev => prev.map(l => l.id === payload.new.id ? { ...l, ...payload.new as Consultation } : l))
+                    setAppointments(prev => prev.map(a => a.id === payload.new.id ? { ...a, ...payload.new as Appointment } : a))
                 } else if (payload.eventType === 'INSERT') {
-                    setLeads(prev => [payload.new as Consultation, ...prev])
+                    setAppointments(prev => [payload.new as Appointment, ...prev])
                 } else if (payload.eventType === 'DELETE') {
-                    setLeads(prev => prev.filter(l => l.id !== payload.old.id))
+                    setAppointments(prev => prev.filter(a => a.id !== payload.old.id))
                 }
             })
             .subscribe()
@@ -55,21 +67,18 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
         }
     }, [supabase])
 
-    const selectedLead = useMemo(() =>
-        leads.find(l => l.id === selectedLeadId),
-        [leads, selectedLeadId])
+    const selectedAppointment = useMemo(() =>
+        appointments.find(a => a.id === selectedAppointmentId),
+        [appointments, selectedAppointmentId])
 
-    const handleStatusChange = (id: string, newStatus: ConsultationStatus) => {
-        setLeads(prev => prev.map(l => l.id === id ? { ...l, status: newStatus } : l))
+    const handleStatusChange = (id: string, newStatus: string) => {
+        setAppointments(prev => prev.map(a => a.id === id ? { ...a, status: newStatus as any } : a))
     }
 
     return (
         <div className="flex flex-col gap-4 md:gap-6 h-[900px] md:h-[calc(100vh-160px)] min-h-[500px]">
-            {/* Top Insights & View Toggle */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex-1">
-                    <LeadInsights leads={leads} />
-                </div>
+            {/* View Toggle */}
+            <div className="flex justify-end">
                 <div className="flex items-center gap-1 p-1 bg-black/20 border border-white/5 rounded-2xl shrink-0">
                     <Button
                         variant="ghost"
@@ -111,37 +120,37 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
             <div className="flex flex-1 gap-6 min-h-0 relative overflow-hidden">
                 {viewMode === 'dossier' ? (
                     <>
-                        {/* Left Side: Lead Rail */}
+                        {/* Left Side: Appointments Rail */}
                         <Card className={cn(
                             "flex flex-col border-none glass-card overflow-hidden bg-black/40 transition-all duration-300",
                             "w-full lg:w-80 xl:w-96",
-                            selectedLeadId ? "hidden lg:flex" : "flex"
+                            selectedAppointmentId ? "hidden lg:flex" : "flex"
                         )}>
-                            <LeadRail
-                                leads={leads}
-                                selectedId={selectedLeadId}
-                                onSelect={setSelectedLeadId}
+                            <AppointmentsRail
+                                appointments={appointments}
+                                selectedId={selectedAppointmentId}
+                                onSelect={setSelectedAppointmentId}
                             />
                         </Card>
 
                         {/* Right Side: Immersive Details */}
                         <Card className={cn(
                             "flex-1 flex flex-col border-none glass-card overflow-hidden relative bg-black/40 transition-all duration-300",
-                            selectedLeadId ? "flex" : "hidden lg:flex"
+                            selectedAppointmentId ? "flex" : "hidden lg:flex"
                         )}>
-                            {selectedLead ? (
-                                <LeadDetailsPane
-                                    lead={selectedLead}
-                                    onBack={() => setSelectedLeadId(null)}
+                            {selectedAppointment ? (
+                                <AppointmentDetailsPane
+                                    appointment={selectedAppointment}
+                                    onBack={() => setSelectedAppointmentId(null)}
                                 />
                             ) : (
                                 <div className="flex-1 flex flex-col items-center justify-center p-12 text-center text-[var(--dashboard-text-muted)]">
                                     <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
                                         <span className="text-2xl opacity-50">✦</span>
                                     </div>
-                                    <h3 className="text-xl font-serif font-medium text-[var(--dashboard-text)] mb-2">No Lead Selected</h3>
+                                    <h3 className="text-xl font-serif font-medium text-[var(--dashboard-text)] mb-2">No Appointment Selected</h3>
                                     <p className="max-w-xs mx-auto text-sm opacity-70">
-                                        Select a lead from the rail on the left to view full dossier and manage workflow.
+                                        Select an appointment from the rail on the left to view full details and manage workflow.
                                     </p>
                                 </div>
                             )}
@@ -149,8 +158,8 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
                     </>
                 ) : (
                     <div className="flex-1 min-h-0">
-                        <LeadKanban
-                            leads={leads}
+                        <AppointmentKanban
+                            appointments={appointments}
                             onStatusChange={handleStatusChange}
                         />
                     </div>

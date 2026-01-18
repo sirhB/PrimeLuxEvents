@@ -154,7 +154,7 @@ export default async function ProductsPage({
                         <ProductFilters categories={categories || []} />
                     </div>
 
-                    <ProductsTable products={products || []} />
+                    <ProductsTable products={products || []} categories={categories} />
 
                     {totalProductsCount !== null && totalProductsCount > 0 && (
                         <div className="mt-8 flex justify-center">

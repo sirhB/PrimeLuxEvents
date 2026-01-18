@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { ChatLayout } from '@/components/chat/chat-layout'
+import { MessagesContent } from '@/components/chat/messages-content'
 import { redirect } from 'next/navigation'
 
 export default async function AdminMessagesPage() {
@@ -29,10 +29,9 @@ export default async function AdminMessagesPage() {
                 </div>
             </div>
 
-            <ChatLayout
+            <MessagesContent
                 currentUserEmail={user.email || ''}
                 currentUserId={user.id}
-                isAdmin={true}
             />
         </div>
     )

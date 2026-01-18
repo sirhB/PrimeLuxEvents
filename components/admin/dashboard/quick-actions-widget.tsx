@@ -15,6 +15,7 @@ import {
     Sparkles
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { haptics } from '@/lib/utils/haptics'
 
 interface QuickAction {
     label: string
@@ -142,6 +143,7 @@ export function QuickActionsWidget() {
                         >
                             <Link href={action.href}>
                                 <div
+                                    onClick={() => haptics.impact()}
                                     className={cn(
                                         "group relative p-4 rounded-2xl border transition-all duration-300 cursor-pointer",
                                         colors.bg,

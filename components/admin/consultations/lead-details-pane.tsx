@@ -9,12 +9,15 @@ import { cn } from '@/lib/utils'
 import {
     Phone, Mail, Calendar, Users, MapPin,
     MessageSquare, ClipboardList, Clock,
-    ArrowRight, User, DollarSign, Quote, ArrowLeft
+    ArrowRight, User, DollarSign, Quote, ArrowLeft,
+    StickyNote, Save
 } from 'lucide-react'
 import { type Consultation } from '@/components/admin/consultations/types'
 import { LeadStageProgress } from '@/components/admin/consultations/lead-stage-progress'
 import { LeadActionBar } from '@/components/admin/consultations/lead-action-bar'
 import { format } from 'date-fns'
+import { updateConsultation } from '@/app/admin/consultations/actions'
+import { toast } from 'sonner'
 import { ScheduleAppointmentDialog } from '@/components/admin/consultations/schedule-appointment-dialog'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
@@ -27,11 +30,14 @@ interface LeadDetailsPaneProps {
 export function LeadDetailsPane({ lead, onBack }: LeadDetailsPaneProps) {
     const [communications, setCommunications] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState(false)
+    const [internalNote, setInternalNote] = useState(lead.internal_notes || '')
+    const [isSavingNote, setIsSavingNote] = useState(false)
     const supabase = createClient()
 
     useEffect(() => {
         fetchCommunications()
-    }, [lead.id])
+        setInternalNote(lead.internal_notes || '')
+    }, [lead.id, lead.internal_notes])
 
     const fetchCommunications = async () => {
         setIsLoading(true)
@@ -43,6 +49,23 @@ export function LeadDetailsPane({ lead, onBack }: LeadDetailsPaneProps) {
 
         if (data) setCommunications(data)
         setIsLoading(false)
+    }
+
+    const handleSaveNote = async () => {
+        if (internalNote === lead.internal_notes) return
+        setIsSavingNote(true)
+        try {
+            const res = await updateConsultation(lead.id, { internal_notes: internalNote } as any)
+            if (res.success) {
+                toast.success('Internal note updated')
+            } else {
+                toast.error('Failed to update note')
+            }
+        } catch (error) {
+            toast.error('Error updating note')
+        } finally {
+            setIsSavingNote(false)
+        }
     }
 
     const getDisplayName = () => {
@@ -230,6 +253,34 @@ export function LeadDetailsPane({ lead, onBack }: LeadDetailsPaneProps) {
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Staff Collaboration / Internal Notes */}
+                        <div className="bg-amber-500/5 border border-amber-500/10 rounded-3xl p-6 space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-amber-500/70 flex items-center gap-2">
+                                    <StickyNote className="h-3 w-3" />
+                                    Staff Collaboration Note
+                                </h4>
+                                {internalNote !== (lead.internal_notes || '') && (
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-7 px-2 text-[10px] text-amber-500 hover:text-amber-400 hover:bg-amber-500/10"
+                                        onClick={handleSaveNote}
+                                        disabled={isSavingNote}
+                                    >
+                                        <Save className="h-3 w-3 mr-1.5" />
+                                        {isSavingNote ? 'Saving...' : 'Save Changes'}
+                                    </Button>
+                                )}
+                            </div>
+                            <textarea
+                                value={internalNote}
+                                onChange={(e) => setInternalNote(e.target.value)}
+                                placeholder="Add private staff notes, internal context, or reminders here..."
+                                className="w-full bg-black/20 border border-white/5 rounded-2xl p-4 text-sm text-white/80 placeholder:text-white/10 min-h-[120px] focus:ring-1 focus:ring-amber-500/30 focus:border-amber-500/30 transition-all resize-none font-sans"
+                            />
                         </div>
 
                         {/* Quote Summary */}
