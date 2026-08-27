@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { generateWarehouseTasksForOrder } from '@/lib/warehouse/task-generator'
 
 
 export interface UpdateOrderData {
@@ -106,7 +107,12 @@ export async function createOrder(data: CreateOrderData) {
             }
         }
 
+        if (newOrder.status === 'confirmed' && newOrder.delivery_date) {
+            await generateWarehouseTasksForOrder(supabase, newOrder.id)
+        }
+
         revalidatePath('/admin/orders')
+        revalidatePath('/admin/warehouse/schedule')
         return { success: true, data: newOrder }
     } catch (error) {
         console.error('Create order error:', error)
@@ -138,8 +144,28 @@ export async function updateOrder(orderId: string, data: UpdateOrderData) {
             return { success: false, error: error.message }
         }
 
+        const shouldGenerateTasks =
+            data.status === 'confirmed' ||
+            data.deliveryDate !== undefined
+
+        if (shouldGenerateTasks) {
+            const { data: updatedOrder } = await supabase
+                .from('orders')
+                .select('id, status, delivery_date')
+                .eq('id', orderId)
+                .single()
+
+            if (
+                updatedOrder?.delivery_date &&
+                ['confirmed', 'processing', 'out_for_delivery'].includes(updatedOrder.status)
+            ) {
+                await generateWarehouseTasksForOrder(supabase, orderId)
+            }
+        }
+
         revalidatePath('/admin/orders')
         revalidatePath(`/admin/orders/${orderId}`)
+        revalidatePath('/admin/warehouse/schedule')
         return { success: true }
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error'
@@ -175,7 +201,20 @@ export async function updateOrderStatus(orderId: string, status: string) {
             return { success: false, error: error.message }
         }
 
+        if (status === 'confirmed') {
+            const { data: order } = await supabase
+                .from('orders')
+                .select('delivery_date')
+                .eq('id', orderId)
+                .single()
+
+            if (order?.delivery_date) {
+                await generateWarehouseTasksForOrder(supabase, orderId)
+            }
+        }
+
         revalidatePath('/admin/orders')
+        revalidatePath('/admin/warehouse/schedule')
         return { success: true }
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error'

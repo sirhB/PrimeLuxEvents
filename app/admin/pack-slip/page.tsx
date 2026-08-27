@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { Suspense, useState, useEffect } from 'react'
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -26,7 +28,9 @@ import {
     FileText,
     ChevronRight,
     Search,
-    Truck
+    Truck,
+    CheckSquare,
+    Loader2
 } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
@@ -64,8 +68,16 @@ interface UpcomingDate {
     orderCount: number
 }
 
-export default function PackSlipPage() {
-    const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0])
+interface OrderTaskInfo {
+    packTaskId?: string
+    packStatus?: string
+    pickStatus?: string
+}
+
+function PackSlipPageContent() {
+    const searchParams = useSearchParams()
+    const initialDate = searchParams.get('date')
+    const [date, setDate] = useState<string>(initialDate || new Date().toISOString().split('T')[0])
     const [loading, setLoading] = useState(false)
     const [items, setItems] = useState<PackItem[]>([])
     const [assemblySummary, setAssemblySummary] = useState<Record<string, AssemblyPartDetail>>({})
@@ -75,8 +87,15 @@ export default function PackSlipPage() {
     const [viewMode, setViewMode] = useState<"aggregate" | "by-order">("aggregate")
     const [upcomingDates, setUpcomingDates] = useState<UpcomingDate[]>([])
     const [activeTab, setActiveTab] = useState("upcoming")
+    const [orderTasks, setOrderTasks] = useState<Record<string, OrderTaskInfo>>({})
 
     const supabase = createClient()
+
+    useEffect(() => {
+        if (initialDate) {
+            generatePackSlip(initialDate)
+        }
+    }, [initialDate])
 
     useEffect(() => {
         fetchUpcomingDates()
@@ -241,6 +260,8 @@ export default function PackSlipPage() {
             setOrders(Array.from(orderMap.values()))
             setOrderCount(orderMap.size)
 
+            await fetchOrderTasks(Array.from(orderMap.keys()))
+
             toast.success(`Pack slip generated for ${orderMap.size} orders`)
 
         } catch (error) {
@@ -251,6 +272,34 @@ export default function PackSlipPage() {
         } finally {
             setLoading(false)
         }
+    }
+
+    async function fetchOrderTasks(orderIds: string[]) {
+        if (orderIds.length === 0) {
+            setOrderTasks({})
+            return
+        }
+
+        const { data } = await supabase
+            .from('tasks')
+            .select('id, order_id, warehouse_category, status')
+            .in('order_id', orderIds)
+            .eq('task_type', 'warehouse')
+            .in('warehouse_category', ['pick', 'pack'])
+
+        const map: Record<string, OrderTaskInfo> = {}
+        for (const task of data || []) {
+            if (!task.order_id) continue
+            if (!map[task.order_id]) map[task.order_id] = {}
+            if (task.warehouse_category === 'pack') {
+                map[task.order_id].packTaskId = task.id
+                map[task.order_id].packStatus = task.status
+            }
+            if (task.warehouse_category === 'pick') {
+                map[task.order_id].pickStatus = task.status
+            }
+        }
+        setOrderTasks(map)
     }
 
     const handlePrint = () => {
@@ -530,6 +579,29 @@ export default function PackSlipPage() {
                                                         </div>
                                                     </div>
 
+                                                    <div className="flex flex-col gap-2 items-end">
+                                                        {orderTasks[order.id]?.packTaskId && (
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={cn(
+                                                                    "text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded",
+                                                                    orderTasks[order.id].packStatus === 'completed'
+                                                                        ? 'bg-green-500/10 text-green-400'
+                                                                        : orderTasks[order.id].packStatus === 'in_progress'
+                                                                          ? 'bg-blue-500/10 text-blue-400'
+                                                                          : 'bg-gray-500/10 text-gray-400'
+                                                                )}>
+                                                                    Pack: {orderTasks[order.id].packStatus?.replace('_', ' ')}
+                                                                </span>
+                                                                <Button asChild size="sm" variant="outline" className="rounded-xl print:hidden">
+                                                                    <Link href={`/admin/warehouse/schedule?date=${date}`}>
+                                                                        <CheckSquare className="h-3.5 w-3.5 mr-1" />
+                                                                        Start Packing
+                                                                    </Link>
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
                                                     {order.deliveryNotes && (
                                                         <div className="md:max-w-xs w-full">
                                                             <div className="p-4 rounded-xl bg-[var(--dashboard-accent-gold)]/5 border border-[var(--dashboard-accent-gold)]/10 text-sm print:bg-gray-50 print:border-gray-200">
@@ -640,5 +712,13 @@ export default function PackSlipPage() {
                 }
             `}</style>
         </div>
+    )
+}
+
+export default function PackSlipPage() {
+    return (
+        <Suspense fallback={<div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <PackSlipPageContent />
+        </Suspense>
     )
 }

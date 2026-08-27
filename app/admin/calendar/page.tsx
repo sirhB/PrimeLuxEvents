@@ -1,10 +1,22 @@
 import { createClient } from '@/lib/supabase/server'
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, format, addMonths, subMonths, isSameMonth, isSameDay, parseISO, isToday } from 'date-fns'
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, CheckCircle2, AlertCircle, Briefcase, MapPin } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, CheckCircle2, AlertCircle, Briefcase, MapPin, Package } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { WAREHOUSE_CATEGORY_LABELS, type WarehouseCategory } from '@/lib/warehouse/types'
+
+const warehouseCategoryColors: Record<WarehouseCategory, string> = {
+    pick: 'bg-blue-500/10 border-blue-500/20 text-blue-300',
+    pack: 'bg-purple-500/10 border-purple-500/20 text-purple-300',
+    vehicle_load: 'bg-amber-500/10 border-amber-500/20 text-amber-300',
+    put_away: 'bg-teal-500/10 border-teal-500/20 text-teal-300',
+    inventory_maintenance: 'bg-orange-500/10 border-orange-500/20 text-orange-300',
+    returns_checkin: 'bg-pink-500/10 border-pink-500/20 text-pink-300',
+    location_audit: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-300',
+    general: 'bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]',
+}
 
 export default async function CalendarPage({
     searchParams,
@@ -27,7 +39,7 @@ export default async function CalendarPage({
     // Fetch Tasks
     const { data: tasks } = await supabase
         .from('tasks')
-        .select('id, title, due_date, status, priority, task_type')
+        .select('id, title, due_date, status, priority, task_type, warehouse_category')
         .gte('due_date', viewStart.toISOString())
         .lte('due_date', viewEnd.toISOString())
 
@@ -98,10 +110,11 @@ export default async function CalendarPage({
                         const isTodayDate = isToday(day)
 
                         return (
-                            <div
+                            <Link
                                 key={day.toString()}
+                                href={`/admin/warehouse/schedule?date=${format(day, 'yyyy-MM-dd')}`}
                                 className={cn(
-                                    "min-h-[140px] p-3 border-r border-b border-[var(--dashboard-border)] transition-colors hover:bg-white/5 flex flex-col gap-2 group",
+                                    "min-h-[140px] p-3 border-r border-b border-[var(--dashboard-border)] transition-colors hover:bg-white/5 flex flex-col gap-2 group block",
                                     !isCurrentMonth && "bg-black/40 opacity-50",
                                     isTodayDate && "bg-[var(--dashboard-accent-gold)]/5 shadow-inner"
                                 )}
@@ -131,23 +144,40 @@ export default async function CalendarPage({
                                     ))}
 
                                     {/* Tasks */}
-                                    {dayTasks.map(task => (
-                                        <div key={task.id} className={cn(
-                                            "text-xs px-2 py-1.5 rounded-lg flex items-center gap-2 border hover:opacity-100 transition-all cursor-default",
-                                            task.status === 'completed'
-                                                ? "bg-green-500/10 border-green-500/20 text-green-300 opacity-60 line-through"
-                                                : "bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]"
-                                        )}>
-                                            <div className={cn("w-1.5 h-1.5 rounded-full shrink-0",
-                                                task.priority === 'urgent' ? 'bg-red-400' :
-                                                    task.priority === 'high' ? 'bg-orange-400' :
-                                                        'bg-[var(--dashboard-accent-gold)]'
-                                            )} />
-                                            <span className="truncate">{task.title}</span>
-                                        </div>
-                                    ))}
+                                    {dayTasks.map(task => {
+                                        const isWarehouse = task.task_type === 'warehouse' || task.warehouse_category
+                                        const category = (task.warehouse_category || 'general') as WarehouseCategory
+                                        const colorClass = isWarehouse
+                                            ? warehouseCategoryColors[category]
+                                            : task.status === 'completed'
+                                              ? "bg-green-500/10 border-green-500/20 text-green-300 opacity-60 line-through"
+                                              : "bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]"
+
+                                        return (
+                                            <div key={task.id} className={cn(
+                                                "text-xs px-2 py-1.5 rounded-lg flex items-center gap-2 border hover:opacity-100 transition-all",
+                                                colorClass
+                                            )}>
+                                                {isWarehouse ? (
+                                                    <Package className="w-3 h-3 shrink-0 opacity-70" />
+                                                ) : (
+                                                    <div className={cn("w-1.5 h-1.5 rounded-full shrink-0",
+                                                        task.priority === 'urgent' ? 'bg-red-400' :
+                                                            task.priority === 'high' ? 'bg-orange-400' :
+                                                                'bg-[var(--dashboard-accent-gold)]'
+                                                    )} />
+                                                )}
+                                                <span className="truncate">
+                                                    {isWarehouse && task.warehouse_category
+                                                        ? `${WAREHOUSE_CATEGORY_LABELS[category]}: `
+                                                        : ''}
+                                                    {task.title}
+                                                </span>
+                                            </div>
+                                        )
+                                    })}
                                 </div>
-                            </div>
+                            </Link>
                         )
                     })}
                 </div>
@@ -160,8 +190,12 @@ export default async function CalendarPage({
                     <span>Appointments</span>
                 </div>
                 <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded bg-purple-500/20 border border-purple-500/40" />
+                    <span>Warehouse Tasks</span>
+                </div>
+                <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded bg-[var(--dashboard-card)] border border-[var(--dashboard-border)]" />
-                    <span>Tasks</span>
+                    <span>Other Tasks</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-red-400" />

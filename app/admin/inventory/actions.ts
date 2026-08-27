@@ -64,6 +64,29 @@ export async function adjustInventory(
             return { success: false, error: updateError.message }
         }
 
+        // Log to inventory_logs
+        try {
+            const { data: { user } } = await supabase.auth.getUser()
+            await supabase.from('inventory_logs').insert({
+                product_id: productId,
+                change_amount: quantityChange,
+                reason,
+                created_by: user?.id || null,
+            })
+        } catch (e) {
+            console.log('Could not log to inventory_logs:', e)
+        }
+
+        // Also sync legacy stock column if present
+        try {
+            await supabase
+                .from('products')
+                .update({ stock: newQuantity })
+                .eq('id', productId)
+        } catch {
+            // stock column may not exist on all deployments
+        }
+
         // Log the adjustment if we have an audit log table
         try {
             await supabase.from('inventory_adjustments').insert({

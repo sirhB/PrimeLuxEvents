@@ -25,6 +25,7 @@ import {
     CheckSquare,
     QrCode,
     Truck,
+    CalendarDays,
     TrendingUp,
     MessageSquare,
     Tag,
@@ -237,6 +238,7 @@ const sidebarGroups = [
         title: "Operations",
         items: [
             { icon: Truck, label: 'Logistics Hub', href: '/admin/logistics' },
+            { icon: CalendarDays, label: 'Warehouse Schedule', href: '/admin/warehouse/schedule' },
             { icon: Box, label: 'Delivery', href: '/admin/delivery' },
             { icon: QrCode, label: 'Scanner', href: '/admin/scan' },
             { icon: Archive, label: 'Inventory', href: '/admin/inventory' },
@@ -260,6 +262,7 @@ const sidebarGroups = [
         title: "System",
         items: [
             { icon: UserCog, label: 'Staff Management', href: '/admin/team' },
+            { icon: CalendarDays, label: 'Staff Shifts', href: '/admin/team/shifts' },
             { icon: Settings, label: 'Global Settings', href: '/admin/settings' },
         ]
     }
