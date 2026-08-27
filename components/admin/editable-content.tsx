@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils"
 import { Pencil, Check, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
+import { useEditorContent } from "@/components/admin/visual-editor/editor-content-context"
+import { getFieldLabel } from "@/lib/admin/visual-editor-config"
 
 interface EditableContentProps {
     contentKey: string
@@ -15,9 +17,16 @@ interface EditableContentProps {
     isEditing?: boolean
     className?: string
     as?: any
-    alt?: string // For images
+    alt?: string
     [key: string]: any
 }
+
+/** Fixed chrome for edit controls — never inherit storefront text-white / huge type sizes */
+const EDIT_CONTROL_BASE =
+    "w-full rounded-md border-2 border-[var(--dashboard-accent-gold,#B8956B)] " +
+    "bg-[#F7F4EF] text-[#121110] caret-[#121110] " +
+    "outline-none ring-2 ring-[var(--dashboard-accent-gold,#B8956B)]/25 " +
+    "placeholder:text-[#121110]/40 selection:bg-[var(--dashboard-accent-gold,#B8956B)]/30"
 
 export function EditableContent({
     contentKey,
@@ -29,22 +38,46 @@ export function EditableContent({
     alt,
     ...props
 }: EditableContentProps) {
-    const [value, setValue] = useState(initialValue)
+    const editor = useEditorContent()
+    const contextValue = editor?.content[contentKey]
+    const resolvedInitial =
+        typeof contextValue === 'string'
+            ? contextValue
+            : contextValue != null
+              ? String(contextValue)
+              : initialValue
+
+    const [value, setValue] = useState(resolvedInitial)
     const [isSaving, setIsSaving] = useState(false)
     const [isHovered, setIsHovered] = useState(false)
     const [editMode, setEditMode] = useState(false)
-    const [tempValue, setTempValue] = useState(initialValue)
+    const [tempValue, setTempValue] = useState(resolvedInitial)
     const supabase = createClient()
     const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
+    const wrapperRef = useRef<HTMLDivElement>(null)
+    const fieldLabel = getFieldLabel(contentKey)
 
     useEffect(() => {
-        setValue(initialValue)
-        setTempValue(initialValue)
-    }, [initialValue])
+        setValue(resolvedInitial)
+        setTempValue(resolvedInitial)
+    }, [resolvedInitial])
 
     useEffect(() => {
-        if (editMode && inputRef.current) {
-            inputRef.current.focus()
+        if (!editMode || !inputRef.current) return
+
+        const input = inputRef.current
+        input.focus()
+
+        // Keep the field above the mobile keyboard
+        const scrollIntoView = () => {
+            wrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+        const timer = window.setTimeout(scrollIntoView, 350)
+        window.visualViewport?.addEventListener('resize', scrollIntoView)
+
+        return () => {
+            window.clearTimeout(timer)
+            window.visualViewport?.removeEventListener('resize', scrollIntoView)
         }
     }, [editMode])
 
@@ -63,30 +96,41 @@ export function EditableContent({
 
         setIsSaving(true)
         try {
-            // Check if content exists
-            const { data: existing } = await supabase
-                .from('content')
-                .select('id')
-                .eq('key', contentKey)
-                .single()
-
-            let error
-            if (existing) {
-                const { error: updateError } = await supabase
-                    .from('content')
-                    .update({ value: tempValue })
-                    .eq('key', contentKey)
+            if (editor) {
+                editor.updateField(contentKey, tempValue)
+                const ok = await editor.saveField(contentKey, tempValue)
+                if (!ok) throw new Error('Save failed')
             } else {
-                const { error: insertError } = await supabase
+                const { data: existing } = await supabase
                     .from('content')
-                    .insert([{ key: contentKey, value: tempValue, type: type === 'image' ? 'image' : 'text' }])
-            }
+                    .select('id')
+                    .eq('key', contentKey)
+                    .maybeSingle()
 
-            if (error) throw error
+                let error = null as Error | null
+                if (existing) {
+                    const { error: updateError } = await supabase
+                        .from('content')
+                        .update({ value: tempValue })
+                        .eq('key', contentKey)
+                    error = updateError
+                } else {
+                    const { error: insertError } = await supabase
+                        .from('content')
+                        .insert([{
+                            key: contentKey,
+                            value: tempValue,
+                            type: type === 'image' ? 'image' : 'text',
+                        }])
+                    error = insertError
+                }
+
+                if (error) throw error
+                toast.success("Content updated successfully")
+            }
 
             setValue(tempValue)
             setEditMode(false)
-            toast.success("Content updated successfully")
         } catch (error) {
             console.error(error)
             toast.error("Failed to update content")
@@ -100,6 +144,8 @@ export function EditableContent({
         setEditMode(false)
     }
 
+    const emptyPlaceholder = `Add ${fieldLabel}`
+
     if (type === 'image') {
         return (
             <div
@@ -110,7 +156,6 @@ export function EditableContent({
             >
                 <Component src={value} alt={alt || "Image"} className="w-full h-full object-cover" {...props} />
 
-                {/* Overlay when hovering in edit mode */}
                 <div className={cn(
                     "absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-200",
                     isHovered && !editMode ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -118,7 +163,6 @@ export function EditableContent({
                     <Pencil className="text-white w-8 h-8" />
                 </div>
 
-                {/* Edit Modal/Popover for Image URL */}
                 <AnimatePresence>
                     {editMode && (
                         <motion.div
@@ -128,17 +172,17 @@ export function EditableContent({
                             className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="bg-background p-4 rounded-lg w-full max-w-md space-y-4">
-                                <h3 className="font-medium text-black">Edit Image URL</h3>
+                            <div className="bg-[#F7F4EF] p-4 rounded-lg w-full max-w-md space-y-4">
+                                <h3 className="font-medium text-[#121110]">Edit image URL</h3>
                                 <input
                                     type="text"
                                     value={tempValue}
                                     onChange={(e) => setTempValue(e.target.value)}
-                                    className="w-full p-2 border rounded-md bg-white text-black"
+                                    className={cn(EDIT_CONTROL_BASE, "p-2 text-sm")}
                                     placeholder="Enter image URL"
                                 />
                                 <div className="flex justify-end gap-2">
-                                    <Button size="sm" variant="outline" onClick={handleCancel} disabled={isSaving} className="text-black">
+                                    <Button size="sm" variant="outline" onClick={handleCancel} disabled={isSaving} className="text-[#121110]">
                                         Cancel
                                     </Button>
                                     <Button size="sm" onClick={handleSave} disabled={isSaving} className="bg-gold text-black hover:bg-gold/90">
@@ -155,66 +199,82 @@ export function EditableContent({
 
     return (
         <div
-            className="relative group"
+            ref={wrapperRef}
+            className="relative group scroll-mt-24"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
             {editMode ? (
-                <div className="relative z-10">
+                <div className="relative z-20 space-y-2 rounded-lg bg-[#1A1A1A]/90 p-2 ring-1 ring-[var(--dashboard-accent-gold,#B8956B)]/40 backdrop-blur-sm">
+                    <div className="flex items-center justify-between gap-2 px-1">
+                        <span className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--dashboard-accent-gold,#B8956B)]">
+                            {fieldLabel}
+                        </span>
+                        <div className="flex shrink-0 gap-1 rounded-md border border-white/10 bg-black/40 p-0.5">
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-[var(--dashboard-accent-gold,#B8956B)] hover:bg-[var(--dashboard-accent-gold,#B8956B)]/15"
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                aria-label="Save changes"
+                            >
+                                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                            </Button>
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-white/70 hover:bg-white/10 hover:text-white"
+                                onClick={handleCancel}
+                                disabled={isSaving}
+                                aria-label="Cancel editing"
+                            >
+                                <X className="w-4 h-4" />
+                            </Button>
+                        </div>
+                    </div>
+
                     {type === 'textarea' ? (
                         <textarea
-                            ref={inputRef as any}
+                            ref={inputRef as React.RefObject<HTMLTextAreaElement>}
                             value={tempValue}
                             onChange={(e) => setTempValue(e.target.value)}
-                            className={cn(
-                                "w-full p-2 border-2 border-primary rounded-md bg-white text-black min-h-[100px] outline-none ring-2 ring-primary/20",
-                                className
-                            )}
+                            className={cn(EDIT_CONTROL_BASE, "min-h-[120px] p-3 text-base leading-relaxed")}
+                            placeholder={emptyPlaceholder}
                             onKeyDown={(e) => {
                                 if (e.key === 'Escape') handleCancel()
-                                // Ctrl+Enter to save
                                 if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSave()
                             }}
                         />
                     ) : (
                         <input
-                            ref={inputRef as any}
+                            ref={inputRef as React.RefObject<HTMLInputElement>}
                             type="text"
                             value={tempValue}
                             onChange={(e) => setTempValue(e.target.value)}
-                            className={cn(
-                                "w-full p-1 border-2 border-primary rounded-md bg-white text-black outline-none ring-2 ring-primary/20",
-                                className
-                            )}
+                            className={cn(EDIT_CONTROL_BASE, "p-3 text-base")}
+                            placeholder={emptyPlaceholder}
                             onKeyDown={(e) => {
                                 if (e.key === 'Escape') handleCancel()
                                 if (e.key === 'Enter') handleSave()
                             }}
                         />
                     )}
-                    <div className="absolute right-2 top-full mt-1 flex gap-1 z-20 bg-background/90 p-1 rounded-md shadow-lg border">
-                        <Button size="icon" variant="ghost" className="h-6 w-6 text-green-600 hover:text-green-700 hover:bg-green-100" onClick={handleSave} disabled={isSaving}>
-                            <Check className="w-4 h-4" />
-                        </Button>
-                        <Button size="icon" variant="ghost" className="h-6 w-6 text-red-600 hover:text-red-700 hover:bg-red-100" onClick={handleCancel} disabled={isSaving}>
-                            <X className="w-4 h-4" />
-                        </Button>
-                    </div>
                 </div>
             ) : (
                 <div
                     onClick={() => setEditMode(true)}
                     className={cn(
                         "relative cursor-pointer rounded-sm transition-all duration-200",
-                        isHovered && "outline outline-2 outline-primary/50 bg-primary/5"
+                        isHovered && "outline outline-2 outline-[var(--dashboard-accent-gold,#B8956B)]/50 bg-[var(--dashboard-accent-gold,#B8956B)]/5"
                     )}
                 >
                     <Component className={className} {...props}>
-                        {value || <span className="text-muted-foreground italic">Empty content</span>}
+                        {value || <span className="text-muted-foreground italic">{emptyPlaceholder}</span>}
                     </Component>
 
                     {isHovered && (
-                        <div className="absolute -right-3 -top-3 bg-primary text-primary-foreground rounded-full p-1 shadow-md z-10">
+                        <div className="absolute -right-3 -top-3 bg-[var(--dashboard-accent-gold,#B8956B)] text-black rounded-full p-1 shadow-md z-10">
                             <Pencil className="w-3 h-3" />
                         </div>
                     )}

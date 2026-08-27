@@ -1,73 +1,104 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { toast } from "sonner"
+import { AnimatePresence, motion } from "framer-motion"
 import { VisualEditorNav } from "@/components/admin/visual-editor-nav"
 import { VisualEditorLanding } from "@/components/admin/visual-editor-landing"
+import { VisualEditorSidebar } from "@/components/admin/visual-editor-sidebar"
 import { AboutPageContent } from "@/components/about-page-content"
 import { HowItWorksPageContent } from "@/components/how-it-works-page-content"
 import { ContactPageContent } from "@/components/contact-page-content"
 import { GalleryPageContent } from "@/components/gallery-page-content"
 import { JournalPageContent } from "@/components/journal-page-content"
-import { AnimatePresence, motion } from "framer-motion"
-import { VisualEditorSidebar } from "@/components/admin/visual-editor-sidebar"
+import { useEditorContent } from "@/components/admin/visual-editor/editor-content-context"
+import { StageFrame } from "@/components/admin/visual-editor/stage-frame"
+import { type PreviewDevice } from "@/lib/admin/visual-editor-config"
 
-export default function VisualEditorPage() {
-    const [activePage, setActivePage] = useState<string | null>(null)
-    const [content, setContent] = useState<any>(null)
-    const [loading, setLoading] = useState(false)
-    const supabase = createClient()
+function isMissingContentTableError(message: string | null | undefined): boolean {
+  if (!message) return false
+  const lower = message.toLowerCase()
+  return (
+    lower.includes("schema cache") ||
+    lower.includes("could not find the table") ||
+    lower.includes("public.content") ||
+    lower.includes("relation") && lower.includes("content") && lower.includes("does not exist")
+  )
+}
+
+function EditorWorkspace({
+    activePage,
+    onPageChange,
+    onNavigateToLanding,
+}: {
+    activePage: string
+    onPageChange: (page: string) => void
+    onNavigateToLanding: () => void
+}) {
+    const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('desktop')
+    // Closed by default on narrow screens so the preview is visible
+    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const editor = useEditorContent()
+    const loadPage = editor?.loadPage
+
+    // loadPage is stable (memoized once) — only re-fetch when the page changes
+    useEffect(() => {
+        if (!loadPage) return
+        void loadPage(activePage)
+    }, [activePage, loadPage])
 
     useEffect(() => {
-        if (!activePage) return
+        // Open sidebar by default on desktop widths
+        const mq = window.matchMedia('(min-width: 768px)')
+        setSidebarOpen(mq.matches)
+        const onChange = (e: MediaQueryListEvent) => setSidebarOpen(e.matches)
+        mq.addEventListener('change', onChange)
+        return () => mq.removeEventListener('change', onChange)
+    }, [])
 
-        async function fetchContent() {
-            setLoading(true)
-            let keyPrefix = activePage + '.'
-            if (activePage === 'how-it-works') keyPrefix = 'howitworks.'
+    if (!editor) return null
 
-            const { data, error } = await supabase
-                .from('content')
-                .select('*')
-                .like('key', keyPrefix + '%')
-
-            if (error) {
-                console.error('Error fetching content:', error)
-                toast.error("Failed to load content")
-            } else {
-                const contentMap = data.reduce((acc: any, item: any) => {
-                    let value = item.value
-                    if (typeof value === 'string' && (value.startsWith('[') || value.startsWith('{'))) {
-                        try {
-                            value = JSON.parse(value)
-                        } catch (e) {
-                            // Keep as string if parse fails
-                        }
-                    }
-                    acc[item.key] = value
-                    return acc
-                }, {})
-                setContent(contentMap)
-            }
-            setLoading(false)
-        }
-
-        fetchContent()
-    }, [activePage])
-
-    const handleUpdateContent = (key: string, value: string) => {
-        setContent((prev: any) => ({
-            ...prev,
-            [key]: value
-        }))
-    }
+    const { content, settings, isLoading, loadError } = editor
 
     const renderContent = () => {
-        if (loading) {
+        if (isLoading) {
             return (
-                <div className="flex items-center justify-center h-full">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
+                <div className="flex h-[60vh] flex-col gap-4 p-8">
+                    <div className="h-8 w-1/3 animate-pulse rounded bg-gray-200" />
+                    <div className="h-4 w-2/3 animate-pulse rounded bg-gray-200" />
+                    <div className="mt-8 h-48 w-full animate-pulse rounded bg-gray-200" />
+                </div>
+            )
+        }
+
+        if (loadError) {
+            const missingTable = isMissingContentTableError(loadError)
+            return (
+                <div className="flex h-[50vh] flex-col items-center justify-center gap-4 p-8 text-center">
+                    <p className="text-sm font-medium text-gray-900">
+                        {missingTable ? 'CMS database not set up yet' : "Couldn’t load this page’s content"}
+                    </p>
+                    {missingTable ? (
+                        <div className="max-w-md space-y-2 text-xs leading-relaxed text-gray-600">
+                            <p>
+                                This Supabase project is missing the <code className="rounded bg-gray-100 px-1">public.content</code> table
+                                the Site editor uses to store page copy.
+                            </p>
+                            <p>
+                                In the Supabase SQL Editor, run{' '}
+                                <code className="rounded bg-gray-100 px-1">supabase/migrations/20260827_ensure_content_cms.sql</code>
+                                , then try again.
+                            </p>
+                        </div>
+                    ) : (
+                        <p className="max-w-sm text-xs text-gray-500">{loadError}</p>
+                    )}
+                    <button
+                        type="button"
+                        onClick={() => void editor.loadPage(activePage)}
+                        className="mt-2 rounded-md bg-[var(--dashboard-accent-gold,#B8956B)] px-4 py-2 text-xs font-semibold text-black"
+                    >
+                        Try again
+                    </button>
                 </div>
             )
         }
@@ -80,52 +111,68 @@ export default function VisualEditorPage() {
             case 'how-it-works':
                 return <HowItWorksPageContent {...props} />
             case 'contact':
-                return <ContactPageContent {...props} />
+                return <ContactPageContent {...props} settings={settings} />
             case 'gallery':
                 return <GalleryPageContent {...props} />
             case 'journal':
                 return <JournalPageContent {...props} />
             default:
-                return <div className="p-12 text-center text-muted-foreground">Select a page to start editing</div>
+                return (
+                    <div className="p-12 text-center text-muted-foreground">
+                        Select a page to start editing
+                    </div>
+                )
         }
     }
+
+    return (
+        <div className="flex h-screen flex-col overflow-hidden bg-[var(--dashboard-background)]">
+            <VisualEditorNav
+                activePage={activePage}
+                onPageChange={onPageChange}
+                onNavigateToLanding={onNavigateToLanding}
+            />
+
+            <div className="relative flex flex-1 overflow-hidden">
+                <VisualEditorSidebar
+                    activePage={activePage}
+                    previewDevice={previewDevice}
+                    onPreviewDeviceChange={setPreviewDevice}
+                    isOpen={sidebarOpen}
+                    onToggle={() => setSidebarOpen((prev) => !prev)}
+                />
+
+                <StageFrame device={previewDevice}>
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={activePage}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="w-full"
+                        >
+                            {renderContent()}
+                        </motion.div>
+                    </AnimatePresence>
+                </StageFrame>
+            </div>
+        </div>
+    )
+}
+
+export default function VisualEditorPage() {
+    const [activePage, setActivePage] = useState<string | null>(null)
 
     if (!activePage) {
         return <VisualEditorLanding onSelectPage={setActivePage} />
     }
 
     return (
-        <div className="min-h-screen bg-[#F8F9FA] flex flex-col overflow-hidden">
-            <VisualEditorNav
-                activePage={activePage}
-                onPageChange={setActivePage}
-                onNavigateToLanding={() => setActivePage(null)}
-            />
-
-            <div className="flex-1 flex overflow-hidden">
-                <VisualEditorSidebar
-                    activePage={activePage}
-                    content={content}
-                    onUpdateContent={handleUpdateContent}
-                />
-
-                <main className="flex-1 overflow-auto relative">
-                    <div className="max-w-[1440px] mx-auto min-h-full bg-white shadow-2xl my-8 mx-8 rounded-xl overflow-hidden border border-border/50">
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={activePage}
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                                className="w-full h-full"
-                            >
-                                {renderContent()}
-                            </motion.div>
-                        </AnimatePresence>
-                    </div>
-                </main>
-            </div>
-        </div>
+        <EditorWorkspace
+            activePage={activePage}
+            onPageChange={setActivePage}
+            onNavigateToLanding={() => setActivePage(null)}
+        />
     )
 }
