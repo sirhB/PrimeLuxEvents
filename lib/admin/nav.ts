@@ -61,6 +61,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments', keywords: ['showroom', 'visits'] },
       { icon: MessageSquare, label: 'Messages', href: '/admin/messages', keywords: ['inbox', 'chat'] },
       { icon: Users, label: 'Customers', href: '/admin/customers', permission: 'customers.view', keywords: ['clients'] },
+      { icon: Briefcase, label: 'Partners', href: '/admin/partners', permission: 'customers.view', keywords: ['planners', 'decorators', 'preferred', 'trade'] },
       { icon: Tag, label: 'Discounts', href: '/admin/marketing/discounts', keywords: ['coupons', 'promo', 'marketing'] },
     ],
   },

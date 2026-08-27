@@ -24,7 +24,6 @@ export async function createPaymentIntent(items: CartItem[], deliveryAddress: st
                 enabled: true,
             },
             metadata: {
-                // You can add more metadata here, like customer info or item IDs
                 itemCount: items.length.toString(),
                 isPartial: (customAmount && customAmount < totals.totalAmount) ? 'true' : 'false',
                 totalAmount: totals.totalAmount.toString(),
@@ -57,7 +56,7 @@ export async function createBalancePaymentIntent(orderId: string, amount: number
 
         const { data: order, error: orderError } = await supabase
             .from('orders')
-            .select('id, user_id, customer_email, total_amount, balance_paid, payment_status')
+            .select('id, user_id, customer_email, total_amount, balance_paid, payment_status, client_can_pay, billing_party')
             .eq('id', orderId)
             .single()
 
@@ -68,6 +67,13 @@ export async function createBalancePaymentIntent(orderId: string, amount: number
         const staff = await isStaffUser(user.id)
         if (!staff && !userOwnsOrder(user, order)) {
             return { error: 'You do not have permission to pay this order' }
+        }
+
+        // Partner settle-up orders: end clients must not pay PrimeLux directly
+        if (order.client_can_pay === false && !staff && order.user_id !== user.id) {
+            return {
+                error: 'Payment for this booking is handled by your planner with PrimeLux directly.',
+            }
         }
 
         const remaining = Math.max(0, (order.total_amount || 0) - (order.balance_paid || 0))
@@ -83,7 +89,8 @@ export async function createBalancePaymentIntent(orderId: string, amount: number
             },
             metadata: {
                 orderId,
-                paymentType: 'balance_payment'
+                paymentType:
+                    order.billing_party === 'partner' ? 'partner_trade_balance' : 'balance_payment',
             },
         })
 

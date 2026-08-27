@@ -2,21 +2,46 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ShoppingCart, Heart, CalendarCheck, MessageSquare } from 'lucide-react'
+import { LayoutDashboard, ShoppingCart, Heart, CalendarCheck, Handshake } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { usePwaContext } from '@/components/providers/pwa-provider'
+import type { PartnerNavStatus } from '@/components/account-sidebar'
 
-const navItems = [
-  { title: 'Home', href: '/account', icon: LayoutDashboard },
-  { title: 'Orders', href: '/account/orders', icon: ShoppingCart },
-  { title: 'Saved', href: '/account/favorites', icon: Heart },
-  { title: 'Visits', href: '/account/appointments', icon: CalendarCheck },
-  { title: 'Chat', href: '/account/messages', icon: MessageSquare },
-]
-
-export function AccountBottomBar() {
+export function AccountBottomBar({ partnerStatus = 'none' }: { partnerStatus?: PartnerNavStatus }) {
   const pathname = usePathname()
   const { isStandalone } = usePwaContext()
+
+  const navItems = [
+    { title: 'Home', href: '/account', icon: LayoutDashboard },
+    { title: 'Orders', href: '/account/orders', icon: ShoppingCart },
+    partnerStatus === 'active'
+      ? { title: 'Partner', href: '/account/partner', icon: Handshake }
+      : { title: 'Saved', href: '/account/favorites', icon: Heart },
+    { title: 'Visits', href: '/account/appointments', icon: CalendarCheck },
+    partnerStatus === 'active'
+      ? { title: 'Carts', href: '/account/partner/carts', icon: ShoppingCart }
+      : { title: 'Saved', href: '/account/favorites', icon: Heart },
+  ]
+
+  // Dedupe if both slots would be Saved for non-partners
+  const seen = new Set<string>()
+  const items = navItems.filter((item) => {
+    if (seen.has(item.href)) return false
+    seen.add(item.href)
+    return true
+  })
+
+  // Ensure non-partners still get Chat-like fifth slot: favorites already covered;
+  // keep 4–5 items max
+  const finalItems =
+    partnerStatus === 'active'
+      ? items
+      : [
+          { title: 'Home', href: '/account', icon: LayoutDashboard },
+          { title: 'Orders', href: '/account/orders', icon: ShoppingCart },
+          { title: 'Saved', href: '/account/favorites', icon: Heart },
+          { title: 'Visits', href: '/account/appointments', icon: CalendarCheck },
+        ]
 
   return (
     <nav
@@ -26,8 +51,9 @@ export function AccountBottomBar() {
       )}
     >
       <div className="flex items-center justify-around px-1 py-2">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/account' && pathname.startsWith(item.href))
+        {finalItems.map((item) => {
+          const isActive =
+            pathname === item.href || (item.href !== '/account' && pathname.startsWith(item.href))
           const Icon = item.icon
           return (
             <Link
@@ -39,7 +65,9 @@ export function AccountBottomBar() {
               )}
             >
               <Icon className={cn('h-5 w-5', isActive && 'scale-110')} />
-              <span className={cn('text-[10px] font-medium', isActive && 'font-semibold')}>{item.title}</span>
+              <span className={cn('text-[10px] font-medium', isActive && 'font-semibold')}>
+                {item.title}
+              </span>
             </Link>
           )
         })}

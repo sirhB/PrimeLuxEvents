@@ -5,12 +5,15 @@ import { Calendar, Package, Clock, ArrowRight, CheckCircle2, PenLine, Truck } fr
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { OrderStatusChip } from '@/components/account/order-status-chip'
+import { getPartnerProfileForUser } from '@/lib/auth/partners'
 
 export default async function AccountPage() {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) return null
+
+    const partner = await getPartnerProfileForUser(user.id)
 
     const { data: orders } = await supabase
         .from('orders')
@@ -81,6 +84,20 @@ export default async function AccountPage() {
                     Track deliveries, review orders, and update your profile.
                 </p>
             </div>
+
+            {!partner && (
+                <div className="flex flex-col gap-3 rounded-2xl border border-[var(--champagne,#B8956B)]/30 bg-white/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-sm font-medium">Event planner or decorator?</p>
+                        <p className="text-xs text-muted-foreground">
+                            Join the Preferred Vendor program for trade rates and client share links.
+                        </p>
+                    </div>
+                    <Button asChild variant="outline" className="rounded-full shrink-0">
+                        <Link href="/account/partner/apply">Learn more</Link>
+                    </Button>
+                </div>
+            )}
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <Card className="spotlight-frame border-border/60 bg-white/80">

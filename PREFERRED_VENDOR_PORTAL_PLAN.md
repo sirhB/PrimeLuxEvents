@@ -208,13 +208,18 @@ Fix checkout’s current `planner` role lookup to use the shared helper and comb
 
 ---
 
-## 7. Checkout & pricing UX
+## 7. Checkout, shared carts & payment model
 
-1. Cart / checkout detects active partner → show badge: “Partner trade pricing applied”.
-2. Line pricing can stay retail with a clear discount line (transparency for client invoices), or show net trade (decide with ops; recommend **retail + discount line** so client-facing PDFs stay clear).
-3. Partner checkout fields: select or create `partner_event` (client name/email required).
-4. Deposit / balance / e-sign flows unchanged; agreements still bind the responsible party (partner or client — document in rental agreement copy).
-5. Admin order detail shows Partner badge + company name.
+**Critical billing rule:** End clients must **never** pay PrimeLux on a partner-sourced booking. If they did, PrimeLux would receive retail and owe the partner a cut. Instead:
+
+1. Partner builds a cart and creates a **shared cart** with a public link (`/share/[token]`).
+2. Client reviews **retail** pricing only — **no Stripe / no payment** on the share link.
+3. Partner invoices and collects from the client externally.
+4. Partner **settles** with PrimeLux in the portal at the **trade total** (base tier % + volume ladder).
+5. Order is created with `billing_party = 'partner'`, `client_can_pay = false`, owned by the partner account.
+
+Cart / partner checkout badge: “Partner trade pricing — settle-up with PrimeLux.”
+Admin order detail shows Partner badge + company name.
 
 ---
 
@@ -300,11 +305,11 @@ Reuse existing patterns from `/admin/customers` and `/admin/marketing/discounts`
 
 ## 12. Open decisions
 
-1. **Role name:** keep `planner` vs introduce `partner` (recommended: `partner`, migrate checkout check).
-2. **Who is the order’s `user_id`:** partner account (simpler portal) vs end client (requires claim/link UX). Recommendation: **partner owns the order**; client email on order + `partner_events` for communication.
-3. **Invoice presentation:** show trade discount to client or net-only partner invoice. Recommendation: retail + discount line; optional “client-facing” PDF without trade breakdown later.
-4. **Application auto-approve:** never for v1; staff review required.
-5. **Whether decorators differ from planners in product:** same portal; `business_type` for CRM only unless perks diverge later.
+1. **Role name:** Implemented as `partner` (not `planner`).
+2. **Who is the order’s `user_id`:** Partner account owns the order; client contact lives on the shared cart / delivery notes. Client email is **not** used as `customer_email` so claim/pay paths cannot unlock Stripe for the end client.
+3. **Invoice presentation:** Share link shows retail only; partner portal shows retail vs trade side-by-side.
+4. **Application auto-approve:** Never for v1; staff review in `/admin/partners`.
+5. **Whether decorators differ from planners in product:** Same portal; `business_type` for CRM only.
 
 ---
 

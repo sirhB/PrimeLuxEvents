@@ -225,6 +225,11 @@ function OrderDetailContent() {
                                 Sign Agreement
                             </Button>
                         )}
+                        {!isPaid && order.billing_party === 'partner' && (
+                            <p className="text-xs text-muted-foreground max-w-xs text-right">
+                                Partner settle-up order — end clients cannot pay this balance on PrimeLux.
+                            </p>
+                        )}
                         {!isPaid && (
                             <Button
                                 onClick={handlePayBalance}
@@ -232,7 +237,9 @@ function OrderDetailContent() {
                                 className="rounded-full bg-gold text-black hover:bg-black hover:text-white flex items-center gap-2"
                             >
                                 {isProcessingPayment ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-                                Pay Balance ({formatCurrency(remainingBalance)})
+                                {order.billing_party === 'partner'
+                                    ? `Pay PrimeLux (${formatCurrency(remainingBalance)})`
+                                    : `Pay Balance (${formatCurrency(remainingBalance)})`}
                             </Button>
                         )}
                     </div>
