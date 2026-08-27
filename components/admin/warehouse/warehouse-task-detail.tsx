@@ -38,7 +38,7 @@ export function WarehouseTaskDetail({ task, onUpdate }: WarehouseTaskDetailProps
     const [notes, setNotes] = useState('')
     const [loading, setLoading] = useState<string | null>(null)
     const category = (task.warehouse_category || 'general') as WarehouseCategory
-    const checklist = task.checklist || []
+    const checklist = Array.isArray(task.checklist) ? task.checklist : []
     const isComplete = task.status === 'completed'
 
     async function handleChecklistToggle(itemId: string, completed: boolean) {

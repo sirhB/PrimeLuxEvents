@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { format } from 'date-fns'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
     Calendar,
     Clock,
@@ -27,6 +27,7 @@ import {
     generateRecurringTasks,
     generateTasksForDeliveryDate,
 } from '@/app/admin/warehouse/actions'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 import {
     WAREHOUSE_CATEGORY_ORDER,
     WAREHOUSE_CATEGORY_LABELS,
@@ -50,7 +51,6 @@ export function WarehouseScheduleContent({
     staffOnShift = [],
 }: WarehouseScheduleContentProps) {
     const router = useRouter()
-    const searchParams = useSearchParams()
     const [tasks, setTasks] = useState<WarehouseTask[]>(initialTasks)
     const [selectedTask, setSelectedTask] = useState<WarehouseTask | null>(null)
     const [viewMode, setViewMode] = useState<'board' | 'queue'>('board')
@@ -62,14 +62,18 @@ export function WarehouseScheduleContent({
         setSelectedTask(null)
     }, [initialTasks])
 
+    useEffect(() => {
+        if (filter === 'shift' && staffOnShift.length === 0) {
+            setFilter('all')
+        }
+    }, [filter, staffOnShift.length])
+
     const refresh = useCallback(() => {
         router.refresh()
     }, [router])
 
     function handleDateChange(date: string) {
-        const params = new URLSearchParams(searchParams.toString())
-        params.set('date', date)
-        router.push(`/admin/warehouse/schedule?${params.toString()}`)
+        router.push(`/admin/warehouse/schedule?date=${encodeURIComponent(date)}`)
     }
 
     const filteredTasks = tasks.filter((t) => {
@@ -138,8 +142,8 @@ export function WarehouseScheduleContent({
     const queueTasks = [...filteredTasks]
         .filter((t) => t.status !== 'cancelled' && t.status !== 'completed')
         .sort((a, b) => {
-            const timeA = a.scheduled_start || '99:99'
-            const timeB = b.scheduled_start || '99:99'
+            const timeA = typeof a.scheduled_start === 'string' ? a.scheduled_start : '99:99'
+            const timeB = typeof b.scheduled_start === 'string' ? b.scheduled_start : '99:99'
             if (timeA !== timeB) return timeA.localeCompare(timeB)
             const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 }
             return (priorityOrder[a.priority as keyof typeof priorityOrder] ?? 2) -
@@ -148,46 +152,40 @@ export function WarehouseScheduleContent({
 
     return (
         <div className="flex flex-col gap-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="space-y-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                        Operations
-                    </span>
-                    <h1 className="text-4xl md:text-5xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                        Warehouse Schedule
-                    </h1>
-                    <p className="text-[var(--dashboard-text-muted)] font-light max-w-lg">
-                        Daily task queue for picking, packing, loading, and inventory maintenance.
-                    </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                    <CreateWarehouseTaskDialog defaultDate={selectedDate} onSuccess={refresh} />
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="rounded-xl"
-                        disabled={generating}
-                        onClick={handleGenerateForDate}
-                    >
-                        {generating ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : (
-                            <Wand2 className="h-4 w-4 mr-2" />
-                        )}
-                        Generate from Orders
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="rounded-xl"
-                        disabled={generating}
-                        onClick={handleGenerateRecurring}
-                    >
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Recurring
-                    </Button>
-                </div>
-            </div>
+            <AdminPageHeader
+                eyebrow="Operations"
+                title="Warehouse Schedule"
+                description="Daily task queue for picking, packing, loading, and inventory maintenance."
+                actions={
+                    <div className="flex flex-wrap items-center gap-2">
+                        <CreateWarehouseTaskDialog defaultDate={selectedDate} onSuccess={refresh} />
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="rounded-xl"
+                            disabled={generating}
+                            onClick={handleGenerateForDate}
+                        >
+                            {generating ? (
+                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            ) : (
+                                <Wand2 className="h-4 w-4 mr-2" />
+                            )}
+                            Generate from Orders
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="rounded-xl"
+                            disabled={generating}
+                            onClick={handleGenerateRecurring}
+                        >
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Recurring
+                        </Button>
+                    </div>
+                }
+            />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="glass-card border-none rounded-2xl">
@@ -251,7 +249,12 @@ export function WarehouseScheduleContent({
                     </Card>
 
                     <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-                        <TabsList className="w-full grid grid-cols-3 bg-black/20">
+                        <TabsList
+                            className={cn(
+                                'w-full grid bg-black/20',
+                                staffOnShift.length > 0 ? 'grid-cols-3' : 'grid-cols-2'
+                            )}
+                        >
                             <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
                             <TabsTrigger value="mine" className="text-xs">My Tasks</TabsTrigger>
                             {staffOnShift.length > 0 && (
