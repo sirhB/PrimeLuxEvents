@@ -1186,6 +1186,202 @@ export default function CheckoutPage() {
                                 </div>
                             </div>
 
+                            {/* Event & Delivery Review */}
+                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
+                                <div className="p-10 border-b border-border/5">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
+                                                <CalendarIcon className="h-6 w-6 text-gold" />
+                                            </div>
+                                            <h3 className="text-2xl font-serif font-bold text-gray-900">Event Information</h3>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setCurrentStep(2)}
+                                            className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold hover:text-gold/70 transition-colors"
+                                        >
+                                            Edit
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="p-10 space-y-8">
+                                    <div className="grid sm:grid-cols-2 gap-8">
+                                        <div>
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Event Date</span>
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <CalendarIcon className="h-4 w-4 text-gold flex-shrink-0" />
+                                                <p className="font-medium text-gray-900">
+                                                    {date ? format(date, 'PPP') : 'Not set'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Event Time</span>
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <Clock className="h-4 w-4 text-gold flex-shrink-0" />
+                                                <p className="font-medium text-gray-900">
+                                                    {startTime || 'TBD'}{endTime ? ` – ${endTime}` : ''}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid sm:grid-cols-2 gap-8">
+                                        {formData.eventType && (
+                                            <div>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Event Type</span>
+                                                <p className="mt-2 font-medium text-gray-900">{formData.eventType}</p>
+                                            </div>
+                                        )}
+                                        <div>
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Venue Type</span>
+                                            <p className="mt-2 font-medium text-gray-900 capitalize">
+                                                {venueType?.replace(/_/g, ' ') || 'Not set'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-6 border-t border-border/5">
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Venue / Delivery Address</span>
+                                        <div className="flex items-start gap-2 mt-2">
+                                            <MapPin className="h-4 w-4 text-gold mt-1 flex-shrink-0" />
+                                            <p className="font-medium text-gray-900 leading-relaxed">
+                                                {formData.venueAddress || formData.deliveryAddress || 'Not set'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {(hasElevator || hasStairs || hasLoadingDock) && (
+                                        <div className="pt-6 border-t border-border/5">
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Access</span>
+                                            <div className="flex flex-wrap gap-3 mt-3">
+                                                {hasElevator && (
+                                                    <span className="text-xs font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-border/5">
+                                                        Elevator Access
+                                                    </span>
+                                                )}
+                                                {hasStairs && (
+                                                    <span className="text-xs font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-border/5">
+                                                        Stairs Required
+                                                    </span>
+                                                )}
+                                                {hasLoadingDock && (
+                                                    <span className="text-xs font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-border/5">
+                                                        Loading Dock
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {formData.deliveryNotes && (
+                                        <div className="pt-6 border-t border-border/5">
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Logistics Notes</span>
+                                            <p className="mt-2 text-sm text-gray-500 italic font-light leading-relaxed">
+                                                &ldquo;{formData.deliveryNotes}&rdquo;
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Delivery & Pickup Review */}
+                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
+                                <div className="p-10 border-b border-border/5">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
+                                                <Truck className="h-6 w-6 text-gold" />
+                                            </div>
+                                            <h3 className="text-2xl font-serif font-bold text-gray-900">Delivery & Pickup</h3>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setCurrentStep(2)}
+                                            className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold hover:text-gold/70 transition-colors"
+                                        >
+                                            Edit
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="p-10 space-y-10">
+                                    <div className="space-y-6">
+                                        <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Delivery</h4>
+                                        <div className="grid sm:grid-cols-2 gap-8">
+                                            <div>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Delivery Date</span>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <CalendarIcon className="h-4 w-4 text-gold flex-shrink-0" />
+                                                    <p className="font-medium text-gray-900">
+                                                        {date ? format(date, 'PPP') : 'Not set'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Delivery Time</span>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <Clock className="h-4 w-4 text-gold flex-shrink-0" />
+                                                    <p className="font-medium text-gray-900">
+                                                        {formData.deliveryTime || startTime || 'TBD'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Delivery Address</span>
+                                            <div className="flex items-start gap-2 mt-2">
+                                                <MapPin className="h-4 w-4 text-gold mt-1 flex-shrink-0" />
+                                                <p className="font-medium text-gray-900 leading-relaxed">
+                                                    {formData.deliveryAddress || formData.venueAddress || 'Not set'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-8 border-t border-border/5 space-y-6">
+                                        <div className="flex items-center gap-3">
+                                            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Pickup</h4>
+                                            {sameDayPickup && (
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-black bg-gold px-3 py-1 rounded-full">
+                                                    Same-Day
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="grid sm:grid-cols-2 gap-8">
+                                            <div>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Pickup Date</span>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <CalendarIcon className="h-4 w-4 text-gold flex-shrink-0" />
+                                                    <p className="font-medium text-gray-900">
+                                                        {sameDayPickup
+                                                            ? (date ? format(date, 'PPP') : 'Same as event date')
+                                                            : (pickupDate ? format(pickupDate, 'PPP') : 'Not set')}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Preferred Pickup Time</span>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <Clock className="h-4 w-4 text-gold flex-shrink-0" />
+                                                    <p className="font-medium text-gray-900">
+                                                        {pickupTime || 'TBD'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {pickupNotes && (
+                                            <div>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Pickup Instructions</span>
+                                                <p className="mt-2 text-sm text-gray-500 italic font-light leading-relaxed">
+                                                    &ldquo;{pickupNotes}&rdquo;
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Payment Choice */}
                             <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
                                 <div className="p-10 border-b border-border/5">
