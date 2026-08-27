@@ -361,9 +361,39 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Ensure products.quantity_available exists (legacy DBs may only have stock)
 DO $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'products') THEN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'products'
+    ) THEN
+        IF NOT EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = 'products' AND column_name = 'quantity_available'
+        ) THEN
+            ALTER TABLE public.products ADD COLUMN quantity_available integer DEFAULT 1;
+
+            IF EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_schema = 'public' AND table_name = 'products' AND column_name = 'stock'
+            ) THEN
+                UPDATE public.products
+                SET quantity_available = COALESCE(stock, 1)
+                WHERE quantity_available IS NULL;
+            END IF;
+        END IF;
+
+        ALTER TABLE public.products ADD COLUMN IF NOT EXISTS quantity_reserved integer DEFAULT 0;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name = 'products' AND column_name = 'quantity_available'
+    ) THEN
         DROP TRIGGER IF EXISTS on_low_stock_maintenance ON public.products;
         CREATE TRIGGER on_low_stock_maintenance
             AFTER UPDATE OF quantity_available ON public.products
