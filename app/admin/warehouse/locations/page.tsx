@@ -103,7 +103,11 @@ export default function WarehouseLocationsPage() {
                         </CardHeader>
                         <CardContent className="pt-6 flex flex-col items-center gap-6">
                             <AdminQRCode url={`/admin/warehouse/locations/${loc.id}`} label={loc.name} />
-                            <Button variant="outline" className="w-full rounded-xl border-[var(--dashboard-border)] hover:bg-[var(--dashboard-accent-gold)] hover:text-black">
+                            <Button
+                                variant="outline"
+                                className="w-full rounded-xl border-[var(--dashboard-border)] hover:bg-[var(--dashboard-accent-gold)] hover:text-black"
+                                onClick={() => window.open(`/admin/warehouse/locations/${loc.id}`, '_blank')}
+                            >
                                 <Printer className="mr-2 h-4 w-4" />
                                 Print Tag
                             </Button>

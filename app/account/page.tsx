@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { formatCentsWithCommas } from '@/lib/format-money'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Calendar, Package, Clock, ArrowRight } from 'lucide-react'
+import { Calendar, Package, Clock, ArrowRight, CheckCircle2, PenLine, Truck } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { OrderStatusChip } from '@/components/account/order-status-chip'
@@ -11,12 +11,6 @@ export default async function AccountPage() {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) return null
-
-    const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
 
     const { data: orders } = await supabase
         .from('orders')
@@ -37,6 +31,45 @@ export default async function AccountPage() {
         const diffTime = new Date(upcomingOrder.delivery_date).getTime() - now.getTime()
         daysUntil = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     }
+
+    const timeline = upcomingOrder
+        ? [
+            {
+                label: 'Order placed',
+                done: true,
+                icon: Package,
+                detail: upcomingOrder.created_at
+                    ? new Date(upcomingOrder.created_at).toLocaleDateString()
+                    : undefined,
+            },
+            {
+                label: 'Agreement signed',
+                done: Boolean(upcomingOrder.signature_url),
+                icon: PenLine,
+                detail: upcomingOrder.signed_at
+                    ? new Date(upcomingOrder.signed_at).toLocaleDateString()
+                    : 'Awaiting signature',
+            },
+            {
+                label: 'Delivery',
+                done: ['delivered', 'completed', 'returned'].includes(upcomingOrder.status),
+                icon: Truck,
+                detail: upcomingOrder.delivery_date
+                    ? new Date(upcomingOrder.delivery_date).toLocaleDateString()
+                    : undefined,
+            },
+            {
+                label: 'Pickup',
+                done: ['completed', 'returned'].includes(upcomingOrder.status),
+                icon: CheckCircle2,
+                detail: upcomingOrder.pickup_date
+                    ? new Date(upcomingOrder.pickup_date).toLocaleDateString()
+                    : upcomingOrder.same_day_pickup
+                        ? 'Same-day pickup'
+                        : 'Scheduled after event',
+            },
+        ]
+        : []
 
     return (
         <div className="space-y-8">
@@ -89,6 +122,35 @@ export default async function AccountPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            {upcomingOrder && (
+                <Card className="spotlight-frame border-border/60 bg-white/80">
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle className="font-serif text-xl font-light">Event timeline</CardTitle>
+                        <Button variant="ghost" asChild size="sm">
+                            <Link href={`/account/orders/${upcomingOrder.id}`}>View order</Link>
+                        </Button>
+                    </CardHeader>
+                    <CardContent>
+                        <ol className="grid gap-4 md:grid-cols-4">
+                            {timeline.map((step) => {
+                                const Icon = step.icon
+                                return (
+                                    <li key={step.label} className="relative rounded-2xl border border-border/50 p-4">
+                                        <div className="mb-3 flex items-center gap-2">
+                                            <span className={`rounded-full p-2 ${step.done ? 'bg-[var(--champagne,#B8956B)]/15 text-[var(--champagne,#B8956B)]' : 'bg-muted text-muted-foreground'}`}>
+                                                <Icon className="h-4 w-4" />
+                                            </span>
+                                            <span className="text-sm font-medium">{step.label}</span>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">{step.detail}</p>
+                                    </li>
+                                )
+                            })}
+                        </ol>
+                    </CardContent>
+                </Card>
+            )}
 
             <div className="space-y-4">
                 <div className="flex items-center justify-between">

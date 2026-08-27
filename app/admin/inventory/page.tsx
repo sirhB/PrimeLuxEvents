@@ -76,11 +76,13 @@ export default async function InventoryPage({
     const [
         { data: allProductsMetrics },
         { data: lowStockWidgetItems },
-        { data: products, count }
+        { data: products, count },
+        { data: popularItems },
     ] = await Promise.all([
         metricsPromise,
         lowStockWidgetPromise,
-        tablePromise
+        tablePromise,
+        supabase.from('view_popular_items').select('*').limit(5),
     ])
 
     // Calc aggregated metrics
@@ -162,9 +164,25 @@ export default async function InventoryPage({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <LowStockWidget items={lowStockWidgetItems || []} />
-                {/* Placeholder for future widget */}
-                <Card className="glass-card border-none flex flex-col items-center justify-center p-6 text-[var(--dashboard-text-muted)]">
-                    <p>Most Popular Items (Coming Soon)</p>
+                <Card className="glass-card border-none p-6 space-y-4">
+                    <div>
+                        <CardTitle className="font-serif text-xl">Most Popular Items</CardTitle>
+                        <CardDescription>Top rented products by quantity</CardDescription>
+                    </div>
+                    <div className="space-y-3">
+                        {(popularItems || []).length === 0 ? (
+                            <p className="text-sm text-[var(--dashboard-text-muted)]">No rental data yet</p>
+                        ) : (
+                            (popularItems || []).map((item: any) => (
+                                <div key={item.name} className="flex items-center justify-between border-b border-[var(--dashboard-border)]/40 pb-2 last:border-0">
+                                    <p className="text-sm text-[var(--dashboard-text)]">{item.name}</p>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-[var(--dashboard-accent-gold)]">
+                                        {item.total_rented} rented
+                                    </p>
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </Card>
             </div>
 

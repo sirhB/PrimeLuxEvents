@@ -32,12 +32,13 @@ interface Customer {
 
 interface CustomersClientProps {
     customers: Customer[]
+    activeCustomers?: Customer[]
     totalCount: number
     currentPage: number
     pageSize: number
 }
 
-export function CustomersClient({ customers, totalCount, currentPage, pageSize }: CustomersClientProps) {
+export function CustomersClient({ customers, activeCustomers = [], totalCount, currentPage, pageSize }: CustomersClientProps) {
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
     const [isEditOpen, setIsEditOpen] = useState(false)
     const router = useRouter()
@@ -199,9 +200,45 @@ export function CustomersClient({ customers, totalCount, currentPage, pageSize }
                     )}
                 </TabsContent>
                 <TabsContent value="active" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
-                        <p className="text-[var(--dashboard-text-muted)] font-light">Active customers view coming soon</p>
-                    </div>
+                    <Card className="border-none glass-card overflow-hidden">
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader className="bg-black/20">
+                                    <TableRow className="border-[var(--dashboard-border)] hover:bg-transparent">
+                                        <TableHead className="text-[var(--dashboard-text-muted)]">Customer</TableHead>
+                                        <TableHead className="text-[var(--dashboard-text-muted)]">Orders</TableHead>
+                                        <TableHead className="text-[var(--dashboard-text-muted)]">Spent</TableHead>
+                                        <TableHead className="text-[var(--dashboard-text-muted)]">Last Order</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {activeCustomers.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={4} className="h-32 text-center text-[var(--dashboard-text-muted)]">
+                                                No customers with orders in the last 90 days
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        activeCustomers.map((customer) => (
+                                            <TableRow key={customer.email} className="border-[var(--dashboard-border)]">
+                                                <TableCell>
+                                                    <div>
+                                                        <p className="font-medium text-[var(--dashboard-text)]">{customer.name}</p>
+                                                        <p className="text-xs text-[var(--dashboard-text-muted)]">{customer.email}</p>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-[var(--dashboard-text)]">{customer.orderCount}</TableCell>
+                                                <TableCell className="text-[var(--dashboard-text)]">{formatCentsWithCommas(customer.totalSpent)}</TableCell>
+                                                <TableCell className="text-[var(--dashboard-text-muted)]">
+                                                    {customer.lastOrderDate ? new Date(customer.lastOrderDate).toLocaleDateString() : '—'}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
 

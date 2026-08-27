@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
-import { Plus, FolderTree } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SearchInput } from '@/components/admin/search-input'
@@ -146,12 +146,11 @@ export default async function CategoriesPage({
                 </TabsContent>
 
                 <TabsContent value="active" className="space-y-6 mt-6">
-                    <div className="flex items-center justify-center h-60 glass-card rounded-3xl border-none">
-                        <div className="text-center">
-                            <FolderTree className="h-10 w-10 text-[var(--dashboard-text-muted)] opacity-30 mx-auto mb-4" />
-                            <p className="text-[var(--dashboard-text-muted)] font-light">Active categories view coming soon</p>
-                        </div>
-                    </div>
+                    <CategoriesTable
+                        categories={categories.filter((c) => (c.product_count || 0) > 0)}
+                        onDelete={deleteCategory}
+                        onBulkDelete={bulkDeleteCategories}
+                    />
                 </TabsContent>
             </Tabs>
         </div>

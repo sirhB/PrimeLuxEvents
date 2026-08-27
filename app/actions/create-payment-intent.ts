@@ -2,6 +2,9 @@
 
 import { stripe } from '@/lib/stripe'
 import { calculateOrderTotal, type CartItem } from './checkout'
+import { createClient } from '@/lib/supabase/server'
+import { userOwnsOrder } from '@/lib/orders/ownership'
+import { isStaffUser } from '@/lib/auth/roles'
 
 export async function createPaymentIntent(items: CartItem[], deliveryAddress: string, customAmount?: number) {
     try {
@@ -44,6 +47,32 @@ export async function createBalancePaymentIntent(orderId: string, amount: number
     try {
         if (!stripe) {
             throw new Error('Stripe is not configured')
+        }
+
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return { error: 'You must be signed in to pay a balance' }
+        }
+
+        const { data: order, error: orderError } = await supabase
+            .from('orders')
+            .select('id, user_id, customer_email, total_amount, balance_paid, payment_status')
+            .eq('id', orderId)
+            .single()
+
+        if (orderError || !order) {
+            return { error: 'Order not found' }
+        }
+
+        const staff = await isStaffUser(user.id)
+        if (!staff && !userOwnsOrder(user, order)) {
+            return { error: 'You do not have permission to pay this order' }
+        }
+
+        const remaining = Math.max(0, (order.total_amount || 0) - (order.balance_paid || 0))
+        if (amount <= 0 || amount > remaining) {
+            return { error: 'Invalid payment amount' }
         }
 
         const paymentIntent = await stripe.paymentIntents.create({

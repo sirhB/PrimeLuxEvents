@@ -166,32 +166,57 @@ export function MetricsOverview() {
                     ? ((currentOrders?.length || 0) - lastMonthOrders.length) / lastMonthOrders.length * 100
                     : 0
 
-                // Total customers
-                const { count: customersCount } = await supabase
-                    .from('profiles')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('role', 'planner')
+                // Distinct customers with orders this month vs last month
+                const { data: currentCustomerRows } = await supabase
+                    .from('orders')
+                    .select('customer_email')
+                    .gte('created_at', firstDayOfMonth.toISOString())
 
-                // Upcoming events (next 30 days)
+                const { data: lastCustomerRows } = await supabase
+                    .from('orders')
+                    .select('customer_email')
+                    .gte('created_at', lastMonth.toISOString())
+                    .lte('created_at', lastMonthEnd.toISOString())
+
+                const currentCustomers = new Set((currentCustomerRows || []).map((r) => r.customer_email).filter(Boolean)).size
+                const lastCustomers = new Set((lastCustomerRows || []).map((r) => r.customer_email).filter(Boolean)).size
+                const customersChange = lastCustomers > 0
+                    ? ((currentCustomers - lastCustomers) / lastCustomers) * 100
+                    : currentCustomers > 0 ? 100 : 0
+
+                // Upcoming deliveries (next 30 days)
                 const thirtyDaysFromNow = new Date()
                 thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
 
                 const { data: upcomingEvents } = await supabase
                     .from('orders')
+                    .select('id, delivery_date')
+                    .not('delivery_date', 'is', null)
+                    .gte('delivery_date', now.toISOString().slice(0, 10))
+                    .lte('delivery_date', thirtyDaysFromNow.toISOString().slice(0, 10))
+                    .neq('status', 'cancelled')
+
+                const { data: lastUpcoming } = await supabase
+                    .from('orders')
                     .select('id')
-                    .not('delivery_time', 'is', null)
-                    .gte('delivery_time', now.toISOString())
-                    .lte('delivery_time', thirtyDaysFromNow.toISOString())
+                    .not('delivery_date', 'is', null)
+                    .gte('delivery_date', lastMonth.toISOString().slice(0, 10))
+                    .lte('delivery_date', lastMonthEnd.toISOString().slice(0, 10))
+                    .neq('status', 'cancelled')
+
+                const eventsChange = (lastUpcoming?.length || 0) > 0
+                    ? (((upcomingEvents?.length || 0) - (lastUpcoming?.length || 0)) / (lastUpcoming?.length || 1)) * 100
+                    : (upcomingEvents?.length || 0) > 0 ? 100 : 0
 
                 setMetrics({
                     revenue: currentTotal,
                     orders: currentOrders?.length || 0,
-                    customers: customersCount || 0,
+                    customers: currentCustomers,
                     events: upcomingEvents?.length || 0,
                     revenueChange: Math.round(revenueChange),
                     ordersChange: Math.round(ordersChange),
-                    customersChange: 12, // Mock data
-                    eventsChange: 8 // Mock data
+                    customersChange: Math.round(customersChange),
+                    eventsChange: Math.round(eventsChange),
                 })
             } catch (error) {
                 console.error('Error fetching metrics:', error)

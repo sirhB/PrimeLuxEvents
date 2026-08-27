@@ -111,7 +111,7 @@ export default async function OrdersPage({
                         <CardContent className="py-12 text-center">
                             <Package className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
                             <p className="text-lg font-medium text-muted-foreground">No orders found matching your filter.</p>
-                            <Link href="/products" className="text-primary hover:underline mt-2 inline-block">
+                            <Link href="/catalog" className="text-primary hover:underline mt-2 inline-block">
                                 Browse our catalog
                             </Link>
                         </CardContent>
