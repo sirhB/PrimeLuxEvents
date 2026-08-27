@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, Trash2, Calendar as CalendarIcon, MapPin, Clock, User, Mail, Phone } from 'lucide-react'
+import { Calendar as CalendarIcon, MapPin, Clock, User, Mail, Phone } from 'lucide-react'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
@@ -10,6 +10,8 @@ import { DeleteAppointmentDialog } from '@/components/admin/appointments/delete-
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { AppointmentEditForm } from '@/components/admin/appointments/appointment-edit-form'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default async function AppointmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -58,34 +60,28 @@ export default async function AppointmentDetailPage({ params }: { params: Promis
     }
 
     return (
-        <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link href="/admin/appointments">
-                        <ArrowLeft className="h-4 w-4" />
-                    </Link>
-                </Button>
-                <div className="flex-1">
-                    <h1 className="text-3xl font-bold tracking-tight">Appointment Details</h1>
-                    <p className="text-muted-foreground mt-1">
-                        ID: {appointment.id.slice(0, 8)}...
-                    </p>
-                </div>
-                <div className="flex gap-2 items-center">
-                    <span
-                        className={cn(
-                            'inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold border',
-                            getStatusColor(appointment.status)
-                        )}
-                    >
-                        {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-                    </span>
-                    <DeleteAppointmentDialog
-                        appointmentId={appointment.id}
-                        clientName={appointment.client_name || 'Unknown'}
-                    />
-                </div>
-            </div>
+        <AdminPage>
+            <AdminPageHeader
+                breadcrumbs={[{ label: 'Appointments', href: '/admin/appointments' }, { label: appointment.client_name || 'Details' }]}
+                title="Appointment Details"
+                description={`ID: ${appointment.id.slice(0, 8)}…`}
+                actions={
+                    <div className="flex gap-2 items-center">
+                        <span
+                            className={cn(
+                                'inline-flex items-center rounded-md px-3 py-1 text-sm font-semibold border',
+                                getStatusColor(appointment.status)
+                            )}
+                        >
+                            {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+                        </span>
+                        <DeleteAppointmentDialog
+                            appointmentId={appointment.id}
+                            clientName={appointment.client_name || 'Unknown'}
+                        />
+                    </div>
+                }
+            />
 
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Appointment Information */}
@@ -213,7 +209,7 @@ export default async function AppointmentDetailPage({ params }: { params: Promis
                     </div>
                 </CardContent>
             </Card>
-        </div>
+        </AdminPage>
     )
 }
 

@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import PackageBuilderForm from '../new/PackageBuilderForm'
 import { PackageItemGroup } from '@/components/admin/PackageItemGroupBuilder'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default async function EditPackagePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -127,18 +129,16 @@ export default async function EditPackagePage({ params }: { params: Promise<{ id
     }
 
     return (
-        <div className="max-w-5xl mx-auto p-6">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Edit Package</h1>
-                <p className="text-muted-foreground mt-2">
-                    Update package details, configurable items, and pricing.
-                </p>
-            </div>
-
+        <AdminPage>
+            <AdminPageHeader
+                breadcrumbs={[{ label: 'Packages', href: '/admin/packages' }, { label: pkg.name }]}
+                title="Edit Package"
+                description="Update package details, configurable items, and pricing."
+            />
             <PackageBuilderForm
                 products={products || []}
                 initialData={initialData}
             />
-        </div>
+        </AdminPage>
     )
 }

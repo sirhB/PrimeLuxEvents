@@ -10,8 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { PortfolioImageUpload } from './portfolio-image-upload'
 import { createPortfolioCategory, updatePortfolioCategory } from '@/app/admin/portfolio/actions'
-import { ChevronLeft, Save, Loader2 } from 'lucide-react'
-import Link from 'next/link'
+import { Save, Loader2 } from 'lucide-react'
 
 interface PortfolioCategoryFormProps {
     category?: any
@@ -55,27 +54,11 @@ export function PortfolioCategoryForm({ category }: PortfolioCategoryFormProps) 
 
     return (
         <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center gap-4">
-                <Button asChild variant="ghost" size="icon" className="rounded-full hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]">
-                    <Link href="/admin/portfolio">
-                        <ChevronLeft className="h-5 w-5" />
-                    </Link>
-                </Button>
-                <div>
-                    <h2 className="text-2xl font-serif text-[var(--dashboard-text)]">
-                        {category ? 'Edit Portfolio Category' : 'New Portfolio Category'}
-                    </h2>
-                    <p className="text-sm text-[var(--dashboard-text-muted)] font-light">
-                        {category ? 'Update category details and cover image' : 'Create a new category for your portfolio showcases'}
-                    </p>
-                </div>
-            </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
-                    <Card className="glass-card border-none overflow-hidden rounded-3xl">
-                        <CardHeader className="border-b border-[var(--dashboard-border)]/50 bg-white/5 pb-6">
-                            <CardTitle className="text-lg font-serif font-light text-[var(--dashboard-text)]">General Information</CardTitle>
+                    <Card className="glass-card border-none overflow-hidden rounded-[var(--dashboard-radius)]">
+                        <CardHeader className="border-b border-[var(--dashboard-border)]/50 bg-white/5 pb-4">
+                            <CardTitle className="text-sm font-semibold text-[var(--dashboard-text)]">General Information</CardTitle>
                         </CardHeader>
                         <CardContent className="p-8 space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -121,7 +104,7 @@ export function PortfolioCategoryForm({ category }: PortfolioCategoryFormProps) 
                 <div className="space-y-8">
                     <Card className="glass-card border-none overflow-hidden rounded-3xl">
                         <CardHeader className="border-b border-[var(--dashboard-border)]/50 bg-white/5 pb-6">
-                            <CardTitle className="text-lg font-serif font-light text-[var(--dashboard-text)]">Cover Image</CardTitle>
+                            <CardTitle className="text-sm font-semibold text-[var(--dashboard-text)]">Cover Image</CardTitle>
                         </CardHeader>
                         <CardContent className="p-8">
                             <PortfolioImageUpload

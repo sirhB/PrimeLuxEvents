@@ -71,22 +71,26 @@
   --sidebar-border: oklch(0.88 0.02 90);
   --sidebar-ring: oklch(0.15 0.02 85);
 
-  /* Modern Dashboard Colors - Premium Theme */
-  --dashboard-background: #0a0a0b;
-  --dashboard-card: rgba(23, 23, 26, 0.7);
-  --dashboard-card-hover: rgba(30, 30, 35, 0.8);
-  --dashboard-text: #f8fafc;
-  --dashboard-text-muted: #94a3b8;
-  --dashboard-border: rgba(255, 255, 255, 0.08);
-  --dashboard-accent-gold: var(--champagne);
-  --dashboard-accent-green: #10b981;
-  --dashboard-accent-orange: #f59e0b;
-  --dashboard-accent-blue: #3b82f6;
-  --dashboard-accent-purple: #8b5cf6;
-  --dashboard-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
-  --dashboard-shadow-lg: 0 10px 40px -4px rgba(0, 0, 0, 0.7);
-  --dashboard-glass-bg: rgba(15, 15, 18, 0.6);
-  --dashboard-glass-border: rgba(255, 255, 255, 0.05);
+  /* Admin "Atelier Rail" — cool graphite ops console with brass signal */
+  --dashboard-background: #0f1215;
+  --dashboard-surface: #13171c;
+  --dashboard-card: #181d24;
+  --dashboard-card-hover: #1f262f;
+  --dashboard-text: #eef0f2;
+  --dashboard-text-muted: #8a929c;
+  --dashboard-border: rgba(255, 255, 255, 0.07);
+  --dashboard-accent-gold: #c4a574;
+  --dashboard-accent-green: #3d9a78;
+  --dashboard-accent-orange: #d4924a;
+  --dashboard-accent-blue: #5b8def;
+  --dashboard-accent-red: #d4655a;
+  --dashboard-accent-purple: #8b7bb8;
+  --dashboard-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 24px -12px rgba(0, 0, 0, 0.55);
+  --dashboard-shadow-lg: 0 16px 40px -16px rgba(0, 0, 0, 0.65);
+  --dashboard-glass-bg: rgba(19, 23, 28, 0.92);
+  --dashboard-glass-border: rgba(255, 255, 255, 0.06);
+  --dashboard-radius: 0.625rem;
+  --dashboard-rail: 2px;
 }
 
 .admin-theme {
@@ -99,30 +103,48 @@
   --muted: var(--dashboard-card-hover);
   --muted-foreground: var(--dashboard-text-muted);
   --primary: var(--dashboard-accent-gold);
-  --primary-foreground: #000000;
+  --primary-foreground: #121110;
   --secondary: var(--dashboard-card-hover);
   --secondary-foreground: var(--dashboard-text);
   --accent: var(--dashboard-accent-gold);
-  --accent-foreground: #000000;
+  --accent-foreground: #121110;
   --border: var(--dashboard-border);
   --input: var(--dashboard-border);
   --ring: var(--dashboard-accent-gold);
-  --radius: 1rem;
+  --radius: var(--dashboard-radius);
+  color-scheme: dark;
+}
+
+.admin-theme,
+.admin-theme body {
+  font-feature-settings: "ss01" on, "tnum" on;
+}
+
+.admin-panel {
+  box-shadow: var(--dashboard-shadow);
 }
 
 .glass-morphism {
   background: var(--dashboard-glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--dashboard-glass-border);
 }
 
 .glass-card {
   background: var(--dashboard-card);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--dashboard-border);
   box-shadow: var(--dashboard-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-theme *,
+  .admin-theme *::before,
+  .admin-theme *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .dark {

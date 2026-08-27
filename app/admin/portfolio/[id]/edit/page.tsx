@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { PortfolioCategoryForm } from '@/components/admin/portfolio-category-form'
 import { notFound } from 'next/navigation'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,8 +25,13 @@ export default async function EditPortfolioCategoryPage({
     }
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+        <AdminPage>
+            <AdminPageHeader
+                breadcrumbs={[{ label: 'Portfolio', href: '/admin/portfolio' }, { label: category.name }]}
+                title="Edit Portfolio Category"
+                description="Update gallery category details and cover image."
+            />
             <PortfolioCategoryForm category={category} />
-        </div>
+        </AdminPage>
     )
 }

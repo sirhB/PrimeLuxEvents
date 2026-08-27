@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import dynamic from 'next/dynamic'
+import { AdminPage } from '@/components/admin/page-shell'
 
 const DiscountsContent = dynamic(
     () => import('@/components/admin/marketing/discounts-content').then(mod => mod.DiscountsContent)
@@ -13,8 +14,8 @@ export default async function DiscountsPage() {
         .order('min_cart_total', { ascending: true })
 
     return (
-        <div className="p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+        <AdminPage>
             <DiscountsContent discounts={discounts} />
-        </div>
+        </AdminPage>
     )
 }

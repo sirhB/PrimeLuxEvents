@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import dynamic from 'next/dynamic'
+import { AdminPage } from '@/components/admin/page-shell'
 
 const TasksContent = dynamic(
     () => import('@/components/admin/tasks/tasks-content').then(mod => mod.TasksContent)
@@ -24,8 +25,8 @@ export default async function TasksPage() {
     const roleIds = userRoles?.map(r => r.role_id) || []
 
     return (
-        <div className="p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+        <AdminPage>
             <TasksContent tasks={tasks} user={user} roleIds={roleIds} />
-        </div>
+        </AdminPage>
     )
 }

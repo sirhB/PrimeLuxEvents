@@ -10,6 +10,8 @@ import { useParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { AddCatalogItemToBag } from '@/components/admin/add-catalog-item-to-bag'
 import { toast } from 'sonner'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default function BagDetailPage() {
     const { id } = useParams()
@@ -95,25 +97,16 @@ export default function BagDetailPage() {
     const totalItems = orderAssignments.length + catalogItems.length
 
     return (
-        <div className="flex flex-col gap-8 max-w-4xl mx-auto">
-            <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild className="rounded-full hover:bg-gray-100">
-                        <Link href="/admin/bags">
-                            <ArrowLeft className="h-4 w-4" />
-                        </Link>
-                    </Button>
-                    <div>
-                        <h1 className="text-3xl font-serif font-light tracking-tight">
-                            {bag.color} Bag {bag.number}
-                        </h1>
-                        <p className="text-sm text-gray-400 mt-1 uppercase tracking-widest font-bold">Bag Manifest</p>
-                    </div>
-                </div>
-                <AddCatalogItemToBag bagId={id as string} onSuccess={fetchBagData} />
-            </div>
+        <AdminPage className="max-w-4xl mx-auto">
+            <AdminPageHeader
+                breadcrumbs={[{ label: 'Bags', href: '/admin/bags' }, { label: `${bag.color} ${bag.number}` }]}
+                eyebrow="Warehouse"
+                title={`${bag.color} Bag ${bag.number}`}
+                description="Bag manifest"
+                actions={<AddCatalogItemToBag bagId={id as string} onSuccess={fetchBagData} />}
+            />
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-6">
                 <div className="md:col-span-1 space-y-6">
                     <Card className="rounded-[2rem] border-[var(--dashboard-border)] shadow-xl overflow-hidden bg-[var(--dashboard-card)] text-[var(--dashboard-text)]">
                         <div className={cn(
@@ -161,7 +154,7 @@ export default function BagDetailPage() {
                 <div className="md:col-span-2 space-y-6">
                     <Card className="rounded-[2.5rem] border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-2xl overflow-hidden min-h-[500px]">
                         <CardHeader className="bg-white/5 border-b border-[var(--dashboard-border)] p-8">
-                            <CardTitle className="text-2xl font-serif text-[var(--dashboard-text)]">Manifest Contents</CardTitle>
+                            <CardTitle className="text-base font-semibold text-[var(--dashboard-text)]">Manifest Contents</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0">
                             {totalItems === 0 ? (
@@ -255,6 +248,6 @@ export default function BagDetailPage() {
                     </Card>
                 </div>
             </div>
-        </div>
+        </AdminPage>
     )
 }

@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 import {
     Table,
     TableBody,
@@ -38,31 +40,20 @@ export default async function PackagesPage() {
     }
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                            Bundles
-                        </span>
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                        Packages
-                    </h1>
-                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
-                        Manage your rental packages, bundles, and discounts.
-                    </p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Button asChild className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium px-6">
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="Bundles"
+                title="Packages"
+                description="Manage your rental packages, bundles, and discounts."
+                actions={
+                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90">
                         <Link href="/admin/packages/new">
                             <Plus className="mr-2 h-4 w-4" />
                             Create Package
                         </Link>
                     </Button>
-                </div>
-            </div>
+                }
+            />
 
             {/* Stats Cards */}
             <div className="grid gap-6 md:grid-cols-4">
@@ -72,7 +63,7 @@ export default async function PackagesPage() {
                         <Package className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-serif font-light text-[var(--dashboard-text)]">{totalPackages}</div>
+                        <div className="text-2xl font-semibold text-[var(--dashboard-text)]">{totalPackages}</div>
                     </CardContent>
                 </Card>
                 <Card className="border-none glass-card overflow-hidden">
@@ -81,7 +72,7 @@ export default async function PackagesPage() {
                         <Tag className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-serif font-light text-[var(--dashboard-text)]">{featuredPackages}</div>
+                        <div className="text-2xl font-semibold text-[var(--dashboard-text)]">{featuredPackages}</div>
                     </CardContent>
                 </Card>
                 <Card className="border-none glass-card overflow-hidden">
@@ -90,7 +81,7 @@ export default async function PackagesPage() {
                         <Percent className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-serif font-light text-[var(--dashboard-text)]">
+                        <div className="text-2xl font-semibold text-[var(--dashboard-text)]">
                             {packages?.length ? Math.round(packages.reduce((acc, p) => acc + (p.discount_type === 'percentage' ? p.discount_value : 0), 0) / packages.length) : 0}%
                         </div>
                     </CardContent>
@@ -101,7 +92,7 @@ export default async function PackagesPage() {
                         <DollarSign className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-serif font-light text-[var(--dashboard-text)]">{formatCurrency(totalSavings)}</div>
+                        <div className="text-2xl font-semibold text-[var(--dashboard-text)]">{formatCurrency(totalSavings)}</div>
                     </CardContent>
                 </Card>
             </div>
@@ -147,7 +138,7 @@ export default async function PackagesPage() {
                                         <TableRow key={pkg.id} className="hover:bg-[var(--dashboard-card-hover)] border-b border-[var(--dashboard-border)] transition-colors">
                                             <TableCell className="py-4 pl-6">
                                                 <div className="flex flex-col">
-                                                    <span className="font-serif text-lg text-[var(--dashboard-text)]">{pkg.name}</span>
+                                                    <span className="text-base font-semibold text-[var(--dashboard-text)]">{pkg.name}</span>
                                                     <span className="text-[10px] text-[var(--dashboard-text-muted)] font-medium uppercase tracking-tight truncate max-w-[300px]">
                                                         {pkg.description}
                                                     </span>
@@ -221,7 +212,7 @@ export default async function PackagesPage() {
                                 <TableBody>
                                     {packages?.filter(p => p.is_featured).map((pkg) => (
                                         <TableRow key={pkg.id} className="hover:bg-[var(--dashboard-card-hover)] border-b border-[var(--dashboard-border)] transition-colors">
-                                            <TableCell className="font-serif text-lg py-4 pl-6">{pkg.name}</TableCell>
+                                            <TableCell className="text-base font-semibold py-4 pl-6">{pkg.name}</TableCell>
                                             <TableCell className="font-mono font-bold text-[var(--dashboard-text)]">{formatCurrency(pkg.price)}</TableCell>
                                             <TableCell>
                                                 {pkg.savings_amount > 0 && (
@@ -255,6 +246,6 @@ export default async function PackagesPage() {
                     </Card>
                 </TabsContent>
             </Tabs>
-        </div>
+        </AdminPage>
     )
 }

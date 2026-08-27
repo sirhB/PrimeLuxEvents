@@ -11,6 +11,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { createClient } from '@/lib/supabase/client'
 import { updateProductStock } from './actions'
 import { toast } from 'sonner'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 type ScanMode = 'navigation' | 'inventory' | 'picking'
 
@@ -175,20 +177,20 @@ export default function ScanPage() {
     }
 
     return (
-        <div className="flex flex-col gap-6 max-w-2xl mx-auto py-8 px-4">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild className="rounded-full hover:bg-gray-100">
+        <AdminPage className="max-w-2xl mx-auto">
+            <AdminPageHeader
+                breadcrumbs={[{ label: 'Dashboard', href: '/admin' }, { label: 'Scanner' }]}
+                eyebrow="Warehouse"
+                title="Scanner V2"
+                description="Logistics and inventory."
+                actions={
+                    <Button variant="ghost" size="icon" asChild className="rounded-md">
                         <Link href="/admin">
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>
-                    <div>
-                        <h1 className="text-3xl font-serif font-light tracking-tight">Scanner V2</h1>
-                        <p className="text-sm text-gray-400 mt-1 uppercase tracking-widest font-bold">Logistics & Inventory</p>
-                    </div>
-                </div>
-            </div>
+                }
+            />
 
             <Tabs value={mode} onValueChange={(v) => {
                 setMode(v as ScanMode);
@@ -358,6 +360,6 @@ export default function ScanPage() {
                     <span className="text-[10px] font-bold uppercase tracking-tight">Order Picking</span>
                 </div>
             </div>
-        </div>
+        </AdminPage>
     )
 }
