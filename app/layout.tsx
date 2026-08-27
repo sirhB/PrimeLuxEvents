@@ -1,17 +1,26 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google"
+import { IBM_Plex_Sans, Instrument_Serif } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import Script from "next/script"
 import "./globals.css"
-import { CapacitorProvider } from "@/components/providers/capacitor-provider"
+import { PwaProvider } from "@/components/providers/pwa-provider"
 import { NotificationsProvider } from "@/components/providers/notifications-provider"
 import { CartProvider } from "@/components/providers/cart-provider"
 import { SiteLayout } from "@/components/site-layout"
+import { SiteHeaderWrapper } from "@/components/site-header-wrapper"
+import { SiteFooter } from "@/components/site-footer"
 
-const _geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
-const _geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-serif" })
+const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-sans",
+})
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-serif",
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://primeluxevents.com'),
@@ -21,7 +30,7 @@ export const metadata: Metadata = {
   },
   description: 'Premium event rentals for weddings, corporate events, and luxury gatherings. Elevate your event with our curated collection of furniture, decor, and lighting.',
   keywords: ['luxury event rentals', 'wedding rentals', 'event design', 'party rentals', 'furniture rental'],
-  manifest: '/manifest.json',
+  manifest: '/manifest-store.webmanifest',
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -69,7 +78,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport = {
-  themeColor: "#111111",
+  themeColor: "#121110",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -77,30 +86,24 @@ export const viewport = {
   viewportFit: "cover",
 }
 
-import { headers } from "next/headers"
-
-// ... (keep existing code)
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const headersList = await headers()
-  const isNative = headersList.get("x-is-native") === "true"
-
   return (
     <html lang="en">
-      <body className={`font-sans antialiased ${playfair.variable} ${_geist.variable} ${_geistMono.variable}`}>
-        <CapacitorProvider initialIsNative={isNative}>
+      <body className={`font-sans antialiased ${instrumentSerif.variable} ${ibmPlexSans.variable}`}>
+        <PwaProvider>
           <NotificationsProvider>
             <CartProvider>
-              <SiteLayout>{children}</SiteLayout>
+              <SiteLayout header={<SiteHeaderWrapper />} footer={<SiteFooter />}>
+                {children}
+              </SiteLayout>
             </CartProvider>
           </NotificationsProvider>
-        </CapacitorProvider>
+        </PwaProvider>
         <Analytics />
-        <Script src="https://js.puter.com/v2/" strategy="beforeInteractive" />
       </body>
     </html>
   )

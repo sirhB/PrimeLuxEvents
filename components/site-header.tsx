@@ -11,48 +11,33 @@ import { SearchTrigger } from "@/components/search-trigger"
 import { SearchModal } from "@/components/search-modal"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { createClient } from "@/lib/supabase/client"
+import { PwaBackButton } from "@/components/pwa/pwa-back-button"
 
-import { CapacitorBackButton } from "@/components/ui/capacitor-back-button"
+interface SiteHeaderProps {
+  initialSettings?: {
+    company_email: string
+    company_phone: string
+  }
+}
 
-export function SiteHeader() {
+export function SiteHeader({
+  initialSettings = {
+    company_email: "info@primeluxevents.com",
+    company_phone: "(555) 123-4567",
+  },
+}: SiteHeaderProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
   const headerRef = useRef<HTMLElement>(null)
-
-  const [settings, setSettings] = useState({
-    company_email: "info@primeluxevents.com",
-    company_phone: "(555) 123-4567"
-  })
+  const settings = initialSettings
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
     window.addEventListener("scroll", handleScroll)
-
-    async function fetchSettings() {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('settings')
-        .select('key, value')
-        .in('key', ['company_email', 'company_phone'])
-
-      if (data) {
-        const fetchedSettings: any = {}
-        data.forEach(item => {
-          fetchedSettings[item.key] = item.value
-        })
-        setSettings(prev => ({
-          ...prev,
-          ...fetchedSettings
-        }))
-      }
-    }
-    fetchSettings()
-
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
@@ -125,7 +110,7 @@ export function SiteHeader() {
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
           {/* Mobile Menu Trigger */}
           <div className="flex items-center lg:hidden">
-            <CapacitorBackButton isDark={headerTheme === 'dark'} />
+            <PwaBackButton isDark={headerTheme === 'dark'} />
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button

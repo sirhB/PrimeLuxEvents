@@ -1,80 +1,38 @@
-import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics'
-import { Capacitor } from '@capacitor/core'
-
 /**
- * Haptic feedback utility that safely handles platform checks.
- * Falls back to no-op on web/non-native platforms.
+ * Haptic feedback via the Web Vibration API.
+ * Works in installed PWAs on supported mobile browsers.
  */
-export const haptics = {
-    /**
-     * Trigger a subtle impact vibration
-     */
-    impact: async (style: ImpactStyle = ImpactStyle.Medium) => {
-        if (Capacitor.isNativePlatform()) {
-            try {
-                await Haptics.impact({ style })
-            } catch (e) {
-                console.warn('Haptics impact failed', e)
-            }
-        }
-    },
+export type HapticStyle = "light" | "medium" | "heavy"
+export type HapticNotification = "success" | "warning" | "error"
 
-    /**
-     * Trigger a notification vibration (success, warning, error)
-     */
-    notification: async (type: NotificationType = NotificationType.Success) => {
-        if (Capacitor.isNativePlatform()) {
-            try {
-                await Haptics.notification({ type })
-            } catch (e) {
-                console.warn('Haptics notification failed', e)
-            }
-        }
-    },
-
-    /**
-     * Trigger a light click vibration
-     */
-    vibrate: async () => {
-        if (Capacitor.isNativePlatform()) {
-            try {
-                await Haptics.vibrate()
-            } catch (e) {
-                console.warn('Haptics vibrate failed', e)
-            }
-        }
-    },
-
-    /**
-     * Selection changed (light vibration)
-     */
-    selectionStart: async () => {
-        if (Capacitor.isNativePlatform()) {
-            try {
-                await Haptics.selectionStart()
-            } catch (e) {
-                console.warn('Haptics selectionStart failed', e)
-            }
-        }
-    },
-
-    selectionChanged: async () => {
-        if (Capacitor.isNativePlatform()) {
-            try {
-                await Haptics.selectionChanged()
-            } catch (e) {
-                console.warn('Haptics selectionChanged failed', e)
-            }
-        }
-    },
-
-    selectionEnd: async () => {
-        if (Capacitor.isNativePlatform()) {
-            try {
-                await Haptics.selectionEnd()
-            } catch (e) {
-                console.warn('Haptics selectionEnd failed', e)
-            }
-        }
+function vibrate(pattern: number | number[]) {
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+    try {
+      navigator.vibrate(pattern)
+    } catch {
+      // no-op
     }
+  }
+}
+
+export const haptics = {
+  impact: async (style: HapticStyle = "medium") => {
+    const duration = style === "light" ? 10 : style === "heavy" ? 30 : 20
+    vibrate(duration)
+  },
+
+  notification: async (type: HapticNotification = "success") => {
+    const patterns: Record<HapticNotification, number[]> = {
+      success: [10, 30, 10],
+      warning: [20, 40, 20],
+      error: [30, 20, 30, 20, 30],
+    }
+    vibrate(patterns[type])
+  },
+
+  vibrate: async () => vibrate(15),
+
+  selectionStart: async () => vibrate(5),
+  selectionChanged: async () => vibrate(8),
+  selectionEnd: async () => vibrate(5),
 }

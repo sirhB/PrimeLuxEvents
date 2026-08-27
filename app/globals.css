@@ -5,10 +5,17 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  /* Venue Floor palette */
+  --ink: #121110;
+  --linen: #F7F4EF;
+  --champagne: #B8956B;
+  --sage: #8A9A8B;
+  --signal: #FFFFFF;
+
   /* Warm, luxury cream palette inspired by the reference images */
-  --background: #FDFBF7;
+  --background: var(--linen);
   /* Warm Cream */
-  --foreground: #1A1A1A;
+  --foreground: var(--ink);
   /* Dark Warm Grey */
 
   --card: oklch(0.99 0.005 90);
@@ -17,8 +24,8 @@
   --popover: oklch(0.99 0.005 90);
   --popover-foreground: oklch(0.15 0.02 85);
 
-  --primary: oklch(0.7344 0.15 85);
-  /* Rich gold for luxury accent */
+  --primary: oklch(0.68 0.1 75);
+  /* Champagne gold accent */
   --primary-foreground: oklch(0.98 0.01 90);
 
   /* Safe Area Variables */
@@ -71,7 +78,7 @@
   --dashboard-text: #f8fafc;
   --dashboard-text-muted: #94a3b8;
   --dashboard-border: rgba(255, 255, 255, 0.08);
-  --dashboard-accent-gold: #d4af37;
+  --dashboard-accent-gold: var(--champagne);
   --dashboard-accent-green: #10b981;
   --dashboard-accent-orange: #f59e0b;
   --dashboard-accent-blue: #3b82f6;
@@ -167,10 +174,9 @@
 }
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
-  --font-serif: "Playfair Display", "Times New Roman", serif;
-  /* Added serif for luxury feel */
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+  --font-serif: "Instrument Serif", "Times New Roman", serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -210,7 +216,77 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   /* Gold color for luxury accents */
-  --color-gold: #D4AF37;
+  --color-gold: var(--champagne);
+}
+
+.ambient-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--champagne) 12%, transparent), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, color-mix(in srgb, var(--sage) 8%, transparent), transparent),
+    var(--linen);
+}
+
+.spotlight-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.spotlight-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--champagne) 18%, transparent), transparent 70%);
+  z-index: 1;
+}
+
+.pwa-standalone {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero-enter {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.hero-parallax {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-parallax {
+    animation: heroParallax 20s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes heroParallax {
+  from {
+    transform: scale(1.02) translateY(0);
+  }
+  to {
+    transform: scale(1.06) translateY(-1%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter,
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-scale-in {
+    animation: none !important;
+  }
+
+  .hero-parallax {
+    animation: none !important;
+  }
+
+  .spotlight-frame::before {
+    opacity: 0.5;
+  }
 }
 
 /* Added animations and noise texture */
@@ -326,10 +402,18 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50 select-none;
-    /* Native feel: disable selection and tap highlight */
+    @apply border-border outline-ring/50;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
+  }
+
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  [role="button"] {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-[var(--champagne,#B8956B)] focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
   /* Allow text selection in inputs */

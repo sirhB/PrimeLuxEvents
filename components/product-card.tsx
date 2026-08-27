@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatCurrency } from '@/lib/utils'
-import { motion } from 'framer-motion'
 
 interface Product {
     id: string
@@ -29,65 +28,55 @@ export function ProductCard({ product }: ProductCardProps) {
     const price = product.rental_price_daily || product.price
 
     return (
-        <Link href={productUrl} className="block h-full">
-            <motion.div
-                className="group relative flex flex-col h-full bg-white overflow-hidden rounded-2xl border border-border/10 transition-all duration-500 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)]"
-                whileHover={{ y: -10 }}
-                transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-            >
-                {/* Image Container */}
-                <div className="relative aspect-[4/5] overflow-hidden bg-[#FDFBF7] rounded-t-2xl">
+        <Link href={productUrl} className="group block h-full">
+            <article className="spotlight-frame flex h-full flex-col overflow-hidden rounded-2xl border border-border/10 bg-white shadow-[0_10px_40px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)]">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-t-2xl bg-[var(--linen,#F7F4EF)]">
                     {product.image_url ? (
                         <Image
                             src={product.image_url}
                             alt={product.name}
                             fill
-                            className="object-contain p-6 transition-transform duration-1000 ease-out group-hover:scale-110"
+                            sizes="(max-width: 768px) 50vw, 25vw"
+                            className="object-contain p-6 transition-transform duration-700 ease-out group-hover:scale-105"
                         />
                     ) : (
                         <div className="absolute inset-0 flex items-center justify-center bg-neutral-50 text-neutral-300">
-                            <div className="text-center">
-                                <div className="w-12 h-12 mx-auto mb-2 opacity-30">
-                                    <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM4 7v10h16V7H4zm8 2l5 4H7l5-4z" />
-                                    </svg>
-                                </div>
-                                <span className="text-xs font-medium tracking-widest uppercase">No Image</span>
-                            </div>
+                            <span className="text-xs font-medium uppercase tracking-widest">Image coming soon</span>
                         </div>
                     )}
                 </div>
 
-                {/* Category Badge */}
-                <div className="absolute top-4 left-4 z-10">
-                    <span className="px-3 py-1.5 bg-white/90 text-black text-[10px] font-bold tracking-[0.2em] uppercase rounded-full backdrop-blur-md shadow-sm border border-border/10">
+                <div className="absolute left-4 top-4 z-10">
+                    <span className="rounded-full border border-border/10 bg-white/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--ink,#121110)] shadow-sm backdrop-blur-md">
                         {product.categories?.name || 'Collection'}
                     </span>
                 </div>
 
-                {/* Content */}
-                <div className="flex flex-col gap-4 p-6 flex-grow">
+                <div className="flex flex-grow flex-col gap-4 p-6">
                     <div className="space-y-2">
-                        <h3 className="font-serif text-xl font-light text-foreground group-hover:text-gold transition-colors duration-300 line-clamp-1 tracking-tight">
+                        <h3 className="line-clamp-1 font-serif text-xl font-light tracking-tight text-foreground transition-colors duration-300 group-hover:text-[var(--champagne,#B8956B)]">
                             {product.name}
                         </h3>
                         {product.description && (
-                            <p className="text-sm text-muted-foreground/70 line-clamp-2 font-light leading-relaxed">
+                            <p className="line-clamp-2 text-sm font-light leading-relaxed text-muted-foreground/70">
                                 {product.description}
                             </p>
                         )}
                     </div>
 
-                    <div className="mt-auto pt-4 flex items-center justify-between border-t border-border/5">
+                    <div className="mt-auto flex items-center justify-between border-t border-border/5 pt-4">
                         <div className="flex flex-col">
-                            <span className="text-2xl font-light text-foreground">
-                                {formatCurrency(price)}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">per day</span>
+                            <span className="text-2xl font-light text-foreground">{formatCurrency(price)}</span>
+                            <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">per day</span>
                         </div>
+                        {typeof product.quantity_available === 'number' && (
+                            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--sage,#8A9A8B)]">
+                                {product.quantity_available > 0 ? 'Available' : 'Reserved'}
+                            </span>
+                        )}
                     </div>
                 </div>
-            </motion.div>
+            </article>
         </Link>
     )
 }

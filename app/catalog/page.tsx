@@ -3,7 +3,7 @@ import CatalogClient from "./catalog-client"
 import { createClient } from "@/lib/supabase/server"
 import { Metadata } from "next"
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Catalog',

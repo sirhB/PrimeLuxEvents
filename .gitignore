@@ -11,3 +11,5 @@ coverage/
 *.tgz
 .vscode/
 .next/
+public/sw.js
+public/swe-worker-*.js

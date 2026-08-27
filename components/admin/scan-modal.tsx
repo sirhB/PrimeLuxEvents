@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, Camera, Package, ShoppingBag, Plus, Minus, CheckCircle2, Loader2, QrCode } from "lucide-react"
+import { X, Package, ShoppingBag, Plus, Minus, CheckCircle2, Loader2, QrCode } from "lucide-react"
 import { Html5QrcodeScanner } from "html5-qrcode"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -11,8 +11,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createClient } from "@/lib/supabase/client"
 import { updateProductStock } from "@/app/admin/scan/actions"
 import { toast } from "sonner"
-import { BarcodeScanner, BarcodeFormat } from "@capacitor-mlkit/barcode-scanning"
-import { useCapacitor } from "@/components/providers/capacitor-provider"
 
 interface ScanModalProps {
     isOpen: boolean
@@ -33,7 +31,6 @@ export function ScanModal({ isOpen, onClose }: ScanModalProps) {
     const router = useRouter()
     const scannerRef = useRef<Html5QrcodeScanner | null>(null)
     const supabase = createClient()
-    const { isNative } = useCapacitor()
 
     useEffect(() => {
         if (!isOpen) {
@@ -43,11 +40,6 @@ export function ScanModal({ isOpen, onClose }: ScanModalProps) {
                 })
                 scannerRef.current = null
             }
-            return
-        }
-
-        if (isNative) {
-            // For native, we don't use html5-qrcode-scanner
             return
         }
 
@@ -104,7 +96,7 @@ export function ScanModal({ isOpen, onClose }: ScanModalProps) {
                 scannerRef.current = null
             }
         }
-    }, [isOpen, mode, selectedOrder, onClose, router, isNative])
+    }, [isOpen, mode, selectedOrder, onClose, router])
 
     useEffect(() => {
         if (isOpen && mode === "picking") {
@@ -200,51 +192,7 @@ export function ScanModal({ isOpen, onClose }: ScanModalProps) {
         setIsLoading(false)
     }
 
-    async function handleNativeScan() {
-        try {
-            const { camera } = await BarcodeScanner.requestPermissions()
-            if (camera !== "granted") {
-                toast.error("Camera permission is required")
-                return
-            }
-
-            const { barcodes } = await BarcodeScanner.scan({
-                formats: [BarcodeFormat.QrCode],
-            })
-
-            if (barcodes.length > 0) {
-                const decodedText = barcodes[0].displayValue
-                setScanResult(decodedText)
-
-                if (mode === "navigation") {
-                    onClose()
-                    if (decodedText.includes("/admin/")) {
-                        const targetPath = decodedText.split("/admin/")[1]
-                        router.push(`/admin/${targetPath}`)
-                    } else if (decodedText.startsWith("/")) {
-                        router.push(decodedText)
-                    }
-                } else if (mode === "inventory") {
-                    await handleInventoryScan(decodedText)
-                } else if (mode === "picking") {
-                    if (!selectedOrder) {
-                        toast.error("Please select an order first")
-                        return
-                    }
-                    await handlePickingScan(decodedText)
-                }
-            }
-        } catch (error) {
-            console.error("Native scan error:", error)
-            toast.error("Failed to scan code")
-        }
-    }
-
     function restartScanner() {
-        if (isNative) {
-            handleNativeScan()
-            return
-        }
         if (scannerRef.current) {
             scannerRef.current.clear().then(() => {
                 const scanner = new Html5QrcodeScanner(
@@ -349,25 +297,7 @@ export function ScanModal({ isOpen, onClose }: ScanModalProps) {
                                     </Tabs>
 
                                     <div className="relative bg-black rounded-3xl overflow-hidden min-h-[300px] flex items-center justify-center">
-                                        {!isNative && <div id="modal-reader" className="w-full"></div>}
-
-                                        {isNative && isScanning && !scannedProduct && (!selectedOrder || mode !== "picking") && (
-                                            <div className="flex flex-col items-center gap-6 p-12 text-center">
-                                                <div className="h-20 w-20 rounded-full bg-gold/20 flex items-center justify-center animate-pulse">
-                                                    <Camera className="h-10 w-10 text-gold" />
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-white text-lg font-serif mb-2">Native Scanner Ready</h3>
-                                                    <p className="text-gray-400 text-sm">Tap the button below to start scanning</p>
-                                                </div>
-                                                <Button
-                                                    className="bg-gold text-black hover:bg-white transition-colors h-14 px-8 rounded-2xl font-bold uppercase tracking-widest"
-                                                    onClick={handleNativeScan}
-                                                >
-                                                    Start Scanning
-                                                </Button>
-                                            </div>
-                                        )}
+                                        <div id="modal-reader" className="w-full"></div>
 
                                         {(!isScanning || scannedProduct || (mode === "picking" && selectedOrder)) && (
                                             <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-300">

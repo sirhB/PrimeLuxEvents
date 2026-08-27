@@ -1,0 +1,21 @@
+{
+  "name": "PrimeLux Client Portal",
+  "short_name": "Portal",
+  "description": "Track orders, profile details, and event updates.",
+  "start_url": "/account",
+  "scope": "/account",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F7F4EF",
+  "theme_color": "#121110",
+  "icons": [
+    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "My orders", "short_name": "Orders", "url": "/account/orders", "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }] },
+    { "name": "Profile", "short_name": "Profile", "url": "/account/profile", "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }] }
+  ]
+}
