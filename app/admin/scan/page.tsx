@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { createClient } from '@/lib/supabase/client'
 import { updateProductStock, markPickItemComplete, getPickTaskForOrder } from './actions'
 import { toast } from 'sonner'
+import { ACTIVE_FULFILLMENT_ORDER_STATUSES } from '@/lib/orders/status'
 import type { ChecklistItem } from '@/lib/warehouse/types'
 import { AdminPage, AdminPageHeader } from '@/components/admin/page-shell'
 
@@ -99,7 +100,7 @@ function ScanPageContent() {
         const { data } = await supabase
             .from('orders')
             .select('id, customer_name, total_amount, created_at')
-            .in('status', ['confirmed', 'processing', 'out_for_delivery'])
+            .in('status', [...ACTIVE_FULFILLMENT_ORDER_STATUSES])
             .order('created_at', { ascending: false })
 
         if (data) setActiveOrders(data)

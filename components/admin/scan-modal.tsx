@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Package, ShoppingBag, Plus, Minus, CheckCircle2, Loader2, QrCode } from "lucide-react"
-import { Html5QrcodeScanner } from "html5-qrcode"
+import { ACTIVE_FULFILLMENT_ORDER_STATUSES } from '@/lib/orders/status'
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -108,7 +108,7 @@ export function ScanModal({ isOpen, onClose }: ScanModalProps) {
         const { data, error } = await supabase
             .from("orders")
             .select("id, customer_name, total_amount, created_at")
-            .in("status", ["confirmed", "processing", "out_for_delivery"])
+            .in("status", [...ACTIVE_FULFILLMENT_ORDER_STATUSES])
             .order("created_at", { ascending: false })
 
         if (data) setActiveOrders(data)
