@@ -5,6 +5,7 @@ A premium event rental platform built with Next.js and Supabase.
 ## Documentation
 - **[Features Guide](FEATURES.md)** - Overview of core platform functionality.
 - **[Admin Guide](ADMIN.md)** - Detailed look at administrative tools and management.
+- **[Production Launch Plan](PRODUCTION_LAUNCH_PLAN.md)** - Go-live checklist: database security, Stripe, Vercel, and ops.
 - **[Future Roadmap](FUTURE_ROADMAPPING.md)** - Suggestions for expansion and future features.
 
 ## Getting Started
@@ -48,3 +49,5 @@ A premium event rental platform built with Next.js and Supabase.
 ## Deployment
 
 This project is optimized for deployment on Vercel. Connect your repository to Vercel and ensure environment variables are configured.
+
+For a full production go-live (secure Supabase RLS, secret rotation, Stripe live mode, CI, and cutover), follow **[PRODUCTION_LAUNCH_PLAN.md](PRODUCTION_LAUNCH_PLAN.md)**.
