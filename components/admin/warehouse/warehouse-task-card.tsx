@@ -37,7 +37,7 @@ const statusColors: Record<string, string> = {
 
 export function WarehouseTaskCard({ task, selected, onClick, compact }: WarehouseTaskCardProps) {
     const category = (task.warehouse_category || 'general') as WarehouseCategory
-    const checklist = task.checklist || []
+    const checklist = Array.isArray(task.checklist) ? task.checklist : []
     const completedCount = checklist.filter((i) => i.completed).length
     const progress = checklist.length > 0 ? Math.round((completedCount / checklist.length) * 100) : null
 

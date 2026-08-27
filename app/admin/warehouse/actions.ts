@@ -464,4 +464,3 @@ export async function deleteStaffShift(shiftId: string) {
     }
 }
 
-export { WAREHOUSE_CATEGORIES }
