@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
-import { Loader2, Check, AlertCircle, CalendarIcon, Clock, MapPin, Truck, ArrowRight, ArrowLeft, ShoppingBag, Plus, Minus, Package, X } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Loader2, Check, AlertCircle, CalendarIcon, Clock, ArrowRight, ArrowLeft, ShoppingBag, Plus, Minus, Package, X } from 'lucide-react'
 import { createOrder, calculateOrderTotal, type CheckoutFormData, type CartItem } from '@/app/actions/checkout'
 import { formatCurrency } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/client'
@@ -18,11 +18,10 @@ import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Checkbox } from "@/components/ui/checkbox"
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import Link from 'next/link'
-import { StripeProvider, stripePromise } from '@/components/providers/stripe-provider'
+import { stripePromise } from '@/components/providers/stripe-provider'
 import { StripePaymentForm } from '@/components/checkout/stripe-payment-form'
 import { createPaymentIntent } from '@/app/actions/create-payment-intent'
 import { Elements } from '@stripe/react-stripe-js'
@@ -114,7 +113,7 @@ export default function CheckoutPage() {
             const { data } = await supabase.from('products').select('*').limit(20)
 
             if (data) {
-                // Filter out items already in cart
+                // Filter out items already in cart; normalize plux price_cents → price
                 const available = data
                     .map((row) => adaptProduct(row))
                     .filter((p): p is NonNullable<ReturnType<typeof adaptProduct>> => p != null && p.is_active)
@@ -173,7 +172,7 @@ export default function CheckoutPage() {
             if (data) {
                 const adapted = data
                     .map((row) => adaptProduct(row))
-                    .filter((p): p is NonNullable<typeof p> => Boolean(p))
+                    .filter((p): p is NonNullable<ReturnType<typeof adaptProduct>> => p != null)
                 setCartProducts(adapted)
 
                 // Check for invalid items and remove them
@@ -490,27 +489,36 @@ export default function CheckoutPage() {
 
     if (items.length === 0 && isLoaded) return null
 
+    const fieldClass =
+        "bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-11 sm:h-12 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-base"
+    const labelClass = "text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400"
+    const sectionTitleClass = "text-xl sm:text-2xl font-serif font-bold text-gray-900 tracking-tight"
+    const cardClass = "bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-border/5"
+    const stickyBarClass =
+        "fixed inset-x-0 bottom-0 z-40 border-t border-border/10 bg-[#FDFBF7]/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:static sm:border-0 sm:bg-transparent sm:backdrop-blur-none sm:p-0 sm:mt-8"
+
     if (isSuccess) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="min-h-screen flex items-center justify-center bg-background px-4">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
+                    className="w-full max-w-md"
                 >
-                    <Card className="max-w-md w-full border-gold/20 shadow-2xl shadow-gold/5">
-                        <CardContent className="pt-10 pb-10 text-center space-y-6">
+                    <Card className="w-full border-gold/20 shadow-2xl shadow-gold/5">
+                        <CardContent className="pt-8 pb-8 text-center space-y-5">
                             <motion.div
-                                className="h-20 w-20 rounded-full bg-gold/10 flex items-center justify-center text-gold mx-auto border border-gold/20"
+                                className="h-14 w-14 rounded-full bg-gold/10 flex items-center justify-center text-gold mx-auto border border-gold/20"
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                             >
-                                <Check className="h-10 w-10" />
+                                <Check className="h-7 w-7" />
                             </motion.div>
                             <div className="space-y-2">
                                 <motion.h2
-                                    className="text-3xl font-serif text-foreground"
+                                    className="text-2xl sm:text-3xl font-serif text-foreground"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.3 }}
@@ -518,7 +526,7 @@ export default function CheckoutPage() {
                                     Order Placed Successfully!
                                 </motion.h2>
                                 <motion.p
-                                    className="text-muted-foreground text-lg"
+                                    className="text-muted-foreground text-sm sm:text-base"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.4 }}
@@ -534,70 +542,55 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#FDFBF7] py-24 md:py-40 relative overflow-hidden">
-            {/* Decorative background element */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-24 bg-gradient-to-b from-gold/50 to-transparent" />
-
+        <div className="min-h-screen bg-[#FDFBF7] pt-20 pb-28 sm:pt-24 sm:pb-16 md:pt-28 relative">
             <div className="container max-w-6xl mx-auto px-4 relative z-10">
-                {/* Progress Steps - Redesigned */}
+                {/* Compact sticky progress */}
                 <motion.div
-                    className="mb-24"
+                    className="sticky top-16 z-30 -mx-4 px-4 py-3 mb-6 sm:mb-10 bg-[#FDFBF7]/90 backdrop-blur-md border-b border-border/5 sm:static sm:bg-transparent sm:backdrop-blur-none sm:border-0 sm:mx-0 sm:px-0 sm:py-0"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}
+                    transition={{ duration: 0.35 }}
                 >
-                    <div className="relative max-w-2xl mx-auto">
-                        {/* Progress Bar Background */}
-                        <div className="absolute left-0 top-[15px] w-full h-[1px] bg-gold/10">
+                    <div className="relative max-w-md mx-auto">
+                        <div className="absolute left-4 right-4 top-[11px] h-px bg-gold/15">
                             <motion.div
                                 className="h-full bg-gold"
                                 initial={{ width: "0%" }}
                                 animate={{
                                     width: currentStep === 1 ? "0%" : currentStep === 2 ? "50%" : "100%"
                                 }}
-                                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                             />
                         </div>
-
-                        {/* Steps */}
-                        <div className="flex items-start justify-between relative">
+                        <div className="flex items-center justify-between relative">
                             {[
-                                { num: 1, label: "Add-ons", desc: "Complete your look" },
-                                { num: 2, label: "Details", desc: "Event information" },
-                                { num: 3, label: "Payment", desc: "Review & confirm" }
+                                { num: 1, label: "Add-ons" },
+                                { num: 2, label: "Details" },
+                                { num: 3, label: "Pay" }
                             ].map((step) => (
-                                <div key={step.num} className="flex flex-col items-center gap-4 relative z-10 group cursor-default">
-                                    {/* Step Circle */}
-                                    <motion.div
+                                <div key={step.num} className="flex flex-col items-center gap-1.5 relative z-10 min-w-[4.5rem]">
+                                    <div
                                         className={cn(
-                                            "relative h-8 w-8 rounded-full flex items-center justify-center font-bold text-[10px] transition-all duration-500 border",
+                                            "h-6 w-6 rounded-full flex items-center justify-center font-bold text-[10px] transition-all duration-300 border",
                                             step.num < currentStep
-                                                ? "bg-gold border-gold text-black shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                                                ? "bg-gold border-gold text-black"
                                                 : step.num === currentStep
-                                                    ? "bg-white border-gold text-gold shadow-[0_0_20px_rgba(212,175,55,0.1)]"
-                                                    : "bg-white border-border/10 text-gray-300"
+                                                    ? "bg-white border-gold text-gold ring-4 ring-gold/10"
+                                                    : "bg-white border-border/20 text-gray-300"
                                         )}
-                                        initial={false}
-                                        animate={{
-                                            scale: step.num === currentStep ? 1.2 : 1,
-                                        }}
                                     >
                                         {step.num < currentStep ? (
                                             <Check className="h-3 w-3 stroke-[3]" />
                                         ) : (
                                             <span>{step.num}</span>
                                         )}
-                                    </motion.div>
-
-                                    {/* Step Label */}
-                                    <div className="text-center space-y-1">
-                                        <p className={cn(
-                                            "text-[10px] font-bold uppercase tracking-[0.2em] transition-colors duration-500",
-                                            step.num === currentStep ? "text-gray-900" : "text-gray-400"
-                                        )}>
-                                            {step.label}
-                                        </p>
                                     </div>
+                                    <p className={cn(
+                                        "text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.14em] transition-colors",
+                                        step.num === currentStep ? "text-gray-900" : "text-gray-400"
+                                    )}>
+                                        {step.label}
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -605,89 +598,96 @@ export default function CheckoutPage() {
                 </motion.div>
 
                 <motion.div
-                    className="text-center mb-16"
+                    className="mb-6 sm:mb-10"
                     key={currentStep}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.35 }}
                 >
-                    <h1 className="text-5xl md:text-7xl font-serif font-light tracking-tighter text-gray-900 leading-tight">
+                    <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif font-light tracking-tight text-gray-900 leading-snug">
                         {currentStep === 1 && <>Complete Your <span className="italic text-gold">Look</span></>}
-                        {currentStep === 2 && <>Event & <span className="italic text-gold">Delivery</span> Details</>}
-                        {currentStep === 3 && <>Review & <span className="italic text-gold">Payment</span></>}
+                        {currentStep === 2 && <>Event & <span className="italic text-gold">Delivery</span></>}
+                        {currentStep === 3 && <>Review & <span className="italic text-gold">Pay</span></>}
                     </h1>
+                    <p className="mt-1.5 text-sm text-gray-500 font-light">
+                        {currentStep === 1 && "Optional extras — skip anytime."}
+                        {currentStep === 2 && "Tell us where and when."}
+                        {currentStep === 3 && "Confirm items, sign, and pay."}
+                    </p>
                 </motion.div>
 
                 {/* Step 1: Supplemental Items */}
                 {currentStep === 1 && (
                     <motion.div
-                        className="space-y-16"
-                        initial={{ opacity: 0, y: 20 }}
+                        className="space-y-4 sm:space-y-8"
+                        initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.4 }}
                     >
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
                             {isLoadingSupplemental ? (
                                 Array(4).fill(0).map((_, i) => (
-                                    <div key={i} className="animate-pulse space-y-4">
-                                        <div className="aspect-[4/5] bg-white rounded-[2rem]" />
-                                        <div className="h-4 bg-white rounded w-3/4 mx-auto" />
+                                    <div key={i} className="animate-pulse space-y-2">
+                                        <div className="aspect-[4/5] bg-white rounded-2xl" />
+                                        <div className="h-3 bg-white rounded w-3/4" />
                                     </div>
                                 ))
+                            ) : supplementalProducts.length === 0 ? (
+                                <div className="col-span-2 lg:col-span-4 text-center py-10 text-sm text-gray-500">
+                                    No add-ons available right now — continue to details.
+                                </div>
                             ) : (
                                 supplementalProducts.map((product, index) => (
                                     <motion.div
                                         key={product.id}
-                                        initial={{ opacity: 0, y: 20 }}
+                                        initial={{ opacity: 0, y: 12 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        transition={{
-                                            duration: 0.6,
-                                            delay: index * 0.1,
-                                            ease: "easeOut"
-                                        }}
+                                        transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
                                         className="group"
                                     >
-                                        <div className="bg-white rounded-[2.5rem] overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-border/5 transition-all duration-700 hover:shadow-[0_30px_60px_rgba(0,0,0,0.08)] hover:-translate-y-2 flex flex-col h-full">
+                                        <div className="bg-white rounded-2xl overflow-hidden border border-border/5 shadow-[0_6px_20px_rgba(0,0,0,0.03)] flex flex-col h-full">
                                             <div className="aspect-[4/5] relative overflow-hidden bg-gray-50">
                                                 <img
                                                     src={product.image_url || '/placeholder.svg'}
                                                     alt={product.name}
-                                                    className="object-cover w-full h-full transition-transform duration-1000 group-hover:scale-110"
+                                                    className="object-cover w-full h-full"
                                                 />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                                                <div className="absolute bottom-6 left-6 right-6 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                                            </div>
+                                            <div className="p-3 sm:p-4 flex flex-col flex-1 gap-2.5">
+                                                <div>
+                                                    <h3 className="font-serif text-sm sm:text-base font-bold text-gray-900 line-clamp-2 leading-snug">{product.name}</h3>
+                                                    <p className="text-gold font-bold text-xs sm:text-sm mt-1">{formatCurrency(resolvePriceCents(product))}</p>
+                                                </div>
+                                                <div className="mt-auto flex items-center justify-between gap-2">
+                                                    <div className="flex items-center gap-2.5 bg-gray-50 rounded-full px-2.5 py-1 border border-border/5">
+                                                        <button
+                                                            type="button"
+                                                            aria-label="Decrease quantity"
+                                                            className="text-gray-400 hover:text-gold transition-colors p-0.5"
+                                                            onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) - 1)}
+                                                            disabled={(supplementalQuantities[product.id] || 1) <= 1}
+                                                        >
+                                                            <Minus className="h-3 w-3" />
+                                                        </button>
+                                                        <span className="text-xs font-bold w-4 text-center">
+                                                            {supplementalQuantities[product.id] || 1}
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            aria-label="Increase quantity"
+                                                            className="text-gray-400 hover:text-gold transition-colors p-0.5"
+                                                            onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) + 1)}
+                                                        >
+                                                            <Plus className="h-3 w-3" />
+                                                        </button>
+                                                    </div>
                                                     <Button
-                                                        className="w-full bg-white text-black hover:bg-gold hover:text-black rounded-full text-[10px] font-bold uppercase tracking-widest h-10 shadow-xl"
+                                                        size="sm"
+                                                        className="h-8 px-3 bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full text-[10px] font-bold uppercase tracking-wider"
                                                         onClick={() => handleAddSupplementalItem(product)}
                                                     >
-                                                        Add to Order
+                                                        Add
                                                     </Button>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-8 flex flex-col flex-1 text-center">
-                                                <h3 className="font-serif text-lg font-bold text-gray-900 mb-2 line-clamp-1">{product.name}</h3>
-                                                <p className="text-gold font-bold text-sm mb-6">{formatCurrency(resolvePriceCents(product))}</p>
-
-                                                <div className="mt-auto flex items-center justify-center gap-6 bg-gray-50 rounded-full px-4 py-2 border border-border/5">
-                                                    <button
-                                                        className="text-gray-400 hover:text-gold transition-colors"
-                                                        onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) - 1)}
-                                                        disabled={(supplementalQuantities[product.id] || 1) <= 1}
-                                                    >
-                                                        <Minus className="h-3 w-3" />
-                                                    </button>
-                                                    <span className="text-xs font-bold w-4">
-                                                        {supplementalQuantities[product.id] || 1}
-                                                    </span>
-                                                    <button
-                                                        className="text-gray-400 hover:text-gold transition-colors"
-                                                        onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) + 1)}
-                                                    >
-                                                        <Plus className="h-3 w-3" />
-                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -695,14 +695,23 @@ export default function CheckoutPage() {
                                 ))
                             )}
                         </div>
-                        <div className="flex justify-center pt-16 border-t border-border/5">
-                            <Button
-                                onClick={handleNextStep}
-                                size="lg"
-                                className="bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full px-12 h-16 text-[11px] font-bold uppercase tracking-[0.2em] shadow-2xl transition-all duration-500 group"
-                            >
-                                Continue to Details <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                            </Button>
+
+                        <div className={stickyBarClass}>
+                            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-4 max-w-6xl mx-auto">
+                                <Button
+                                    variant="ghost"
+                                    onClick={handleNextStep}
+                                    className="h-11 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500 hover:text-gold"
+                                >
+                                    Skip add-ons
+                                </Button>
+                                <Button
+                                    onClick={handleNextStep}
+                                    className="bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full px-8 h-12 text-[11px] font-bold uppercase tracking-[0.16em] w-full sm:w-auto"
+                                >
+                                    Continue <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     </motion.div>
                 )}
@@ -710,120 +719,119 @@ export default function CheckoutPage() {
                 {/* Step 2: Event & Delivery Details */}
                 {currentStep === 2 && (
                     <motion.div
-                        className="space-y-20 max-w-4xl mx-auto"
-                        initial={{ opacity: 0, y: 20 }}
+                        className="space-y-8 max-w-3xl mx-auto"
+                        initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.4 }}
                     >
                         {error && (
                             <motion.div
-                                className="bg-red-50 border border-red-100 rounded-[2rem] p-8 flex items-center gap-4 text-red-800"
-                                initial={{ opacity: 0, scale: 0.95 }}
+                                className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-start gap-3 text-red-800"
+                                initial={{ opacity: 0, scale: 0.98 }}
                                 animate={{ opacity: 1, scale: 1 }}
                             >
-                                <AlertCircle className="h-6 w-6 shrink-0" />
+                                <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
                                 <p className="text-sm font-medium">{error}</p>
                             </motion.div>
                         )}
 
-                        <div className="space-y-24">
+                        <div className="space-y-10 sm:space-y-12">
                             {/* Customer Info */}
-                            <section className="space-y-12">
-                                <div className="flex items-center gap-6">
-                                    <h2 className="text-3xl font-serif font-bold text-gray-900 tracking-tight">Contact Information</h2>
-                                    <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent"></div>
+                            <section className="space-y-5">
+                                <div className="flex items-center gap-3">
+                                    <h2 className={sectionTitleClass}>Contact</h2>
+                                    <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent" />
                                 </div>
-                                <div className="grid sm:grid-cols-2 gap-12">
-                                    <div className="space-y-2 sm:col-span-2">
-                                        <Label htmlFor="customerName" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Full Name *</Label>
+                                <div className="grid sm:grid-cols-2 gap-5 sm:gap-6">
+                                    <div className="space-y-1.5 sm:col-span-2">
+                                        <Label htmlFor="customerName" className={labelClass}>Full Name *</Label>
                                         <Input
                                             id="customerName"
                                             value={formData.customerName}
                                             onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                                             required
-                                            className="bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-lg"
+                                            className={fieldClass}
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="customerEmail" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Email Address *</Label>
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="customerEmail" className={labelClass}>Email *</Label>
                                         <Input
                                             id="customerEmail"
                                             type="email"
                                             value={formData.customerEmail}
                                             onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
                                             required
-                                            className="bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-lg"
+                                            className={fieldClass}
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label htmlFor="customerPhone" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Phone Number *</Label>
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="customerPhone" className={labelClass}>Phone *</Label>
                                         <Input
                                             id="customerPhone"
                                             type="tel"
                                             value={formData.customerPhone}
                                             onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
                                             required
-                                            className="bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-lg"
+                                            className={fieldClass}
                                         />
                                     </div>
                                 </div>
                             </section>
 
                             {/* Event Details */}
-                            <section className="space-y-12">
-                                <div className="flex items-center gap-6">
-                                    <h2 className="text-3xl font-serif font-bold text-gray-900 tracking-tight">Event Details</h2>
-                                    <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent"></div>
+                            <section className="space-y-5">
+                                <div className="flex items-center gap-3">
+                                    <h2 className={sectionTitleClass}>Event</h2>
+                                    <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent" />
                                 </div>
-                                <div className="grid gap-12">
-                                    <div className="grid sm:grid-cols-2 gap-12">
-                                        <div className="grid gap-2">
-                                            <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Event Date *</Label>
+                                <div className="grid gap-5 sm:gap-6">
+                                    <div className="grid sm:grid-cols-2 gap-5 sm:gap-6">
+                                        <div className="grid gap-1.5">
+                                            <Label className={labelClass}>Event Date *</Label>
                                             <Popover>
                                                 <PopoverTrigger asChild>
                                                     <Button
                                                         variant={"outline"}
-                                                        className={cn("bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 justify-start text-left font-light text-lg hover:bg-transparent hover:border-gold transition-colors", !date && "text-gray-300")}
+                                                        className={cn(fieldClass, "justify-start text-left hover:bg-transparent hover:border-gold", !date && "text-gray-300")}
                                                     >
-                                                        <CalendarIcon className="mr-3 h-5 w-5 text-gold" />
-                                                        {date ? format(date, "PPP") : <span>Select Date</span>}
+                                                        <CalendarIcon className="mr-2 h-4 w-4 text-gold shrink-0" />
+                                                        {date ? format(date, "MMM d, yyyy") : <span>Select date</span>}
                                                     </Button>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-0 border-border/10 shadow-2xl bg-[#FDFBF7]">
-                                                    <Calendar mode="single" selected={date} onSelect={setDate} initialFocus className="p-4" />
+                                                    <Calendar mode="single" selected={date} onSelect={setDate} initialFocus className="p-3" />
                                                 </PopoverContent>
                                             </Popover>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-8">
-                                            <div className="grid gap-2">
-                                                <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Start Time *</Label>
-                                                <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required className="bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 focus-visible:ring-0 focus-visible:border-gold transition-colors font-light text-lg" />
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="grid gap-1.5">
+                                                <Label className={labelClass}>Start *</Label>
+                                                <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} required className={fieldClass} />
                                             </div>
-                                            <div className="grid gap-2">
-                                                <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">End Time *</Label>
-                                                <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required className="bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 focus-visible:ring-0 focus-visible:border-gold transition-colors font-light text-lg" />
+                                            <div className="grid gap-1.5">
+                                                <Label className={labelClass}>End *</Label>
+                                                <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} required className={fieldClass} />
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="grid gap-2">
-                                        <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Venue Address *</Label>
+                                    <div className="grid gap-1.5">
+                                        <Label className={labelClass}>Venue Address *</Label>
                                         <Input
-                                            placeholder="E.g. 123 Fifth Avenue, New York, NY"
+                                            placeholder="123 Fifth Avenue, New York, NY"
                                             value={formData.venueAddress}
                                             onChange={(e) => setFormData({ ...formData, venueAddress: e.target.value, deliveryAddress: e.target.value })}
                                             required
-                                            className="bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-lg"
+                                            className={fieldClass}
                                         />
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-2">Default delivery address</p>
+                                        <p className="text-[10px] font-medium tracking-wide text-gray-400">Used as delivery address</p>
                                     </div>
 
-                                    <div className="grid sm:grid-cols-2 gap-12">
-                                        <div className="grid gap-2">
-                                            <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Venue Type</Label>
+                                    <div className="grid sm:grid-cols-2 gap-5 sm:gap-6">
+                                        <div className="grid gap-1.5">
+                                            <Label className={labelClass}>Venue Type</Label>
                                             <Select value={venueType} onValueChange={setVenueType}>
-                                                <SelectTrigger className="bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 focus:ring-0 focus:border-gold transition-colors font-light text-lg">
+                                                <SelectTrigger className={cn(fieldClass, "focus:ring-0 focus:border-gold")}>
                                                     <SelectValue placeholder="Select type" />
                                                 </SelectTrigger>
                                                 <SelectContent className="bg-[#FDFBF7] border-border/10">
@@ -836,13 +844,13 @@ export default function CheckoutPage() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="grid gap-2">
-                                            <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Event Type</Label>
+                                        <div className="grid gap-1.5">
+                                            <Label className={labelClass}>Event Type</Label>
                                             <Input
-                                                placeholder="E.g. Wedding Gala"
+                                                placeholder="Wedding, gala, corporate…"
                                                 value={formData.eventType}
                                                 onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
-                                                className="bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-lg"
+                                                className={fieldClass}
                                             />
                                         </div>
                                     </div>
@@ -850,103 +858,108 @@ export default function CheckoutPage() {
                             </section>
 
                             {/* Logistics */}
-                            <section className="space-y-12">
-                                <div className="flex items-center gap-6">
-                                    <h2 className="text-3xl font-serif font-bold text-gray-900 tracking-tight">Logistics & Access</h2>
-                                    <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent"></div>
+                            <section className="space-y-5">
+                                <div className="flex items-center gap-3">
+                                    <h2 className={sectionTitleClass}>Access</h2>
+                                    <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent" />
                                 </div>
-                                <div className="space-y-12">
-                                    <div className="grid sm:grid-cols-3 gap-8 p-10 bg-white rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.02)] border border-border/5">
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 p-3 sm:p-4 bg-white rounded-2xl border border-border/5">
                                         {[
-                                            { id: "elevator", label: "Elevator Access", checked: hasElevator, onChange: setHasElevator },
-                                            { id: "stairs", label: "Stairs Required", checked: hasStairs, onChange: setHasStairs },
-                                            { id: "loading_dock", label: "Loading Dock", checked: hasLoadingDock, onChange: setHasLoadingDock }
+                                            { id: "elevator", label: "Elevator", checked: hasElevator, onChange: setHasElevator },
+                                            { id: "stairs", label: "Stairs", checked: hasStairs, onChange: setHasStairs },
+                                            { id: "loading_dock", label: "Loading dock", checked: hasLoadingDock, onChange: setHasLoadingDock }
                                         ].map((item) => (
-                                            <div key={item.id} className="flex items-center gap-4 group cursor-pointer" onClick={() => item.onChange(!item.checked)}>
+                                            <button
+                                                key={item.id}
+                                                type="button"
+                                                className={cn(
+                                                    "flex items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors",
+                                                    item.checked ? "bg-gold/10" : "hover:bg-gray-50"
+                                                )}
+                                                onClick={() => item.onChange(!item.checked)}
+                                            >
                                                 <div className={cn(
-                                                    "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all duration-300",
-                                                    item.checked ? "bg-gold border-gold" : "border-gray-200 group-hover:border-gold"
+                                                    "h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all",
+                                                    item.checked ? "bg-gold border-gold" : "border-gray-200"
                                                 )}>
-                                                    {item.checked && <Check className="h-3 w-3 text-black stroke-[3]" />}
+                                                    {item.checked && <Check className="h-2.5 w-2.5 text-black stroke-[3]" />}
                                                 </div>
                                                 <span className={cn(
-                                                    "text-xs font-bold uppercase tracking-widest transition-colors",
-                                                    item.checked ? "text-gray-900" : "text-gray-400 group-hover:text-gold"
+                                                    "text-[11px] font-bold uppercase tracking-wider",
+                                                    item.checked ? "text-gray-900" : "text-gray-400"
                                                 )}>
                                                     {item.label}
                                                 </span>
-                                            </div>
+                                            </button>
                                         ))}
                                     </div>
-                                    <div className="grid gap-2">
-                                        <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Additional Logistics Notes</Label>
+                                    <div className="grid gap-1.5">
+                                        <Label className={labelClass}>Logistics notes</Label>
                                         <Textarea
-                                            placeholder="Gate codes, parking instructions, specific room names..."
+                                            placeholder="Gate codes, parking, room names…"
                                             value={formData.deliveryNotes}
                                             onChange={(e) => setFormData({ ...formData, deliveryNotes: e.target.value })}
-                                            className="min-h-[120px] bg-transparent border-0 border-b border-gray-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-lg resize-none"
+                                            className="min-h-[72px] bg-transparent border-0 border-b border-gray-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-base resize-none"
                                         />
                                     </div>
                                 </div>
                             </section>
 
                             {/* Pickup Information */}
-                            <section className="space-y-12">
-                                <div className="flex items-center gap-6">
-                                    <h2 className="text-3xl font-serif font-bold text-gray-900 tracking-tight">Pickup Information</h2>
-                                    <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent"></div>
+                            <section className="space-y-5">
+                                <div className="flex items-center gap-3">
+                                    <h2 className={sectionTitleClass}>Pickup</h2>
+                                    <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent" />
                                 </div>
-                                <div className="space-y-12">
-                                    {/* Same Day Pickup Toggle */}
-                                    <div
+                                <div className="space-y-5">
+                                    <button
+                                        type="button"
                                         className={cn(
-                                            "flex items-center justify-between p-10 rounded-[2.5rem] border transition-all duration-500 cursor-pointer group",
-                                            sameDayPickup ? "bg-gold/5 border-gold shadow-[0_20px_40px_rgba(212,175,55,0.1)]" : "bg-white border-border/5 shadow-[0_10px_40px_rgba(0,0,0,0.02)] hover:border-gold/30"
+                                            "w-full flex items-center gap-4 p-4 rounded-2xl border text-left transition-all",
+                                            sameDayPickup ? "bg-gold/5 border-gold" : "bg-white border-border/5 hover:border-gold/30"
                                         )}
                                         onClick={() => setSameDayPickup(!sameDayPickup)}
                                     >
-                                        <div className="flex items-center gap-8">
-                                            <div className={cn(
-                                                "h-16 w-16 rounded-full flex items-center justify-center transition-all duration-500",
-                                                sameDayPickup ? "bg-gold text-black" : "bg-gray-50 text-gray-400 group-hover:bg-gold/10 group-hover:text-gold"
-                                            )}>
-                                                <Clock className="h-8 w-8" />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-xl font-serif font-bold text-gray-900">Same-Day Pickup</h4>
-                                                <p className="text-sm text-gray-500 mt-1 font-light">Return items the same day as your event</p>
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-gold mt-2">Additional fee applies</p>
-                                            </div>
+                                        <div className={cn(
+                                            "h-10 w-10 rounded-full flex items-center justify-center shrink-0 transition-all",
+                                            sameDayPickup ? "bg-gold text-black" : "bg-gray-50 text-gray-400"
+                                        )}>
+                                            <Clock className="h-5 w-5" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="text-base font-serif font-bold text-gray-900">Same-day pickup</h4>
+                                            <p className="text-xs text-gray-500 mt-0.5">Return items the day of your event · fee applies</p>
                                         </div>
                                         <div className={cn(
-                                            "h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all duration-500",
-                                            sameDayPickup ? "bg-gold border-gold" : "border-gray-200 group-hover:border-gold"
+                                            "h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0",
+                                            sameDayPickup ? "bg-gold border-gold" : "border-gray-200"
                                         )}>
-                                            {sameDayPickup && <Check className="h-4 w-4 text-black stroke-[3]" />}
+                                            {sameDayPickup && <Check className="h-3 w-3 text-black stroke-[3]" />}
                                         </div>
-                                    </div>
+                                    </button>
 
-                                    <div className="grid sm:grid-cols-2 gap-12">
-                                        {/* Pickup Date */}
-                                        <div className="space-y-2">
-                                            <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                                                Pickup Date {!sameDayPickup && "*"}
+                                    <div className="grid sm:grid-cols-2 gap-5 sm:gap-6">
+                                        <div className="space-y-1.5">
+                                            <Label className={labelClass}>
+                                                Pickup date {!sameDayPickup && "*"}
                                             </Label>
                                             <Popover>
                                                 <PopoverTrigger asChild>
                                                     <Button
                                                         variant={"outline"}
                                                         className={cn(
-                                                            "bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 justify-start text-left font-light text-lg hover:bg-transparent hover:border-gold transition-colors w-full",
+                                                            fieldClass,
+                                                            "justify-start text-left hover:bg-transparent hover:border-gold w-full",
                                                             !pickupDate && !sameDayPickup && "text-gray-300",
                                                             sameDayPickup && "opacity-50 cursor-not-allowed"
                                                         )}
                                                         disabled={sameDayPickup}
                                                     >
-                                                        <CalendarIcon className="mr-3 h-5 w-5 text-gold" />
+                                                        <CalendarIcon className="mr-2 h-4 w-4 text-gold shrink-0" />
                                                         {sameDayPickup
-                                                            ? (date ? format(date, "PPP") : "Same as event date")
-                                                            : (pickupDate ? format(pickupDate, "PPP") : <span>Select Date</span>)
+                                                            ? (date ? format(date, "MMM d, yyyy") : "Same as event")
+                                                            : (pickupDate ? format(pickupDate, "MMM d, yyyy") : <span>Select date</span>)
                                                         }
                                                     </Button>
                                                 </PopoverTrigger>
@@ -957,60 +970,69 @@ export default function CheckoutPage() {
                                                             selected={pickupDate}
                                                             onSelect={setPickupDate}
                                                             initialFocus
-                                                            disabled={(date) => date < new Date()}
-                                                            className="p-4"
+                                                            disabled={(d) => d < new Date()}
+                                                            className="p-3"
                                                         />
                                                     </PopoverContent>
                                                 )}
                                             </Popover>
                                         </div>
 
-                                        {/* Pickup Time */}
-                                        <div className="space-y-2">
-                                            <Label htmlFor="pickupTime" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                                                Preferred Pickup Time
+                                        <div className="space-y-1.5">
+                                            <Label htmlFor="pickupTime" className={labelClass}>
+                                                Preferred time
                                             </Label>
                                             <Input
                                                 id="pickupTime"
                                                 type="time"
                                                 value={pickupTime}
                                                 onChange={(e) => setPickupTime(e.target.value)}
-                                                className="bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-14 focus-visible:ring-0 focus-visible:border-gold transition-colors font-light text-lg"
+                                                className={fieldClass}
                                             />
                                         </div>
                                     </div>
 
-                                    {/* Pickup Notes */}
-                                    <div className="space-y-2">
-                                        <Label htmlFor="pickupNotes" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                                            Pickup Instructions
+                                    <div className="space-y-1.5">
+                                        <Label htmlFor="pickupNotes" className={labelClass}>
+                                            Pickup notes
                                         </Label>
                                         <Textarea
                                             id="pickupNotes"
-                                            placeholder="Any special instructions for pickup?"
+                                            placeholder="Any special pickup instructions?"
                                             value={pickupNotes}
                                             onChange={(e) => setPickupNotes(e.target.value)}
-                                            className="min-h-[120px] bg-transparent border-0 border-b border-gray-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-lg resize-none"
+                                            className="min-h-[72px] bg-transparent border-0 border-b border-gray-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-base resize-none"
                                         />
                                     </div>
                                 </div>
                             </section>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-8 pt-16 border-t border-border/5">
-                            <button
-                                onClick={handlePrevStep}
-                                className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-gold transition-colors flex items-center gap-2 group"
-                            >
-                                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" /> Back to Add-ons
-                            </button>
-                            <Button
-                                onClick={handleNextStep}
-                                size="lg"
-                                className="bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full px-12 h-16 text-[11px] font-bold uppercase tracking-[0.2em] shadow-2xl transition-all duration-500 group w-full sm:w-auto"
-                            >
-                                Continue to Payment <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                            </Button>
+                        <div className={stickyBarClass}>
+                            <div className="flex items-center justify-between gap-3 max-w-3xl mx-auto">
+                                <button
+                                    type="button"
+                                    onClick={handlePrevStep}
+                                    className="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 hover:text-gold transition-colors flex items-center gap-1.5 shrink-0 py-2"
+                                >
+                                    <ArrowLeft className="h-4 w-4" />
+                                    <span className="hidden xs:inline sm:inline">Back</span>
+                                </button>
+                                <Button
+                                    onClick={handleNextStep}
+                                    disabled={isLoading}
+                                    className="bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full px-6 sm:px-8 h-12 text-[11px] font-bold uppercase tracking-[0.16em] flex-1 sm:flex-none"
+                                >
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Preparing…
+                                        </>
+                                    ) : (
+                                        <>Continue to pay <ArrowRight className="ml-2 h-4 w-4" /></>
+                                    )}
+                                </Button>
+                            </div>
                         </div>
                     </motion.div>
                 )}
@@ -1018,239 +1040,160 @@ export default function CheckoutPage() {
                 {/* Step 3: Payment */}
                 {currentStep === 3 && (
                     <motion.div
-                        className="grid lg:grid-cols-3 gap-16"
-                        initial={{ opacity: 0, y: 20 }}
+                        className="grid lg:grid-cols-5 gap-6 lg:gap-10"
+                        initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.4 }}
                     >
-                        <div className="lg:col-span-2 space-y-12">
+                        <div className="lg:col-span-3 space-y-5 sm:space-y-6">
                             {/* Review Order */}
-                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
-                                <div className="p-10 border-b border-border/5">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
-                                            <ShoppingBag className="h-6 w-6 text-gold" />
-                                        </div>
-                                        <h3 className="text-2xl font-serif font-bold text-gray-900">Review Your Order</h3>
+                            <div className={cardClass}>
+                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border/5 flex items-center gap-3">
+                                    <div className="h-9 w-9 rounded-full bg-gold/10 flex items-center justify-center shrink-0">
+                                        <ShoppingBag className="h-4 w-4 text-gold" />
                                     </div>
+                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-gray-900">Your order</h3>
+                                    <span className="ml-auto text-xs text-gray-400 font-medium">{items.length} item{items.length === 1 ? '' : 's'}</span>
                                 </div>
                                 <div className="divide-y divide-border/5">
                                     {items.map((item, index) => {
-                                        // Handle Package Items
                                         if (item.packageId && item.packageData) {
                                             const { name, price } = item.packageData
                                             const packagePrice = resolvePriceCents({ price })
-
                                             return (
-                                                <motion.div
-                                                    key={item.id}
-                                                    className="flex gap-8 p-10 hover:bg-gray-50/50 transition-all duration-300 group"
-                                                    initial={{ opacity: 0, x: -20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                                                >
-                                                    <div className="h-32 w-32 rounded-[2rem] border border-border/5 bg-gray-50 overflow-hidden flex-shrink-0 shadow-sm relative">
+                                                <div key={item.id} className="flex gap-3 sm:gap-4 p-4 sm:p-5">
+                                                    <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl border border-border/5 bg-gray-50 overflow-hidden flex-shrink-0 relative">
                                                         {item.packageData.image_url ? (
-                                                            <img
-                                                                src={item.packageData.image_url}
-                                                                alt={name}
-                                                                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                            />
+                                                            <img src={item.packageData.image_url} alt={name} className="h-full w-full object-cover" />
                                                         ) : (
                                                             <div className="absolute inset-0 bg-gold/5 flex items-center justify-center">
-                                                                <span className="text-xs text-gold font-bold uppercase tracking-widest">Package</span>
+                                                                <Package className="h-5 w-5 text-gold/60" />
                                                             </div>
                                                         )}
                                                     </div>
-                                                    <div className="flex-1 flex flex-col justify-between">
-                                                        <div>
-                                                            <div className="flex justify-between items-start">
-                                                                <h4 className="font-serif text-xl font-bold text-gray-900 mb-2">{name}</h4>
-                                                                <button
-                                                                    onClick={() => removeItem(item.id)}
-                                                                    className="text-gray-300 hover:text-red-500 transition-colors p-2"
-                                                                >
-                                                                    <span className="sr-only">Remove</span>
-                                                                    <X className="h-5 w-5" />
-                                                                </button>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex justify-between gap-2 items-start">
+                                                            <div className="min-w-0">
+                                                                <h4 className="font-serif text-base font-bold text-gray-900 truncate">{name}</h4>
+                                                                <p className="text-gold font-bold text-sm mt-0.5">{formatCurrency(packagePrice * item.quantity)}</p>
+                                                                <p className="text-[10px] uppercase tracking-wider font-bold text-gold/50 mt-1">Package</p>
                                                             </div>
-                                                            <p className="text-gold font-bold text-lg mb-4">{formatCurrency(packagePrice * item.quantity)}</p>
-
-                                                            {/* Package Contents Breakdown */}
-                                                            {item.packageData.selectionsSummary && (
-                                                                <div className="space-y-4 mb-6">
-                                                                    {item.packageData.selectionsSummary.map((group: any, gIdx: number) => (
-                                                                        <div key={gIdx} className="space-y-1">
-                                                                            <p className="text-[10px] uppercase tracking-widest font-bold text-gray-400">{group.groupName}</p>
-                                                                            <div className="flex flex-wrap gap-2">
-                                                                                {group.items.map((selection: any, sIdx: number) => (
-                                                                                    <span key={sIdx} className="text-xs text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
-                                                                                        {selection.name} {selection.quantity > 1 ? `x${selection.quantity}` : ''}
-                                                                                    </span>
-                                                                                ))}
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-
-                                                            <div className="text-[10px] uppercase tracking-widest font-bold text-gold/60">
-                                                                Package Deal
-                                                            </div>
+                                                            <button type="button" onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 p-1 shrink-0" aria-label="Remove">
+                                                                <X className="h-4 w-4" />
+                                                            </button>
                                                         </div>
-                                                        <div className="flex items-center gap-6 mt-6">
-                                                            <div className="flex items-center gap-6 bg-gray-50 rounded-full px-6 py-2 border border-border/5">
-                                                                <button
-                                                                    className="text-gray-400 hover:text-gold transition-colors"
-                                                                    onClick={() => {
-                                                                        updateQuantity(item.id, item.quantity - 1)
-                                                                        toast.info('Quantity updated')
-                                                                    }}
-                                                                    disabled={item.quantity <= 1}
-                                                                >
-                                                                    <Minus className="h-4 w-4" />
+                                                        {item.packageData.selectionsSummary && (
+                                                            <div className="mt-2 flex flex-wrap gap-1.5">
+                                                                {item.packageData.selectionsSummary.flatMap((group: any) =>
+                                                                    group.items.map((selection: any, sIdx: number) => (
+                                                                        <span key={`${group.groupName}-${sIdx}`} className="text-[10px] text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">
+                                                                            {selection.name}{selection.quantity > 1 ? ` ×${selection.quantity}` : ''}
+                                                                        </span>
+                                                                    ))
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        <div className="flex items-center gap-3 mt-3">
+                                                            <div className="flex items-center gap-3 bg-gray-50 rounded-full px-3 py-1 border border-border/5">
+                                                                <button type="button" className="text-gray-400 hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity - 1); toast.info('Quantity updated') }} disabled={item.quantity <= 1} aria-label="Decrease">
+                                                                    <Minus className="h-3.5 w-3.5" />
                                                                 </button>
-                                                                <span className="text-sm font-bold w-6 text-center">
-                                                                    {item.quantity}
-                                                                </span>
-                                                                <button
-                                                                    className="text-gray-400 hover:text-gold transition-colors"
-                                                                    onClick={() => {
-                                                                        updateQuantity(item.id, item.quantity + 1)
-                                                                        toast.info('Quantity updated')
-                                                                    }}
-                                                                >
-                                                                    <Plus className="h-4 w-4" />
+                                                                <span className="text-xs font-bold w-5 text-center">{item.quantity}</span>
+                                                                <button type="button" className="text-gray-400 hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity + 1); toast.info('Quantity updated') }} aria-label="Increase">
+                                                                    <Plus className="h-3.5 w-3.5" />
                                                                 </button>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </motion.div>
+                                                </div>
                                             )
                                         }
 
-                                        // Handle Standard Products
                                         const product = cartProducts.find((p) => p.id === item.productId)
                                         if (!product) return null
                                         return (
-                                            <motion.div
-                                                key={item.productId}
-                                                className="flex gap-8 p-10 hover:bg-gray-50/50 transition-all duration-300 group"
-                                                initial={{ opacity: 0, x: -20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                            >
-                                                <div className="h-32 w-32 rounded-[2rem] border border-border/5 bg-gray-50 overflow-hidden flex-shrink-0 shadow-sm">
-                                                    <img
-                                                        src={product.image_url || '/placeholder.svg'}
-                                                        alt={product.name}
-                                                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                    />
+                                            <div key={item.id} className="flex gap-3 sm:gap-4 p-4 sm:p-5">
+                                                <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl border border-border/5 bg-gray-50 overflow-hidden flex-shrink-0">
+                                                    <img src={product.image_url || '/placeholder.svg'} alt={product.name} className="h-full w-full object-cover" />
                                                 </div>
-                                                <div className="flex-1 flex flex-col justify-between">
-                                                    <div>
-                                                        <div className="flex justify-between items-start">
-                                                            <h4 className="font-serif text-xl font-bold text-gray-900 mb-2">{product.name}</h4>
-                                                            <button
-                                                                onClick={() => removeItem(item.id)}
-                                                                className="text-gray-300 hover:text-red-500 transition-colors p-2"
-                                                            >
-                                                                <span className="sr-only">Remove</span>
-                                                                <X className="h-5 w-5" />
-                                                            </button>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex justify-between gap-2 items-start">
+                                                        <div className="min-w-0">
+                                                            <h4 className="font-serif text-base font-bold text-gray-900 truncate">{product.name}</h4>
+                                                            <p className="text-gold font-bold text-sm mt-0.5">{formatCurrency(resolvePriceCents(product) * item.quantity)}</p>
                                                         </div>
-                                                        <p className="text-gold font-bold text-lg">{formatCurrency(resolvePriceCents(product) * item.quantity)}</p>
+                                                        <button type="button" onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 p-1 shrink-0" aria-label="Remove">
+                                                            <X className="h-4 w-4" />
+                                                        </button>
                                                     </div>
-                                                    <div className="flex items-center gap-6 mt-6">
-                                                        <div className="flex items-center gap-6 bg-gray-50 rounded-full px-6 py-2 border border-border/5">
-                                                            <button
-                                                                className="text-gray-400 hover:text-gold transition-colors"
-                                                                onClick={() => {
-                                                                    updateQuantity(item.id, item.quantity - 1)
-                                                                    toast.info('Quantity updated')
-                                                                }}
-                                                            >
-                                                                <Minus className="h-4 w-4" />
+                                                    <div className="flex items-center gap-3 mt-3">
+                                                        <div className="flex items-center gap-3 bg-gray-50 rounded-full px-3 py-1 border border-border/5">
+                                                            <button type="button" className="text-gray-400 hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity - 1); toast.info('Quantity updated') }} disabled={item.quantity <= 1} aria-label="Decrease">
+                                                                <Minus className="h-3.5 w-3.5" />
                                                             </button>
-                                                            <span className="text-sm font-bold w-6 text-center">
-                                                                {item.quantity}
-                                                            </span>
-                                                            <button
-                                                                className="text-gray-400 hover:text-gold transition-colors"
-                                                                onClick={() => {
-                                                                    updateQuantity(item.id, item.quantity + 1)
-                                                                    toast.info('Quantity updated')
-                                                                }}
-                                                            >
-                                                                <Plus className="h-4 w-4" />
+                                                            <span className="text-xs font-bold w-5 text-center">{item.quantity}</span>
+                                                            <button type="button" className="text-gray-400 hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity + 1); toast.info('Quantity updated') }} aria-label="Increase">
+                                                                <Plus className="h-3.5 w-3.5" />
                                                             </button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </motion.div>
+                                            </div>
                                         )
                                     })}
                                 </div>
                             </div>
 
                             {/* Payment Choice */}
-                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
-                                <div className="p-10 border-b border-border/5">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
-                                            <div className="font-serif font-bold text-gold text-xl">$</div>
-                                        </div>
-                                        <h3 className="text-2xl font-serif font-bold text-gray-900">Payment Amount</h3>
-                                    </div>
+                            <div className={cardClass}>
+                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border/5">
+                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-gray-900">Payment amount</h3>
                                 </div>
-                                <div className="p-10 space-y-8">
-                                    <div className="grid sm:grid-cols-2 gap-6">
+                                <div className="p-4 sm:p-6 space-y-4">
+                                    <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                                         <button
+                                            type="button"
                                             onClick={() => {
                                                 setPaymentChoice('full')
                                                 const amount = totals?.totalAmount || 0
                                                 setPaidAmount(amount)
-                                                // Trigger payment intent update
                                                 setCurrentStep(2)
                                                 setTimeout(() => handleNextStep(), 10)
                                             }}
                                             className={cn(
-                                                "p-8 rounded-[2rem] border-2 text-left transition-all duration-300 space-y-2",
-                                                paymentChoice === 'full' ? "border-gold bg-gold/5 shadow-lg shadow-gold/5" : "border-gray-100 hover:border-gold/30 hover:bg-gray-50/50"
+                                                "p-3.5 sm:p-5 rounded-2xl border-2 text-left transition-all space-y-1",
+                                                paymentChoice === 'full' ? "border-gold bg-gold/5" : "border-gray-100 hover:border-gold/30"
                                             )}
                                         >
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Option 1</span>
-                                                {paymentChoice === 'full' && <Check className="h-4 w-4 text-gold" />}
+                                            <div className="flex items-center justify-between gap-1">
+                                                <span className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Full</span>
+                                                {paymentChoice === 'full' && <Check className="h-3.5 w-3.5 text-gold shrink-0" />}
                                             </div>
-                                            <h4 className="text-xl font-serif font-bold text-gray-900">Pay in Full</h4>
-                                            <p className="text-sm text-gray-500 font-light">Settle your complete balance today.</p>
-                                            <p className="text-xl font-bold text-gold mt-4">{totals ? formatCurrency(totals.totalAmount) : '...'}</p>
+                                            <h4 className="text-sm sm:text-base font-serif font-bold text-gray-900">Pay in full</h4>
+                                            <p className="text-sm sm:text-base font-bold text-gold">{totals ? formatCurrency(totals.totalAmount) : '…'}</p>
                                         </button>
 
                                         <button
+                                            type="button"
                                             onClick={() => {
                                                 setPaymentChoice('deposit')
                                                 const minDeposit = Math.ceil((totals?.totalAmount || 0) * 0.5)
                                                 setPaidAmount(minDeposit)
                                                 setCustomAmount((minDeposit / 100).toString())
-                                                // Trigger payment intent update
                                                 setCurrentStep(2)
                                                 setTimeout(() => handleNextStep(), 10)
                                             }}
                                             className={cn(
-                                                "p-8 rounded-[2rem] border-2 text-left transition-all duration-300 space-y-2",
-                                                paymentChoice === 'deposit' ? "border-gold bg-gold/5 shadow-lg shadow-gold/5" : "border-gray-100 hover:border-gold/30 hover:bg-gray-50/50"
+                                                "p-3.5 sm:p-5 rounded-2xl border-2 text-left transition-all space-y-1",
+                                                paymentChoice === 'deposit' ? "border-gold bg-gold/5" : "border-gray-100 hover:border-gold/30"
                                             )}
                                         >
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Option 2</span>
-                                                {paymentChoice === 'deposit' && <Check className="h-4 w-4 text-gold" />}
+                                            <div className="flex items-center justify-between gap-1">
+                                                <span className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Deposit</span>
+                                                {paymentChoice === 'deposit' && <Check className="h-3.5 w-3.5 text-gold shrink-0" />}
                                             </div>
-                                            <h4 className="text-xl font-serif font-bold text-gray-900">Pay Deposit</h4>
-                                            <p className="text-sm text-gray-500 font-light">Pay at least 50% now, balance later.</p>
-                                            <p className="text-xl font-bold text-gold mt-4">Min. {totals ? formatCurrency(Math.ceil(totals.totalAmount * 0.5)) : '...'}</p>
+                                            <h4 className="text-sm sm:text-base font-serif font-bold text-gray-900">50% now</h4>
+                                            <p className="text-sm sm:text-base font-bold text-gold">Min. {totals ? formatCurrency(Math.ceil(totals.totalAmount * 0.5)) : '…'}</p>
                                         </button>
                                     </div>
 
@@ -1258,11 +1201,11 @@ export default function CheckoutPage() {
                                         <motion.div
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: 'auto' }}
-                                            className="space-y-4 pt-4 border-t border-border/5"
+                                            className="space-y-2 pt-3 border-t border-border/5"
                                         >
-                                            <Label htmlFor="custom-amount" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Custom Payment Amount ($)</Label>
+                                            <Label htmlFor="custom-amount" className={labelClass}>Custom amount ($)</Label>
                                             <div className="relative">
-                                                <span className="absolute left-0 bottom-4 text-2xl font-light text-gray-400">$</span>
+                                                <span className="absolute left-0 bottom-3 text-lg font-light text-gray-400">$</span>
                                                 <Input
                                                     id="custom-amount"
                                                     type="number"
@@ -1273,45 +1216,39 @@ export default function CheckoutPage() {
                                                         const min = Math.ceil((totals?.totalAmount || 0) * 0.5)
                                                         if (val >= min && val <= (totals?.totalAmount || 0)) {
                                                             setPaidAmount(val)
-                                                            // Trigger payment intent update with debounce or separate button
                                                         }
                                                     }}
                                                     onBlur={() => {
-                                                        // Update payment intent on blur to avoid too many requests
                                                         setCurrentStep(2)
                                                         setTimeout(() => handleNextStep(), 10)
                                                     }}
-                                                    className="bg-transparent border-0 border-b border-gray-200 rounded-none pl-6 h-14 focus-visible:ring-0 focus-visible:border-gold transition-colors font-light text-2xl"
+                                                    className="bg-transparent border-0 border-b border-gray-200 rounded-none pl-5 h-11 focus-visible:ring-0 focus-visible:border-gold font-light text-xl"
                                                     placeholder={((totals?.totalAmount || 0) / 200).toString()}
                                                 />
                                             </div>
                                             {(parseFloat(customAmount) * 100) < Math.ceil((totals?.totalAmount || 0) * 0.5) && (
                                                 <p className="text-xs text-red-500 font-medium flex items-center gap-1">
-                                                    <AlertCircle className="h-3 w-3" /> Minimum deposit is 50% ({formatCurrency(Math.ceil((totals?.totalAmount || 0) * 0.5))})
+                                                    <AlertCircle className="h-3 w-3" /> Min. {formatCurrency(Math.ceil((totals?.totalAmount || 0) * 0.5))}
                                                 </p>
                                             )}
                                         </motion.div>
                                     )}
 
-                                    <div className="p-6 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <p className="text-xs text-gray-600 leading-relaxed italic">
-                                            "The remaining balance must be settled according to our final settlement policy as outlined in the <Link href="/rental-agreement" target="_blank" className="text-gold font-bold hover:underline">Rental Agreement</Link>."
-                                        </p>
-                                    </div>
+                                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                                        Remaining balance follows the{' '}
+                                        <Link href="/rental-agreement" target="_blank" className="text-gold font-semibold hover:underline">
+                                            rental agreement
+                                        </Link>.
+                                    </p>
                                 </div>
                             </div>
 
                             {/* Payment Method */}
-                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
-                                <div className="p-10 border-b border-border/5">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
-                                            <Truck className="h-6 w-6 text-gold" />
-                                        </div>
-                                        <h3 className="text-2xl font-serif font-bold text-gray-900">Payment Details</h3>
-                                    </div>
+                            <div className={cardClass}>
+                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border/5">
+                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-gray-900">Payment details</h3>
                                 </div>
-                                <div className="p-10">
+                                <div className="p-4 sm:p-6">
                                     {clientSecret ? (
                                         <Elements stripe={stripePromise} options={{ clientSecret }}>
                                             <StripePaymentForm
@@ -1321,146 +1258,130 @@ export default function CheckoutPage() {
                                             />
                                         </Elements>
                                     ) : (
-                                        <div className="flex flex-col items-center justify-center py-16 space-y-6">
-                                            <Loader2 className="h-10 w-10 animate-spin text-gold" />
-                                            <p className="text-sm font-light text-gray-500">Initializing secure payment...</p>
+                                        <div className="flex flex-col items-center justify-center py-10 space-y-3">
+                                            <Loader2 className="h-8 w-8 animate-spin text-gold" />
+                                            <p className="text-sm text-gray-500">Initializing secure payment…</p>
                                         </div>
                                     )}
                                 </div>
                             </div>
 
-                            {/* Signature Canvas */}
-                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
-                                <div className="p-10 border-b border-border/5">
-                                    <div className="flex items-center gap-4">
-                                        <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
-                                            <Check className="h-6 w-6 text-gold" />
-                                        </div>
-                                        <h3 className="text-2xl font-serif font-bold text-gray-900">Sign Your Agreement</h3>
-                                    </div>
+                            {/* Signature */}
+                            <div className={cardClass}>
+                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border/5">
+                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-gray-900">Sign agreement</h3>
                                 </div>
-                                <div className="p-10">
+                                <div className="p-4 sm:p-6">
                                     <SignatureCanvas
                                         onSave={setSignatureData}
                                         onClear={() => setSignatureData(null)}
                                     />
                                     {!signatureData && (
-                                        <p className="text-red-500 text-[10px] mt-2 font-bold uppercase tracking-widest">
-                                            Signature is required to proceed.
+                                        <p className="text-red-500 text-[10px] mt-2 font-bold uppercase tracking-wider">
+                                            Signature required
                                         </p>
                                     )}
                                 </div>
                             </div>
                         </div>
 
-                        <div className="lg:col-span-1">
-                            <div className="sticky top-24 bg-white rounded-[3rem] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.08)] border border-gold/10">
-                                <div className="bg-gradient-to-br from-[#1A1A1A] to-black text-white py-10 px-8">
-                                    <h3 className="text-2xl font-serif font-bold text-center">Order Summary</h3>
+                        <div className="lg:col-span-2">
+                            <div className="lg:sticky lg:top-24 bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.06)] border border-gold/10">
+                                <div className="bg-gradient-to-br from-[#1A1A1A] to-black text-white py-5 px-5 sm:px-6">
+                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-center">Order summary</h3>
                                 </div>
-                                <div className="p-10 space-y-8">
+                                <div className="p-5 sm:p-6 space-y-5">
                                     {totals ? (
-                                        <div className="space-y-6">
-                                            <div className="space-y-4">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-sm font-light text-gray-500">Subtotal</span>
-                                                    <span className="text-base font-medium text-gray-900">{formatCurrency(totals.subtotal)}</span>
-                                                </div>
-                                                {totals.discountAmount > 0 && (
-                                                    <div className="flex justify-between items-center text-green-600">
-                                                        <span className="text-sm font-medium">{totals.discountName || 'Discount'}</span>
-                                                        <span className="text-base font-medium">-{formatCurrency(totals.discountAmount)}</span>
-                                                    </div>
-                                                )}
-                                                {totals.setupFee > 0 && (
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-sm font-light text-gray-500">Setup Fee</span>
-                                                        <span className="text-base font-medium text-gray-900">{formatCurrency(totals.setupFee)}</span>
-                                                    </div>
-                                                )}
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-sm font-light text-gray-500">Tax ({(totals.taxRate * 100).toFixed(2)}%)</span>
-                                                    <span className="text-base font-medium text-gray-900">{formatCurrency(totals.taxAmount)}</span>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-sm font-light text-gray-500">Delivery Fee</span>
-                                                    <span className="text-base font-medium text-gray-900">{isCalculating ? '...' : formatCurrency(totals.deliveryFee)}</span>
-                                                </div>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-500">Subtotal</span>
+                                                <span className="font-medium text-gray-900">{formatCurrency(totals.subtotal)}</span>
                                             </div>
-
-                                            <div className="pt-6 border-t border-gold/10">
-                                                <div className="flex justify-between items-baseline">
-                                                    <span className="text-lg font-serif font-bold text-gray-900">Total</span>
-                                                    <span className="font-bold text-3xl text-gold">{formatCurrency(totals.totalAmount)}</span>
+                                            {totals.discountAmount > 0 && (
+                                                <div className="flex justify-between text-sm text-green-600">
+                                                    <span className="font-medium">{totals.discountName || 'Discount'}</span>
+                                                    <span className="font-medium">-{formatCurrency(totals.discountAmount)}</span>
                                                 </div>
+                                            )}
+                                            {totals.setupFee > 0 && (
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-gray-500">Setup fee</span>
+                                                    <span className="font-medium text-gray-900">{formatCurrency(totals.setupFee)}</span>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-500">Tax ({(totals.taxRate * 100).toFixed(2)}%)</span>
+                                                <span className="font-medium text-gray-900">{formatCurrency(totals.taxAmount)}</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-500">Delivery</span>
+                                                <span className="font-medium text-gray-900">{isCalculating ? '…' : formatCurrency(totals.deliveryFee)}</span>
+                                            </div>
+                                            <div className="pt-3 border-t border-gold/10 flex justify-between items-baseline">
+                                                <span className="text-base font-serif font-bold text-gray-900">Total</span>
+                                                <span className="font-bold text-2xl text-gold">{formatCurrency(totals.totalAmount)}</span>
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="flex justify-center py-12">
-                                            <Loader2 className="h-10 w-10 animate-spin text-gold" />
+                                        <div className="flex justify-center py-8">
+                                            <Loader2 className="h-8 w-8 animate-spin text-gold" />
                                         </div>
                                     )}
 
-                                    {/* Rental Agreement */}
-                                    <div className="p-8 bg-gold/5 rounded-[2rem] border border-gold/10 space-y-4">
-                                        <div className="flex items-start gap-5">
-                                            <div className="pt-0.5">
-                                                <div
-                                                    onClick={() => setAgreesToRentalAgreement(!agreesToRentalAgreement)}
-                                                    className={cn(
-                                                        "h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 cursor-pointer",
-                                                        agreesToRentalAgreement ? "bg-gold border-gold" : "border-gold/30 hover:border-gold"
-                                                    )}
+                                    <div className="p-4 bg-gold/5 rounded-2xl border border-gold/10">
+                                        <div className="flex items-start gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => setAgreesToRentalAgreement(!agreesToRentalAgreement)}
+                                                className={cn(
+                                                    "mt-0.5 h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all",
+                                                    agreesToRentalAgreement ? "bg-gold border-gold" : "border-gold/30 hover:border-gold"
+                                                )}
+                                                aria-pressed={agreesToRentalAgreement}
+                                                aria-label="Agree to rental agreement"
+                                            >
+                                                {agreesToRentalAgreement && <Check className="h-2.5 w-2.5 text-black stroke-[3]" />}
+                                            </button>
+                                            <label
+                                                className="text-xs sm:text-sm font-medium cursor-pointer leading-relaxed text-gray-900"
+                                                onClick={() => setAgreesToRentalAgreement(!agreesToRentalAgreement)}
+                                            >
+                                                I agree to the{' '}
+                                                <Link
+                                                    href="/rental-agreement"
+                                                    target="_blank"
+                                                    className="text-gold underline underline-offset-2 font-bold"
+                                                    onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    {agreesToRentalAgreement && <Check className="h-3 w-3 text-black stroke-[3]" />}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 space-y-3">
-                                                <label
-                                                    htmlFor="rental-agreement"
-                                                    className="text-sm font-medium cursor-pointer leading-relaxed block select-none text-gray-900"
-                                                    onClick={() => setAgreesToRentalAgreement(!agreesToRentalAgreement)}
-                                                >
-                                                    I agree to the{' '}
-                                                    <Link
-                                                        href="/rental-agreement"
-                                                        target="_blank"
-                                                        className="text-gold hover:text-gold/80 underline underline-offset-4 font-bold transition-colors"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                    >
-                                                        PrimeLux Events Rental Agreement
-                                                    </Link>
-                                                    {' '}terms and conditions
-                                                </label>
-                                                <p className="text-xs text-gray-500 leading-relaxed font-light">
-                                                    By checking this box, you acknowledge that you have read, understood, and agree to be bound by all terms and conditions in our rental agreement.
-                                                </p>
-                                            </div>
+                                                    rental agreement
+                                                </Link>
+                                            </label>
                                         </div>
                                     </div>
 
                                     {!clientSecret && (
                                         <Button
-                                            className="w-full h-16 bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full text-[11px] font-bold uppercase tracking-[0.2em] shadow-2xl transition-all duration-500 group"
+                                            className="w-full h-12 bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full text-[11px] font-bold uppercase tracking-[0.16em]"
                                             onClick={handleSubmit}
                                             disabled={isLoading || isCalculating || !totals || !agreesToRentalAgreement || !signatureData}
                                         >
                                             {isLoading ? (
                                                 <>
-                                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                    Processing Order...
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Processing…
                                                 </>
                                             ) : (
-                                                <>Place Order <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /></>
+                                                <>Place order <ArrowRight className="ml-2 h-4 w-4" /></>
                                             )}
                                         </Button>
                                     )}
 
                                     <button
+                                        type="button"
                                         onClick={handlePrevStep}
-                                        className="w-full text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 hover:text-gold transition-colors flex items-center justify-center gap-2 group py-4"
+                                        className="w-full text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 hover:text-gold transition-colors flex items-center justify-center gap-1.5 py-2"
                                     >
-                                        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" /> Back to Details
+                                        <ArrowLeft className="h-4 w-4" /> Back
                                     </button>
                                 </div>
                             </div>
@@ -1486,6 +1407,6 @@ export default function CheckoutPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div >
+        </div>
     )
 }
