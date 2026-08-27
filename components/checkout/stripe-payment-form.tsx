@@ -57,7 +57,7 @@ export function StripePaymentForm({ onSuccess, amount, disabled }: StripePayment
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
             <PaymentElement />
 
             {errorMessage && (
@@ -70,12 +70,12 @@ export function StripePaymentForm({ onSuccess, amount, disabled }: StripePayment
             <Button
                 type="submit"
                 disabled={!stripe || isProcessing || disabled}
-                className="w-full h-14 text-lg bg-gold text-black hover:bg-gold/90 rounded-full font-medium shadow-lg hover:shadow-gold/20 transition-all duration-300"
+                className="w-full h-12 text-base bg-gold text-black hover:bg-gold/90 rounded-full font-medium shadow-md transition-all duration-300"
             >
                 {isProcessing ? (
                     <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Processing Payment...
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing…
                     </>
                 ) : (
                     `Pay ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount / 100)}`
