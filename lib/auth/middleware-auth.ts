@@ -67,8 +67,6 @@ export async function getCurrentUserFromRequest(request: NextRequest): Promise<U
 // Helper to get user profile using an existing Supabase client (avoids creating a new one in middleware)
 export async function getUserProfileForMiddleware(supabase: any, userId: string): Promise<UserProfile | null> {
     try {
-        console.log('Middleware: Fetching profile for user:', userId)
-
         // 1. Get user profile with roles and permissions in ONE query
         const { data: profileData, error: profileError } = await supabase
             .from('user_profiles')
@@ -132,7 +130,6 @@ export async function getUserProfileForMiddleware(supabase: any, userId: string)
         })
 
         const permissions = Array.from(permissionsMap.values())
-        console.log('Middleware: Profile found, roles count:', roles.length, 'permissions count:', permissions.length)
 
         return {
             id: profileData.id,

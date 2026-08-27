@@ -4,12 +4,11 @@ import { requirePermission } from '@/lib/auth/authorization'
 
 export async function POST(request: NextRequest) {
     try {
-        // Require permission to invite users
         await requirePermission('users.create')
 
         const supabase = await createClient()
         const body = await request.json()
-        const { email, role_ids, temp_password } = body
+        const { email, role_ids } = body
 
         if (!email || !role_ids || !Array.isArray(role_ids) || role_ids.length === 0) {
             return NextResponse.json(
@@ -18,15 +17,13 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Generate invitation token and expiry
+        // Invitation token is the sole secret (UUID in the invite URL)
         const invitation_token = crypto.randomUUID()
         const expires_at = new Date()
-        expires_at.setDate(expires_at.getDate() + 7) // 7 days
+        expires_at.setDate(expires_at.getDate() + 7)
 
-        // Get current user for invited_by
         const { data: { user } } = await supabase.auth.getUser()
 
-        // Check for existing invitation
         const { data: existingInvitation } = await supabase
             .from('user_invitations')
             .select('id, status')
@@ -43,7 +40,7 @@ export async function POST(request: NextRequest) {
         const invitationData = {
             email: email.toLowerCase().trim(),
             role_ids,
-            temp_password,
+            temp_password: null,
             invitation_token,
             expires_at: expires_at.toISOString(),
             invited_by: user?.id,
@@ -51,21 +48,19 @@ export async function POST(request: NextRequest) {
             updated_at: new Date().toISOString()
         }
 
-        let result;
+        let result
         if (existingInvitation) {
-            // Update existing invitation
             result = await supabase
                 .from('user_invitations')
                 .update(invitationData)
                 .eq('id', existingInvitation.id)
-                .select()
+                .select('id, email, expires_at, invitation_token, status, created_at, invited_by')
                 .single()
         } else {
-            // Create new invitation
             result = await supabase
                 .from('user_invitations')
                 .insert(invitationData)
-                .select()
+                .select('id, email, expires_at, invitation_token, status, created_at, invited_by')
                 .single()
         }
 
@@ -74,9 +69,6 @@ export async function POST(request: NextRequest) {
         }
 
         const data = result.data
-
-        // TODO: Send invitation email
-        // For now, just return success with the invitation details
 
         return NextResponse.json({
             success: true,
@@ -99,14 +91,14 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
     try {
-        // Require permission to view invitations
         await requirePermission('users.view')
 
         const supabase = await createClient()
 
+        // Never return temp_password (legacy plaintext column)
         const { data, error } = await supabase
             .from('user_invitations')
-            .select('*')
+            .select('id, email, status, expires_at, created_at, invitation_token, invited_by, role_ids')
             .order('created_at', { ascending: false })
 
         if (error) throw error
@@ -124,7 +116,7 @@ export async function GET() {
 
 export async function DELETE(request: NextRequest) {
     try {
-        await requirePermission('users.update') // Use users.update for cancelling
+        await requirePermission('users.update')
 
         const { searchParams } = new URL(request.url)
         const id = searchParams.get('id')
@@ -168,7 +160,7 @@ export async function PATCH(request: NextRequest) {
             .from('user_invitations')
             .update({
                 expires_at,
-                status: 'pending' // Reset to pending if it was expired
+                status: 'pending'
             })
             .eq('id', id)
 

@@ -47,10 +47,10 @@ export default async function TeamManagementPage() {
             .select('*')
             .order('display_name')
 
-        // Fetch pending and expired invitations
+        // Fetch pending and expired invitations (never select temp_password)
         const { data: invitationsRes, error: invitationsError } = await serviceRoleSupabase
             .from('user_invitations')
-            .select('*')
+            .select('id, email, status, expires_at, created_at, invitation_token, invited_by, role_ids')
             .in('status', ['pending', 'expired'])
             .order('created_at', { ascending: false })
 

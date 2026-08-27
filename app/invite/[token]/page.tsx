@@ -14,7 +14,6 @@ interface InvitationData {
     email: string
     role_ids: string[]
     expires_at: string
-    requires_temp_password: boolean
 }
 
 export default function AcceptInvitationPage({ params }: { params: Promise<{ token: string }> }) {
@@ -26,7 +25,6 @@ export default function AcceptInvitationPage({ params }: { params: Promise<{ tok
         password: '',
         confirmPassword: '',
         fullName: '',
-        tempPassword: ''
     })
     const router = useRouter()
 
@@ -68,8 +66,8 @@ export default function AcceptInvitationPage({ params }: { params: Promise<{ tok
             return
         }
 
-        if (formData.password.length < 6) {
-            toast.error('Password must be at least 6 characters')
+        if (formData.password.length < 8) {
+            toast.error('Password must be at least 8 characters')
             return
         }
 
@@ -83,7 +81,6 @@ export default function AcceptInvitationPage({ params }: { params: Promise<{ tok
                 body: JSON.stringify({
                     password: formData.password,
                     full_name: formData.fullName || null,
-                    temp_password: formData.tempPassword
                 })
             })
 
@@ -169,23 +166,6 @@ export default function AcceptInvitationPage({ params }: { params: Promise<{ tok
                             />
                         </div>
 
-                        {invitation.requires_temp_password && (
-                            <div>
-                                <Label htmlFor="tempPassword">Temporary Password</Label>
-                                <Input
-                                    id="tempPassword"
-                                    type="text"
-                                    value={formData.tempPassword}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, tempPassword: e.target.value }))}
-                                    placeholder="Enter the temporary password provided by admin"
-                                    required
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                    You should have received this from your administrator
-                                </p>
-                            </div>
-                        )}
-
                         <div>
                             <Label htmlFor="password">Password</Label>
                             <Input
@@ -195,10 +175,10 @@ export default function AcceptInvitationPage({ params }: { params: Promise<{ tok
                                 onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                                 placeholder="Create a password"
                                 required
-                                minLength={6}
+                                minLength={8}
                             />
                             <p className="text-xs text-gray-500 mt-1">
-                                Must be at least 6 characters long
+                                Must be at least 8 characters long
                             </p>
                         </div>
 

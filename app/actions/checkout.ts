@@ -1,8 +1,8 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getDistanceBetweenAddresses } from '@/lib/geocoding'
-import { stripe, createMockPaymentIntent } from '@/lib/stripe'
+import { stripe, createMockPaymentIntent, allowMockPayments } from '@/lib/stripe'
 import { resolvePriceCents } from '@/lib/catalog/adapters'
 
 export interface CheckoutFormData {
@@ -258,7 +258,10 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
  */
 export async function createOrder(formData: CheckoutFormData, items: CartItem[], paymentIntentId?: string, signatureUrl?: string, paidAmount?: number) {
     try {
+        // Session client for identity; service role for writes after server-side validation
+        // (RLS no longer allows open public inserts on orders / items / reservations).
         const supabase = await createClient()
+        const admin = createServiceClient()
 
         // Calculate totals
         const totals = await calculateOrderTotal(items, formData.deliveryAddress)
@@ -326,7 +329,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
             throw new Error('Some packages in your cart are no longer available.')
         }
 
-        // Use provided payment intent ID or create a new one (mock if no Stripe key)
+        // Use provided payment intent ID, create a real Stripe PI, or (dev-only) a mock
         let finalPaymentIntentId = paymentIntentId
         if (!finalPaymentIntentId) {
             if (stripe) {
@@ -338,9 +341,11 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                     },
                 })
                 finalPaymentIntentId = paymentIntent.id
-            } else {
+            } else if (allowMockPayments()) {
                 const paymentIntent = await createMockPaymentIntent(paidAmount ?? totals.totalAmount)
                 finalPaymentIntentId = paymentIntent.id
+            } else {
+                throw new Error('Stripe is not configured. Payments cannot be processed.')
             }
         }
 
@@ -431,8 +436,8 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
             ? (initialBalancePaid >= totals.totalAmount ? 'paid' : 'partially_paid')
             : 'unpaid'
 
-        // Create order
-        const { data: order, error: orderError } = await supabase
+        // Create order (service role — validated above)
+        const { data: order, error: orderError } = await admin
             .from('orders')
             .insert({
                 customer_name: formData.customerName,
@@ -540,7 +545,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         })
 
         if (orderItems.length > 0) {
-            const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
+            const { error: itemsError } = await admin.from('order_items').insert(orderItems)
             if (itemsError) {
                 console.error('Error creating order items:', itemsError)
                 throw new Error('Failed to create order items')
@@ -558,7 +563,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         }))
 
         if (reservations.length > 0) {
-            const { error: reservationError } = await supabase.from('rental_reservations').insert(reservations)
+            const { error: reservationError } = await admin.from('rental_reservations').insert(reservations)
             if (reservationError) {
                 console.error('Error creating reservations:', reservationError)
             }
@@ -579,18 +584,16 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
 }
 
 /**
- * Confirm payment (placeholder for Stripe integration)
+ * Confirm payment (Stripe only — mock confirmations are blocked in production)
  */
 export async function confirmPayment(paymentIntentId: string) {
     try {
-        const supabase = await createClient()
+        const admin = createServiceClient()
 
         if (stripe) {
-            // Real Stripe confirmation
             const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
 
-            // Update order payment status
-            await supabase
+            await admin
                 .from('orders')
                 .update({
                     payment_status: paymentIntent.status === 'succeeded' ? 'paid' : paymentIntent.status,
@@ -602,20 +605,23 @@ export async function confirmPayment(paymentIntentId: string) {
                 success: true,
                 status: paymentIntent.status,
             }
-        } else {
-            // Mock confirmation for development
-            await supabase
-                .from('orders')
-                .update({
-                    payment_status: 'paid',
-                    payment_method: 'mock_card',
-                })
-                .eq('payment_intent_id', paymentIntentId)
+        }
 
-            return {
-                success: true,
-                status: 'succeeded',
-            }
+        if (!allowMockPayments()) {
+            throw new Error('Stripe is not configured')
+        }
+
+        await admin
+            .from('orders')
+            .update({
+                payment_status: 'paid',
+                payment_method: 'mock_card',
+            })
+            .eq('payment_intent_id', paymentIntentId)
+
+        return {
+            success: true,
+            status: 'succeeded',
         }
     } catch (error) {
         console.error('Error confirming payment:', error)

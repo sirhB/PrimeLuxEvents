@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Loader2, Check, AlertCircle, CalendarIcon, Clock, ArrowRight, ArrowLeft, ShoppingBag, Plus, Minus, Package, X } from 'lucide-react'
 import { createOrder, calculateOrderTotal, type CheckoutFormData, type CartItem } from '@/app/actions/checkout'
+import { uploadSignatureImage } from '@/app/actions/upload-signature'
 import { formatCurrency } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/client'
 import { adaptProduct, resolvePriceCents } from '@/lib/catalog/adapters'
@@ -421,27 +422,12 @@ export default function CheckoutPage() {
 
             let signatureUrl = ''
             if (signatureData) {
-                const supabase = createClient()
-                const fileName = `${paymentIntentId}-signature.png`
-                const base64Data = signatureData.split(',')[1]
-                const binaryData = atob(base64Data)
-                const array = []
-                for (let i = 0; i < binaryData.length; i++) {
-                    array.push(binaryData.charCodeAt(i))
-                }
-                const blob = new Blob([new Uint8Array(array)], { type: 'image/png' })
-
-                const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from('signatures')
-                    .upload(fileName, blob, { upsert: true })
-
-                if (uploadError) {
-                    console.error('Error uploading signature:', uploadError)
-                } else {
-                    const { data: publicUrl } = supabase.storage
-                        .from('signatures')
-                        .getPublicUrl(fileName)
-                    signatureUrl = publicUrl.publicUrl
+                const fileName = `${paymentIntentId || 'checkout'}-signature.png`
+                const upload = await uploadSignatureImage(signatureData, fileName)
+                if (upload.url) {
+                    signatureUrl = upload.url
+                } else if (upload.error) {
+                    console.error('Error uploading signature:', upload.error)
                 }
             }
 
