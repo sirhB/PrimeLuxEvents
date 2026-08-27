@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import dynamic from 'next/dynamic'
 import { AdminPage } from '@/components/admin/page-shell'
+import { buildIlikeOrFilter } from '@/lib/supabase/filter-sanitize'
 
 const AppointmentsContent = dynamic(
     () => import('@/components/admin/appointments/appointments-content').then(mod => mod.AppointmentsContent)
@@ -26,9 +27,11 @@ export default async function AppointmentsPage({
         .order('appointment_time', { ascending: true })
 
     if (search) {
-        query = query.or(
-            `id.ilike.%${search}%,client_name.ilike.%${search}%,client_email.ilike.%${search}%,location.ilike.%${search}%`
+        const orFilter = buildIlikeOrFilter(
+            ['id', 'client_name', 'client_email', 'location'],
+            search,
         )
+        if (orFilter) query = query.or(orFilter)
     }
 
     if (status) {

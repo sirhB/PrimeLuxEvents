@@ -2,7 +2,7 @@
 
 This plan covers launching **PrimeLux Events** (Next.js + Supabase + Stripe on Vercel) safely. Follow phases in order; do not go live until **Phase 0–4** blockers are cleared.
 
-> **Implementation status (code):** Phase 0 hardening is in progress on branch `cursor/production-launch-plan-550f` — mock payments fail closed, Stripe webhook uses service role, checkout/consultation/signature writes go through service-role server actions, invite plaintext passwords removed, security headers added, CI workflow added, and migration `20260827_production_rls_hardening.sql` must be applied on Supabase before relying on the tightened RLS.
+> **Implementation status (code):** Phase 0 hardening is in progress on branch `cursor/production-launch-plan-550f` — mock payments fail closed, Stripe webhook uses service role, checkout/consultation/signature writes go through service-role server actions, invite plaintext passwords removed, security headers added, CI workflow added, and migration `20260827_production_rls_hardening.sql` must be applied on Supabase before relying on the tightened RLS. **Database data safety follow-up:** apply `20260829_database_data_safety.sql` (staff-only ops RLS, signature/claim RPCs, staff-only user search, tighter GRANTs). Catalog reads use the anon key (no `cost_cents`); checkout amounts are server-authoritative; admin auth cache is HMAC-signed.
 
 **Stack assumptions**
 - App: Next.js 16 (App Router) on **Vercel**

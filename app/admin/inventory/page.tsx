@@ -18,6 +18,7 @@ import { SearchInput } from '@/components/admin/search-input'
 import { PaginationControls } from '@/components/admin/pagination-controls'
 import { InventoryStatsCards } from '@/components/admin/inventory/inventory-stats-cards'
 import { LowStockWidget } from '@/components/admin/inventory/low-stock-widget'
+import { buildIlikeOrFilter } from '@/lib/supabase/filter-sanitize'
 
 export default async function InventoryPage({
     searchParams,
@@ -65,7 +66,8 @@ export default async function InventoryPage({
         .order('name')
 
     if (search) {
-        query = query.or(`name.ilike.%${search}%,sku.ilike.%${search}%`)
+        const orFilter = buildIlikeOrFilter(['name', 'sku'], search)
+        if (orFilter) query = query.or(orFilter)
     }
 
     // If we are on low-stock tab, filter query

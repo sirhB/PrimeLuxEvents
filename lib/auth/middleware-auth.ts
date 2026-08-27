@@ -1,7 +1,37 @@
 import { createServerClient } from '@supabase/ssr'
 import type { NextRequest } from 'next/server'
-import { cache } from 'react'
+import { createHmac, timingSafeEqual } from 'crypto'
 import { requireSupabaseAnonKey, requireSupabaseUrl } from '@/lib/supabase/env'
+import { getSupabaseServiceRoleKey } from '@/lib/supabase/env'
+
+type AuthCachePayload = {
+    id: string
+    roles: string[]
+    active: boolean
+    ts: number
+}
+
+function getAuthCacheSecret(): string | null {
+    const dedicated = process.env.AUTH_CACHE_SECRET?.trim()
+    if (dedicated) return dedicated
+    // Prefer a server-only secret; service role is never exposed to the browser
+    return getSupabaseServiceRoleKey() || null
+}
+
+function signPayload(payloadB64: string, secret: string): string {
+    return createHmac('sha256', secret).update(payloadB64).digest('base64url')
+}
+
+function safeEqual(a: string, b: string): boolean {
+    try {
+        const bufA = Buffer.from(a)
+        const bufB = Buffer.from(b)
+        if (bufA.length !== bufB.length) return false
+        return timingSafeEqual(bufA, bufB)
+    } catch {
+        return false
+    }
+}
 
 export interface UserProfile {
     id: string
@@ -152,27 +182,62 @@ export async function getUserProfileForMiddleware(supabase: any, userId: string)
 }
 
 /**
- * Serializes minimal profile info for cookie-based caching in middleware.
- * Focuses on authorization fields to keep cookie size small.
+ * Serializes minimal profile info for an HMAC-signed middleware cookie.
+ * Returns null when no server secret is available (caller should skip cache).
  */
-export function serializeAuthCache(profile: UserProfile): string {
-    const minProfile = {
+export function serializeAuthCache(profile: UserProfile): string | null {
+    const secret = getAuthCacheSecret()
+    if (!secret) return null
+
+    const minProfile: AuthCachePayload = {
         id: profile.id,
-        roles: profile.roles.map(r => r.name),
+        roles: profile.roles.map((r) => r.name),
         active: profile.is_active,
-        ts: Date.now()
+        ts: Date.now(),
     }
-    return Buffer.from(JSON.stringify(minProfile)).toString('base64')
+    const payloadB64 = Buffer.from(JSON.stringify(minProfile)).toString('base64url')
+    const sig = signPayload(payloadB64, secret)
+    return `${payloadB64}.${sig}`
 }
 
 /**
- * Deserializes profile info from middleware cookie.
+ * Deserializes and verifies an HMAC-signed auth cache cookie.
+ * Rejects unsigned legacy Base64 cookies and forged payloads.
  */
-export function deserializeAuthCache(token: string): { id: string, roles: string[], active: boolean, ts: number } | null {
+export function deserializeAuthCache(token: string): AuthCachePayload | null {
     try {
-        const decoded = Buffer.from(token, 'base64').toString()
-        return JSON.parse(decoded)
-    } catch (e) {
+        const secret = getAuthCacheSecret()
+        if (!secret) return null
+
+        const dot = token.lastIndexOf('.')
+        if (dot <= 0) return null
+
+        const payloadB64 = token.slice(0, dot)
+        const sig = token.slice(dot + 1)
+        if (!payloadB64 || !sig) return null
+
+        const expected = signPayload(payloadB64, secret)
+        if (!safeEqual(sig, expected)) return null
+
+        const decoded = Buffer.from(payloadB64, 'base64url').toString('utf8')
+        const parsed = JSON.parse(decoded) as AuthCachePayload
+
+        if (
+            typeof parsed?.id !== 'string' ||
+            !Array.isArray(parsed.roles) ||
+            typeof parsed.active !== 'boolean' ||
+            typeof parsed.ts !== 'number'
+        ) {
+            return null
+        }
+
+        return {
+            id: parsed.id,
+            roles: parsed.roles.filter((r): r is string => typeof r === 'string'),
+            active: parsed.active,
+            ts: parsed.ts,
+        }
+    } catch {
         return null
     }
 }

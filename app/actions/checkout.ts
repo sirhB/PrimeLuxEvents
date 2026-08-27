@@ -8,6 +8,27 @@ import {
     getPartnerBaseDiscountPercent,
     getPartnerProfileForUser,
 } from '@/lib/auth/partners'
+import { clampCheckoutAmount } from '@/lib/security/checkout-amounts'
+import { checkRateLimit, clientIpFromHeaders } from '@/lib/security/rate-limit'
+import { headers } from 'next/headers'
+import { z } from 'zod'
+
+const checkoutFormSchema = z.object({
+    customerName: z.string().min(1).max(200),
+    customerEmail: z.string().email().max(200),
+    customerPhone: z.string().min(1).max(40),
+    deliveryAddress: z.string().min(1).max(500),
+    deliveryDate: z.string().min(1).max(40),
+    deliveryTime: z.string().min(1).max(40),
+    deliveryNotes: z.string().max(2000).optional(),
+    eventDate: z.string().min(1).max(40),
+    eventType: z.string().min(1).max(100),
+    venueAddress: z.string().max(500).optional().default(''),
+    pickupDate: z.string().max(40).optional(),
+    pickupTime: z.string().max(40).optional(),
+    pickupNotes: z.string().max(2000).optional(),
+    sameDayPickup: z.boolean().optional(),
+})
 
 export interface CheckoutFormData {
     customerName: string
@@ -120,15 +141,39 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
         }))
     }
 
+    // Fetch package prices from DB — never trust client packageData.price
+    const packageIds = [
+        ...new Set(
+            items.filter((item) => item.packageId).map((item) => item.packageId as string),
+        ),
+    ]
+    const packagePriceById = new Map<string, { id: string; name: string; price: number }>()
+    if (packageIds.length > 0) {
+        const { data: pkgRows, error: pkgErr } = await supabase
+            .from('packages')
+            .select('id, name, price')
+            .in('id', packageIds)
+        if (pkgErr) throw new Error('Failed to fetch packages')
+        for (const row of pkgRows || []) {
+            packagePriceById.set(row.id, {
+                id: row.id,
+                name: row.name,
+                price: resolvePriceCents({ price: row.price }),
+            })
+        }
+    }
+
     // Calculate subtotal
     let subtotal = 0
     let setupFee = 0
 
     items.forEach((item) => {
-        // Handle Package Items
-        if (item.packageId && item.packageData) {
-            subtotal += resolvePriceCents({ price: item.packageData.price }) * item.quantity
-            // Packages might have their own setup fee logic, usually included or 0
+        // Handle Package Items — price from DB only
+        if (item.packageId) {
+            const pkg = packagePriceById.get(item.packageId)
+            if (pkg) {
+                subtotal += pkg.price * item.quantity
+            }
             return
         }
 
@@ -136,9 +181,12 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
         if (item.productId) {
             const product = products.find((p) => p.id === item.productId)
             if (product) {
-                // Calculate modifier price
+                // Modifiers: only accept finite numeric adjustments; re-validate against known modifiers when available
                 const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
-                    return acc + (curr.priceAdjustment || 0)
+                    const adj = typeof curr?.priceAdjustment === 'number' && Number.isFinite(curr.priceAdjustment)
+                        ? curr.priceAdjustment
+                        : 0
+                    return acc + adj
                 }, 0)
 
                 subtotal += (product.price + modifiersPrice) * item.quantity
@@ -221,6 +269,7 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
         deliveryFee,
         totalAmount,
         products,
+        packagePriceById: Object.fromEntries(packagePriceById),
     }
 }
 
@@ -229,12 +278,30 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
  */
 export async function createOrder(formData: CheckoutFormData, items: CartItem[], paymentIntentId?: string, signatureUrl?: string, paidAmount?: number) {
     try {
+        const hdrs = await headers()
+        const ip = clientIpFromHeaders(hdrs)
+        const rate = checkRateLimit(`checkout:${ip}`, 10, 60_000)
+        if (!rate.allowed) {
+            return { success: false, error: 'Too many checkout attempts. Please try again shortly.' }
+        }
+
+        const parsedForm = checkoutFormSchema.safeParse(formData)
+        if (!parsedForm.success) {
+            return { success: false, error: 'Invalid checkout form data' }
+        }
+        const validForm = parsedForm.data as CheckoutFormData
+        formData = validForm
+
+        if (!Array.isArray(items) || items.length === 0 || items.length > 100) {
+            return { success: false, error: 'Invalid cart' }
+        }
+
         // Session client for identity; service role for writes after server-side validation
         // (RLS no longer allows open public inserts on orders / items / reservations).
         const supabase = await createClient()
         const admin = createServiceClient()
 
-        // Calculate totals
+        // Calculate totals (package/product prices from DB — ignore client prices)
         const totals = await calculateOrderTotal(items, formData.deliveryAddress)
 
         // Validate that all STANDARD items exist
@@ -252,8 +319,8 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         let allOptions: any[] = []
 
         if (packageIds.length > 0) {
-            // 1. Fetch basic packages and static items
-            const { data: pkgData, error: pkgError } = await supabase
+            // 1. Fetch basic packages and static items (service role for consistent reads)
+            const { data: pkgData, error: pkgError } = await admin
                 .from('packages')
                 .select('*, package_items(product_id, quantity)')
                 .in('id', packageIds)
@@ -300,21 +367,50 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
             throw new Error('Some packages in your cart are no longer available.')
         }
 
-        // Use provided payment intent ID, create a real Stripe PI, or (dev-only) a mock
+        // Use provided payment intent ID, create a real Stripe PI, or (dev-only) a mock.
+        // Amounts are always derived from server totals — never trust client paidAmount alone.
+        const { amount: authorizedAmount } = clampCheckoutAmount(paidAmount, totals.totalAmount)
+
         let finalPaymentIntentId = paymentIntentId
-        if (!finalPaymentIntentId) {
+        let verifiedPaidCents = 0
+        let paymentStatus: 'paid' | 'partially_paid' | 'unpaid' | 'processing' = 'unpaid'
+
+        if (finalPaymentIntentId) {
+            if (stripe) {
+                const paymentIntent = await stripe.paymentIntents.retrieve(finalPaymentIntentId)
+                const piAmount = paymentIntent.amount
+                const minDeposit = Math.ceil(totals.totalAmount * 0.5)
+                if (piAmount > totals.totalAmount || piAmount < minDeposit) {
+                    throw new Error('Payment amount does not match the authorized order total')
+                }
+                if (paymentIntent.status === 'succeeded') {
+                    verifiedPaidCents = Math.min(piAmount, totals.totalAmount)
+                    paymentStatus = verifiedPaidCents >= totals.totalAmount ? 'paid' : 'partially_paid'
+                } else {
+                    paymentStatus = 'processing'
+                    verifiedPaidCents = 0
+                }
+            } else if (allowMockPayments()) {
+                verifiedPaidCents = authorizedAmount
+                paymentStatus = verifiedPaidCents >= totals.totalAmount ? 'paid' : 'partially_paid'
+            } else {
+                throw new Error('Stripe is not configured. Payments cannot be processed.')
+            }
+        } else {
             if (stripe) {
                 const paymentIntent = await stripe.paymentIntents.create({
-                    amount: paidAmount ?? totals.totalAmount,
+                    amount: authorizedAmount,
                     currency: 'usd',
                     automatic_payment_methods: {
                         enabled: true,
                     },
                 })
                 finalPaymentIntentId = paymentIntent.id
+                paymentStatus = 'unpaid'
             } else if (allowMockPayments()) {
-                const paymentIntent = await createMockPaymentIntent(paidAmount ?? totals.totalAmount)
+                const paymentIntent = await createMockPaymentIntent(authorizedAmount)
                 finalPaymentIntentId = paymentIntent.id
+                paymentStatus = 'unpaid'
             } else {
                 throw new Error('Stripe is not configured. Payments cannot be processed.')
             }
@@ -402,11 +498,6 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
             data: { user: checkoutUser },
         } = await supabase.auth.getUser()
 
-        const initialBalancePaid = paidAmount ?? (paymentIntentId ? totals.totalAmount : 0)
-        const paymentStatus = paymentIntentId
-            ? (initialBalancePaid >= totals.totalAmount ? 'paid' : 'partially_paid')
-            : 'unpaid'
-
         // Create order (service role — validated above)
         const { data: order, error: orderError } = await admin
             .from('orders')
@@ -437,7 +528,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 same_day_pickup: formData.sameDayPickup || false,
                 signature_url: signatureUrl,
                 signed_at: signatureUrl ? new Date().toISOString() : null,
-                balance_paid: initialBalancePaid,
+                balance_paid: verifiedPaidCents,
             })
             .select()
             .single()
@@ -465,8 +556,9 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                     price_at_time: priceAtTime,
                     modifiers: item.modifiers || {}
                 })
-            } else if (item.packageId && item.packageData) {
+            } else if (item.packageId) {
                 const pkg = packages.find(p => p.id === item.packageId)
+                const dbPkg = totals.packagePriceById[item.packageId]
                 const packageContents: { productId: string, quantity: number, groupName: string }[] = []
 
                 if (pkg) {
@@ -493,7 +585,9 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 }
 
                 if (packageContents.length > 0) {
-                    const packagePrice = item.packageData.price
+                    // Price from DB package row — never client packageData.price
+                    const packagePrice = dbPkg?.price ?? 0
+                    const packageName = dbPkg?.name || item.packageData?.name || pkg?.name || 'Package'
                     const bundleId = crypto.randomUUID()
 
                     packageContents.forEach((content, index) => {
@@ -505,7 +599,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                                 price_at_time: index === 0 ? packagePrice : 0,
                                 modifiers: {},
                                 package_id: item.packageId,
-                                package_name: item.packageData?.name,
+                                package_name: packageName,
                                 bundle_id: bundleId,
                                 group_name: content.groupName
                             })
@@ -559,18 +653,54 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
  */
 export async function confirmPayment(paymentIntentId: string) {
     try {
+        if (!paymentIntentId || typeof paymentIntentId !== 'string' || paymentIntentId.length > 200) {
+            return { success: false, error: 'Invalid payment intent' }
+        }
+
         const admin = createServiceClient()
 
         if (stripe) {
             const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
 
-            await admin
+            const { data: order } = await admin
                 .from('orders')
-                .update({
-                    payment_status: paymentIntent.status === 'succeeded' ? 'paid' : paymentIntent.status,
-                    payment_method: paymentIntent.payment_method as string,
-                })
+                .select('id, total_amount, balance_paid')
                 .eq('payment_intent_id', paymentIntentId)
+                .maybeSingle()
+
+            if (!order) {
+                return { success: false, error: 'Order not found for payment' }
+            }
+
+            if (paymentIntent.status === 'succeeded') {
+                // Prefer webhook as source of truth; only set paid if PI amount is within order total
+                if (paymentIntent.amount > order.total_amount) {
+                    return { success: false, error: 'Payment amount exceeds order total' }
+                }
+
+                const newBalance = Math.min(
+                    order.total_amount,
+                    Math.max(order.balance_paid || 0, paymentIntent.amount_received || paymentIntent.amount),
+                )
+                const paymentStatus = newBalance >= order.total_amount ? 'paid' : 'partially_paid'
+
+                await admin
+                    .from('orders')
+                    .update({
+                        payment_status: paymentStatus,
+                        balance_paid: newBalance,
+                        payment_method: paymentIntent.payment_method as string,
+                    })
+                    .eq('id', order.id)
+            } else {
+                await admin
+                    .from('orders')
+                    .update({
+                        payment_status: paymentIntent.status,
+                        payment_method: paymentIntent.payment_method as string,
+                    })
+                    .eq('payment_intent_id', paymentIntentId)
+            }
 
             return {
                 success: true,

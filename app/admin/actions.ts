@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { requirePermission } from '@/lib/auth/authorization'
 import { revalidatePath } from 'next/cache'
+import { buildIlikeOrFilter, sanitizePostgrestFilterValue } from '@/lib/supabase/filter-sanitize'
 
 export interface SearchResult {
     id: string
@@ -20,34 +21,49 @@ export interface SearchResult {
 export async function searchAdmin(query: string): Promise<SearchResult[]> {
     if (!query || query.length < 2) return []
 
+    await requirePermission('orders.view')
+
+    const safeQuery = sanitizePostgrestFilterValue(query)
+    if (safeQuery.length < 2) return []
+
     const supabase = await createClient()
     const results: SearchResult[] = []
+
+    const customersOr = buildIlikeOrFilter(['full_name', 'email'], safeQuery)
+    const consultationsOr = buildIlikeOrFilter(['client_name', 'event_type'], safeQuery)
+    const ordersOr = buildIlikeOrFilter(['id'], safeQuery)
 
     // Parallelize queries
     const [products, orders, customers, consultations] = await Promise.all([
         // Products
         supabase.from('products')
             .select('id, name, price, stock')
-            .ilike('name', `%${query}%`)
+            .ilike('name', `%${safeQuery}%`)
             .limit(5),
 
         // Orders
-        supabase.from('orders')
-            .select('id, total_amount, status, created_at')
-            .or(`id.eq.${query},id.ilike.%${query}%`) // Allow searching by ID
-            .limit(5),
+        ordersOr
+            ? supabase.from('orders')
+                .select('id, total_amount, status, created_at')
+                .or(ordersOr)
+                .limit(5)
+            : Promise.resolve({ data: [] as any[], error: null }),
 
         // Customers (User Profiles)
-        supabase.from('user_profiles')
-            .select('id, full_name, email')
-            .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
-            .limit(5),
+        customersOr
+            ? supabase.from('user_profiles')
+                .select('id, full_name, email')
+                .or(customersOr)
+                .limit(5)
+            : Promise.resolve({ data: [] as any[], error: null }),
 
         // Consultations
-        supabase.from('consultations')
-            .select('id, client_name, event_type, status, scheduled_date')
-            .or(`client_name.ilike.%${query}%,event_type.ilike.%${query}%`)
-            .limit(5)
+        consultationsOr
+            ? supabase.from('consultations')
+                .select('id, client_name, event_type, status, scheduled_date')
+                .or(consultationsOr)
+                .limit(5)
+            : Promise.resolve({ data: [] as any[], error: null }),
     ])
 
     // Process Products

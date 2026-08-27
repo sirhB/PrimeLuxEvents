@@ -24,12 +24,26 @@ export function useAdminNotifications() {
         // Initial fetch
         async function fetchNotifications() {
             try {
-                const { data, error } = await supabase
+                const { data: { user } } = await supabase.auth.getUser()
+                const userId = user?.id
+                // Only interpolate a verified UUID into the filter expression
+                const uuidOk =
+                    typeof userId === 'string' &&
+                    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)
+
+                let q = supabase
                     .from('admin_notifications')
                     .select('*')
-                    .or(`user_id.eq.${(await supabase.auth.getUser()).data.user?.id},user_id.is.null`)
                     .order('created_at', { ascending: false })
                     .limit(20)
+
+                if (uuidOk) {
+                    q = q.or(`user_id.eq.${userId},user_id.is.null`)
+                } else {
+                    q = q.is('user_id', null)
+                }
+
+                const { data, error } = await q
 
                 if (error) {
                     console.error('Error fetching admin notifications:', error)

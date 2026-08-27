@@ -73,14 +73,17 @@ export async function updateSession(request: NextRequest) {
                             ['admin', 'manager', 'staff'].includes(role.name)
                         )
 
-                        // Update cache for next time
+                        // Update HMAC-signed cache for next time (skip if no secret)
                         const newCacheToken = serializeAuthCache(userProfile)
-                        supabaseResponse.cookies.set('admin-auth-cache', newCacheToken, {
-                            httpOnly: true,
-                            secure: process.env.NODE_ENV === 'production',
-                            maxAge: 60 * 60, // 1 hour (though we check timestamp internally for 5 mins)
-                            path: '/',
-                        })
+                        if (newCacheToken) {
+                            supabaseResponse.cookies.set('admin-auth-cache', newCacheToken, {
+                                httpOnly: true,
+                                secure: process.env.NODE_ENV === 'production',
+                                sameSite: 'lax',
+                                maxAge: 60 * 60, // 1 hour (timestamp checked for 5 mins)
+                                path: '/',
+                            })
+                        }
                     }
                 }
 
