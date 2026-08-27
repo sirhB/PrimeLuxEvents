@@ -10,6 +10,7 @@ import {
   Users,
   Tag,
   Truck,
+  CalendarDays,
   Box,
   QrCode,
   Archive,
@@ -67,6 +68,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     title: 'Fulfillment',
     items: [
       { icon: Truck, label: 'Logistics', href: '/admin/logistics', keywords: ['hub', 'ops'] },
+      { icon: CalendarDays, label: 'Warehouse schedule', href: '/admin/warehouse/schedule', keywords: ['pick', 'pack', 'load', 'warehouse tasks'] },
       { icon: Box, label: 'Delivery', href: '/admin/delivery', keywords: ['routes', 'dropoff'] },
       { icon: QrCode, label: 'Scanner', href: '/admin/scan', keywords: ['qr', 'pick'] },
       { icon: FileOutput, label: 'Pack slips', href: '/admin/pack-slip', keywords: ['packing', 'warehouse slip'] },
@@ -91,6 +93,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     title: 'Admin',
     items: [
       { icon: UserCog, label: 'Staff', href: '/admin/team', permission: 'team.view', keywords: ['users', 'roles', 'permissions'] },
+      { icon: CalendarDays, label: 'Staff shifts', href: '/admin/team/shifts', keywords: ['schedule', 'shifts', 'roster'] },
       { icon: Settings, label: 'Settings', href: '/admin/settings', permission: 'settings.view', keywords: ['company', 'hours'] },
     ],
   },

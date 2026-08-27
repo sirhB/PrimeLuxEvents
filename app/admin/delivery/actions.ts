@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 
 export interface CreateDeliveryData {
     orderId: string
-    taskType: 'delivery' | 'pickup' | 'return_trip'
+    taskType: 'delivery' | 'return_trip'
     scheduledDate: string
     scheduledTime?: string
     address: string
@@ -35,7 +35,7 @@ export async function createDeliveryTask(data: CreateDeliveryData) {
             .insert({
                 order_id: data.orderId,
                 task_type: data.taskType,
-                title: `${data.taskType === 'delivery' ? 'Delivery' : data.taskType === 'pickup' ? 'Pickup' : 'Return'} - ${data.address}`,
+                title: `${data.taskType === 'delivery' ? 'Delivery' : 'Return'} - ${data.address}`,
                 due_date: data.scheduledDate,
                 priority: data.priority || 'medium',
                 status: 'pending',

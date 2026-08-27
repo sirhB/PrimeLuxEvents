@@ -23,11 +23,9 @@ interface TaskFormData {
     assigned_role_id: string
     due_date: string
     task_type: string
-    event_id?: string
 }
 
 interface TaskFormProps {
-    eventId?: string
     task?: any // Using any to handle incoming data flexibly
     onSuccess?: () => void
     onCancel?: () => void
@@ -56,7 +54,7 @@ const taskTypes = [
     { value: 'return_trip', label: 'Return Trip', icon: Truck }
 ]
 
-export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) {
+export function TaskForm({ task, onSuccess, onCancel }: TaskFormProps) {
     const router = useRouter()
     const [teamMembers, setTeamMembers] = useState<any[]>([])
     const [roles, setRoles] = useState<any[]>([])
@@ -70,7 +68,6 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
         assigned_role_id: task?.assigned_role_id || '',
         due_date: task?.due_date || '',
         task_type: task?.task_type || 'general',
-        event_id: task?.event_id || eventId || ''
     })
 
     const [loading, setLoading] = useState(false)
@@ -122,7 +119,6 @@ export function TaskForm({ eventId, task, onSuccess, onCancel }: TaskFormProps) 
                     : selectedRole
                         ? `Role: ${selectedRole.display_name}`
                         : null,
-                event_id: formData.event_id || null,
                 updated_at: new Date().toISOString()
             }
 

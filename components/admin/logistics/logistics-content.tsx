@@ -110,6 +110,12 @@ export function LogisticsContent() {
                         </CardHeader>
                         <CardContent className="p-4 space-y-2">
                             <Button asChild variant="ghost" className="w-full justify-start gap-3 rounded-xl hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]">
+                                <Link href="/admin/warehouse/schedule">
+                                    <Calendar className="h-4 w-4" />
+                                    Warehouse Schedule
+                                </Link>
+                            </Button>
+                            <Button asChild variant="ghost" className="w-full justify-start gap-3 rounded-xl hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]">
                                 <Link href="/admin/scan">
                                     <Search className="h-4 w-4" />
                                     Inventory Scanner
