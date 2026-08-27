@@ -63,7 +63,7 @@ export function AccountSidebar() {
     }
 
     return (
-        <div className="flex h-screen w-64 flex-col border-r bg-background text-foreground shrink-0 sticky top-0">
+        <div className="hidden md:flex h-screen w-64 flex-col border-r bg-background text-foreground shrink-0 sticky top-0">
             <div className="flex h-16 items-center border-b px-6">
                 <Link className="flex items-center gap-2 font-serif font-semibold tracking-wide text-lg" href="/">
                     <span className="">PrimeLux Portal</span>

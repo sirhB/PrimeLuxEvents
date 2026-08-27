@@ -9,13 +9,11 @@ const CommandPalette = dynamic(() => import('@/components/admin/command-palette'
 import { AdminBottomBar } from '@/components/admin/admin-bottom-bar'
 import { cn } from '@/lib/utils'
 import { Search, User, Command, Menu } from 'lucide-react'
-import { usePwaContext } from '@/components/providers/pwa-provider'
 import { InstallPrompt } from '@/components/pwa/install-prompt'
 import { useState, useEffect } from 'react'
 
 export function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     const { isCollapsed, setIsMobileOpen } = useAdminSidebar()
-    const { isStandalone } = usePwaContext()
     const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
 
     useEffect(() => {
@@ -48,15 +46,14 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
                 {/* Admin Header / Top Bar */}
                 <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between border-b border-[var(--dashboard-border)] bg-[var(--dashboard-background)]/80 backdrop-blur-md px-4 md:px-8 pt-[env(safe-area-inset-top)]">
                     <div className="flex items-center gap-4 min-w-0">
-                        {/* Mobile Menu Toggle - Only show if not native (native has bottom bar) */}
-                        {!isStandalone && (
-                            <button
-                                onClick={() => setIsMobileOpen(true)}
-                                className="md:hidden p-2 -ml-2 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)] rounded-lg transition-colors"
-                            >
-                                <Menu className="h-6 w-6" />
-                            </button>
-                        )}
+                        {/* Mobile Menu Toggle */}
+                        <button
+                            onClick={() => setIsMobileOpen(true)}
+                            className="md:hidden p-2 -ml-2 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)] rounded-lg transition-colors"
+                            aria-label="Open menu"
+                        >
+                            <Menu className="h-6 w-6" />
+                        </button>
                         <div className="hidden md:flex relative w-64 group cursor-pointer" onClick={() => setIsCommandPaletteOpen(true)}>
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-accent-gold)] transition-colors" />
                             <div className="w-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] rounded-xl py-2 pl-10 pr-4 text-xs text-[var(--dashboard-text-muted)]/50 flex items-center justify-between group-hover:border-[var(--dashboard-accent-gold)]/30 transition-all">
