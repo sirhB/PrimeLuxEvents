@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { isWarehouseEligibleOrderStatus } from '@/lib/orders/status'
 import type { ChecklistItem, WarehouseCategory } from './types'
 
 function addDays(dateStr: string, days: number): string {
@@ -57,7 +58,7 @@ export async function generateWarehouseTasksForOrder(
         return { success: false, error: 'Order has no delivery date' }
     }
 
-    if (!['confirmed', 'processing', 'out_for_delivery'].includes(order.status)) {
+    if (!isWarehouseEligibleOrderStatus(order.status)) {
         return { success: false, error: 'Order status does not require warehouse tasks' }
     }
 
@@ -191,9 +192,8 @@ export async function generateWarehouseTasksForDeliveryDate(
 ): Promise<{ success: boolean; generated: number; errors: string[] }> {
     const { data: orders, error } = await supabase
         .from('orders')
-        .select('id')
+        .select('id, status')
         .eq('delivery_date', deliveryDate)
-        .in('status', ['confirmed', 'processing', 'out_for_delivery'])
 
     if (error) {
         return { success: false, generated: 0, errors: [error.message] }
@@ -202,7 +202,7 @@ export async function generateWarehouseTasksForDeliveryDate(
     const errors: string[] = []
     let generated = 0
 
-    for (const order of orders || []) {
+    for (const order of (orders || []).filter((row) => isWarehouseEligibleOrderStatus(row.status))) {
         const result = await generateWarehouseTasksForOrder(supabase, order.id)
         if (result.success) {
             generated++

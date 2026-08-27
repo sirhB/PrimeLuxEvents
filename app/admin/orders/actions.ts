@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { isWarehouseEligibleOrderStatus } from '@/lib/orders/status'
 import { generateWarehouseTasksForOrder } from '@/lib/warehouse/task-generator'
 
 
@@ -155,10 +156,7 @@ export async function updateOrder(orderId: string, data: UpdateOrderData) {
                 .eq('id', orderId)
                 .single()
 
-            if (
-                updatedOrder?.delivery_date &&
-                ['confirmed', 'processing', 'out_for_delivery'].includes(updatedOrder.status)
-            ) {
+            if (updatedOrder?.delivery_date && isWarehouseEligibleOrderStatus(updatedOrder.status)) {
                 await generateWarehouseTasksForOrder(supabase, orderId)
             }
         }
