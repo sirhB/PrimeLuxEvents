@@ -20,6 +20,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { useRouter } from 'next/navigation'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 interface PortfolioImage {
     id: string
@@ -82,35 +83,22 @@ export function CategoryImagesClient({ category, images }: CategoryImagesClientP
 
     return (
         <>
-            <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                    <div className="space-y-4">
-                        <Link
-                            href="/admin/portfolio"
-                            className="flex items-center gap-2 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] transition-colors text-xs font-bold uppercase tracking-widest"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            Back to Portfolio
-                        </Link>
-                        <div>
-                            <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                                {category.name}
-                            </h1>
-                            <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md mt-2">
-                                Manage the visual story of this collection.
-                            </p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-6">
+                <AdminPageHeader
+                    breadcrumbs={[{ label: 'Portfolio', href: '/admin/portfolio' }, { label: category.name }]}
+                    eyebrow="Content"
+                    title={category.name}
+                    description="Manage the visual story of this collection."
+                    actions={
                         <Button
                             onClick={() => setUploadDialogOpen(true)}
-                            className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium px-6"
+                            className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90"
                         >
                             <Plus className="mr-2 h-4 w-4" />
                             Upload Images
                         </Button>
-                    </div>
-                </div>
+                    }
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {images.map((image) => (
@@ -135,7 +123,7 @@ export function CategoryImagesClient({ category, images }: CategoryImagesClientP
                                     </div>
                                 </div>
                                 <div className="p-6 space-y-2">
-                                    <h3 className="font-serif text-lg text-[var(--dashboard-text)] truncate">
+                                    <h3 className="text-sm font-semibold text-[var(--dashboard-text)] truncate">
                                         {image.title || 'Untitled'}
                                     </h3>
                                     <p className="text-[var(--dashboard-text-muted)] text-sm font-light truncate">

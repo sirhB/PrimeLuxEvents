@@ -1,4 +1,5 @@
 import dynamic from 'next/dynamic'
+import { AdminPage } from '@/components/admin/page-shell'
 
 const LogisticsContent = dynamic(
     () => import('@/components/admin/logistics/logistics-content').then(mod => mod.LogisticsContent)
@@ -6,8 +7,8 @@ const LogisticsContent = dynamic(
 
 export default function LogisticsPage() {
     return (
-        <div className="p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+        <AdminPage>
             <LogisticsContent />
-        </div>
+        </AdminPage>
     )
 }

@@ -9,6 +9,8 @@ import { formatCents, formatCentsWithCommas } from '@/lib/format-money'
 import { ConsultationQuickActions } from '@/components/admin/consultations/consultation-quick-actions'
 import { CommunicationLog, type Communication } from '@/components/admin/consultations/communication-log'
 import { format } from 'date-fns'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default async function ConsultationDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
@@ -71,43 +73,28 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
     const token = getStatusToken(consultation.status)
 
     return (
-        <div className="flex flex-col gap-6 p-6 md:p-10 min-h-screen bg-[var(--dashboard-background)]">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                    <Button variant="outline" size="icon" className="h-9 w-9 border-muted-foreground/20" asChild>
-                        <Link href="/admin/consultations">
-                            <ArrowLeft className="h-4 w-4" />
-                        </Link>
-                    </Button>
-                    <div>
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-3xl font-serif font-medium text-[var(--dashboard-text)] tracking-tight">
-                                Result for {getDisplayName()}
-                            </h1>
-                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${token.color}`}>
-                                {token.label}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-1 text-sm text-[var(--dashboard-text-muted)]">
-                            <span className="font-mono text-xs opacity-70">ID: {consultation.id.slice(0, 8)}</span>
-                            <span>•</span>
-                            <span className="flex items-center gap-1">
-                                <Clock className="h-3.5 w-3.5" />
-                                {new Date(consultation.created_at).toLocaleDateString()}
-                            </span>
-                        </div>
+        <AdminPage>
+            <AdminPageHeader
+                breadcrumbs={[{ label: 'Leads', href: '/admin/consultations' }, { label: getDisplayName() }]}
+                title={getDisplayName()}
+                description={`ID: ${consultation.id.slice(0, 8)} · ${new Date(consultation.created_at).toLocaleDateString()}`}
+                eyebrow={token.label}
+                actions={
+                    <div className="flex items-center gap-3">
+                        <Button variant="outline" size="icon" className="h-9 w-9 rounded-md" asChild>
+                            <Link href="/admin/consultations">
+                                <ArrowLeft className="h-4 w-4" />
+                            </Link>
+                        </Button>
+                        <ConsultationQuickActions
+                            consultationId={consultation.id}
+                            customerName={getDisplayName()}
+                            customerEmail={consultation.customer_email}
+                            customerPhone={consultation.customer_phone}
+                        />
                     </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <ConsultationQuickActions
-                        consultationId={consultation.id}
-                        customerName={getDisplayName()}
-                        customerEmail={consultation.customer_email}
-                        customerPhone={consultation.customer_phone}
-                    />
-                </div>
-            </div>
+                }
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -233,7 +220,7 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
                                         <span className="text-muted-foreground">Fees</span>
                                         <span>{formatCentsWithCommas((consultation.delivery_fee || 0) + (consultation.setup_fee || 0))}</span>
                                     </div>
-                                    <div className="flex justify-between border-t pt-2 font-serif text-xl">
+                                    <div className="flex justify-between border-t pt-2 text-base font-semibold">
                                         <span>Total</span>
                                         <span>{formatCentsWithCommas(consultation.total_amount)}</span>
                                     </div>
@@ -300,6 +287,6 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
 
                 </div>
             </div>
-        </div>
+        </AdminPage>
     )
 }

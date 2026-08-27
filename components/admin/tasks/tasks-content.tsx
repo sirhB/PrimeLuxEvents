@@ -6,6 +6,7 @@ import { CreateTaskDialog } from '@/components/admin/tasks/create-task-dialog'
 import { CheckCircle2, Clock, Flag, Briefcase, Truck, Home, Building, MapPin, Calendar, AlertCircle } from 'lucide-react'
 import { TaskItem } from '@/components/admin/tasks/task-item'
 import { cn } from '@/lib/utils'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 interface TasksContentProps {
     tasks: any[] | null
@@ -94,25 +95,13 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
     }) || []
 
     return (
-        <div className="flex flex-col gap-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 animate-fade-in-up">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                            Operations
-                        </span>
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                        Task Management
-                    </h1>
-                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
-                        Coordinate event execution and manage team responsibilities.
-                    </p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <CreateTaskDialog />
-                </div>
-            </div>
+        <div className="flex flex-col gap-6">
+            <AdminPageHeader
+                eyebrow="Operations"
+                title="Task Management"
+                description="Coordinate event execution and manage team responsibilities."
+                actions={<CreateTaskDialog />}
+            />
 
             <div className="grid gap-6 md:grid-cols-4 animate-fade-in-up delay-100">
                 <Card className="glass-card border-none overflow-hidden relative group">
@@ -210,7 +199,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center justify-between px-4 py-3 glass-card border-none rounded-2xl mb-2">
-                                <h3 className="flex items-center gap-2 font-serif text-lg text-[var(--dashboard-text)]">
+                                <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--dashboard-text)]">
                                     <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-orange)]" />
                                     Pending
                                 </h3>
@@ -227,7 +216,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
 
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center justify-between px-4 py-3 glass-card border-none rounded-2xl mb-2">
-                                <h3 className="flex items-center gap-2 font-serif text-lg text-[var(--dashboard-text)]">
+                                <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--dashboard-text)]">
                                     <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-blue)]" />
                                     In Progress
                                 </h3>
@@ -244,7 +233,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
 
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center justify-between px-4 py-3 glass-card border-none rounded-2xl mb-2">
-                                <h3 className="flex items-center gap-2 font-serif text-lg text-[var(--dashboard-text)]">
+                                <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--dashboard-text)]">
                                     <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-green)]" />
                                     Completed
                                 </h3>
@@ -266,7 +255,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
                         <CardHeader className="border-b border-[var(--dashboard-border)] bg-black/10">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <CardTitle className="text-lg font-serif">My Assignments</CardTitle>
+                                    <CardTitle className="text-sm font-semibold">My Assignments</CardTitle>
                                     <p className="text-xs text-[var(--dashboard-text-muted)]">Tasks assigned to you or your team</p>
                                 </div>
                                 <div className="px-3 py-1 rounded-full bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] text-xs font-bold uppercase tracking-wider border border-[var(--dashboard-accent-gold)]/20">
@@ -286,7 +275,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
                                             <CheckCircle2 className="h-10 w-10 text-[var(--dashboard-accent-green)] opacity-40" />
                                         </div>
                                         <div className="space-y-1">
-                                            <h3 className="text-xl font-serif text-[var(--dashboard-text)]">All Caught Up</h3>
+                                            <h3 className="text-base font-semibold text-[var(--dashboard-text)]">All Caught Up</h3>
                                             <p className="text-sm opacity-60 max-w-xs mx-auto">You have no pending tasks assigned to you at the moment.</p>
                                         </div>
                                         <div className="mt-4">

@@ -1,98 +1,106 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { Command, Menu, Search } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { useAdminSidebar } from '@/components/admin/sidebar-context'
 import { ModernSidebar } from '@/components/admin/modern-sidebar'
 import { AdminToastProvider } from '@/components/admin/toast-provider'
 import { AdminNotifications } from '@/components/admin/notifications'
-import dynamic from 'next/dynamic'
-const CommandPalette = dynamic(() => import('@/components/admin/command-palette').then(m => m.CommandPalette), { ssr: false })
 import { AdminBottomBar } from '@/components/admin/admin-bottom-bar'
-import { cn } from '@/lib/utils'
-import { Search, User, Command, Menu } from 'lucide-react'
 import { usePwaContext } from '@/components/providers/pwa-provider'
 import { InstallPrompt } from '@/components/pwa/install-prompt'
-import { useState, useEffect } from 'react'
+
+const CommandPalette = dynamic(
+  () => import('@/components/admin/command-palette').then((m) => m.CommandPalette),
+  { ssr: false },
+)
 
 export function AdminLayoutContent({ children }: { children: React.ReactNode }) {
-    const { isCollapsed, setIsMobileOpen } = useAdminSidebar()
-    const { isStandalone } = usePwaContext()
-    const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+  const { isCollapsed, setIsMobileOpen } = useAdminSidebar()
+  const { isStandalone } = usePwaContext()
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
 
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault()
-                setIsCommandPaletteOpen(prev => !prev)
-            }
-        }
-        window.addEventListener('keydown', handleKeyDown)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        setIsCommandPaletteOpen((prev) => !prev)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    document.documentElement.classList.add('admin-theme')
 
-        // Apply admin theme class to root for consistent background (important for iOS status bar)
-        document.documentElement.classList.add('admin-theme')
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      document.documentElement.classList.remove('admin-theme')
+    }
+  }, [])
 
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-            document.documentElement.classList.remove('admin-theme')
-        }
-    }, [])
+  return (
+    <div className="admin-theme flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--dashboard-background)] font-sans text-[var(--dashboard-text)]">
+      <div className="print:hidden">
+        <ModernSidebar />
+      </div>
 
-    return (
-        <div className="flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--dashboard-background)] text-[var(--dashboard-text)] font-sans admin-theme">
-            <div className="print:hidden">
-                <ModernSidebar />
-            </div>
-            <div className={cn(
-                "flex flex-1 flex-col transition-all duration-300 max-w-full overflow-x-hidden",
-                isCollapsed ? "md:pl-20" : "md:pl-64"
-            )}>
-                {/* Admin Header / Top Bar */}
-                <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between border-b border-[var(--dashboard-border)] bg-[var(--dashboard-background)]/80 backdrop-blur-md px-4 md:px-8 pt-[env(safe-area-inset-top)]">
-                    <div className="flex items-center gap-4 min-w-0">
-                        {/* Mobile Menu Toggle - Only show if not native (native has bottom bar) */}
-                        {!isStandalone && (
-                            <button
-                                onClick={() => setIsMobileOpen(true)}
-                                className="md:hidden p-2 -ml-2 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)] rounded-lg transition-colors"
-                            >
-                                <Menu className="h-6 w-6" />
-                            </button>
-                        )}
-                        <div className="hidden md:flex relative w-64 group cursor-pointer" onClick={() => setIsCommandPaletteOpen(true)}>
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-accent-gold)] transition-colors" />
-                            <div className="w-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] rounded-xl py-2 pl-10 pr-4 text-xs text-[var(--dashboard-text-muted)]/50 flex items-center justify-between group-hover:border-[var(--dashboard-accent-gold)]/30 transition-all">
-                                <span>Search or command...</span>
-                                <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/20 border border-white/5 text-[9px]">
-                                    <Command className="h-2.5 w-2.5" />
-                                    <span>K</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+      <div
+        className={cn(
+          'flex max-w-full flex-1 flex-col overflow-x-hidden transition-[padding] duration-300',
+          isCollapsed ? 'md:pl-[4.5rem]' : 'md:pl-60',
+        )}
+      >
+        <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between gap-3 border-b border-[var(--dashboard-border)] bg-[var(--dashboard-background)]/90 px-3 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:px-5 md:px-6 print:hidden">
+          <div className="flex min-w-0 items-center gap-2">
+            {!isStandalone && (
+              <button
+                type="button"
+                onClick={() => setIsMobileOpen(true)}
+                className="-ml-1 rounded-md p-2 text-[var(--dashboard-text-muted)] transition-colors hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)] md:hidden"
+                aria-label="Open menu"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            )}
 
-                    <div className="flex items-center gap-2 md:gap-4 shrink-0">
-                        <AdminNotifications />
-                        <div className="h-8 w-px bg-[var(--dashboard-border)] mx-1" />
-                        <div className="flex items-center gap-3">
-                            <div className="hidden sm:block text-right">
-                                <p className="text-xs font-bold text-[var(--dashboard-text)] leading-none mb-1">Admin Panel</p>
-                                <p className="text-[10px] text-[var(--dashboard-text-muted)] uppercase tracking-wider">Live System</p>
-                            </div>
-                            <div className="h-9 w-9 rounded-full bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] flex items-center justify-center text-[var(--dashboard-text-muted)]">
-                                <User className="h-5 w-5" />
-                            </div>
-                        </div>
-                    </div>
-                </header>
+            <button
+              type="button"
+              onClick={() => setIsCommandPaletteOpen(true)}
+              className="group relative hidden w-72 cursor-pointer items-center md:flex"
+            >
+              <Search className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-[var(--dashboard-text-muted)] transition-colors group-hover:text-[var(--dashboard-accent-gold)]" />
+              <span className="flex w-full items-center justify-between rounded-md border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] py-2 pl-9 pr-3 text-xs text-[var(--dashboard-text-muted)] transition-colors group-hover:border-[var(--dashboard-accent-gold)]/35">
+                Search pages and actions…
+                <kbd className="inline-flex items-center gap-0.5 rounded border border-[var(--dashboard-border)] bg-black/20 px-1.5 py-0.5 text-[9px]">
+                  <Command className="h-2.5 w-2.5" />
+                  K
+                </kbd>
+              </span>
+            </button>
+          </div>
 
-                <main className="flex-1 p-4 md:p-8 overflow-y-auto overflow-x-hidden pb-32 md:pb-8 max-w-full">
-                    {children}
-                </main>
-            </div>
-            <AdminBottomBar />
-            <AdminToastProvider />
-            <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} />
-            <InstallPrompt surface="admin" />
-        </div>
-    )
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsCommandPaletteOpen(true)}
+              className="rounded-md p-2 text-[var(--dashboard-text-muted)] transition-colors hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)] md:hidden"
+              aria-label="Search"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+            <AdminNotifications />
+          </div>
+        </header>
+
+        <main className="max-w-full flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 pb-24 sm:px-5 sm:py-5 md:px-6 md:pb-8">
+          {children}
+        </main>
+      </div>
+
+      <AdminBottomBar />
+      <AdminToastProvider />
+      <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} />
+      <InstallPrompt surface="admin" />
+    </div>
+  )
 }
-

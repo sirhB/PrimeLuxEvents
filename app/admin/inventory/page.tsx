@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 import {
     Table,
     TableBody,
@@ -95,22 +97,12 @@ export default async function InventoryPage({
     const lowStockCount = allProductsMetrics?.filter(p => p.quantity_available <= 2).length || 0
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                            Operations
-                        </span>
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                        Inventory
-                    </h1>
-                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
-                        Track rental reservations and product availability.
-                    </p>
-                </div>
-            </div>
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="Operations"
+                title="Inventory"
+                description="Track rental reservations and product availability."
+            />
 
             <Tabs defaultValue="inventory" className="w-full">
                 <TabsList className="glass-card border-none p-1 bg-black/20 mb-8 w-fit h-auto">
@@ -166,7 +158,7 @@ export default async function InventoryPage({
                 <LowStockWidget items={lowStockWidgetItems || []} />
                 <Card className="glass-card border-none p-6 space-y-4">
                     <div>
-                        <CardTitle className="font-serif text-xl">Most Popular Items</CardTitle>
+                        <CardTitle className="text-base font-semibold">Most Popular Items</CardTitle>
                         <CardDescription>Top rented products by quantity</CardDescription>
                     </div>
                     <div className="space-y-3">
@@ -204,7 +196,7 @@ export default async function InventoryPage({
 
                     <Card className="border-none glass-card overflow-hidden">
                         <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">
-                            <CardTitle className="font-serif text-2xl">
+                            <CardTitle className="text-base font-semibold">
                                 {tab === 'low-stock' ? 'Low Stock Items' : 'Product Availability'}
                             </CardTitle>
                             <CardDescription className="text-[var(--dashboard-text-muted)]">
@@ -231,7 +223,7 @@ export default async function InventoryPage({
 
                                         return (
                                             <TableRow key={product.id} className="hover:bg-[var(--dashboard-card-hover)] border-b border-[var(--dashboard-border)] transition-colors">
-                                                <TableCell className="font-serif text-lg py-4 pl-6">{product.name}</TableCell>
+                                                <TableCell className="text-base font-semibold py-4 pl-6">{product.name}</TableCell>
                                                 <TableCell className="font-mono text-xs text-[var(--dashboard-text-muted)]">
                                                     {product.sku || 'N/A'}
                                                 </TableCell>
@@ -280,7 +272,7 @@ export default async function InventoryPage({
                     )}
                 </div>
             </Tabs>
-        </div>
+        </AdminPage>
     )
 }
 

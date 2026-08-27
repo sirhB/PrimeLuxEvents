@@ -10,6 +10,8 @@ import { Loader2, Check, Settings as SettingsIcon, Eye, Palette } from 'lucide-r
 import { createClient } from '@/lib/supabase/client'
 import { getDistanceBetweenAddresses } from '@/lib/geocoding'
 import Link from 'next/link'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default function SettingsClient() {
     const [isLoading, setIsLoading] = useState(true)
@@ -164,38 +166,28 @@ export default function SettingsClient() {
     }
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                            Configuration
-                        </span>
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                        Settings
-                    </h1>
-                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
-                        Configure global settings for your store, tax, and delivery.
-                    </p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Button asChild variant="outline" className="rounded-full border-[var(--dashboard-accent-gold)] text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/10 font-medium px-6">
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="Configuration"
+                title="Settings"
+                description="Configure global settings for your store, tax, and delivery."
+                actions={
+                    <Button asChild variant="outline" className="rounded-md">
                         <Link href="/admin/visual-editor">
                             <Eye className="mr-2 h-4 w-4" />
                             Open Visual Editor
                         </Link>
                     </Button>
-                </div>
-            </div>
+                }
+            />
 
-            <div className="grid gap-8 max-w-4xl">
+            <div className="grid gap-6 max-w-4xl">
                 {/* Branding & Appearance Shortcut */}
                 <Card className="border-none glass-card overflow-hidden border-gold/20 bg-gold/[0.02]">
-                    <CardHeader className="border-b border-gold/10 pb-6 bg-gold/5">
+                    <CardHeader className="border-b border-gold/10 pb-4 bg-gold/5">
                         <div className="flex items-center justify-between">
                             <div>
-                                <CardTitle className="font-serif text-2xl text-gold">Appearance & Branding</CardTitle>
+                                <CardTitle className="text-base font-semibold text-gold">Appearance & Branding</CardTitle>
                                 <CardDescription className="text-gold/60">Customize your store's visual identity and landing pages</CardDescription>
                             </div>
                             <Palette className="h-8 w-8 text-gold/40" />
@@ -420,6 +412,6 @@ export default function SettingsClient() {
                     )}
                 </div>
             </div>
-        </div>
+        </AdminPage>
     )
 }

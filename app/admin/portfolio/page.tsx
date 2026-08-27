@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import nextDynamic from 'next/dynamic'
+import { AdminPage } from '@/components/admin/page-shell'
 
 const PortfolioContent = nextDynamic(
     () => import('./portfolio-content').then(mod => mod.PortfolioContent)
@@ -16,8 +17,8 @@ export default async function PortfolioAdminPage() {
         .order('name')
 
     return (
-        <div className="p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+        <AdminPage>
             <PortfolioContent categories={categories || []} />
-        </div>
+        </AdminPage>
     )
 }

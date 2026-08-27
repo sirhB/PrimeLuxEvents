@@ -9,6 +9,8 @@ import { Plus, Trash2, MapPin, Printer, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { AdminQRCode } from '@/components/admin/qr-code'
 import { CreateLocationDialog } from '@/components/admin/warehouse/create-location-dialog'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 interface Location {
     id: string
@@ -59,25 +61,13 @@ export default function WarehouseLocationsPage() {
     }
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                            Warehouse
-                        </span>
-                    </div>
-                    <div>
-                        <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                            Locations
-                        </h1>
-                        <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md mt-2">
-                            Manage shelves, bins, and aisles. Generate QR tags for physical mapping.
-                        </p>
-                    </div>
-                </div>
-                <CreateLocationDialog onSuccess={fetchLocations} />
-            </div>
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="Warehouse"
+                title="Locations"
+                description="Manage shelves, bins, and aisles. Generate QR tags for physical mapping."
+                actions={<CreateLocationDialog onSuccess={fetchLocations} />}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {locations.map((loc) => (
@@ -88,7 +78,7 @@ export default function WarehouseLocationsPage() {
                                     <MapPin className="h-4 w-4" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-lg font-serif">{loc.name}</CardTitle>
+                                    <CardTitle className="text-base font-semibold">{loc.name}</CardTitle>
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">{loc.type}</p>
                                 </div>
                             </div>
@@ -115,6 +105,6 @@ export default function WarehouseLocationsPage() {
                     </Card>
                 ))}
             </div>
-        </div>
+        </AdminPage>
     )
 }

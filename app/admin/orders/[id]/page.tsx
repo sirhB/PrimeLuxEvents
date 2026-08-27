@@ -2,6 +2,8 @@ import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { Package } from 'lucide-react'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 import {
     Card,
     CardContent,
@@ -71,27 +73,28 @@ export default async function OrderDetailsPage({
             <OrderInvoice order={order} />
 
             {/* Order details for screen viewing */}
-            <div className="flex flex-col gap-8 print:hidden p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild className="glass-card hover:bg-[var(--dashboard-card-hover)]">
-                        <Link href="/admin/orders">
-                            <ArrowLeft className="h-4 w-4" />
-                        </Link>
-                    </Button>
-                    <div className="flex-1">
-                        <h1 className="text-4xl font-serif font-light tracking-tight text-[var(--dashboard-text)]">Order Details</h1>
-                        <p className="text-[var(--dashboard-text-muted)] mt-1 font-light">
-                            Order ID: {order.id.slice(0, 8)}...
-                        </p>
-                    </div>
-                    <PrintButton />
-                </div>
+            <AdminPage className="print:hidden">
+                <AdminPageHeader
+                    breadcrumbs={[{ label: 'Orders', href: '/admin/orders' }, { label: 'Details' }]}
+                    title="Order Details"
+                    description={`Order ID: ${order.id.slice(0, 8)}…`}
+                    actions={
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="icon" asChild className="rounded-md">
+                                <Link href="/admin/orders">
+                                    <ArrowLeft className="h-4 w-4" />
+                                </Link>
+                            </Button>
+                            <PrintButton />
+                        </div>
+                    }
+                />
 
                 <div className="grid gap-6 md:grid-cols-2">
                     {/* Customer Information */}
                     <Card className="glass-card border-none">
                         <CardHeader>
-                            <CardTitle className="text-[var(--dashboard-text)] font-serif font-light">Customer Information</CardTitle>
+                            <CardTitle className="text-[var(--dashboard-text)] text-base font-semibold">Customer Information</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
@@ -116,7 +119,7 @@ export default async function OrderDetailsPage({
                     {/* Order Status */}
                     <Card className="glass-card border-none">
                         <CardHeader>
-                            <CardTitle className="text-[var(--dashboard-text)] font-serif font-light">Order Status</CardTitle>
+                            <CardTitle className="text-[var(--dashboard-text)] text-base font-semibold">Order Status</CardTitle>
                             <CardDescription className="text-[var(--dashboard-text-muted)]">Update the status of this order</CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -148,7 +151,7 @@ export default async function OrderDetailsPage({
                 {/* Order Items */}
                 <Card className="glass-card border-none">
                     <CardHeader>
-                        <CardTitle className="text-[var(--dashboard-text)] font-serif font-light">Order Items</CardTitle>
+                        <CardTitle className="text-[var(--dashboard-text)] text-base font-semibold">Order Items</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <Table>
@@ -266,7 +269,7 @@ export default async function OrderDetailsPage({
                 {/* Order Timeline */}
                 <Card className="glass-card border-none">
                     <CardHeader>
-                        <CardTitle className="text-[var(--dashboard-text)] font-serif font-light">Order Timeline</CardTitle>
+                        <CardTitle className="text-[var(--dashboard-text)] text-base font-semibold">Order Timeline</CardTitle>
                         <CardDescription className="text-[var(--dashboard-text-muted)]">Track the progress of this order</CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -292,7 +295,7 @@ export default async function OrderDetailsPage({
                         </div>
                     </CardContent>
                 </Card>
-            </div>
+            </AdminPage>
         </>
     )
 }

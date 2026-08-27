@@ -1,47 +1,29 @@
+import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link' // Re-ensuring import is fresh
 import { DashboardContent } from '@/components/admin/dashboard/dashboard-content'
-
-// Force re-compilation to clear Turbo cache issues
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboardPage() {
-    return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 lg:p-10 bg-[var(--dashboard-background)] min-h-screen">
-            {/* Header Section */}
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-                <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                            Management Console
-                        </span>
-                        <span className="flex items-center gap-2 px-3 py-1 rounded-full glass-card text-xs font-medium text-[var(--dashboard-text-muted)]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--dashboard-accent-green)] animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                            Live
-                        </span>
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                        Dashboard
-                    </h1>
-                    <p className="text-[var(--dashboard-text-muted)] font-light text-lg max-w-2xl">
-                        Welcome back. Here's what's happening with your events today.
-                    </p>
-                </div>
-
-                {/* Quick Action Buttons */}
-                <div className="flex items-center gap-3">
-                    <Link href="/admin/orders/new">
-                        <Button className="bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black rounded-2xl h-12 px-6 shadow-lg shadow-[var(--dashboard-accent-gold)]/20 transition-all duration-300 hover:scale-105 active:scale-95">
-                            <Plus className="h-5 w-5 mr-2" />
-                            <span className="font-bold uppercase tracking-wider text-xs">New Order</span>
-                        </Button>
-                    </Link>
-                </div>
-            </div>
-
-            <DashboardContent />
-        </div>
-    )
+  return (
+    <AdminPage>
+      <AdminPageHeader
+        eyebrow="Today"
+        title="Dashboard"
+        description="Orders, leads, and warehouse movement at a glance."
+        actions={
+          <Link href="/admin/orders/new">
+            <Button className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90">
+              <Plus className="mr-2 h-4 w-4" />
+              New order
+            </Button>
+          </Link>
+        }
+      />
+      <DashboardContent />
+    </AdminPage>
+  )
 }

@@ -11,6 +11,8 @@ import { ProductStatsCards } from '@/components/admin/products/product-stats-car
 import { adaptProducts, type LiveProduct } from '@/lib/catalog/adapters'
 
 import { requirePermission } from '@/lib/auth/authorization'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default async function ProductsPage({
     searchParams,
@@ -97,19 +99,20 @@ export default async function ProductsPage({
     const categoriesCount = categories.length
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                <div>
-                    <h1 className="text-3xl font-serif font-light tracking-tight">Products</h1>
-                    <p className="text-muted-foreground mt-1">Manage your rental catalog</p>
-                </div>
-                <Button asChild>
-                    <Link href="/admin/products/new">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Product
-                    </Link>
-                </Button>
-            </div>
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="Catalog"
+                title="Products"
+                description="Manage your rental catalog."
+                actions={
+                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90">
+                        <Link href="/admin/products/new">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Product
+                        </Link>
+                    </Button>
+                }
+            />
 
             <ProductStatsCards
                 totalProducts={totalProducts}
@@ -134,10 +137,12 @@ export default async function ProductsPage({
 
                 <PaginationControls
                     currentPage={currentPage}
-                    totalItems={totalProducts}
+                    totalCount={totalProducts}
                     pageSize={pageSize}
+                    hasNextPage={currentPage * pageSize < totalProducts}
+                    hasPrevPage={currentPage > 1}
                 />
             </div>
-        </div>
+        </AdminPage>
     )
 }

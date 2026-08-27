@@ -4,6 +4,8 @@ import { VerificationView } from '@/components/admin/products/verification-view'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default async function ProductVerificationPage() {
     await requirePermission('products.update')
@@ -36,49 +38,46 @@ export default async function ProductVerificationPage() {
     }
 
     return (
-        <div className="flex flex-col gap-6 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                    <Button asChild variant="ghost" size="icon" className="rounded-full">
-                        <Link href="/admin/products">
-                            <ChevronLeft className="h-6 w-6" />
-                        </Link>
-                    </Button>
-                    <div>
-                        <h1 className="text-3xl font-serif font-light text-[var(--dashboard-text)]">
-                            Product Verification
-                        </h1>
-                        <p className="text-[var(--dashboard-text-muted)] text-sm">
-                            Review and verify product details for the catalog.
-                        </p>
+        <AdminPage>
+            <AdminPageHeader
+                breadcrumbs={[{ label: 'Products', href: '/admin/products' }, { label: 'Verify' }]}
+                title="Product Verification"
+                description="Review and verify product details for the catalog."
+                actions={
+                    <div className="flex items-center gap-3">
+                        <Button asChild variant="ghost" size="icon" className="rounded-md">
+                            <Link href="/admin/products">
+                                <ChevronLeft className="h-5 w-5" />
+                            </Link>
+                        </Button>
+                        <div className="text-right">
+                            <span className="text-2xl font-semibold text-[var(--dashboard-accent-gold)]">
+                                {totalUnverified || 0}
+                            </span>
+                            <p className="text-[var(--dashboard-text-muted)] text-[10px] uppercase tracking-wider font-bold">
+                                Remaining
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <div className="text-right">
-                    <span className="text-2xl font-serif text-[var(--dashboard-accent-gold)]">
-                        {totalUnverified || 0}
-                    </span>
-                    <p className="text-[var(--dashboard-text-muted)] text-[10px] uppercase tracking-wider font-bold">
-                        Remaining
-                    </p>
-                </div>
-            </div>
+                }
+            />
 
             {products && products.length > 0 ? (
                 <VerificationView products={products} categories={categories || []} />
             ) : (
-                <div className="flex-1 flex flex-col items-center justify-center glass-card p-12 rounded-3xl border-none animate-fade-in">
-                    <div className="h-20 w-20 rounded-full bg-[var(--dashboard-accent-gold)]/10 flex items-center justify-center mb-6">
-                        <span className="text-4xl">✨</span>
+                <div className="flex-1 flex flex-col items-center justify-center glass-card p-12 rounded-[var(--dashboard-radius)] border-none animate-fade-in">
+                    <div className="h-16 w-16 rounded-full bg-[var(--dashboard-accent-gold)]/10 flex items-center justify-center mb-6">
+                        <span className="text-2xl font-semibold text-[var(--dashboard-accent-gold)]">✓</span>
                     </div>
-                    <h2 className="text-2xl font-serif text-[var(--dashboard-text)] mb-2">All Products Verified</h2>
-                    <p className="text-[var(--dashboard-text-muted)] max-w-sm text-center mb-8">
+                    <h2 className="text-base font-semibold text-[var(--dashboard-text)] mb-2">All Products Verified</h2>
+                    <p className="text-[var(--dashboard-text-muted)] max-w-sm text-center mb-8 text-sm">
                         Great job! There are no pending products waiting for verification at this time.
                     </p>
-                    <Button asChild className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium px-8">
+                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90">
                         <Link href="/admin/products">Return to Inventory</Link>
                     </Button>
                 </div>
             )}
-        </div>
+        </AdminPage>
     )
 }

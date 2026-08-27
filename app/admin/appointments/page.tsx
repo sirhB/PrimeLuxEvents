@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import dynamic from 'next/dynamic'
+import { AdminPage } from '@/components/admin/page-shell'
 
 const AppointmentsContent = dynamic(
     () => import('@/components/admin/appointments/appointments-content').then(mod => mod.AppointmentsContent)
@@ -37,7 +38,7 @@ export default async function AppointmentsPage({
     const { data: appointments, count } = await query.range(start, end)
 
     return (
-        <div className="p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+        <AdminPage>
             <AppointmentsContent
                 appointments={appointments}
                 count={count}
@@ -46,6 +47,6 @@ export default async function AppointmentsPage({
                 currentPage={currentPage}
                 pageSize={pageSize}
             />
-        </div>
+        </AdminPage>
     )
 }
