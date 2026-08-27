@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { TableHead } from '@/components/ui/table'
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
@@ -12,16 +13,26 @@ interface SortableHeaderProps {
     sortMapping?: { asc: string; desc: string }
 }
 
-export function SortableHeader({ column, label, className, sortMapping }: SortableHeaderProps) {
+function SortableHeaderFallback({ label, className }: Pick<SortableHeaderProps, 'label' | 'className'>) {
+    return (
+        <TableHead className={cn('group transition-colors', className)}>
+            <div className="flex items-center gap-2">
+                {label}
+                <ChevronsUpDown className="h-3 w-3 opacity-30" />
+            </div>
+        </TableHead>
+    )
+}
+
+function SortableHeaderInner({ column, label, className, sortMapping }: SortableHeaderProps) {
     const router = useRouter()
     const searchParams = useSearchParams()
 
     const currentSort = searchParams.get('sort') || ''
 
-    // Default mapping if not provided
     const mapping = sortMapping || {
         asc: `${column}_asc`,
-        desc: `${column}_desc`
+        desc: `${column}_desc`,
     }
 
     const isAsc = currentSort === mapping.asc
@@ -33,7 +44,7 @@ export function SortableHeader({ column, label, className, sortMapping }: Sortab
         if (isAsc) {
             params.set('sort', mapping.desc)
         } else if (isDesc) {
-            params.delete('sort') // Reset or go back to newest (default)
+            params.delete('sort')
         } else {
             params.set('sort', mapping.asc)
         }
@@ -45,7 +56,7 @@ export function SortableHeader({ column, label, className, sortMapping }: Sortab
         <TableHead
             sortable
             onClick={handleSort}
-            className={cn("group transition-colors", className)}
+            className={cn('group transition-colors', className)}
         >
             <div className="flex items-center gap-2">
                 {label}
@@ -60,5 +71,13 @@ export function SortableHeader({ column, label, className, sortMapping }: Sortab
                 </div>
             </div>
         </TableHead>
+    )
+}
+
+export function SortableHeader(props: SortableHeaderProps) {
+    return (
+        <Suspense fallback={<SortableHeaderFallback label={props.label} className={props.className} />}>
+            <SortableHeaderInner {...props} />
+        </Suspense>
     )
 }

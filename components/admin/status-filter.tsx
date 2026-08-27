@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
     Select,
@@ -15,7 +16,18 @@ interface StatusFilterProps {
     placeholder?: string
 }
 
-export function StatusFilter({ statuses, placeholder = 'Filter by' }: StatusFilterProps) {
+function StatusFilterFallback({ placeholder = 'Filter by' }: Pick<StatusFilterProps, 'placeholder'>) {
+    return (
+        <Select disabled>
+            <SelectTrigger className="w-auto gap-2 h-10 border-gray-300 rounded-lg">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+        </Select>
+    )
+}
+
+function StatusFilterInner({ statuses, placeholder = 'Filter by' }: StatusFilterProps) {
     const router = useRouter()
     const searchParams = useSearchParams()
 
@@ -26,7 +38,7 @@ export function StatusFilter({ statuses, placeholder = 'Filter by' }: StatusFilt
         } else {
             params.set('status', value)
         }
-        params.set('page', '1') // Reset to first page on filter change
+        params.set('page', '1')
 
         router.push(`?${params.toString()}`)
     }
@@ -49,5 +61,13 @@ export function StatusFilter({ statuses, placeholder = 'Filter by' }: StatusFilt
                 ))}
             </SelectContent>
         </Select>
+    )
+}
+
+export function StatusFilter(props: StatusFilterProps) {
+    return (
+        <Suspense fallback={<StatusFilterFallback placeholder={props.placeholder} />}>
+            <StatusFilterInner {...props} />
+        </Suspense>
     )
 }
