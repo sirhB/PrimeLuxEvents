@@ -13,7 +13,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
 
-import { CapacitorBackButton } from "@/components/ui/capacitor-back-button"
+import { PwaBackButton } from "@/components/pwa/pwa-back-button"
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false)
@@ -125,7 +125,7 @@ export function SiteHeader() {
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
           {/* Mobile Menu Trigger */}
           <div className="flex items-center lg:hidden">
-            <CapacitorBackButton isDark={headerTheme === 'dark'} />
+            <PwaBackButton isDark={headerTheme === 'dark'} />
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button

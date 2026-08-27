@@ -9,7 +9,7 @@ const FeaturedCollection = nextDynamic(() => import("@/components/featured-colle
 const BrandValuesSection = nextDynamic(() => import("@/components/brand-values-section").then(m => m.BrandValuesSection))
 const TestimonialsSection = nextDynamic(() => import("@/components/testimonials-section").then(m => m.TestimonialsSection))
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 export default async function Home() {
   const content = await getSiteContent()

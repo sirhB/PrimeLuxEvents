@@ -9,12 +9,13 @@ const CommandPalette = dynamic(() => import('@/components/admin/command-palette'
 import { AdminBottomBar } from '@/components/admin/admin-bottom-bar'
 import { cn } from '@/lib/utils'
 import { Search, User, Command, Menu } from 'lucide-react'
-import { useCapacitor } from '@/components/providers/capacitor-provider'
+import { usePwaContext } from '@/components/providers/pwa-provider'
+import { InstallPrompt } from '@/components/pwa/install-prompt'
 import { useState, useEffect } from 'react'
 
 export function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     const { isCollapsed, setIsMobileOpen } = useAdminSidebar()
-    const { isNative } = useCapacitor()
+    const { isStandalone } = usePwaContext()
     const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
 
     useEffect(() => {
@@ -48,7 +49,7 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
                 <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between border-b border-[var(--dashboard-border)] bg-[var(--dashboard-background)]/80 backdrop-blur-md px-4 md:px-8 pt-[env(safe-area-inset-top)]">
                     <div className="flex items-center gap-4 min-w-0">
                         {/* Mobile Menu Toggle - Only show if not native (native has bottom bar) */}
-                        {!isNative && (
+                        {!isStandalone && (
                             <button
                                 onClick={() => setIsMobileOpen(true)}
                                 className="md:hidden p-2 -ml-2 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)] hover:bg-[var(--dashboard-card-hover)] rounded-lg transition-colors"
@@ -90,6 +91,7 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
             <AdminBottomBar />
             <AdminToastProvider />
             <CommandPalette isOpen={isCommandPaletteOpen} onClose={() => setIsCommandPaletteOpen(false)} />
+            <InstallPrompt surface="admin" />
         </div>
     )
 }

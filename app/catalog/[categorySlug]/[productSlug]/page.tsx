@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import { ProductDetailClient } from "./product-detail-client"
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 export default async function ProductPage({ params }: { params: Promise<{ categorySlug: string, productSlug: string }> }) {
     const { categorySlug, productSlug } = await params

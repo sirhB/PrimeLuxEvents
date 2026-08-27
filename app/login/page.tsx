@@ -9,16 +9,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { useCapacitor } from '@/components/providers/capacitor-provider'
-
-export const dynamic = 'force-dynamic'
+import { usePwaContext } from '@/components/providers/pwa-provider'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const router = useRouter()
-    const { isNative } = useCapacitor()
+    const { isStandalone } = usePwaContext()
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -57,7 +55,7 @@ export default function LoginPage() {
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 px-4 dark:bg-gray-900 gap-8">
-            {isNative && (
+            {isStandalone && (
                 <div className="relative h-16 w-48">
                     <Image
                         src="/images/logo-dark-mode.png"

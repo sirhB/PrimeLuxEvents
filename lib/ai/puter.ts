@@ -16,11 +16,31 @@ declare global {
     }
 }
 
+let puterLoadPromise: Promise<void> | null = null
+
+export function loadPuter(): Promise<void> {
+    if (typeof window === 'undefined') return Promise.resolve()
+    if (window.puter) return Promise.resolve()
+    if (puterLoadPromise) return puterLoadPromise
+
+    puterLoadPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = 'https://js.puter.com/v2/'
+        script.async = true
+        script.onload = () => resolve()
+        script.onerror = () => reject(new Error('Failed to load Puter.js'))
+        document.head.appendChild(script)
+    })
+
+    return puterLoadPromise
+}
+
 export const aiService = {
     /**
      * Checks if the user is signed in to Puter.
      */
     async isSignedIn(): Promise<boolean> {
+        await loadPuter()
         if (typeof window === 'undefined' || !window.puter) return false;
         return await window.puter.auth.isSignedIn();
     },
@@ -29,6 +49,7 @@ export const aiService = {
      * Triggers the Puter sign-in popup.
      */
     async signIn(): Promise<PuterUser | null> {
+        await loadPuter()
         if (typeof window === 'undefined' || !window.puter) return null;
         try {
             return await window.puter.auth.signIn();
@@ -42,6 +63,7 @@ export const aiService = {
      * Gets the current Puter user.
      */
     async getUser(): Promise<PuterUser | null> {
+        await loadPuter()
         if (typeof window === 'undefined' || !window.puter) return null;
         try {
             return await window.puter.auth.getUser();
@@ -54,6 +76,7 @@ export const aiService = {
      * Generates a premium product description.
      */
     async generateProductDescription(name: string, category: string, tone: string = 'luxurious'): Promise<string> {
+        await loadPuter()
         if (typeof window === 'undefined' || !window.puter) {
             console.error('Puter.js not loaded');
             return '';
@@ -75,6 +98,7 @@ export const aiService = {
      * Responds as an AI Concierge in a chat context.
      */
     async getChatResponse(messages: { content: string, role: 'user' | 'assistant' }[]): Promise<string> {
+        await loadPuter()
         if (typeof window === 'undefined' || !window.puter) {
             console.error('Puter.js not loaded');
             return "I'm sorry, I'm having trouble connecting to my creative circuits right now.";

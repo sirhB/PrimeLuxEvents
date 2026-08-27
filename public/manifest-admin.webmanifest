@@ -1,0 +1,21 @@
+{
+  "name": "PrimeLux Admin",
+  "short_name": "Admin",
+  "description": "Manage orders, leads, inventory, and logistics.",
+  "start_url": "/admin",
+  "scope": "/admin",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a0b",
+  "theme_color": "#0a0a0b",
+  "icons": [
+    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Orders", "short_name": "Orders", "url": "/admin/orders", "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }] },
+    { "name": "Scan QR", "short_name": "Scan", "url": "/admin/scan", "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }] }
+  ]
+}

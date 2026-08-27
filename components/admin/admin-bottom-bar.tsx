@@ -1,7 +1,6 @@
 "use client"
 
 import { usePathname } from "next/navigation"
-import { useCapacitor } from "@/components/providers/capacitor-provider"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import {
@@ -27,7 +26,6 @@ const bottomNavItems = [
 ]
 
 export function AdminBottomBar() {
-    const { isNative } = useCapacitor()
     const pathname = usePathname()
     const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } = useAdminSidebar()
     const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -80,10 +78,6 @@ export function AdminBottomBar() {
             channels.forEach(channel => supabase.removeChannel(channel))
         }
     }, [])
-
-    // Show on all mobile devices (hidden via CSS on desktop)
-    // We keep a check for isNative if we want to add specific native-only logic later,
-    // but for visibility, we want it on mobile web too.
 
     const isRouteActive = (href: string) => {
         if (href === '/admin' && pathname === '/admin') return true
