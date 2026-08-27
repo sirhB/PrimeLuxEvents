@@ -1,12 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
+import { checkRateLimit, clientIpFromHeaders } from '@/lib/security/rate-limit'
+import { z } from 'zod'
+
+const acceptInviteSchema = z.object({
+    password: z.string().min(8).max(200),
+    full_name: z.string().max(200).optional().nullable(),
+})
 
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ token: string }> }
 ) {
     try {
+        const ip = clientIpFromHeaders(request.headers)
+        const rate = checkRateLimit(`invite-get:${ip}`, 30, 60_000)
+        if (!rate.allowed) {
+            return NextResponse.json(
+                { error: 'Too many requests' },
+                { status: 429, headers: { 'Retry-After': String(rate.retryAfterSec) } },
+            )
+        }
+
         const { token } = await params
+        if (!token || token.length < 16 || token.length > 200) {
+            return NextResponse.json(
+                { error: 'Invalid or expired invitation' },
+                { status: 404 }
+            )
+        }
+
         const supabase = createServiceRoleClient()
 
         const { data: invitation, error: invitationError } = await supabase
@@ -62,17 +85,33 @@ export async function POST(
     { params }: { params: Promise<{ token: string }> }
 ) {
     try {
+        const ip = clientIpFromHeaders(request.headers)
+        const rate = checkRateLimit(`invite-post:${ip}`, 10, 60_000)
+        if (!rate.allowed) {
+            return NextResponse.json(
+                { error: 'Too many requests' },
+                { status: 429, headers: { 'Retry-After': String(rate.retryAfterSec) } },
+            )
+        }
+
         const { token } = await params
+        if (!token || token.length < 16 || token.length > 200) {
+            return NextResponse.json(
+                { error: 'Invalid or expired invitation' },
+                { status: 400 }
+            )
+        }
+
         const supabase = createServiceRoleClient()
         const body = await request.json()
-        const { password, full_name } = body
-
-        if (!password || password.length < 8) {
+        const parsed = acceptInviteSchema.safeParse(body)
+        if (!parsed.success) {
             return NextResponse.json(
                 { error: 'Password must be at least 8 characters' },
                 { status: 400 }
             )
         }
+        const { password, full_name } = parsed.data
 
         const { data: invitation, error: invitationError } = await supabase
             .from('user_invitations')

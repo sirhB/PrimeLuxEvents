@@ -60,7 +60,28 @@ export async function POST(req: Request) {
                 return NextResponse.json({ error: 'Order not found' }, { status: 404 })
             }
 
-            const newBalancePaid = (order.balance_paid || 0) + paymentIntent.amount_received
+            // Idempotency: skip if this PaymentIntent was already recorded
+            const { data: existingPayment } = await supabase
+                .from('payments')
+                .select('id')
+                .eq('stripe_payment_intent_id', paymentIntent.id)
+                .maybeSingle()
+
+            if (existingPayment) {
+                return NextResponse.json({ received: true, duplicate: true })
+            }
+
+            const amountReceived = paymentIntent.amount_received || paymentIntent.amount || 0
+            if (amountReceived <= 0) {
+                return NextResponse.json({ error: 'Invalid payment amount' }, { status: 400 })
+            }
+
+            // Cap so a single PI cannot inflate balance beyond order total in one shot;
+            // remaining balance is computed from prior balance_paid.
+            const priorPaid = order.balance_paid || 0
+            const remaining = Math.max(0, (order.total_amount || 0) - priorPaid)
+            const applied = Math.min(amountReceived, remaining || amountReceived)
+            const newBalancePaid = priorPaid + applied
             const newStatus = newBalancePaid >= order.total_amount ? 'paid' : 'partially_paid'
 
             const { error: updateError } = await supabase
@@ -81,7 +102,7 @@ export async function POST(req: Request) {
                 .from('payments')
                 .insert({
                     order_id: order.id,
-                    amount: paymentIntent.amount_received,
+                    amount: applied,
                     payment_method: paymentIntent.payment_method_types?.[0],
                     payment_status: 'succeeded',
                     stripe_payment_intent_id: paymentIntent.id

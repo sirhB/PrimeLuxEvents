@@ -9,6 +9,7 @@ import { PaginationControls } from '@/components/admin/pagination-controls'
 import { CategoriesTable } from '@/components/admin/categories-table'
 import { AdminPage } from '@/components/admin/page-shell'
 import { AdminPageHeader } from '@/components/admin/page-shell'
+import { buildIlikeOrFilter } from '@/lib/supabase/filter-sanitize'
 
 export default async function CategoriesPage({
     searchParams,
@@ -28,7 +29,8 @@ export default async function CategoriesPage({
         .select('id, name, slug, description, sort_order, is_active, created_at', { count: 'exact' })
 
     if (search) {
-        query = query.or(`name.ilike.%${search}%,slug.ilike.%${search}%,description.ilike.%${search}%`)
+        const orFilter = buildIlikeOrFilter(['name', 'slug', 'description'], search)
+        if (orFilter) query = query.or(orFilter)
     }
 
     // Apply sorting

@@ -1,8 +1,6 @@
 import { createClient as createSupabaseJsClient } from '@supabase/supabase-js'
-import { createServiceClient } from '@/lib/supabase/server'
 import {
   getSupabaseAnonKey,
-  getSupabaseServiceRoleKey,
   getSupabaseUrl,
 } from '@/lib/supabase/env'
 import {
@@ -14,7 +12,9 @@ import {
   type LiveCategory,
   type LiveProduct,
 } from '@/lib/catalog/adapters'
+import { buildIlikeOrFilter } from '@/lib/supabase/filter-sanitize'
 
+/** Public catalog columns — never select cost_cents for client-facing paths. */
 const PRODUCT_LIST_SELECT = `
   id,
   name,
@@ -23,7 +23,6 @@ const PRODUCT_LIST_SELECT = `
   category_id,
   sku,
   price_cents,
-  cost_cents,
   image_url,
   gallery_images,
   specifications,
@@ -34,10 +33,8 @@ const PRODUCT_LIST_SELECT = `
 `
 
 function getCatalogClient() {
-  // Prefer service role (bypasses RLS). Fall back to anon key from Vercel integration.
-  if (getSupabaseServiceRoleKey()) {
-    return createServiceClient()
-  }
+  // Anon key + RLS: public catalog policies expose active products only.
+  // Do not use service role here — it bypasses RLS and can leak cost_cents / inactive rows.
   const url = getSupabaseUrl()
   const key = getSupabaseAnonKey()
   if (!url || !key) {
@@ -73,9 +70,10 @@ export async function fetchCatalogProducts(options?: {
   }
 
   if (options?.query) {
-    dbQuery = dbQuery.or(
-      `name.ilike.%${options.query}%,description.ilike.%${options.query}%`,
-    )
+    const orFilter = buildIlikeOrFilter(['name', 'description'], options.query)
+    if (orFilter) {
+      dbQuery = dbQuery.or(orFilter)
+    }
   }
 
   if (options?.categorySlug) {

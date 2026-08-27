@@ -2,19 +2,27 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { adaptProducts, adaptCategories, type LiveProduct, type LiveCategory } from '@/lib/catalog/adapters'
+import { buildIlikeOrFilter, sanitizePostgrestFilterValue } from '@/lib/supabase/filter-sanitize'
 
 export async function searchProducts(query: string) {
   if (!query || query.length < 2) {
     return { products: [], categories: [] }
   }
 
+  const safeQuery = sanitizePostgrestFilterValue(query)
+  if (safeQuery.length < 2) {
+    return { products: [], categories: [] }
+  }
+
+  const productOr = buildIlikeOrFilter(['name', 'description'], safeQuery)
   const supabase = await createClient()
 
   const [{ data: products, error }, { data: categories, error: categoriesError }] =
     await Promise.all([
-      supabase
-        .from('products')
-        .select(`
+      productOr
+        ? supabase
+            .from('products')
+            .select(`
           id,
           name,
           description,
@@ -27,14 +35,15 @@ export async function searchProducts(query: string) {
           specifications,
           is_active
         `)
-        .eq('is_active', true)
-        .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
-        .limit(10),
+            .eq('is_active', true)
+            .or(productOr)
+            .limit(10)
+        : Promise.resolve({ data: [], error: null }),
       supabase
         .from('categories')
         .select('id, name, slug, description, is_active, sort_order')
         .eq('is_active', true)
-        .ilike('name', `%${query}%`)
+        .ilike('name', `%${safeQuery}%`)
         .limit(5),
     ])
 
@@ -45,7 +54,6 @@ export async function searchProducts(query: string) {
     console.error('Error searching categories:', categoriesError)
   }
 
-  // Attach category names for product results
   const categoryRows = (categories || []) as LiveCategory[]
   const { data: allCats } = await supabase
     .from('categories')
@@ -54,9 +62,8 @@ export async function searchProducts(query: string) {
 
   const byId = new Map(((allCats || []) as LiveCategory[]).map((c) => [c.id, c]))
 
-  // Also search products whose category name matches
   const matchingCatIds = ((allCats || []) as LiveCategory[])
-    .filter((c) => c.name.toLowerCase().includes(query.toLowerCase()))
+    .filter((c) => c.name.toLowerCase().includes(safeQuery.toLowerCase()))
     .map((c) => c.id)
 
   let categoryProducts: LiveProduct[] = []

@@ -2,30 +2,27 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { sanitizePostgrestFilterValue } from '@/lib/supabase/filter-sanitize'
 
 export async function claimOrdersForCurrentUser() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user?.email) return { claimed: 0 }
 
-  const { data, error } = await supabase
-    .from('orders')
-    .update({ user_id: user.id })
-    .is('user_id', null)
-    .ilike('customer_email', user.email)
-    .select('id')
+  const { data, error } = await supabase.rpc('customer_claim_orders')
 
   if (error) {
     console.error('Failed to claim orders:', error)
     return { claimed: 0 }
   }
 
-  if (data?.length) {
+  const claimed = typeof data === 'number' ? data : 0
+  if (claimed > 0) {
     revalidatePath('/account')
     revalidatePath('/account/orders')
   }
 
-  return { claimed: data?.length || 0 }
+  return { claimed }
 }
 
 export async function toggleFavorite(productId: string) {
@@ -124,11 +121,16 @@ export async function cancelOwnAppointment(appointmentId: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { success: false, error: 'Sign in required' }
 
+  // Prefer user_id ownership; also allow email match with sanitized value only
+  const email = sanitizePostgrestFilterValue(user.email || '', 200)
+  const orParts = [`user_id.eq.${user.id}`]
+  if (email) orParts.push(`client_email.ilike.${email}`)
+
   const { error } = await supabase
     .from('appointments')
     .update({ status: 'cancelled', updated_at: new Date().toISOString() })
     .eq('id', appointmentId)
-    .or(`user_id.eq.${user.id},client_email.ilike.${user.email}`)
+    .or(orParts.join(','))
 
   if (error) return { success: false, error: error.message }
   revalidatePath('/account/appointments')

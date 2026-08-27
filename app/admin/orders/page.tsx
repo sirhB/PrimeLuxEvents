@@ -6,6 +6,7 @@ import { OrdersContent } from '@/components/admin/orders/orders-content'
 import { requirePermission } from '@/lib/auth/authorization'
 import { AdminPage } from '@/components/admin/page-shell'
 import { AdminPageHeader } from '@/components/admin/page-shell'
+import { buildIlikeOrFilter } from '@/lib/supabase/filter-sanitize'
 
 export default async function OrdersPage({
     searchParams,
@@ -37,7 +38,8 @@ export default async function OrdersPage({
         .select('*', { count: 'exact' })
 
     if (search) {
-        query = query.or(`id.ilike.%${search}%,customer_name.ilike.%${search}%,customer_email.ilike.%${search}%`)
+        const orFilter = buildIlikeOrFilter(['id', 'customer_name', 'customer_email'], search)
+        if (orFilter) query = query.or(orFilter)
     }
 
     if (status) {

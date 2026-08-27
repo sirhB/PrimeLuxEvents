@@ -2,6 +2,8 @@
 
 import { createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { checkRateLimit, clientIpFromHeaders } from '@/lib/security/rate-limit'
+import { headers } from 'next/headers'
 
 const consultationSchema = z.object({
     first_name: z.string().min(1).max(100),
@@ -32,6 +34,13 @@ export async function submitConsultationRequest(
     input: ConsultationSubmission,
 ): Promise<{ success: boolean; error?: string }> {
     try {
+        const hdrs = await headers()
+        const ip = clientIpFromHeaders(hdrs)
+        const rate = checkRateLimit(`consultation:${ip}`, 5, 60_000)
+        if (!rate.allowed) {
+            return { success: false, error: 'Too many requests. Please try again shortly.' }
+        }
+
         const parsed = consultationSchema.safeParse(input)
         if (!parsed.success) {
             return { success: false, error: 'Invalid form data' }
