@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
+import { resolvePriceCents } from "@/lib/catalog/adapters"
 import { fetchFeaturedProducts } from "@/lib/catalog/queries"
 
 export async function FeaturedCollection() {
@@ -37,7 +38,7 @@ export async function FeaturedCollection() {
       <div className="relative w-full z-10 overflow-x-auto pb-4">
         <div className="flex gap-6 px-6 md:px-12 min-w-max">
           {featuredProducts.map((product) => {
-            const price = product.rental_price_daily || product.price
+            const price = resolvePriceCents(product)
             const href = `/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`
             return (
               <Link

@@ -9,6 +9,7 @@ import { useDebounce } from "@/lib/hooks/use-debounce"
 import Link from "next/link"
 import Image from "next/image"
 import { formatCurrency } from "@/lib/utils"
+import { resolvePriceCents } from "@/lib/catalog/adapters"
 
 interface SearchModalProps {
     isOpen: boolean
@@ -64,7 +65,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             setIsLoading(true)
             try {
                 const data = await searchProducts(debouncedQuery)
-                setResults(data)
+                setResults(data as { products: Product[]; categories: Category[] })
             } catch (error) {
                 console.error("Error fetching search results:", error)
             } finally {
@@ -199,7 +200,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                                     </span>
                                                                     <span className="w-1 h-1 rounded-full bg-white/10" />
                                                                     <span className="text-sm font-serif text-gold">
-                                                                        {formatCurrency(product.rental_price_daily || product.price)}
+                                                                        {formatCurrency(resolvePriceCents(product))}
                                                                     </span>
                                                                 </div>
                                                             </div>

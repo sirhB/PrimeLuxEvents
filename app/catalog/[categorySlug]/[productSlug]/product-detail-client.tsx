@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator"
 import { ProductGallery } from "@/components/product-gallery"
 import { RelatedProducts } from "@/components/related-products"
 import { formatCurrency, cn } from "@/lib/utils"
+import { resolvePriceCents } from "@/lib/catalog/adapters"
 import {
     Accordion,
     AccordionContent,
@@ -104,7 +105,7 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
 
     const maxQuantity = 100
 
-    const basePrice = product.rental_price_daily || product.price
+    const basePrice = resolvePriceCents(product)
     const modifiersPrice = Object.values(selectedModifiers).reduce((acc, curr) => acc + curr.priceAdjustment, 0)
     const setupFee = product.setup_fee || 0
     const subtotal = (basePrice + modifiersPrice) * quantity

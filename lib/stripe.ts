@@ -41,8 +41,9 @@ export async function createMockPaymentIntent(amount: number) {
 }
 
 export function formatCurrency(cents: number): string {
+    const amount = typeof cents === 'number' && Number.isFinite(cents) ? cents : 0
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-    }).format(cents / 100)
+    }).format(amount / 100)
 }

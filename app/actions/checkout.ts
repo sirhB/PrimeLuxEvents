@@ -2,7 +2,12 @@
 
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getDistanceBetweenAddresses } from '@/lib/geocoding'
+<<<<<<< HEAD
 import { stripe, createMockPaymentIntent, allowMockPayments } from '@/lib/stripe'
+=======
+import { stripe, createMockPaymentIntent } from '@/lib/stripe'
+import { resolvePriceCents } from '@/lib/catalog/adapters'
+>>>>>>> origin/main
 
 export interface CheckoutFormData {
     customerName: string
@@ -107,7 +112,7 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
         // plux uses price_cents — normalize for checkout math that reads product.price
         products = (data || []).map((p: any) => ({
             ...p,
-            price: typeof p.price_cents === 'number' ? p.price_cents : (p.price ?? 0),
+            price: resolvePriceCents(p),
             quantity_available:
                 typeof p.quantity_available === 'number'
                     ? p.quantity_available
@@ -122,7 +127,7 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
     items.forEach((item) => {
         // Handle Package Items
         if (item.packageId && item.packageData) {
-            subtotal += item.packageData.price * item.quantity
+            subtotal += resolvePriceCents({ price: item.packageData.price }) * item.quantity
             // Packages might have their own setup fee logic, usually included or 0
             return
         }
