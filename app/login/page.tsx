@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
 import { usePwaContext } from '@/components/providers/pwa-provider'
-import { fetchIsStaffClient } from '@/lib/auth/roles'
+import { fetchIsStaffClient } from '@/lib/auth/roles-shared'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
