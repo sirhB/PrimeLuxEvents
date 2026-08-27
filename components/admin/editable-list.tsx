@@ -1,14 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { AnimatePresence, motion } from "framer-motion"
-import { Plus, GripVertical } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { EditableListItem } from "./editable-list-item"
 import { createClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
+import { useEditorContent } from "@/components/admin/visual-editor/editor-content-context"
 
 interface EditableListProps {
     contentKey: string
@@ -33,9 +34,20 @@ export function EditableList({
     renderItem,
     emptyState
 }: EditableListProps) {
-    const [items, setItems] = useState(initialItems)
+    const editor = useEditorContent()
+    const contextItems = editor?.content[contentKey]
+    const resolvedInitial = Array.isArray(contextItems) ? contextItems : initialItems
+    const [items, setItems] = useState(resolvedInitial)
     const [isAddingNew, setIsAddingNew] = useState(false)
     const supabase = createClient()
+
+    useEffect(() => {
+        if (Array.isArray(contextItems)) {
+            setItems(contextItems)
+        } else {
+            setItems(initialItems)
+        }
+    }, [contextItems, initialItems])
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -79,12 +91,18 @@ export function EditableList({
 
     const saveToDatabase = async (newItems: any[]) => {
         try {
-            const { error } = await supabase
-                .from('content')
-                .update({ value: JSON.stringify(newItems) })
-                .eq('key', contentKey)
+            if (editor) {
+                editor.updateField(contentKey, newItems)
+                const ok = await editor.saveField(contentKey, newItems)
+                if (!ok) throw new Error('Save failed')
+            } else {
+                const { error } = await supabase
+                    .from('content')
+                    .update({ value: JSON.stringify(newItems) })
+                    .eq('key', contentKey)
 
-            if (error) throw error
+                if (error) throw error
+            }
             toast.success("List updated successfully")
         } catch (error) {
             console.error('Error saving list:', error)

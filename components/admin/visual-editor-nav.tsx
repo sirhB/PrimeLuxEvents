@@ -1,22 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { cn } from "@/lib/utils"
-import {
-    LayoutTemplate,
-    HelpCircle,
-    Phone,
-    Image as ImageIcon,
-    BookOpen,
-    ArrowLeft,
-    Eye,
-    Menu,
-    X,
-    Grid
-} from "lucide-react"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
+import { ArrowLeft, Eye, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { VISUAL_EDITOR_PAGES, getPublicPath } from "@/lib/admin/visual-editor-config"
+import { SaveStatus } from "@/components/admin/visual-editor/save-status"
 
 interface VisualEditorNavProps {
     activePage: string
@@ -24,75 +20,114 @@ interface VisualEditorNavProps {
     onNavigateToLanding: () => void
 }
 
-const pages = [
-    { id: 'about', label: 'About Us', icon: LayoutTemplate },
-    { id: 'how-it-works', label: 'How It Works', icon: HelpCircle },
-    { id: 'contact', label: 'Contact', icon: Phone },
-    { id: 'gallery', label: 'Gallery', icon: ImageIcon },
-    { id: 'journal', label: 'Journal', icon: BookOpen },
-]
-
 export function VisualEditorNav({ activePage, onPageChange, onNavigateToLanding }: VisualEditorNavProps) {
-    const [isOpen, setIsOpen] = useState(false)
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+    const currentPage = VISUAL_EDITOR_PAGES.find((p) => p.id === activePage)
 
     return (
-        <div className="h-16 border-b bg-white flex items-center justify-between px-6 sticky top-0 z-[50] shadow-sm">
-            <div className="flex items-center gap-4">
+        <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[var(--dashboard-border)] bg-[var(--dashboard-glass-bg)] px-4 backdrop-blur-md md:px-6">
+            <div className="flex min-w-0 items-center gap-3">
                 <Button
+                    type="button"
                     variant="ghost"
                     size="sm"
                     onClick={onNavigateToLanding}
-                    className="hover:bg-muted"
+                    className="h-8 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)]"
                 >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back
+                    <ArrowLeft className="mr-1.5 h-4 w-4" />
+                    <span className="hidden sm:inline">Pages</span>
                 </Button>
-                <div className="w-px h-6 bg-border" />
-                <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Editing Page</span>
-                    <h1 className="font-serif text-lg font-medium capitalize prose-stone">
-                        {pages.find(p => p.id === activePage)?.label}
+
+                <div className="hidden h-5 w-px bg-[var(--dashboard-border)] sm:block" aria-hidden />
+
+                <div className="min-w-0">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--dashboard-text-muted)]">
+                        Editing
+                    </p>
+                    <h1 className="truncate text-sm font-semibold text-[var(--dashboard-text)]">
+                        {currentPage?.label ?? activePage}
                     </h1>
                 </div>
             </div>
 
-            <div className="flex items-center gap-3">
-                <div className="flex bg-muted/50 p-1 rounded-lg border border-border/50">
-                    {pages.map((page) => {
-                        const Icon = page.icon
-                        const isActive = activePage === page.id
-                        return (
-                            <Button
-                                key={page.id}
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onPageChange(page.id)}
-                                className={cn(
-                                    "h-8 px-3 rounded-md transition-all duration-300",
-                                    isActive ? "bg-white shadow-sm text-gold" : "text-muted-foreground hover:text-foreground"
-                                )}
-                            >
-                                <Icon className="w-3.5 h-3.5 mr-2" />
-                                <span className="text-xs">{page.label}</span>
-                            </Button>
-                        )
-                    })}
-                </div>
-
-                <div className="w-px h-6 bg-border mx-2" />
-
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="h-9 border-border hover:bg-muted text-xs" asChild>
-                        <Link href={`/${activePage === 'home' ? '' : activePage}`} target="_blank">
-                            <Eye className="w-4 h-4 mr-2" />
-                            Preview
-                        </Link>
-                    </Button>
-                    <Button size="sm" className="h-9 bg-gold text-black hover:bg-gold/90 text-xs font-bold px-6">
-                        Publish Changes
-                    </Button>
-                </div>
+            {/* Desktop page switcher */}
+            <div className="hidden items-center rounded-md border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] p-0.5 lg:flex">
+                {VISUAL_EDITOR_PAGES.map((page) => {
+                    const Icon = page.icon
+                    const isActive = activePage === page.id
+                    return (
+                        <Button
+                            key={page.id}
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onPageChange(page.id)}
+                            className={cn(
+                                "h-8 rounded-[calc(var(--dashboard-radius)-2px)] px-3 text-xs transition-colors",
+                                isActive
+                                    ? "bg-[var(--dashboard-card-hover)] text-[var(--dashboard-accent-gold)]"
+                                    : "text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)]",
+                            )}
+                        >
+                            <Icon className="mr-1.5 h-3.5 w-3.5" />
+                            {page.label}
+                        </Button>
+                    )
+                })}
             </div>
-        </div>
+
+            {/* Mobile page switcher */}
+            <div className="lg:hidden">
+                <DropdownMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 border-[var(--dashboard-border)] text-xs"
+                        >
+                            Switch page
+                            <ChevronDown className="ml-1 h-3.5 w-3.5" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="center" className="w-48">
+                        {VISUAL_EDITOR_PAGES.map((page) => {
+                            const Icon = page.icon
+                            return (
+                                <DropdownMenuItem
+                                    key={page.id}
+                                    onClick={() => {
+                                        onPageChange(page.id)
+                                        setMobileMenuOpen(false)
+                                    }}
+                                    className={cn(
+                                        activePage === page.id && "text-[var(--dashboard-accent-gold)]",
+                                    )}
+                                >
+                                    <Icon className="mr-2 h-4 w-4" />
+                                    {page.label}
+                                </DropdownMenuItem>
+                            )
+                        })}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-2">
+                <SaveStatus activePage={activePage} />
+
+                <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 border-[var(--dashboard-border)] text-xs text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)]"
+                    asChild
+                >
+                    <Link href={getPublicPath(activePage)} target="_blank" rel="noopener noreferrer">
+                        <Eye className="mr-1.5 h-4 w-4" />
+                        <span className="hidden sm:inline">Preview</span>
+                    </Link>
+                </Button>
+            </div>
+        </header>
     )
 }

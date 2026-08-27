@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { usePathname } from 'next/navigation'
 import { Command, Menu, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAdminSidebar } from '@/components/admin/sidebar-context'
@@ -18,6 +19,8 @@ const CommandPalette = dynamic(
 )
 
 export function AdminLayoutContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const isImmersiveEditor = pathname?.startsWith('/admin/visual-editor')
   const { isCollapsed, setIsMobileOpen } = useAdminSidebar()
   const { isStandalone } = usePwaContext()
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
@@ -37,6 +40,15 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
       document.documentElement.classList.remove('admin-theme')
     }
   }, [])
+
+  if (isImmersiveEditor) {
+    return (
+      <div className="admin-theme flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--dashboard-background)] font-sans text-[var(--dashboard-text)]">
+        {children}
+        <AdminToastProvider />
+      </div>
+    )
+  }
 
   return (
     <div className="admin-theme flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--dashboard-background)] font-sans text-[var(--dashboard-text)]">
