@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import { headers } from 'next/headers'
 
 export async function POST(req: Request) {
@@ -10,10 +10,13 @@ export async function POST(req: Request) {
     let event
 
     try {
+        if (!stripe) {
+            throw new Error('Stripe is not configured')
+        }
         if (!process.env.STRIPE_WEBHOOK_SECRET) {
             throw new Error('STRIPE_WEBHOOK_SECRET is not set')
         }
-        event = stripe?.webhooks.constructEvent(
+        event = stripe.webhooks.constructEvent(
             body,
             signature,
             process.env.STRIPE_WEBHOOK_SECRET
@@ -23,26 +26,19 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 })
     }
 
-    if (!event) {
-        return NextResponse.json({ error: 'Event construction failed' }, { status: 400 })
-    }
+    // Service role: webhook has no user session and must update orders/payments despite RLS
+    const supabase = createServiceRoleClient()
 
-    const supabase = await createClient()
-
-    // Handle the event
     switch (event.type) {
-        case 'payment_intent.succeeded':
+        case 'payment_intent.succeeded': {
             const paymentIntent = event.data.object
-            console.log(`PaymentIntent for ${paymentIntent.amount} was successful!`)
 
-            // First, get the current order to calculate new balance
             let { data: order, error: fetchError } = await supabase
                 .from('orders')
                 .select('id, total_amount, balance_paid')
                 .eq('payment_intent_id', paymentIntent.id)
                 .single()
 
-            // If not found by ID, check metadata (for balance payments)
             if (fetchError || !order) {
                 const orderIdFromMetadata = paymentIntent.metadata?.orderId
                 if (orderIdFromMetadata) {
@@ -67,7 +63,6 @@ export async function POST(req: Request) {
             const newBalancePaid = (order.balance_paid || 0) + paymentIntent.amount_received
             const newStatus = newBalancePaid >= order.total_amount ? 'paid' : 'partially_paid'
 
-            // Update order status and balance
             const { error: updateError } = await supabase
                 .from('orders')
                 .update({
@@ -82,7 +77,6 @@ export async function POST(req: Request) {
                 return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
             }
 
-            // Record the payment
             await supabase
                 .from('payments')
                 .insert({
@@ -93,20 +87,20 @@ export async function POST(req: Request) {
                     stripe_payment_intent_id: paymentIntent.id
                 })
             break
+        }
 
-        case 'payment_intent.payment_failed':
+        case 'payment_intent.payment_failed': {
             const failedIntent = event.data.object
-            console.log(`PaymentIntent for ${failedIntent.amount} failed.`)
 
-            // Update order status in database
             await supabase
                 .from('orders')
                 .update({ payment_status: 'failed' })
                 .eq('payment_intent_id', failedIntent.id)
             break
+        }
 
         default:
-            console.log(`Unhandled event type ${event.type}`)
+            break
     }
 
     return NextResponse.json({ received: true })

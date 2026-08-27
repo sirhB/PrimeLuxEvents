@@ -2,6 +2,8 @@
 
 This plan covers launching **PrimeLux Events** (Next.js + Supabase + Stripe on Vercel) safely. Follow phases in order; do not go live until **Phase 0–4** blockers are cleared.
 
+> **Implementation status (code):** Phase 0 hardening is in progress on branch `cursor/production-launch-plan-550f` — mock payments fail closed, Stripe webhook uses service role, checkout/consultation/signature writes go through service-role server actions, invite plaintext passwords removed, security headers added, CI workflow added, and migration `20260827_production_rls_hardening.sql` must be applied on Supabase before relying on the tightened RLS.
+
 **Stack assumptions**
 - App: Next.js 16 (App Router) on **Vercel**
 - Database / Auth / Storage: **Supabase** (PostgreSQL)
@@ -14,18 +16,16 @@ This plan covers launching **PrimeLux Events** (Next.js + Supabase + Stripe on V
 
 These are launch-blocking security issues already present in the repo.
 
-| # | Issue | Action |
-|---|--------|--------|
-| 0.1 | `.env.local` is committed and contains a live Supabase URL + anon JWT | Remove from git history tracking; add `.env*` (except `.env*.example`) to `.gitignore`; **rotate** the Supabase anon key and any other exposed secrets in the Supabase dashboard |
-| 0.2 | `SUPABASE_SERVICE_ROLE_KEY` missing from `.env.local.example` | Document it in the example file (never commit the real value) |
-| 0.3 | Checkout falls back to **mock payment intents** when Stripe is unset (`lib/stripe.ts`, `app/actions/checkout.ts`) | Fail closed in production: refuse checkout if `STRIPE_SECRET_KEY` / publishable key are missing |
-| 0.4 | Stripe webhook uses user-scoped `createClient()` (`app/api/stripe/webhook/route.ts`) | Switch webhook handlers to **service role** client so payment status updates cannot be blocked by RLS |
-| 0.5 | Permissive RLS: `WITH CHECK (true)` on orders / order_items / rental_reservations / payments | Tighten policies (see Phase 1) before exposing production |
-| 0.6 | Storage upload policies allow any `authenticated` user | Restrict uploads to staff roles (admin/manager/staff) |
-| 0.7 | Invitation `temp_password` stored in plaintext | Stop storing plaintext passwords; use one-time invite tokens only, or hash + short TTL |
-| 0.8 | `typescript.ignoreBuildErrors: true` in `next.config.mjs` | Fix type errors and disable this flag before production builds |
-
-**Exit criteria:** secrets rotated and not in git; production cannot take mock payments; webhook can update orders; RLS/storage no longer allow arbitrary writes.
+| # | Issue | Action | Status |
+|---|--------|--------|--------|
+| 0.1 | `.env.local` committed with live secrets | Removed from tracking / gitignored; **still rotate** any historically exposed keys in Supabase | Partially done (ops: rotate) |
+| 0.2 | `SUPABASE_SERVICE_ROLE_KEY` missing from example | Documented in `.env.local.example` | Done |
+| 0.3 | Mock payment intents when Stripe unset | Fail closed unless `ALLOW_MOCK_PAYMENTS=true` (never in production) | Done in code |
+| 0.4 | Stripe webhook used user-scoped client | Uses service role client | Done in code |
+| 0.5 | Permissive RLS open inserts | Migration `20260827_production_rls_hardening.sql` + service-role checkout writes | Done in code (apply migration) |
+| 0.6 | Storage uploads for any authenticated user | Staff-only storage policies in same migration; signatures via service-role action | Done in code (apply migration) |
+| 0.7 | Invitation `temp_password` plaintext | Token-only invites; column nulled; UI/API no longer use it | Done in code (apply migration) |
+| 0.8 | `typescript.ignoreBuildErrors: true` | Still true for build stability; CI runs `tsc` with continue-on-error until debt cleared | Partial |
 
 ---
 

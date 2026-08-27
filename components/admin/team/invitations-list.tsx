@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { MoreVertical, Mail, Clock, CheckCircle, XCircle, RefreshCw, Copy, Shield, User } from 'lucide-react'
+import { MoreVertical, Mail, Clock, CheckCircle, XCircle, RefreshCw, Copy, User } from 'lucide-react'
 import { toast } from 'sonner'
 import { format, addDays } from 'date-fns'
 import { useRouter } from 'next/navigation'
@@ -17,7 +17,6 @@ interface Invitation {
     created_at: string
     invitation_token: string
     invited_by: string | null
-    temp_password?: string
 }
 
 interface InvitationsListProps {
@@ -144,12 +143,6 @@ export function InvitationsList({ invitations, canManage }: InvitationsListProps
                                                 <Clock className="h-3 w-3 text-[var(--dashboard-accent-gold)]" />
                                                 Expires {format(new Date(invitation.expires_at), 'MMM d, yyyy')}
                                             </span>
-                                            {invitation.temp_password && (
-                                                <span className="flex items-center gap-1.5 text-[var(--dashboard-accent-gold)]">
-                                                    <Shield className="h-3 w-3" />
-                                                    Temp Pass Set
-                                                </span>
-                                            )}
                                             {invitation.invited_by && (
                                                 <span className="flex items-center gap-1.5 font-bold uppercase tracking-[0.1em]">
                                                     <User className="h-3 w-3 text-[var(--dashboard-accent-gold)]" />
