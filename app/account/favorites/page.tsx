@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Heart } from 'lucide-react'
 import { FavoriteButton } from '@/components/account/favorite-button'
 import { formatCurrency } from '@/lib/utils'
+import { resolvePriceCents } from '@/lib/catalog/adapters'
 
 export default async function FavoritesPage() {
   const supabase = await createClient()
@@ -14,7 +15,7 @@ export default async function FavoritesPage() {
 
   const { data: favorites } = await supabase
     .from('favorites')
-    .select('id, product_id, products(id, name, slug, image_url, rental_price_daily, price, categories(name, slug))')
+    .select('id, product_id, products(id, name, slug, image_url, price_cents, categories(name, slug))')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -41,7 +42,7 @@ export default async function FavoritesPage() {
             const product = fav.products
             if (!product) return null
             const href = `/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`
-            const price = product.rental_price_daily || product.price
+            const price = resolvePriceCents(product)
             return (
               <Card key={fav.id} className="overflow-hidden border-border/60 bg-white/80">
                 <div className="relative aspect-[4/5] bg-[var(--linen,#F7F4EF)]">

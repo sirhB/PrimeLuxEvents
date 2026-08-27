@@ -3,6 +3,7 @@
 import { useMemo } from "react"
 import { ProductCard } from "@/components/product-card"
 import { cn } from "@/lib/utils"
+import { resolvePriceCents } from "@/lib/catalog/adapters"
 import { motion } from "framer-motion"
 
 interface Product {
@@ -57,8 +58,8 @@ export function RelatedProducts({
                 }
 
                 // Similar price range
-                const currentPrice = currentProduct.rental_price_daily || currentProduct.price
-                const productPrice = product.rental_price_daily || product.price
+                const currentPrice = resolvePriceCents(currentProduct)
+                const productPrice = resolvePriceCents(product)
                 const priceDiff = Math.abs(currentPrice - productPrice)
                 if (priceDiff < currentPrice * 0.3) {
                     score += 3

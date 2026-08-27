@@ -86,15 +86,42 @@ function asStringArray(value: unknown): string[] {
   return []
 }
 
+/** Coerce DB/JSON numeric values (number | numeric string) to a finite number. */
+export function coerceCents(value: unknown, fallback = 0): number {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string' && value.trim() !== '') {
+    const n = Number(value)
+    if (Number.isFinite(n)) return n
+  }
+  return fallback
+}
+
+/**
+ * Resolve display/checkout price in cents from a live plux row or adapted product.
+ * Prefers price_cents, then legacy price / rental_price_daily.
+ */
+export function resolvePriceCents(row: {
+  price_cents?: unknown
+  price?: unknown
+  rental_price_daily?: unknown
+} | null | undefined): number {
+  if (!row) return 0
+  if (row.price_cents != null && row.price_cents !== '') {
+    return coerceCents(row.price_cents, 0)
+  }
+  if (row.price != null && row.price !== '') {
+    return coerceCents(row.price, 0)
+  }
+  if (row.rental_price_daily != null && row.rental_price_daily !== '') {
+    return coerceCents(row.rental_price_daily, 0)
+  }
+  return 0
+}
+
 export function adaptProduct(row: LiveProduct | null | undefined): AppProduct | null {
   if (!row) return null
 
-  const price =
-    typeof row.price_cents === 'number'
-      ? row.price_cents
-      : typeof row.price === 'number'
-        ? row.price
-        : 0
+  const price = resolvePriceCents(row)
 
   const gallery = asStringArray(row.gallery_images)
   const legacyImages = asStringArray(row.images)
@@ -133,7 +160,7 @@ export function adaptProduct(row: LiveProduct | null | undefined): AppProduct | 
     image_url: row.image_url ?? images[0] ?? null,
     images,
     quantity_available,
-    rental_price_daily: typeof row.rental_price_daily === 'number' ? row.rental_price_daily : price,
+    rental_price_daily: coerceCents(row.rental_price_daily, price),
     is_featured: Boolean(row.is_featured),
     is_active: row.is_active !== false,
     minimum_rental_days: row.minimum_rental_period ?? 1,

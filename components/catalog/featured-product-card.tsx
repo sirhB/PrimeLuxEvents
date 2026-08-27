@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatCurrency } from '@/lib/utils'
+import { resolvePriceCents } from '@/lib/catalog/adapters'
 import { Sparkles, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -23,7 +24,7 @@ interface FeaturedProductCardProps {
 }
 
 export function FeaturedProductCard({ product }: FeaturedProductCardProps) {
-    const price = product.rental_price_daily || product.price
+    const price = resolvePriceCents(product)
 
     return (
         <Link
