@@ -23,8 +23,12 @@ import {
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-import { createWarehouseTask, WAREHOUSE_CATEGORIES } from '@/app/admin/warehouse/actions'
-import { WAREHOUSE_CATEGORY_LABELS, type WarehouseCategory } from '@/lib/warehouse/types'
+import { createWarehouseTask } from '@/app/admin/warehouse/actions'
+import {
+    WAREHOUSE_CATEGORIES,
+    WAREHOUSE_CATEGORY_LABELS,
+    type WarehouseCategory,
+} from '@/lib/warehouse/types'
 
 interface CreateWarehouseTaskDialogProps {
     defaultDate?: string

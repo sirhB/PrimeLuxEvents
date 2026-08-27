@@ -51,14 +51,16 @@ export function WarehouseScheduleContent({
     staffOnShift = [],
 }: WarehouseScheduleContentProps) {
     const router = useRouter()
-    const [tasks, setTasks] = useState<WarehouseTask[]>(initialTasks)
+    const [tasks, setTasks] = useState<WarehouseTask[]>(
+        Array.isArray(initialTasks) ? initialTasks : []
+    )
     const [selectedTask, setSelectedTask] = useState<WarehouseTask | null>(null)
     const [viewMode, setViewMode] = useState<'board' | 'queue'>('board')
     const [filter, setFilter] = useState<'all' | 'mine' | 'shift'>('all')
     const [generating, setGenerating] = useState(false)
 
     useEffect(() => {
-        setTasks(initialTasks)
+        setTasks(Array.isArray(initialTasks) ? initialTasks : [])
         setSelectedTask(null)
     }, [initialTasks])
 
