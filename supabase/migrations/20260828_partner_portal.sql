@@ -52,6 +52,14 @@ CREATE TABLE IF NOT EXISTS partner_profiles (
   base_discount_percent integer
     CHECK (base_discount_percent IS NULL OR (base_discount_percent >= 0 AND base_discount_percent <= 100)),
   notes text,
+  -- How clients pay the partner (shown on share invoice — not PrimeLux payout)
+  payment_zelle text,
+  payment_venmo text,
+  payment_apple_cash text,
+  payment_cash_app text,
+  payment_other_label text,
+  payment_other_value text,
+  payment_instructions text,
   approved_at timestamptz,
   approved_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   created_at timestamptz NOT NULL DEFAULT timezone('utc'::text, now()),

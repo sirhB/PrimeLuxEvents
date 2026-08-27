@@ -65,6 +65,7 @@ const partnerActiveNav = [
     { title: 'Partner home', href: '/account/partner', icon: Handshake },
     { title: 'Shared carts', href: '/account/partner/carts', icon: Share2 },
     { title: 'Trade rates', href: '/account/partner/rates', icon: Percent },
+    { title: 'Client payments', href: '/account/partner/payments', icon: ClipboardList },
 ]
 
 function isNavItemActive(pathname: string, href: string) {

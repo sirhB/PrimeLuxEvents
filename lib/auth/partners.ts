@@ -17,6 +17,13 @@ export type PartnerProfile = {
   tier: PartnerTier
   base_discount_percent: number | null
   notes: string | null
+  payment_zelle: string | null
+  payment_venmo: string | null
+  payment_apple_cash: string | null
+  payment_cash_app: string | null
+  payment_other_label: string | null
+  payment_other_value: string | null
+  payment_instructions: string | null
   approved_at: string | null
   created_at: string
 }

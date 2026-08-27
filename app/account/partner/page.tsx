@@ -51,6 +51,13 @@ export default async function PartnerHomePage() {
             >
               <Link href="/account/partner/carts">Shared carts</Link>
             </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-full border-white/30 bg-transparent text-white hover:bg-white/10"
+            >
+              <Link href="/account/partner/payments">Client payment info</Link>
+            </Button>
           </div>
         </div>
       </section>

@@ -177,7 +177,9 @@ export async function getSharedCartByToken(token: string) {
 
   const { data: partner } = await admin
     .from('partner_profiles')
-    .select('company_name, business_type, website, instagram')
+    .select(
+      'company_name, business_type, website, instagram, payment_zelle, payment_venmo, payment_apple_cash, payment_cash_app, payment_other_label, payment_other_value, payment_instructions, phone',
+    )
     .eq('id', cart.partner_id)
     .maybeSingle()
 
@@ -409,6 +411,50 @@ export async function cancelSharedCart(id: string) {
 
     if (error) return { error: error.message }
     revalidatePath('/account/partner/carts')
+    return { success: true }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Failed' }
+  }
+}
+
+const paymentMethodsSchema = z.object({
+  payment_zelle: z.string().max(200).optional().or(z.literal('')),
+  payment_venmo: z.string().max(200).optional().or(z.literal('')),
+  payment_apple_cash: z.string().max(200).optional().or(z.literal('')),
+  payment_cash_app: z.string().max(200).optional().or(z.literal('')),
+  payment_other_label: z.string().max(80).optional().or(z.literal('')),
+  payment_other_value: z.string().max(200).optional().or(z.literal('')),
+  payment_instructions: z.string().max(2000).optional().or(z.literal('')),
+})
+
+/** Partner saves how clients should pay them (shown on share invoice). */
+export async function updatePartnerPaymentMethods(input: z.infer<typeof paymentMethodsSchema>) {
+  try {
+    const partner = await requireActivePartner()
+    const parsed = paymentMethodsSchema.safeParse(input)
+    if (!parsed.success) return { error: 'Invalid payment details' }
+
+    const supabase = await createClient()
+    const { error } = await supabase
+      .from('partner_profiles')
+      .update({
+        payment_zelle: parsed.data.payment_zelle?.trim() || null,
+        payment_venmo: parsed.data.payment_venmo?.trim() || null,
+        payment_apple_cash: parsed.data.payment_apple_cash?.trim() || null,
+        payment_cash_app: parsed.data.payment_cash_app?.trim() || null,
+        payment_other_label: parsed.data.payment_other_label?.trim() || null,
+        payment_other_value: parsed.data.payment_other_value?.trim() || null,
+        payment_instructions: parsed.data.payment_instructions?.trim() || null,
+      })
+      .eq('id', partner.id)
+
+    if (error) {
+      console.error('updatePartnerPaymentMethods:', error)
+      return { error: 'Could not save payment methods' }
+    }
+
+    revalidatePath('/account/partner/payments')
+    revalidatePath('/account/partner')
     return { success: true }
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Failed' }
