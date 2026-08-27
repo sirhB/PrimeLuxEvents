@@ -27,6 +27,7 @@ import {
   Settings,
   FileOutput,
   Plus,
+  Handshake,
 } from 'lucide-react'
 
 export type AdminNavItem = {
@@ -61,7 +62,12 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments', keywords: ['showroom', 'visits'] },
       { icon: MessageSquare, label: 'Messages', href: '/admin/messages', keywords: ['inbox', 'chat'] },
       { icon: Users, label: 'Customers', href: '/admin/customers', permission: 'customers.view', keywords: ['clients'] },
-      { icon: Briefcase, label: 'Partners', href: '/admin/partners', permission: 'customers.view', keywords: ['planners', 'decorators', 'preferred', 'trade'] },
+      {
+        icon: Handshake,
+        label: 'Preferred partners',
+        href: '/admin/partners',
+        keywords: ['planners', 'decorators', 'preferred', 'trade', 'partner', 'vendor'],
+      },
       { icon: Tag, label: 'Discounts', href: '/admin/marketing/discounts', keywords: ['coupons', 'promo', 'marketing'] },
     ],
   },
@@ -104,6 +110,12 @@ export const ADMIN_QUICK_ACTIONS: AdminNavItem[] = [
   { icon: Plus, label: 'New order', href: '/admin/orders/new', keywords: ['create'] },
   { icon: Plus, label: 'New product', href: '/admin/products/new', keywords: ['add', 'create'] },
   { icon: Plus, label: 'New package', href: '/admin/packages/new', keywords: ['add', 'create'] },
+  {
+    icon: Handshake,
+    label: 'Review partners',
+    href: '/admin/partners',
+    keywords: ['approve', 'planner', 'preferred'],
+  },
 ]
 
 /** Primary mobile tabs (scan + menu are chrome, not listed here) */
