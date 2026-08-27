@@ -249,6 +249,46 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.hero-enter {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.hero-parallax {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-parallax {
+    animation: heroParallax 20s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes heroParallax {
+  from {
+    transform: scale(1.02) translateY(0);
+  }
+  to {
+    transform: scale(1.06) translateY(-1%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter,
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-scale-in {
+    animation: none !important;
+  }
+
+  .hero-parallax {
+    animation: none !important;
+  }
+
+  .spotlight-frame::before {
+    opacity: 0.5;
+  }
+}
+
 /* Added animations and noise texture */
 @layer utilities {
   .animate-fade-in {
@@ -362,10 +402,18 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50 select-none;
-    /* Native feel: disable selection and tap highlight */
+    @apply border-border outline-ring/50;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
+  }
+
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  [role="button"] {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-[var(--champagne,#B8956B)] focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
   /* Allow text selection in inputs */

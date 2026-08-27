@@ -1,10 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { formatCentsWithCommas } from '@/lib/format-money'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, Package, Clock, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { OrderStatusChip } from '@/components/account/order-status-chip'
 
 export default async function AccountPage() {
     const supabase = await createClient()
@@ -12,14 +12,12 @@ export default async function AccountPage() {
 
     if (!user) return null
 
-    // Fetch user profile
     const { data: profile } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', user.id)
         .single()
 
-    // Fetch orders for summary and recent list
     const { data: orders } = await supabase
         .from('orders')
         .select('*')
@@ -29,7 +27,6 @@ export default async function AccountPage() {
     const recentOrders = orders?.slice(0, 3) || []
     const totalOrders = orders?.length || 0
 
-    // Find next upcoming order for countdown
     const now = new Date()
     const upcomingOrder = orders
         ?.filter((o: any) => o.delivery_date && new Date(o.delivery_date) >= now && o.status !== 'cancelled')
@@ -43,21 +40,19 @@ export default async function AccountPage() {
 
     return (
         <div className="space-y-8">
-            {/* Welcome Banner */}
             <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-serif font-bold tracking-tight text-primary">
-                    Welcome back, {profile?.full_name || user.email?.split('@')[0]}
-                </h1>
+                <h2 className="font-serif text-2xl font-light tracking-tight text-[var(--ink,#121110)]">
+                    Your dashboard
+                </h2>
                 <p className="text-muted-foreground">
-                    Manage your events and view your order history from your dashboard.
+                    Track deliveries, review orders, and update your profile.
                 </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {/* Stats Summary */}
-                <Card>
+                <Card className="spotlight-frame border-border/60 bg-white/80">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+                        <CardTitle className="text-sm font-medium">Total orders</CardTitle>
                         <Package className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
@@ -66,9 +61,9 @@ export default async function AccountPage() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="spotlight-frame border-border/60 bg-white/80">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Next Event</CardTitle>
+                        <CardTitle className="text-sm font-medium">Next event</CardTitle>
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
@@ -81,24 +76,23 @@ export default async function AccountPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-primary/5 border-primary/20">
+                <Card className="spotlight-frame border-[var(--champagne,#B8956B)]/25 bg-[color-mix(in_srgb,var(--champagne)_8%,white)]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-primary">Countdown</CardTitle>
-                        <Clock className="h-4 w-4 text-primary" />
+                        <CardTitle className="text-sm font-medium text-[var(--champagne,#B8956B)]">Countdown</CardTitle>
+                        <Clock className="h-4 w-4 text-[var(--champagne,#B8956B)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-primary">
-                            {daysUntil !== null ? `${daysUntil} Days` : '---'}
+                        <div className="text-2xl font-bold text-[var(--ink,#121110)]">
+                            {daysUntil !== null ? `${daysUntil} days` : '---'}
                         </div>
-                        <p className="text-xs text-primary/70">Remaining until your next event</p>
+                        <p className="text-xs text-muted-foreground">Until your next delivery</p>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Recent Orders List */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-serif font-bold">Recent Orders</h2>
+                    <h2 className="font-serif text-xl font-light">Recent orders</h2>
                     <Button variant="ghost" asChild>
                         <Link href="/account/orders" className="flex items-center gap-1">
                             View all <ArrowRight className="h-4 w-4" />
@@ -110,7 +104,7 @@ export default async function AccountPage() {
                     {recentOrders.length > 0 ? (
                         recentOrders.map((order: any) => (
                             <Link key={order.id} href={`/account/orders/${order.id}`}>
-                                <Card className="hover:bg-muted/50 transition-colors">
+                                <Card className="spotlight-frame border-border/60 bg-white/80 transition-colors hover:border-[var(--champagne,#B8956B)]/30">
                                     <CardContent className="flex items-center justify-between py-4">
                                         <div className="space-y-1">
                                             <p className="font-medium">Order #{order.id.slice(0, 8).toUpperCase()}</p>
@@ -118,25 +112,23 @@ export default async function AccountPage() {
                                                 Placed on {new Date(order.created_at).toLocaleDateString()}
                                             </p>
                                         </div>
-                                        <div className="text-right space-y-1">
+                                        <div className="space-y-1 text-right">
                                             <p className="font-bold">{formatCentsWithCommas(order.total_amount)}</p>
-                                            <span className={cn(
-                                                "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
-                                                order.status === 'confirmed' ? "bg-green-100 text-green-800" :
-                                                    order.status === 'pending' ? "bg-yellow-100 text-yellow-800" :
-                                                        "bg-gray-100 text-gray-800"
-                                            )}>
-                                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                                            </span>
+                                            <OrderStatusChip status={order.status} />
                                         </div>
                                     </CardContent>
                                 </Card>
                             </Link>
                         ))
                     ) : (
-                        <Card>
-                            <CardContent className="py-8 text-center text-muted-foreground">
-                                No orders found. Ready to start planning your next event?
+                        <Card className="spotlight-frame border-dashed border-border/80 bg-white/60">
+                            <CardContent className="space-y-4 py-10 text-center">
+                                <p className="text-muted-foreground">
+                                    No orders yet. Browse the collection to start planning your event.
+                                </p>
+                                <Button asChild className="rounded-full bg-[var(--champagne,#B8956B)] text-black hover:bg-[var(--ink,#121110)] hover:text-white">
+                                    <Link href="/catalog">Browse the collection</Link>
+                                </Button>
                             </CardContent>
                         </Card>
                     )}

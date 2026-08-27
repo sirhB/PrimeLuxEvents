@@ -1,0 +1,58 @@
+'use client'
+
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+
+interface AccountPortalHeaderProps {
+  userName: string
+  upcomingOrderDate?: string | null
+  upcomingOrderStatus?: string | null
+}
+
+export function AccountPortalHeader({
+  userName,
+  upcomingOrderDate,
+  upcomingOrderStatus,
+}: AccountPortalHeaderProps) {
+  const firstName = userName.split(' ')[0] || userName
+
+  return (
+    <header className="sticky top-0 z-20 border-b border-border/60 bg-[var(--linen,#F7F4EF)]/90 px-6 py-4 backdrop-blur-md md:px-10 pt-[max(1rem,env(safe-area-inset-top))]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--champagne,#B8956B)]">
+            Client portal
+          </p>
+          <h1 className="font-serif text-2xl font-light tracking-tight text-[var(--ink,#121110)]">
+            Hello, {firstName}
+          </h1>
+        </div>
+
+        {upcomingOrderDate ? (
+          <div className="rounded-2xl border border-[var(--champagne,#B8956B)]/20 bg-white/70 px-4 py-3 text-sm shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              Next delivery
+            </p>
+            <p className="font-medium text-[var(--ink,#121110)]">
+              {new Date(upcomingOrderDate).toLocaleDateString(undefined, {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </p>
+            {upcomingOrderStatus && (
+              <p className="mt-1 text-xs capitalize text-[var(--sage,#8A9A8B)]">{upcomingOrderStatus}</p>
+            )}
+          </div>
+        ) : (
+          <Button asChild variant="outline" className="rounded-full border-[var(--champagne,#B8956B)]/30">
+            <Link href="/catalog" className="gap-2">
+              Browse collection <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        )}
+      </div>
+    </header>
+  )
+}

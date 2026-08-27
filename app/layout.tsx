@@ -7,6 +7,8 @@ import { PwaProvider } from "@/components/providers/pwa-provider"
 import { NotificationsProvider } from "@/components/providers/notifications-provider"
 import { CartProvider } from "@/components/providers/cart-provider"
 import { SiteLayout } from "@/components/site-layout"
+import { SiteHeaderWrapper } from "@/components/site-header-wrapper"
+import { SiteFooter } from "@/components/site-footer"
 
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -95,7 +97,9 @@ export default function RootLayout({
         <PwaProvider>
           <NotificationsProvider>
             <CartProvider>
-              <SiteLayout>{children}</SiteLayout>
+              <SiteLayout header={<SiteHeaderWrapper />} footer={<SiteFooter />}>
+                {children}
+              </SiteLayout>
             </CartProvider>
           </NotificationsProvider>
         </PwaProvider>

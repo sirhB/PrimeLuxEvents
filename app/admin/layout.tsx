@@ -12,6 +12,9 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'PrimeLux Admin',
   },
+}
+
+export const viewport = {
   themeColor: '#0a0a0b',
 }
 

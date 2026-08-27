@@ -15,7 +15,7 @@ import { ArrowLeft, LayoutGrid, List, Filter, X, Menu, Search, SlidersHorizontal
 import Image from 'next/image'
 import Link from 'next/link'
 import { cn, formatCurrency } from '@/lib/utils'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 
 interface Product {
@@ -59,7 +59,6 @@ export default function CatalogClient({ heroTitle, products, categories, package
     const searchParams = useSearchParams()
     const router = useRouter()
     const pathname = usePathname()
-    const { scrollY } = useScroll()
 
     const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid')
     const [inputValue, setInputValue] = useState('')
@@ -72,10 +71,6 @@ export default function CatalogClient({ heroTitle, products, categories, package
     const [searchResults, setSearchResults] = useState<Product[]>(products)
 
     const selectedCategory = searchParams.get('category')
-
-    // Parallax effect for hero
-    const heroY = useTransform(scrollY, [0, 500], [0, 200])
-    const heroOpacity = useTransform(scrollY, [0, 300], [1, 0])
 
     // Initial load sync
     useEffect(() => {
@@ -172,30 +167,23 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
             {/* Immersive Hero Section */}
             <div className="relative h-[60vh] md:h-[70vh] overflow-hidden bg-black">
-                <motion.div
-                    style={{ y: heroY, opacity: heroOpacity }}
-                    className="absolute inset-0 w-full h-full"
-                >
+                <div className="hero-parallax absolute inset-0 w-full h-full">
                     <Image
                         src={selectedCategory
                             ? (categories.find(c => c.name === selectedCategory)?.image_url || "/images/luxury-event-hero.png")
                             : "/images/luxury-event-hero.png"
                         }
-                        alt="Catalog Hero"
+                        alt="Catalog hero"
                         fill
                         className="object-cover opacity-40 scale-105"
                         priority
+                        sizes="100vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[#1A1A1A]" />
-                </motion.div>
+                </div>
 
                 <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 z-10">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="max-w-4xl space-y-10"
-                    >
+                    <div className="hero-enter max-w-4xl space-y-10">
                         <div className="flex items-center justify-center gap-3">
                             <span className="w-12 h-px bg-gold/30" />
                             <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Curated Intelligence</span>
@@ -219,7 +207,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     : "Browse our exclusive categories of luxury event rentals, designed to transform any venue."
                             }
                         </p>
-                    </motion.div>
+                    </div>
                 </div>
             </div>
 
@@ -469,15 +457,17 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                             ))}
                                         </motion.div>
                                     ) : (
-                                        <div className="text-center py-40 bg-white/5 rounded-[2.5rem] border border-white/5">
-                                            <Search className="h-16 w-16 text-gold/20 mx-auto mb-8" />
-                                            <h3 className="text-2xl font-serif text-white mb-4">No Masterpieces Found</h3>
-                                            <p className="text-gray-500 font-light mb-12">We couldn't find any products matching your selection.</p>
+                                        <div className="spotlight-frame rounded-[2.5rem] border border-white/5 bg-white/5 py-40 text-center">
+                                            <Search className="mx-auto mb-8 h-16 w-16 text-[var(--champagne,#B8956B)]/30" />
+                                            <h3 className="mb-4 font-serif text-2xl text-white">No pieces match this search</h3>
+                                            <p className="mx-auto mb-12 max-w-md font-light text-gray-500">
+                                                Try another category or browse the full collection to find rentals for your event.
+                                            </p>
                                             <Button
                                                 onClick={handleBackToCatalog}
-                                                className="bg-gold text-black px-12 py-6 rounded-full font-bold uppercase tracking-widest text-[10px] hover:bg-white transition-all duration-500"
+                                                className="rounded-full bg-[var(--champagne,#B8956B)] px-12 py-6 text-[10px] font-bold uppercase tracking-widest text-black transition-all duration-500 hover:bg-white"
                                             >
-                                                Return to Gallery
+                                                Browse the collection
                                             </Button>
                                         </div>
                                     )}
