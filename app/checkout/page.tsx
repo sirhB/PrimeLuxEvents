@@ -12,6 +12,7 @@ import { Loader2, Check, AlertCircle, CalendarIcon, Clock, MapPin, Truck, ArrowR
 import { createOrder, calculateOrderTotal, type CheckoutFormData, type CartItem } from '@/app/actions/checkout'
 import { formatCurrency } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/client'
+import { adaptProduct, resolvePriceCents } from '@/lib/catalog/adapters'
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
@@ -114,7 +115,10 @@ export default function CheckoutPage() {
 
             if (data) {
                 // Filter out items already in cart
-                const available = data.filter(p => !cartIds.includes(p.id))
+                const available = data
+                    .map((row) => adaptProduct(row))
+                    .filter((p): p is NonNullable<ReturnType<typeof adaptProduct>> => p != null && p.is_active)
+                    .filter((p) => !cartIds.includes(p.id))
                 // Shuffle and take 8
                 const shuffled = available.sort(() => 0.5 - Math.random()).slice(0, 8)
                 setSupplementalProducts(shuffled)
@@ -167,11 +171,14 @@ export default function CheckoutPage() {
             const { data } = await supabase.from('products').select('*').in('id', productIds)
 
             if (data) {
-                setCartProducts(data)
+                const adapted = data
+                    .map((row) => adaptProduct(row))
+                    .filter((p): p is NonNullable<typeof p> => Boolean(p))
+                setCartProducts(adapted)
 
                 // Check for invalid items and remove them
                 // Only check standard products
-                const validIds = data.map(p => p.id)
+                const validIds = adapted.map(p => p.id)
                 const invalidItems = items.filter(i => i.productId && !validIds.includes(i.productId))
 
                 if (invalidItems.length > 0) {
@@ -662,7 +669,7 @@ export default function CheckoutPage() {
 
                                             <div className="p-8 flex flex-col flex-1 text-center">
                                                 <h3 className="font-serif text-lg font-bold text-gray-900 mb-2 line-clamp-1">{product.name}</h3>
-                                                <p className="text-gold font-bold text-sm mb-6">{formatCurrency(product.price)}</p>
+                                                <p className="text-gold font-bold text-sm mb-6">{formatCurrency(resolvePriceCents(product))}</p>
 
                                                 <div className="mt-auto flex items-center justify-center gap-6 bg-gray-50 rounded-full px-4 py-2 border border-border/5">
                                                     <button
@@ -1033,6 +1040,7 @@ export default function CheckoutPage() {
                                         // Handle Package Items
                                         if (item.packageId && item.packageData) {
                                             const { name, price } = item.packageData
+                                            const packagePrice = resolvePriceCents({ price })
 
                                             return (
                                                 <motion.div
@@ -1067,7 +1075,7 @@ export default function CheckoutPage() {
                                                                     <X className="h-5 w-5" />
                                                                 </button>
                                                             </div>
-                                                            <p className="text-gold font-bold text-lg mb-4">{formatCurrency(price * item.quantity)}</p>
+                                                            <p className="text-gold font-bold text-lg mb-4">{formatCurrency(packagePrice * item.quantity)}</p>
 
                                                             {/* Package Contents Breakdown */}
                                                             {item.packageData.selectionsSummary && (
@@ -1152,7 +1160,7 @@ export default function CheckoutPage() {
                                                                 <X className="h-5 w-5" />
                                                             </button>
                                                         </div>
-                                                        <p className="text-gold font-bold text-lg">{formatCurrency(product.price * item.quantity)}</p>
+                                                        <p className="text-gold font-bold text-lg">{formatCurrency(resolvePriceCents(product) * item.quantity)}</p>
                                                     </div>
                                                     <div className="flex items-center gap-6 mt-6">
                                                         <div className="flex items-center gap-6 bg-gray-50 rounded-full px-6 py-2 border border-border/5">

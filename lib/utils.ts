@@ -6,8 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number) {
+  const cents = typeof amount === 'number' && Number.isFinite(amount) ? amount : 0
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-  }).format(amount / 100)
+  }).format(cents / 100)
 }

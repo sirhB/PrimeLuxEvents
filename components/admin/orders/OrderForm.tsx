@@ -118,12 +118,15 @@ export function OrderForm() {
     const searchProducts = async (query: string) => {
         const { data, error } = await supabase
             .from('products')
-            .select('id, name, price, image_url')
+            .select('id, name, price_cents, image_url')
             .ilike('name', `%${query}%`)
             .limit(10)
 
         if (error) throw error
-        return data || []
+        return (data || []).map((p: any) => ({
+            ...p,
+            price: typeof p.price_cents === 'number' ? p.price_cents : 0,
+        }))
     }
 
     const addToCart = (product: any) => {
@@ -139,7 +142,7 @@ export function OrderForm() {
             return [...prev, {
                 id: product.id,
                 name: product.name,
-                price: product.price,
+                price: typeof product.price_cents === 'number' ? product.price_cents : (product.price || 0),
                 quantity: 1,
                 image_url: product.image_url
             }]
