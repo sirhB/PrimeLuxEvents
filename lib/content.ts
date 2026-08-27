@@ -3,25 +3,19 @@ import { createClient } from '@/lib/supabase/server'
 export type ContentMap = Record<string, any>
 
 export async function getSiteContent() {
-    const supabase = await createClient()
-
     try {
-        const { data, error } = await supabase
-            .from('content')
-            .select('*')
+        const supabase = await createClient()
+        const { data, error } = await supabase.from('content').select('*')
 
-        if (error) {
-            console.error('Error fetching content:', error)
-            return {}
-        }
+        // plux may not have a content table yet — fall back silently
+        if (error || !data) return {}
 
         const contentMap: ContentMap = {}
-        data?.forEach((item) => {
+        data.forEach((item) => {
             if (item.type === 'json') {
                 try {
                     contentMap[item.key] = JSON.parse(item.value)
-                } catch (e) {
-                    console.error(`Error parsing JSON for key ${item.key}:`, e)
+                } catch {
                     contentMap[item.key] = item.value
                 }
             } else {
@@ -30,33 +24,26 @@ export async function getSiteContent() {
         })
 
         return contentMap
-    } catch (error) {
-        console.error('Error in getSiteContent:', error)
+    } catch {
         return {}
     }
 }
 
 export async function getGlobalSettings() {
-    const supabase = await createClient()
-
     try {
-        const { data, error } = await supabase
-            .from('settings')
-            .select('key, value')
+        const supabase = await createClient()
+        const { data, error } = await supabase.from('settings').select('key, value')
 
-        if (error) {
-            console.error('Error fetching settings:', error)
-            return {}
-        }
+        // plux may not have a settings table yet — fall back silently
+        if (error || !data) return {}
 
         const settingsMap: Record<string, string> = {}
-        data?.forEach((item) => {
+        data.forEach((item) => {
             settingsMap[item.key] = item.value
         })
 
         return settingsMap
-    } catch (error) {
-        console.error('Error in getGlobalSettings:', error)
+    } catch {
         return {}
     }
 }
