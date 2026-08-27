@@ -110,8 +110,8 @@ export function ShareCartWithClientDialog({ open, onOpenChange }: Props) {
             Share cart with client
           </DialogTitle>
           <DialogDescription>
-            Your client gets a review-only link with retail pricing. They cannot pay
-            PrimeLux — you collect from them, then settle your trade rate with us.
+            Your client gets a white-label invoice with your branding and retail pricing.
+            They pay you directly — then you settle your trade rate with PrimeLux.
           </DialogDescription>
         </DialogHeader>
 

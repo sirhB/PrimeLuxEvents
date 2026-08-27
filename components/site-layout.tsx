@@ -17,7 +17,8 @@ export function SiteLayout({
   const pathname = usePathname()
   const isAdmin = pathname?.startsWith("/admin")
   const isAccount = pathname?.startsWith("/account")
-  const isPortal = isAdmin || isAccount
+  const isShareInvoice = pathname?.startsWith("/share")
+  const isPortal = isAdmin || isAccount || isShareInvoice
 
   return (
     <div className="ambient-bg flex min-h-screen flex-col">

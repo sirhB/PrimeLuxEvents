@@ -15,6 +15,7 @@ import {
     Percent,
     Share2,
     ClipboardList,
+    Palette,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -65,6 +66,7 @@ const partnerActiveNav = [
     { title: 'Partner home', href: '/account/partner', icon: Handshake },
     { title: 'Shared carts', href: '/account/partner/carts', icon: Share2 },
     { title: 'Trade rates', href: '/account/partner/rates', icon: Percent },
+    { title: 'Branding', href: '/account/partner/branding', icon: Palette },
     { title: 'Client payments', href: '/account/partner/payments', icon: ClipboardList },
 ]
 

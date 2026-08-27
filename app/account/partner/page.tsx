@@ -35,8 +35,8 @@ export default async function PartnerHomePage() {
             {partner.company_name}
           </h2>
           <p className="max-w-md text-sm font-light leading-relaxed text-white/70">
-            {tier.label} trade rates at {basePercent}% off merchandise. Build a cart, share a
-            review link with your client, collect from them, then settle your portion with us.
+            {tier.label} trade rates at {basePercent}% off merchandise. Build a cart, send a
+            white-label invoice to your client, collect from them, then settle your portion with us.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
             <Button asChild className="rounded-full bg-[var(--champagne,#B8956B)] text-black hover:bg-white">
@@ -50,6 +50,13 @@ export default async function PartnerHomePage() {
               className="rounded-full border-white/30 bg-transparent text-white hover:bg-white/10"
             >
               <Link href="/account/partner/carts">Shared carts</Link>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-full border-white/30 bg-transparent text-white hover:bg-white/10"
+            >
+              <Link href="/account/partner/branding">Invoice branding</Link>
             </Button>
             <Button
               asChild

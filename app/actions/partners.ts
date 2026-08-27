@@ -178,7 +178,12 @@ export async function getSharedCartByToken(token: string) {
   const { data: partner } = await admin
     .from('partner_profiles')
     .select(
-      'company_name, business_type, website, instagram, payment_zelle, payment_venmo, payment_apple_cash, payment_cash_app, payment_other_label, payment_other_value, payment_instructions, phone',
+      `company_name, business_type, website, instagram, phone,
+       payment_zelle, payment_venmo, payment_apple_cash, payment_cash_app,
+       payment_other_label, payment_other_value, payment_instructions,
+       brand_display_name, brand_logo_url, brand_accent_color, brand_tagline,
+       business_email, business_address, business_city, business_region, business_postal,
+       invoice_footer_note`,
     )
     .eq('id', cart.partner_id)
     .maybeSingle()
@@ -454,6 +459,76 @@ export async function updatePartnerPaymentMethods(input: z.infer<typeof paymentM
     }
 
     revalidatePath('/account/partner/payments')
+    revalidatePath('/account/partner')
+    return { success: true }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Failed' }
+  }
+}
+
+const brandingSchema = z.object({
+  brand_display_name: z.string().max(200).optional().or(z.literal('')),
+  brand_logo_url: z.string().max(2000).optional().or(z.literal('')),
+  brand_accent_color: z.union([
+    z.literal(''),
+    z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, 'Use a hex color like #1c1917'),
+  ]),
+  brand_tagline: z.string().max(200).optional().or(z.literal('')),
+  business_email: z.union([z.literal(''), z.string().email()]),
+  business_address: z.string().max(300).optional().or(z.literal('')),
+  business_city: z.string().max(100).optional().or(z.literal('')),
+  business_region: z.string().max(100).optional().or(z.literal('')),
+  business_postal: z.string().max(30).optional().or(z.literal('')),
+  invoice_footer_note: z.string().max(1000).optional().or(z.literal('')),
+  phone: z.string().max(40).optional().or(z.literal('')),
+  website: z.string().max(300).optional().or(z.literal('')),
+  company_name: z.string().min(2).max(200).optional(),
+})
+
+/** Partner saves white-label business + branding for client invoices. */
+export async function updatePartnerBranding(input: z.infer<typeof brandingSchema>) {
+  try {
+    const partner = await requireActivePartner()
+    const parsed = brandingSchema.safeParse(input)
+    if (!parsed.success) {
+      return { error: parsed.error.issues[0]?.message || 'Invalid branding details' }
+    }
+
+    const supabase = await createClient()
+    const updates: Record<string, string | null> = {
+      brand_display_name: parsed.data.brand_display_name?.trim() || null,
+      brand_logo_url: parsed.data.brand_logo_url?.trim() || null,
+      brand_accent_color: parsed.data.brand_accent_color?.trim() || '#1c1917',
+      brand_tagline: parsed.data.brand_tagline?.trim() || null,
+      business_email: parsed.data.business_email?.trim() || null,
+      business_address: parsed.data.business_address?.trim() || null,
+      business_city: parsed.data.business_city?.trim() || null,
+      business_region: parsed.data.business_region?.trim() || null,
+      business_postal: parsed.data.business_postal?.trim() || null,
+      invoice_footer_note: parsed.data.invoice_footer_note?.trim() || null,
+    }
+
+    if (parsed.data.phone !== undefined) {
+      updates.phone = parsed.data.phone.trim() || null
+    }
+    if (parsed.data.website !== undefined) {
+      updates.website = parsed.data.website.trim() || null
+    }
+    if (parsed.data.company_name?.trim()) {
+      updates.company_name = parsed.data.company_name.trim()
+    }
+
+    const { error } = await supabase
+      .from('partner_profiles')
+      .update(updates)
+      .eq('id', partner.id)
+
+    if (error) {
+      console.error('updatePartnerBranding:', error)
+      return { error: 'Could not save branding' }
+    }
+
+    revalidatePath('/account/partner/branding')
     revalidatePath('/account/partner')
     return { success: true }
   } catch (e) {

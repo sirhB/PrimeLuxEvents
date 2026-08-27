@@ -24,6 +24,16 @@ export type PartnerProfile = {
   payment_other_label: string | null
   payment_other_value: string | null
   payment_instructions: string | null
+  brand_display_name: string | null
+  brand_logo_url: string | null
+  brand_accent_color: string | null
+  brand_tagline: string | null
+  business_email: string | null
+  business_address: string | null
+  business_city: string | null
+  business_region: string | null
+  business_postal: string | null
+  invoice_footer_note: string | null
   approved_at: string | null
   created_at: string
 }
