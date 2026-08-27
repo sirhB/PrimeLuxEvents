@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client"
 import { formatCurrency } from "@/lib/utils"
 import { resolvePriceCents } from "@/lib/catalog/adapters"
 import { motion, AnimatePresence } from "framer-motion"
+import { PartnerShareCartButton } from "@/components/partner/partner-share-cart-button"
 
 export function CartSheet() {
   const { items, removeItem, updateQuantity, cartCount, clearCart } = useCart()
@@ -329,6 +330,22 @@ export function CartSheet() {
                 )
               })()}
             </div>
+            <div className="space-y-3">
+            <PartnerShareCartButton
+              disabled={items.reduce((acc, item) => {
+                if (item.packageId && item.packageData) {
+                  return acc + (resolvePriceCents({ price: item.packageData.price }) * item.quantity)
+                }
+                if (item.productId) {
+                  const product = products.find(p => p.id === item.productId)
+                  if (!product) return acc
+                  const price = resolvePriceCents(product)
+                  const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
+                  return acc + (price + modifiersPrice) * item.quantity
+                }
+                return acc
+              }, 0) < 15000}
+            />
             <Button
               className="w-full h-16 bg-gold text-black rounded-full text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all duration-500 group shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gold"
               onClick={() => {
@@ -367,6 +384,7 @@ export function CartSheet() {
             >
               Secure Checkout <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
+            </div>
           </div>
         )}
       </SheetContent>

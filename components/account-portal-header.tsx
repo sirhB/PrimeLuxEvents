@@ -11,18 +11,20 @@ import {
     SheetTitle,
     SheetDescription,
 } from '@/components/ui/sheet'
-import { AccountNav } from '@/components/account-sidebar'
+import { AccountNav, type PartnerNavStatus } from '@/components/account-sidebar'
 
 interface AccountPortalHeaderProps {
   userName: string
   upcomingOrderDate?: string | null
   upcomingOrderStatus?: string | null
+  partnerStatus?: PartnerNavStatus
 }
 
 export function AccountPortalHeader({
   userName,
   upcomingOrderDate,
   upcomingOrderStatus,
+  partnerStatus = 'none',
 }: AccountPortalHeaderProps) {
   const firstName = userName.split(' ')[0] || userName
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
@@ -86,7 +88,10 @@ export function AccountPortalHeader({
               Account navigation
             </SheetDescription>
           </SheetHeader>
-          <AccountNav onNavigate={() => setIsMobileNavOpen(false)} />
+          <AccountNav
+            onNavigate={() => setIsMobileNavOpen(false)}
+            partnerStatus={partnerStatus}
+          />
         </SheetContent>
       </Sheet>
     </header>

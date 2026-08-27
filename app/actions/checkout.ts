@@ -4,6 +4,10 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getDistanceBetweenAddresses } from '@/lib/geocoding'
 import { stripe, createMockPaymentIntent, allowMockPayments } from '@/lib/stripe'
 import { resolvePriceCents } from '@/lib/catalog/adapters'
+import {
+    getPartnerBaseDiscountPercent,
+    getPartnerProfileForUser,
+} from '@/lib/auth/partners'
 
 export interface CheckoutFormData {
     customerName: string
@@ -156,81 +160,48 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
     const taxableAmount = subtotal + setupFee
     const taxAmount = Math.round(taxableAmount * taxRate)
 
-    // --- TIERED DISCOUNTS LOGIC ---
+    // --- PARTNER / TRADE DISCOUNTS ---
+    // Active Preferred Vendor partners get a base trade % off merchandise,
+    // plus volume tiers from tiered_discounts (best of base vs volume).
     let discountAmount = 0
     let discountName = ''
 
-    // Check if user is logged in and has "planner" role
     const { data: { user } } = await supabase.auth.getUser()
+    const partner = user ? await getPartnerProfileForUser(user.id) : null
 
-    if (user) {
-        // Check for planner role
-        const { data: roles } = await supabase
-            .from('user_roles')
-            .select('role_id, roles(name)')
-            .eq('user_id', user.id)
-            .single()
+    if (partner?.status === 'active') {
+        const basePercent = await getPartnerBaseDiscountPercent(partner)
+        const baseDiscount = Math.round(subtotal * (basePercent / 100))
+        const discountParts: string[] = []
 
-        // Note: The previous schema check showed user_roles links to roles table via role_id.
-        // And roles have a 'name' column.
-
-        let isPlanner = false
-        if (roles && roles.roles) {
-            // Supabase returns joined data as object or array depending on query
-            // strict types might require casting, but let's check the shape
-            // referencing 20251130_create_user_management_system.sql
-            // roles table has 'name'. user_roles has 'role_id'.
-            // Actually, let's just use the query:
-            const { data: userRole } = await supabase
-                .from('user_roles')
-                .select('roles!inner(name)')
-                .eq('user_id', user.id)
-                .eq('roles.name', 'planner')
-                .single()
-
-            if (userRole) isPlanner = true
+        if (baseDiscount > 0) {
+            discountParts.push(`${partner.tier} ${basePercent}% trade`)
         }
 
-        if (isPlanner) {
-            // Fetch active discounts
-            const { data: discounts } = await supabase
-                .from('tiered_discounts')
-                .select('*')
-                .eq('is_active', true)
-                .order('min_cart_total', { ascending: false }) // Check highest threshold first
+        const { data: discounts } = await supabase
+            .from('tiered_discounts')
+            .select('*')
+            .eq('is_active', true)
+            .order('min_cart_total', { ascending: false })
 
-            if (discounts && discounts.length > 0) {
-                // Find the best eligible discount
-                const cartValueCents = subtotal // Discount applies to subtotal (merchandise only usually)
-
-                for (const discount of discounts) {
-                    if (cartValueCents >= discount.min_cart_total) {
-                        if (discount.discount_type === 'percentage') {
-                            // value is percentage (e.g. 5 for 5%)
-                            discountAmount = Math.round(subtotal * (discount.discount_value / 100))
-                        } else {
-                            // value is fixed amount in cents
-                            discountAmount = discount.discount_value
-                        }
-
-                        // Cap discount at subtotal to prevent negative or free shipping abuse if needed
-                        if (discountAmount > subtotal) {
-                            discountAmount = subtotal
-                        }
-
-                        discountName = discount.name
-                        break // Stop after finding the highest applicable tier
+        let volumeDiscount = 0
+        if (discounts && discounts.length > 0) {
+            for (const discount of discounts) {
+                if (subtotal >= discount.min_cart_total) {
+                    if (discount.discount_type === 'percentage') {
+                        volumeDiscount = Math.round(subtotal * (discount.discount_value / 100))
+                    } else {
+                        volumeDiscount = discount.discount_value
                     }
+                    discountParts.push(discount.name)
+                    break
                 }
             }
-            // ------------------------------
-
-            // Calculate total
-            // Total = Subtotal - Discount + Setup + Tax + Delivery
-            // Note: Tax usually applies to the discounted price.
-            // Let's recalculate tax based on discounted taxable amount.
-
         }
+
+        discountAmount = Math.max(baseDiscount, volumeDiscount)
+        if (discountAmount > subtotal) discountAmount = subtotal
+        discountName = discountParts.join(' + ') || 'Partner trade rate'
     }
 
     // Adjusted Taxable Amount

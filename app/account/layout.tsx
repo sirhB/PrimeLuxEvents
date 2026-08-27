@@ -6,6 +6,8 @@ import { AccountBottomBar } from '@/components/account-bottom-bar'
 import { AccountPortalHeader } from '@/components/account-portal-header'
 import { InstallPrompt } from '@/components/pwa/install-prompt'
 import { claimOrdersForCurrentUser } from '@/app/account/actions'
+import { getPartnerProfileForUser } from '@/lib/auth/partners'
+import type { PartnerNavStatus } from '@/components/account-sidebar'
 
 export const metadata: Metadata = {
   manifest: '/manifest-account.webmanifest',
@@ -46,6 +48,9 @@ export default async function AccountLayout({
         .eq('user_id', user.id)
         .order('delivery_date', { ascending: true })
 
+    const partner = await getPartnerProfileForUser(user.id)
+    const partnerStatus: PartnerNavStatus = partner?.status ?? 'none'
+
     const now = new Date()
     const upcomingOrder = orders?.find(
         (order) =>
@@ -58,17 +63,18 @@ export default async function AccountLayout({
 
     return (
         <div className="flex min-h-screen bg-[var(--linen,#F7F4EF)]">
-            <AccountSidebar />
+            <AccountSidebar partnerStatus={partnerStatus} />
             <div className="flex min-w-0 flex-1 flex-col">
                 <AccountPortalHeader
                     userName={displayName}
                     upcomingOrderDate={upcomingOrder?.delivery_date}
                     upcomingOrderStatus={upcomingOrder?.status}
+                    partnerStatus={partnerStatus}
                 />
                 <main className="flex-1 p-6 pb-24 md:p-10 md:pb-10">
                     {children}
                 </main>
-                <AccountBottomBar />
+                <AccountBottomBar partnerStatus={partnerStatus} />
                 <InstallPrompt surface="account" />
             </div>
         </div>
