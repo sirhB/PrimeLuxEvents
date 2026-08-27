@@ -1,8 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { toast } from "sonner"
 import { AnimatePresence, motion } from "framer-motion"
 import { VisualEditorNav } from "@/components/admin/visual-editor-nav"
 import { VisualEditorLanding } from "@/components/admin/visual-editor-landing"
@@ -14,18 +12,7 @@ import { GalleryPageContent } from "@/components/gallery-page-content"
 import { JournalPageContent } from "@/components/journal-page-content"
 import { useEditorContent } from "@/components/admin/visual-editor/editor-content-context"
 import { StageFrame } from "@/components/admin/visual-editor/stage-frame"
-import { getPageKeyPrefix, type PreviewDevice } from "@/lib/admin/visual-editor-config"
-
-function parseContentValue(value: unknown) {
-    if (typeof value === 'string' && (value.startsWith('[') || value.startsWith('{'))) {
-        try {
-            return JSON.parse(value)
-        } catch {
-            return value
-        }
-    }
-    return value
-}
+import { type PreviewDevice } from "@/lib/admin/visual-editor-config"
 
 function EditorWorkspace({
     activePage,
@@ -37,55 +24,29 @@ function EditorWorkspace({
     onNavigateToLanding: () => void
 }) {
     const [previewDevice, setPreviewDevice] = useState<PreviewDevice>('desktop')
-    const [sidebarOpen, setSidebarOpen] = useState(true)
+    // Closed by default on narrow screens so the preview is visible
+    const [sidebarOpen, setSidebarOpen] = useState(false)
     const editor = useEditorContent()
-    const supabase = createClient()
+    const loadPage = editor?.loadPage
+
+    // loadPage is stable (memoized once) — only re-fetch when the page changes
+    useEffect(() => {
+        if (!loadPage) return
+        void loadPage(activePage)
+    }, [activePage, loadPage])
 
     useEffect(() => {
-        if (!editor) return
-
-        const currentEditor = editor
-
-        async function fetchData() {
-            currentEditor.setIsLoading(true)
-            const keyPrefix = getPageKeyPrefix(activePage)
-
-            const [contentRes, settingsRes] = await Promise.all([
-                supabase.from('content').select('*').like('key', keyPrefix + '%'),
-                supabase.from('settings').select('key, value'),
-            ])
-
-            if (contentRes.error) {
-                console.error('Error fetching content:', contentRes.error)
-                toast.error('Failed to load content')
-            } else {
-                const contentMap = (contentRes.data ?? []).reduce(
-                    (acc: Record<string, unknown>, item) => {
-                        acc[item.key] = parseContentValue(item.value)
-                        return acc
-                    },
-                    {},
-                )
-                currentEditor.setContent(contentMap)
-            }
-
-            if (!settingsRes.error && settingsRes.data) {
-                const settingsMap: Record<string, string> = {}
-                settingsRes.data.forEach((item) => {
-                    settingsMap[item.key] = item.value
-                })
-                currentEditor.setSettings(settingsMap)
-            }
-
-            currentEditor.setIsLoading(false)
-        }
-
-        void fetchData()
-    }, [activePage, editor, supabase])
+        // Open sidebar by default on desktop widths
+        const mq = window.matchMedia('(min-width: 768px)')
+        setSidebarOpen(mq.matches)
+        const onChange = (e: MediaQueryListEvent) => setSidebarOpen(e.matches)
+        mq.addEventListener('change', onChange)
+        return () => mq.removeEventListener('change', onChange)
+    }, [])
 
     if (!editor) return null
 
-    const { content, settings, isLoading } = editor
+    const { content, settings, isLoading, loadError } = editor
 
     const renderContent = () => {
         if (isLoading) {
@@ -94,6 +55,22 @@ function EditorWorkspace({
                     <div className="h-8 w-1/3 animate-pulse rounded bg-gray-200" />
                     <div className="h-4 w-2/3 animate-pulse rounded bg-gray-200" />
                     <div className="mt-8 h-48 w-full animate-pulse rounded bg-gray-200" />
+                </div>
+            )
+        }
+
+        if (loadError) {
+            return (
+                <div className="flex h-[40vh] flex-col items-center justify-center gap-3 p-8 text-center">
+                    <p className="text-sm font-medium text-gray-800">Couldn’t load this page’s content</p>
+                    <p className="max-w-sm text-xs text-gray-500">{loadError}</p>
+                    <button
+                        type="button"
+                        onClick={() => void editor.loadPage(activePage)}
+                        className="mt-2 rounded-md bg-[var(--dashboard-accent-gold,#B8956B)] px-4 py-2 text-xs font-semibold text-black"
+                    >
+                        Try again
+                    </button>
                 </div>
             )
         }

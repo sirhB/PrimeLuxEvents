@@ -5,11 +5,13 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { getPageKeyPrefix } from '@/lib/admin/visual-editor-config'
 
 type ContentMap = Record<string, unknown>
 
@@ -20,12 +22,11 @@ type EditorContentContextValue = {
   savingKeys: Set<string>
   lastSavedAt: Date | null
   isLoading: boolean
+  loadError: string | null
   updateField: (key: string, value: unknown) => void
   saveField: (key: string, value?: unknown) => Promise<boolean>
   saveAll: () => Promise<void>
-  setContent: (content: ContentMap) => void
-  setSettings: (settings: Record<string, string>) => void
-  setIsLoading: (loading: boolean) => void
+  loadPage: (pageId: string) => Promise<void>
 }
 
 const EditorContentContext = createContext<EditorContentContextValue | null>(null)
@@ -41,6 +42,17 @@ function inferDbType(key: string, value: unknown): 'text' | 'json' | 'image' {
   return 'text'
 }
 
+function parseContentValue(value: unknown) {
+  if (typeof value === 'string' && (value.startsWith('[') || value.startsWith('{'))) {
+    try {
+      return JSON.parse(value)
+    } catch {
+      return value
+    }
+  }
+  return value
+}
+
 export function EditorContentProvider({ children }: { children: ReactNode }) {
   const [content, setContentState] = useState<ContentMap>({})
   const [settings, setSettingsState] = useState<Record<string, string>>({})
@@ -48,16 +60,13 @@ export function EditorContentProvider({ children }: { children: ReactNode }) {
   const [savingKeys, setSavingKeys] = useState<Set<string>>(new Set())
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const supabase = createClient()
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const contentRef = useRef(content)
+  contentRef.current = content
 
-  const setContent = useCallback((next: ContentMap) => {
-    setContentState(next)
-    setDirtyKeys(new Set())
-  }, [])
-
-  const setSettings = useCallback((next: Record<string, string>) => {
-    setSettingsState(next)
-  }, [])
+  // Stable browser client — create once per provider mount
+  const supabase = useMemo(() => createClient(), [])
+  const loadGeneration = useRef(0)
 
   const updateField = useCallback((key: string, value: unknown) => {
     setContentState((prev) => ({ ...prev, [key]: value }))
@@ -66,7 +75,7 @@ export function EditorContentProvider({ children }: { children: ReactNode }) {
 
   const saveField = useCallback(
     async (key: string, value?: unknown): Promise<boolean> => {
-      const resolvedValue = value !== undefined ? value : content[key]
+      const resolvedValue = value !== undefined ? value : contentRef.current[key]
       const serialized = serializeValue(resolvedValue)
       const dbType = inferDbType(key, resolvedValue)
 
@@ -115,7 +124,7 @@ export function EditorContentProvider({ children }: { children: ReactNode }) {
         })
       }
     },
-    [content, supabase],
+    [supabase],
   )
 
   const saveAll = useCallback(async () => {
@@ -126,6 +135,62 @@ export function EditorContentProvider({ children }: { children: ReactNode }) {
     toast.success('All changes saved')
   }, [dirtyKeys, saveField])
 
+  const loadPage = useCallback(
+    async (pageId: string) => {
+      const generation = ++loadGeneration.current
+      setIsLoading(true)
+      setLoadError(null)
+      setDirtyKeys(new Set())
+
+      const keyPrefix = getPageKeyPrefix(pageId)
+
+      try {
+        const [contentRes, settingsRes] = await Promise.all([
+          supabase.from('content').select('*').like('key', `${keyPrefix}%`),
+          supabase.from('settings').select('key, value'),
+        ])
+
+        // Ignore stale responses after a newer load started
+        if (generation !== loadGeneration.current) return
+
+        if (contentRes.error) {
+          console.error('Error fetching content:', contentRes.error)
+          setLoadError(contentRes.error.message)
+          setContentState({})
+          toast.error('Failed to load content')
+        } else {
+          const contentMap = (contentRes.data ?? []).reduce(
+            (acc: ContentMap, item) => {
+              acc[item.key] = parseContentValue(item.value)
+              return acc
+            },
+            {},
+          )
+          setContentState(contentMap)
+          setLoadError(null)
+        }
+
+        if (!settingsRes.error && settingsRes.data) {
+          const settingsMap: Record<string, string> = {}
+          settingsRes.data.forEach((item) => {
+            settingsMap[item.key] = item.value
+          })
+          setSettingsState(settingsMap)
+        }
+      } catch (error) {
+        if (generation !== loadGeneration.current) return
+        console.error('Error loading page content:', error)
+        setLoadError(error instanceof Error ? error.message : 'Unknown error')
+        toast.error('Failed to load content')
+      } finally {
+        if (generation === loadGeneration.current) {
+          setIsLoading(false)
+        }
+      }
+    },
+    [supabase],
+  )
+
   const value = useMemo(
     () => ({
       content,
@@ -134,12 +199,11 @@ export function EditorContentProvider({ children }: { children: ReactNode }) {
       savingKeys,
       lastSavedAt,
       isLoading,
+      loadError,
       updateField,
       saveField,
       saveAll,
-      setContent,
-      setSettings,
-      setIsLoading,
+      loadPage,
     }),
     [
       content,
@@ -148,11 +212,11 @@ export function EditorContentProvider({ children }: { children: ReactNode }) {
       savingKeys,
       lastSavedAt,
       isLoading,
+      loadError,
       updateField,
       saveField,
       saveAll,
-      setContent,
-      setSettings,
+      loadPage,
     ],
   )
 
