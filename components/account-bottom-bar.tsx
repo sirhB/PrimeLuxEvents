@@ -2,15 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ShoppingCart, User, Settings } from 'lucide-react'
+import { LayoutDashboard, ShoppingCart, Heart, CalendarCheck, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { usePwaContext } from '@/components/providers/pwa-provider'
 
 const navItems = [
-  { title: 'Dashboard', href: '/account', icon: LayoutDashboard },
+  { title: 'Home', href: '/account', icon: LayoutDashboard },
   { title: 'Orders', href: '/account/orders', icon: ShoppingCart },
-  { title: 'Profile', href: '/account/profile', icon: User },
-  { title: 'Settings', href: '/account/settings', icon: Settings },
+  { title: 'Saved', href: '/account/favorites', icon: Heart },
+  { title: 'Visits', href: '/account/appointments', icon: CalendarCheck },
+  { title: 'Chat', href: '/account/messages', icon: MessageSquare },
 ]
 
 export function AccountBottomBar() {
@@ -24,7 +25,7 @@ export function AccountBottomBar() {
         isStandalone && 'pb-[env(safe-area-inset-bottom)]',
       )}
     >
-      <div className="flex items-center justify-around px-2 py-2">
+      <div className="flex items-center justify-around px-1 py-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/account' && pathname.startsWith(item.href))
           const Icon = item.icon
@@ -33,7 +34,7 @@ export function AccountBottomBar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex min-w-[64px] flex-col items-center justify-center gap-1 rounded-xl px-3 py-2 transition-colors',
+                'flex min-w-[56px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 transition-colors',
                 isActive ? 'text-primary' : 'text-muted-foreground',
               )}
             >

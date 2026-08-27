@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import dynamic from 'next/dynamic'
 import { requirePermission } from '@/lib/auth/authorization'
+import Link from 'next/link'
+import { formatCentsWithCommas } from '@/lib/format-money'
 
 const CustomersClient = dynamic(() => import('./customers-client').then(mod => mod.CustomersClient))
 const CustomerStatsCards = dynamic(() => import('@/components/admin/customers/customer-stats-cards').then(mod => mod.CustomerStatsCards))
@@ -26,7 +28,7 @@ export default async function CustomersPage({
     const supabase = await createClient()
 
     // Parallelize aggregation data fetching
-    const [ordersRes, consultationsRes] = await Promise.all([
+    const [ordersRes, consultationsRes, archivedRes, recentOrdersRes] = await Promise.all([
         supabase
             .from('orders')
             .select('customer_name, customer_email, total_amount, created_at')
@@ -36,11 +38,19 @@ export default async function CustomersPage({
             .from('consultations')
             .select('customer_name, customer_email, customer_phone, total_amount, created_at')
             .order('created_at', { ascending: false })
-            .limit(2000)
+            .limit(2000),
+        supabase.from('customer_details').select('email').eq('is_archived', true),
+        supabase
+            .from('orders')
+            .select('id, customer_name, customer_email, total_amount, status, created_at')
+            .order('created_at', { ascending: false })
+            .limit(6),
     ])
 
     const orders = ordersRes.data
     const consultations = consultationsRes.data
+    const archivedEmails = new Set((archivedRes.data || []).map((r) => r.email.toLowerCase()))
+    const recentOrders = recentOrdersRes.data || []
 
     // Combine and aggregate customer data (Keep logic same but faster thanks to parallelization and limits)
     const customerMap = new Map<string, Customer>()
@@ -90,7 +100,9 @@ export default async function CustomersPage({
         }
     })
 
-    const customers = Array.from(customerMap.values()).sort(
+    const customers = Array.from(customerMap.values())
+        .filter((c) => !archivedEmails.has(c.email.toLowerCase()))
+        .sort(
         (a, b) => b.totalSpent - a.totalSpent
     )
 
@@ -154,14 +166,42 @@ export default async function CustomersPage({
             {/* Top Customers Widget */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <TopCustomersWidget customers={customers} />
-                <div className="glass-card border-none flex flex-col items-center justify-center p-6 text-[var(--dashboard-text-muted)]">
-                    <p>Recent Activity (Coming Soon)</p>
+                <div className="glass-card border-none p-6 space-y-4">
+                    <div>
+                        <h3 className="font-serif text-xl text-[var(--dashboard-text)]">Recent Activity</h3>
+                        <p className="text-xs text-[var(--dashboard-text-muted)] uppercase tracking-widest">Latest customer orders</p>
+                    </div>
+                    <div className="space-y-3">
+                        {recentOrders.length === 0 ? (
+                            <p className="text-sm text-[var(--dashboard-text-muted)]">No recent orders</p>
+                        ) : (
+                            recentOrders.map((order) => (
+                                <Link
+                                    key={order.id}
+                                    href={`/admin/orders/${order.id}`}
+                                    className="flex items-center justify-between rounded-xl border border-[var(--dashboard-border)]/60 px-3 py-2 hover:bg-[var(--dashboard-card-hover)] transition-colors"
+                                >
+                                    <div>
+                                        <p className="text-sm font-medium text-[var(--dashboard-text)]">{order.customer_name}</p>
+                                        <p className="text-xs text-[var(--dashboard-text-muted)]">{order.customer_email}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-medium text-[var(--dashboard-text)]">
+                                            {formatCentsWithCommas(Number(order.total_amount))}
+                                        </p>
+                                        <p className="text-[10px] uppercase tracking-widest text-[var(--dashboard-text-muted)]">{order.status}</p>
+                                    </div>
+                                </Link>
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
 
             {/* Customer List */}
             <CustomersClient
                 customers={paginatedCustomers}
+                activeCustomers={customers.filter((c) => c.lastOrderDate && new Date(c.lastOrderDate) >= new Date(Date.now() - 90 * 24 * 60 * 60 * 1000))}
                 totalCount={totalCount}
                 currentPage={currentPage}
                 pageSize={pageSize}

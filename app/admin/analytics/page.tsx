@@ -21,16 +21,20 @@ export default function AnalyticsDashboard() {
     const [revenueData, setRevenueData] = useState<any[]>([])
     const [statusData, setStatusData] = useState<any[]>([])
     const [popularData, setPopularData] = useState<any[]>([])
+    const [conversionRate, setConversionRate] = useState(0)
+    const [rangeDays, setRangeDays] = useState(30)
     const [loading, setLoading] = useState(true)
     const supabase = createClient()
 
     useEffect(() => {
         async function fetchAnalytics() {
             setLoading(true)
-            const [revRes, statusRes, popularRes] = await Promise.all([
-                supabase.from('view_revenue_daily').select('*').limit(30),
+            const since = subDays(new Date(), rangeDays).toISOString()
+            const [revRes, statusRes, popularRes, conversionRes] = await Promise.all([
+                supabase.from('view_revenue_daily').select('*').gte('date', since).order('date', { ascending: true }),
                 supabase.from('view_order_status_distribution').select('*'),
-                supabase.from('view_popular_items').select('*')
+                supabase.from('view_popular_items').select('*'),
+                supabase.from('view_lead_conversion').select('*').maybeSingle(),
             ])
 
             if (revRes.data) {
@@ -42,10 +46,28 @@ export default function AnalyticsDashboard() {
             }
             if (statusRes.data) setStatusData(statusRes.data)
             if (popularRes.data) setPopularData(popularRes.data)
+            if (conversionRes.data?.conversion_rate_pct != null) {
+                setConversionRate(Number(conversionRes.data.conversion_rate_pct))
+            }
             setLoading(false)
         }
         fetchAnalytics()
-    }, [])
+    }, [rangeDays])
+
+    const exportCsv = () => {
+        const rows = [
+            ['Date', 'Revenue (cents)', 'Orders'],
+            ...revenueData.map((d) => [d.date, d.total_revenue, d.order_count]),
+        ]
+        const csv = rows.map((r) => r.join(',')).join('\n')
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `primelux-analytics-${rangeDays}d.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+    }
 
     if (loading) {
         return (
@@ -58,6 +80,17 @@ export default function AnalyticsDashboard() {
 
     const totalRevenue = revenueData.reduce((acc, curr) => acc + curr.total_revenue, 0)
     const totalOrders = revenueData.reduce((acc, curr) => acc + curr.order_count, 0)
+    const half = Math.max(1, Math.floor(revenueData.length / 2))
+    const firstHalfRev = revenueData.slice(0, half).reduce((a, c) => a + c.total_revenue, 0)
+    const secondHalfRev = revenueData.slice(half).reduce((a, c) => a + c.total_revenue, 0)
+    const revTrend = firstHalfRev > 0 ? ((secondHalfRev - firstHalfRev) / firstHalfRev) * 100 : 0
+    const firstHalfOrders = revenueData.slice(0, half).reduce((a, c) => a + c.order_count, 0)
+    const secondHalfOrders = revenueData.slice(half).reduce((a, c) => a + c.order_count, 0)
+    const orderTrend = firstHalfOrders > 0 ? ((secondHalfOrders - firstHalfOrders) / firstHalfOrders) * 100 : 0
+    const avgOrder = totalOrders ? totalRevenue / totalOrders : 0
+    const firstHalfAvg = firstHalfOrders ? firstHalfRev / firstHalfOrders : 0
+    const secondHalfAvg = secondHalfOrders ? secondHalfRev / secondHalfOrders : 0
+    const avgTrend = firstHalfAvg > 0 ? ((secondHalfAvg - firstHalfAvg) / firstHalfAvg) * 100 : 0
 
     return (
         <div className="flex flex-col gap-8">
@@ -67,11 +100,16 @@ export default function AnalyticsDashboard() {
                     <p className="text-gray-400 mt-1 uppercase tracking-widest font-bold text-xs">Financial Performance & Trends</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Button variant="outline" size="sm" className="rounded-xl border-gray-200">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-xl border-gray-200"
+                        onClick={() => setRangeDays(rangeDays === 30 ? 90 : 30)}
+                    >
                         <Calendar className="h-4 w-4 mr-2" />
-                        Last 30 Days
+                        Last {rangeDays} Days
                     </Button>
-                    <Button size="sm" className="rounded-xl bg-black text-white hover:bg-gold hover:text-black">
+                    <Button size="sm" className="rounded-xl bg-black text-white hover:bg-gold hover:text-black" onClick={exportCsv}>
                         <Download className="h-4 w-4 mr-2" />
                         Export Report
                     </Button>
@@ -81,10 +119,10 @@ export default function AnalyticsDashboard() {
             {/* Top Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                    { label: 'Total Revenue', value: formatCents(totalRevenue), icon: DollarSign, trend: '+12.5%', isUp: true },
-                    { label: 'Total Orders', value: totalOrders, icon: ShoppingBag, trend: '+5.2%', isUp: true },
-                    { label: 'Avg Order Value', value: formatCents(totalOrders ? totalRevenue / totalOrders : 0), icon: TrendingUp, trend: '-2.1%', isUp: false },
-                    { label: 'Conversion Rate', value: '3.8%', icon: Users, trend: '+0.8%', isUp: true }
+                    { label: 'Total Revenue', value: formatCents(totalRevenue), icon: DollarSign, trend: `${revTrend >= 0 ? '+' : ''}${revTrend.toFixed(1)}%`, isUp: revTrend >= 0 },
+                    { label: 'Total Orders', value: totalOrders, icon: ShoppingBag, trend: `${orderTrend >= 0 ? '+' : ''}${orderTrend.toFixed(1)}%`, isUp: orderTrend >= 0 },
+                    { label: 'Avg Order Value', value: formatCents(avgOrder), icon: TrendingUp, trend: `${avgTrend >= 0 ? '+' : ''}${avgTrend.toFixed(1)}%`, isUp: avgTrend >= 0 },
+                    { label: 'Lead Conversion', value: `${conversionRate.toFixed(1)}%`, icon: Users, trend: 'leads → orders', isUp: conversionRate >= 0 }
                 ].map((metric, i) => (
                     <Card key={i} className="rounded-3xl border-none shadow-sm bg-white overflow-hidden group hover:shadow-xl transition-all duration-300">
                         <CardContent className="p-6">

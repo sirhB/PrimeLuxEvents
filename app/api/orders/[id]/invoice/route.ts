@@ -4,16 +4,24 @@ import { renderToStream } from '@react-pdf/renderer';
 import { InvoicePDF } from '@/components/pdf/invoice-pdf';
 import { RentalAgreementPDF } from '@/components/pdf/rental-agreement-pdf';
 import React from 'react';
+import { userOwnsOrder } from '@/lib/orders/ownership';
+import { isStaffUser } from '@/lib/auth/roles';
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
     try {
-        const orderId = params.id;
+        const resolvedParams = await Promise.resolve(params);
+        const orderId = resolvedParams.id;
         const { searchParams } = new URL(req.url);
         const type = searchParams.get('type') || 'invoice';
         const supabase = await createClient();
+
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
 
         // Fetch order
         const { data: order, error: orderError } = await supabase
@@ -24,6 +32,11 @@ export async function GET(
 
         if (orderError || !order) {
             return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+        }
+
+        const staff = await isStaffUser(user.id);
+        if (!staff && !userOwnsOrder(user, order)) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
         // Fetch items

@@ -149,7 +149,7 @@ function OrderDetailContent() {
     }
 
     const remainingBalance = order.total_amount - (order.balance_paid || 0)
-    const isPaid = remainingBalance <= 0 || order.payment_status === 'paid'
+    const isPaid = remainingBalance <= 0 || order.payment_status === 'paid' || order.payment_status === 'succeeded'
 
     const handlePayBalance = async () => {
         setIsProcessingPayment(true)
@@ -427,8 +427,10 @@ function OrderDetailContent() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="bg-gray-50/50 p-4 border-t border-gold/5">
-                                    <Button variant="ghost" size="sm" className="w-full text-gold hover:text-black font-bold uppercase tracking-widest text-[10px]">
-                                        View Full Agreement
+                                    <Button variant="ghost" size="sm" className="w-full text-gold hover:text-black font-bold uppercase tracking-widest text-[10px]" asChild>
+                                        <a href={`/api/orders/${order.id}/invoice?type=agreement`} target="_blank" rel="noreferrer">
+                                            View Full Agreement
+                                        </a>
                                     </Button>
                                 </CardFooter>
                             </Card>

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatCurrency } from '@/lib/utils'
+import { FavoriteButton } from '@/components/account/favorite-button'
 
 interface Product {
     id: string
@@ -21,14 +22,15 @@ interface Product {
 
 interface ProductCardProps {
     product: Product
+    isFavorited?: boolean
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, isFavorited = false }: ProductCardProps) {
     const productUrl = `/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`
     const price = product.rental_price_daily || product.price
 
     return (
-        <Link href={productUrl} className="group block h-full">
+        <Link href={productUrl} className="group relative block h-full">
             <article className="spotlight-frame flex h-full flex-col overflow-hidden rounded-2xl border border-border/10 bg-white shadow-[0_10px_40px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)]">
                 <div className="relative aspect-[4/5] overflow-hidden rounded-t-2xl bg-[var(--linen,#F7F4EF)]">
                     {product.image_url ? (
@@ -44,6 +46,9 @@ export function ProductCard({ product }: ProductCardProps) {
                             <span className="text-xs font-medium uppercase tracking-widest">Image coming soon</span>
                         </div>
                     )}
+                    <div className="absolute right-3 top-3 z-20">
+                        <FavoriteButton productId={product.id} initialFavorited={isFavorited} />
+                    </div>
                 </div>
 
                 <div className="absolute left-4 top-4 z-10">

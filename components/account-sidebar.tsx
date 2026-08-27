@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ShoppingCart, User, Settings, LogOut } from 'lucide-react'
+import { LayoutDashboard, ShoppingCart, User, Settings, LogOut, Heart, CalendarCheck, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
@@ -19,6 +19,21 @@ const sidebarItems = [
         title: 'My Orders',
         href: '/account/orders',
         icon: ShoppingCart,
+    },
+    {
+        title: 'Favorites',
+        href: '/account/favorites',
+        icon: Heart,
+    },
+    {
+        title: 'Appointments',
+        href: '/account/appointments',
+        icon: CalendarCheck,
+    },
+    {
+        title: 'Messages',
+        href: '/account/messages',
+        icon: MessageSquare,
     },
     {
         title: 'Profile',
@@ -48,7 +63,7 @@ export function AccountSidebar() {
     }
 
     return (
-        <div className="hidden h-screen w-64 shrink-0 flex-col border-r bg-background text-foreground md:sticky md:top-0 md:flex">
+        <div className="flex h-screen w-64 flex-col border-r bg-background text-foreground shrink-0 sticky top-0">
             <div className="flex h-16 items-center border-b px-6">
                 <Link className="flex items-center gap-2 font-serif font-semibold tracking-wide text-lg" href="/">
                     <span className="">PrimeLux Portal</span>
@@ -57,7 +72,7 @@ export function AccountSidebar() {
             <div className="flex-1 overflow-auto py-6">
                 <nav className="grid items-start px-4 text-sm font-medium gap-2">
                     {sidebarItems.map((item) => {
-                        const isActive = pathname === item.href
+                        const isActive = pathname === item.href || (item.href !== '/account' && pathname.startsWith(item.href))
                         return (
                             <Link
                                 key={item.href}

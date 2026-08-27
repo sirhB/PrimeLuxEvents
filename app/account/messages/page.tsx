@@ -9,7 +9,7 @@ export default async function MessagesPage() {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-        redirect('/login')
+        redirect('/login?next=/account/messages')
     }
 
     // Determine if admin (naive check for now, can be improved with roles table)

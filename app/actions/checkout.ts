@@ -395,6 +395,15 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
             }
         }
 
+        const {
+            data: { user: checkoutUser },
+        } = await supabase.auth.getUser()
+
+        const initialBalancePaid = paidAmount ?? (paymentIntentId ? totals.totalAmount : 0)
+        const paymentStatus = paymentIntentId
+            ? (initialBalancePaid >= totals.totalAmount ? 'paid' : 'partially_paid')
+            : 'unpaid'
+
         // Create order
         const { data: order, error: orderError } = await supabase
             .from('orders')
@@ -402,6 +411,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 customer_name: formData.customerName,
                 customer_email: formData.customerEmail,
                 customer_phone: formData.customerPhone,
+                user_id: checkoutUser?.id ?? null,
                 delivery_address: formData.deliveryAddress,
                 delivery_date: formData.deliveryDate,
                 delivery_time: formData.deliveryTime,
@@ -415,7 +425,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 setup_fee: totals.setupFee,
                 total_amount: totals.totalAmount,
                 payment_intent_id: finalPaymentIntentId,
-                payment_status: paymentIntentId ? 'succeeded' : 'pending',
+                payment_status: paymentStatus,
                 status: 'pending',
                 is_overbooked: isOverbooked,
                 pickup_date: formData.sameDayPickup ? formData.eventDate : (formData.pickupDate || null),
@@ -424,7 +434,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 same_day_pickup: formData.sameDayPickup || false,
                 signature_url: signatureUrl,
                 signed_at: signatureUrl ? new Date().toISOString() : null,
-                balance_paid: paidAmount ?? (paymentIntentId ? totals.totalAmount : 0),
+                balance_paid: initialBalancePaid,
             })
             .select()
             .single()
@@ -556,7 +566,7 @@ export async function confirmPayment(paymentIntentId: string) {
             await supabase
                 .from('orders')
                 .update({
-                    payment_status: paymentIntent.status,
+                    payment_status: paymentIntent.status === 'succeeded' ? 'paid' : paymentIntent.status,
                     payment_method: paymentIntent.payment_method as string,
                 })
                 .eq('payment_intent_id', paymentIntentId)
@@ -570,7 +580,7 @@ export async function confirmPayment(paymentIntentId: string) {
             await supabase
                 .from('orders')
                 .update({
-                    payment_status: 'succeeded',
+                    payment_status: 'paid',
                     payment_method: 'mock_card',
                 })
                 .eq('payment_intent_id', paymentIntentId)

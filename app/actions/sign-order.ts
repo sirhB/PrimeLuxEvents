@@ -2,18 +2,40 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { userOwnsOrder } from '@/lib/orders/ownership'
+import { isStaffUser } from '@/lib/auth/roles'
 
 export async function signOrder(orderId: string, signatureDataUrl: string) {
     const supabase = await createClient()
 
     try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return { success: false, error: 'You must be signed in to sign' }
+        }
+
+        const { data: order, error: orderError } = await supabase
+            .from('orders')
+            .select('id, user_id, customer_email, signature_url')
+            .eq('id', orderId)
+            .single()
+
+        if (orderError || !order) {
+            return { success: false, error: 'Order not found' }
+        }
+
+        const staff = await isStaffUser(user.id)
+        if (!staff && !userOwnsOrder(user, order)) {
+            return { success: false, error: 'You do not have permission to sign this order' }
+        }
+
         // 1. Convert base64 to Blob
         const base64Data = signatureDataUrl.split(',')[1]
         const buffer = Buffer.from(base64Data, 'base64')
         const fileName = `${orderId}-${Date.now()}.png`
 
         // 2. Upload to Supabase Storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
             .from('signatures')
             .upload(fileName, buffer, {
                 contentType: 'image/png',

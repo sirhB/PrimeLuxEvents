@@ -252,8 +252,13 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
         try {
             let participantIds: string[] = []
 
-            // If direct message, resolve email/user to ID
-            if (newChatType === 'direct') {
+            if (!isAdmin) {
+                if (!initialMessage.trim()) {
+                    toast.error('Please enter a message')
+                    setIsCreating(false)
+                    return
+                }
+            } else if (newChatType === 'direct') {
                 if (selectedUser) {
                     participantIds = [selectedUser.id]
                 } else if (recipientEmail.trim()) {
@@ -287,11 +292,13 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
             // Create Conversation via RPC
             const { data: conversationId, error } = await supabase
                 .rpc('create_new_conversation', {
-                    p_type: 'internal',
-                    p_subject: null,
+                    p_type: isAdmin ? 'internal' : 'support',
+                    p_subject: isAdmin ? null : 'Support request',
                     p_message: initialMessage.trim() || null,
-                    p_participant_ids: participantIds,
-                    p_target_role_id: newChatType === 'role' ? selectedRoleId : null
+                    p_participant_ids: isAdmin ? participantIds : [],
+                    p_target_role_id: isAdmin
+                        ? (newChatType === 'role' ? selectedRoleId : null)
+                        : roles.find(r => r.name === 'admin' || r.name === 'manager')?.id || null
                 })
 
             if (error) {
@@ -374,12 +381,13 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[500px] bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
                             <DialogHeader>
-                                <DialogTitle>New Message</DialogTitle>
+                                <DialogTitle>{isAdmin ? 'New Message' : 'Contact Support'}</DialogTitle>
                                 <DialogDescription className="text-[var(--dashboard-text-muted)]">
-                                    Start a new conversation.
+                                    {isAdmin ? 'Start a new conversation.' : 'Send a message to the PrimeLux team.'}
                                 </DialogDescription>
                             </DialogHeader>
                             <form onSubmit={startNewChat} className="grid gap-4 py-4">
+                                {isAdmin && (
                                 <div className="grid gap-2">
                                     <Label htmlFor="type" className="text-white font-medium">To</Label>
                                     <Select
@@ -395,8 +403,9 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                )}
 
-                                {newChatType === 'role' && (
+                                {isAdmin && newChatType === 'role' && (
                                     <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
                                         <Label htmlFor="role" className="text-white font-medium">Select Role</Label>
                                         <Select
@@ -417,11 +426,9 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                                     </div>
                                 )}
 
-                                {newChatType === 'direct' && (
+                                {isAdmin && newChatType === 'direct' && (
                                     <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
                                         <Label className="text-white font-medium">Recipient</Label>
-                                        <div className="grid gap-2 animate-in fade-in slide-in-from-top-2">
-                                            <Label className="text-white font-medium">Recipient</Label>
                                             <SearchableSelect
                                                 placeholder="Search by name or email..."
                                                 onSearch={searchUsers}
@@ -436,7 +443,6 @@ export function ChatLayout({ currentUserEmail, currentUserId, isAdmin }: ChatLay
                                                     value: selectedUser
                                                 } : null}
                                             />
-                                        </div>
                                     </div>
                                 )}
 

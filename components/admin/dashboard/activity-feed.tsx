@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
@@ -13,6 +13,7 @@ import {
     TrendingUp
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 
 interface ActivityItem {
     id: string
@@ -24,45 +25,6 @@ interface ActivityItem {
     priority?: string
     href: string
 }
-
-// Mock data - replace with real data from props
-const mockActivities: ActivityItem[] = [
-    {
-        id: '1',
-        type: 'order',
-        title: 'New Order #1234',
-        description: 'Wedding reception for Sarah & John',
-        timestamp: new Date(Date.now() - 1000 * 60 * 30),
-        status: 'pending',
-        href: '/admin/orders/1234'
-    },
-    {
-        id: '2',
-        type: 'task',
-        title: 'Review Product Inventory',
-        description: 'Check stock levels for upcoming events',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-        priority: 'high',
-        href: '/admin/tasks'
-    },
-    {
-        id: '3',
-        type: 'event',
-        title: 'Corporate Event Setup',
-        description: 'Delivery scheduled for tomorrow',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
-        href: '/admin/calendar'
-    },
-    {
-        id: '4',
-        type: 'order',
-        title: 'Order #1233 Confirmed',
-        description: 'Birthday party package confirmed',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8),
-        status: 'confirmed',
-        href: '/admin/orders/1233'
-    }
-]
 
 function getTimeAgo(date: Date): string {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
@@ -105,11 +67,76 @@ function getActivityColor(item: ActivityItem) {
     return 'text-[var(--dashboard-text-muted)]'
 }
 
-interface ActivityFeedProps {
-    activities?: ActivityItem[]
+function mapAuditToActivity(log: any): ActivityItem {
+    const table = log.table_name || 'record'
+    const action = log.action || 'UPDATE'
+    const who = log.user_profiles?.full_name || 'System'
+    let type: ActivityItem['type'] = 'event'
+    let href = '/admin/activity'
+    if (table === 'orders') {
+        type = 'order'
+        href = log.record_id ? `/admin/orders/${log.record_id}` : '/admin/orders'
+    } else if (table === 'tasks' || table === 'event_tasks') {
+        type = 'task'
+        href = '/admin/tasks'
+    } else if (table.includes('notification') || action === 'DELETE') {
+        type = 'alert'
+    }
+
+    return {
+        id: log.id,
+        type,
+        title: `${action} on ${table.replace(/_/g, ' ')}`,
+        description: `By ${who}`,
+        timestamp: new Date(log.created_at),
+        status: log.new_data?.status,
+        href,
+    }
 }
 
-export function ActivityFeed({ activities = mockActivities }: ActivityFeedProps) {
+export function ActivityFeed() {
+    const [activities, setActivities] = useState<ActivityItem[]>([])
+    const [loading, setLoading] = useState(true)
+    const supabase = createClient()
+
+    useEffect(() => {
+        async function load() {
+            const { data } = await supabase
+                .from('audit_logs')
+                .select(`
+                    id, table_name, record_id, action, new_data, created_at,
+                    user_profiles:changed_by ( full_name )
+                `)
+                .order('created_at', { ascending: false })
+                .limit(8)
+
+            if (data?.length) {
+                setActivities(data.map(mapAuditToActivity))
+            } else {
+                // Fallback: recent orders if audit log is empty
+                const { data: orders } = await supabase
+                    .from('orders')
+                    .select('id, customer_name, status, created_at')
+                    .order('created_at', { ascending: false })
+                    .limit(6)
+
+                setActivities(
+                    (orders || []).map((o) => ({
+                        id: o.id,
+                        type: 'order' as const,
+                        title: `Order #${o.id.slice(0, 8).toUpperCase()}`,
+                        description: o.customer_name || 'Customer order',
+                        timestamp: new Date(o.created_at),
+                        status: o.status,
+                        href: `/admin/orders/${o.id}`,
+                    })),
+                )
+            }
+            setLoading(false)
+        }
+        load()
+    }, [])
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -117,7 +144,6 @@ export function ActivityFeed({ activities = mockActivities }: ActivityFeedProps)
             transition={{ delay: 0.3 }}
             className="glass-card rounded-3xl border border-[var(--dashboard-border)] overflow-hidden"
         >
-            {/* Header */}
             <div className="p-6 border-b border-[var(--dashboard-border)]">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -142,9 +168,11 @@ export function ActivityFeed({ activities = mockActivities }: ActivityFeedProps)
                 </div>
             </div>
 
-            {/* Activity List */}
             <div className="divide-y divide-[var(--dashboard-border)]">
-                {activities.map((activity, index) => {
+                {loading && (
+                    <div className="p-8 text-center text-sm text-[var(--dashboard-text-muted)]">Loading activity...</div>
+                )}
+                {!loading && activities.map((activity, index) => {
                     const Icon = getActivityIcon(activity.type)
                     const colorClass = getActivityColor(activity)
 
@@ -158,7 +186,6 @@ export function ActivityFeed({ activities = mockActivities }: ActivityFeedProps)
                             <Link href={activity.href}>
                                 <div className="group p-6 hover:bg-[var(--dashboard-card-hover)] transition-all duration-300 cursor-pointer">
                                     <div className="flex items-start gap-4">
-                                        {/* Icon */}
                                         <div className={cn(
                                             "flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
                                             activity.type === 'order' && "bg-[var(--dashboard-accent-green)]/10",
@@ -170,7 +197,6 @@ export function ActivityFeed({ activities = mockActivities }: ActivityFeedProps)
                                             <Icon className={cn("h-5 w-5", colorClass)} />
                                         </div>
 
-                                        {/* Content */}
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between gap-4">
                                                 <div className="flex-1">
@@ -189,7 +215,6 @@ export function ActivityFeed({ activities = mockActivities }: ActivityFeedProps)
                                                 </div>
                                             </div>
 
-                                            {/* Status/Priority Badge */}
                                             {(activity.status || activity.priority) && (
                                                 <div className="mt-2">
                                                     <span className={cn(
@@ -212,8 +237,7 @@ export function ActivityFeed({ activities = mockActivities }: ActivityFeedProps)
                 })}
             </div>
 
-            {/* Empty State */}
-            {activities.length === 0 && (
+            {!loading && activities.length === 0 && (
                 <div className="p-12 text-center">
                     <div className="w-16 h-16 bg-[var(--dashboard-card-hover)] rounded-full flex items-center justify-center mx-auto mb-4">
                         <Clock className="h-8 w-8 text-[var(--dashboard-text-muted)] opacity-30" />

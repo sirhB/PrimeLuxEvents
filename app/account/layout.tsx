@@ -5,6 +5,7 @@ import { AccountSidebar } from '@/components/account-sidebar'
 import { AccountBottomBar } from '@/components/account-bottom-bar'
 import { AccountPortalHeader } from '@/components/account-portal-header'
 import { InstallPrompt } from '@/components/pwa/install-prompt'
+import { claimOrdersForCurrentUser } from '@/app/account/actions'
 
 export const metadata: Metadata = {
   manifest: '/manifest-account.webmanifest',
@@ -28,8 +29,10 @@ export default async function AccountLayout({
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-        redirect('/login')
+        redirect('/login?next=/account')
     }
+
+    await claimOrdersForCurrentUser()
 
     const { data: profile } = await supabase
         .from('user_profiles')

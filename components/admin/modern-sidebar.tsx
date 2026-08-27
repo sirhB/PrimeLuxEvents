@@ -31,7 +31,8 @@ import {
     Briefcase,
     Eye,
     Box,
-    ChevronDown
+    ChevronDown,
+    MapPin
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
@@ -218,6 +219,7 @@ const sidebarGroups = [
         items: [
             { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
             { icon: TrendingUp, label: 'Analytics', href: '/admin/analytics' },
+            { icon: Eye, label: 'Activity', href: '/admin/activity' },
         ]
     },
     {
@@ -235,14 +237,23 @@ const sidebarGroups = [
         title: "Operations",
         items: [
             { icon: Truck, label: 'Logistics Hub', href: '/admin/logistics' },
+            { icon: Box, label: 'Delivery', href: '/admin/delivery' },
+            { icon: QrCode, label: 'Scanner', href: '/admin/scan' },
+            { icon: Archive, label: 'Inventory', href: '/admin/inventory' },
+            { icon: MapPin, label: 'Warehouse', href: '/admin/warehouse/locations' },
+            { icon: Briefcase, label: 'Bags', href: '/admin/bags' },
             { icon: CheckSquare, label: 'Team Tasks', href: '/admin/tasks' },
+            { icon: CalendarCheck, label: 'Calendar', href: '/admin/calendar' },
         ]
     },
     {
         title: "Store Catalog",
         items: [
             { icon: Package, label: 'Products', href: '/admin/products' },
+            { icon: Layers, label: 'Categories', href: '/admin/categories' },
+            { icon: ClipboardList, label: 'Packages', href: '/admin/packages' },
             { icon: ImageIcon, label: 'Portfolio', href: '/admin/portfolio' },
+            { icon: Eye, label: 'Visual Editor', href: '/admin/visual-editor' },
         ]
     },
     {
@@ -399,13 +410,17 @@ export function ModernSidebar() {
                         <DropdownMenuContent side={isCollapsed ? "right" : "top"} align={isCollapsed ? "start" : "center"} className="w-56 bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] backdrop-blur-xl">
                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                             <DropdownMenuSeparator className="bg-[var(--dashboard-border)]" />
-                            <DropdownMenuItem className="focus:bg-[var(--dashboard-card-hover)] focus:text-[var(--dashboard-text)] cursor-pointer">
-                                <UserCog className="mr-2 h-4 w-4" />
-                                <span>Profile</span>
+                            <DropdownMenuItem asChild className="focus:bg-[var(--dashboard-card-hover)] focus:text-[var(--dashboard-text)] cursor-pointer">
+                                <Link href="/admin/team">
+                                    <UserCog className="mr-2 h-4 w-4" />
+                                    <span>Profile</span>
+                                </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="focus:bg-[var(--dashboard-card-hover)] focus:text-[var(--dashboard-text)] cursor-pointer">
-                                <Settings className="mr-2 h-4 w-4" />
-                                <span>Settings</span>
+                            <DropdownMenuItem asChild className="focus:bg-[var(--dashboard-card-hover)] focus:text-[var(--dashboard-text)] cursor-pointer">
+                                <Link href="/admin/settings">
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    <span>Settings</span>
+                                </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-[var(--dashboard-border)]" />
                             <DropdownMenuItem onClick={handleSignOut} className="text-red-400 focus:text-red-400 focus:bg-red-400/10 cursor-pointer">
