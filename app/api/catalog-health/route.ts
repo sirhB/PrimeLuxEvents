@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import {
+  getSupabaseAnonKey,
+  getSupabaseServiceRoleKey,
+  getSupabaseUrl,
+} from '@/lib/supabase/env'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,9 +13,9 @@ export const dynamic = 'force-dynamic'
  * whether products/categories can be read. Does not expose secret values.
  */
 export async function GET() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || null
-  const hasAnon = Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-  const hasService = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY)
+  const url = getSupabaseUrl() || null
+  const hasAnon = Boolean(getSupabaseAnonKey())
+  const hasService = Boolean(getSupabaseServiceRoleKey())
 
   const result: Record<string, unknown> = {
     ok: false,
@@ -23,11 +28,11 @@ export async function GET() {
     hint: null,
   }
 
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const key = getSupabaseServiceRoleKey() || getSupabaseAnonKey()
   if (!url || !key) {
     result.error = 'Missing Supabase URL or API key on this deployment'
     result.hint =
-      'In Vercel → Settings → Environment Variables, set NEXT_PUBLIC_SUPABASE_URL to https://bxktvrvpksxaijhdjegh.supabase.co and SUPABASE_SERVICE_ROLE_KEY (plux service role). Then redeploy.'
+      'In Vercel → Settings → Environment Variables, set NEXT_PUBLIC_SUPABASE_URL to https://bxktvrvpksxaijhdjegh.supabase.co and SUPABASE_SERVICE_ROLE_KEY (plux service role). Then redeploy. If vars were saved as p_* / NEXT_PUBLIC_p_*, rename them to the standard names (or redeploy — the app also accepts those aliases).'
     return NextResponse.json(result, { status: 500 })
   }
 

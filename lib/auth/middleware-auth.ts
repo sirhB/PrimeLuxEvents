@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import type { NextRequest } from 'next/server'
 import { cache } from 'react'
+import { requireSupabaseAnonKey, requireSupabaseUrl } from '@/lib/supabase/env'
 
 export interface UserProfile {
     id: string
@@ -39,8 +40,8 @@ export interface Permission {
 export async function getCurrentUserFromRequest(request: NextRequest): Promise<UserProfile | null> {
     try {
         const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            requireSupabaseUrl(),
+            requireSupabaseAnonKey(),
             {
                 cookies: {
                     getAll() {
