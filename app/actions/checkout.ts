@@ -2,12 +2,8 @@
 
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getDistanceBetweenAddresses } from '@/lib/geocoding'
-<<<<<<< HEAD
 import { stripe, createMockPaymentIntent, allowMockPayments } from '@/lib/stripe'
-=======
-import { stripe, createMockPaymentIntent } from '@/lib/stripe'
 import { resolvePriceCents } from '@/lib/catalog/adapters'
->>>>>>> origin/main
 
 export interface CheckoutFormData {
     customerName: string
