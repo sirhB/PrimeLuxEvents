@@ -21,6 +21,13 @@ interface EditableContentProps {
     [key: string]: any
 }
 
+/** Fixed chrome for edit controls — never inherit storefront text-white / huge type sizes */
+const EDIT_CONTROL_BASE =
+    "w-full rounded-md border-2 border-[var(--dashboard-accent-gold,#B8956B)] " +
+    "bg-[#F7F4EF] text-[#121110] caret-[#121110] " +
+    "outline-none ring-2 ring-[var(--dashboard-accent-gold,#B8956B)]/25 " +
+    "placeholder:text-[#121110]/40 selection:bg-[var(--dashboard-accent-gold,#B8956B)]/30"
+
 export function EditableContent({
     contentKey,
     initialValue,
@@ -47,6 +54,7 @@ export function EditableContent({
     const [tempValue, setTempValue] = useState(resolvedInitial)
     const supabase = createClient()
     const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
+    const wrapperRef = useRef<HTMLDivElement>(null)
     const fieldLabel = getFieldLabel(contentKey)
 
     useEffect(() => {
@@ -55,8 +63,21 @@ export function EditableContent({
     }, [resolvedInitial])
 
     useEffect(() => {
-        if (editMode && inputRef.current) {
-            inputRef.current.focus()
+        if (!editMode || !inputRef.current) return
+
+        const input = inputRef.current
+        input.focus()
+
+        // Keep the field above the mobile keyboard
+        const scrollIntoView = () => {
+            wrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+        const timer = window.setTimeout(scrollIntoView, 350)
+        window.visualViewport?.addEventListener('resize', scrollIntoView)
+
+        return () => {
+            window.clearTimeout(timer)
+            window.visualViewport?.removeEventListener('resize', scrollIntoView)
         }
     }, [editMode])
 
@@ -151,17 +172,17 @@ export function EditableContent({
                             className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="bg-background p-4 rounded-lg w-full max-w-md space-y-4">
-                                <h3 className="font-medium text-black">Edit image URL</h3>
+                            <div className="bg-[#F7F4EF] p-4 rounded-lg w-full max-w-md space-y-4">
+                                <h3 className="font-medium text-[#121110]">Edit image URL</h3>
                                 <input
                                     type="text"
                                     value={tempValue}
                                     onChange={(e) => setTempValue(e.target.value)}
-                                    className="w-full p-2 border rounded-md bg-white text-black focus:outline-none focus:ring-2 focus:ring-[var(--dashboard-accent-gold,#B8956B)]/40"
+                                    className={cn(EDIT_CONTROL_BASE, "p-2 text-sm")}
                                     placeholder="Enter image URL"
                                 />
                                 <div className="flex justify-end gap-2">
-                                    <Button size="sm" variant="outline" onClick={handleCancel} disabled={isSaving} className="text-black">
+                                    <Button size="sm" variant="outline" onClick={handleCancel} disabled={isSaving} className="text-[#121110]">
                                         Cancel
                                     </Button>
                                     <Button size="sm" onClick={handleSave} disabled={isSaving} className="bg-gold text-black hover:bg-gold/90">
@@ -178,21 +199,48 @@ export function EditableContent({
 
     return (
         <div
-            className="relative group"
+            ref={wrapperRef}
+            className="relative group scroll-mt-24"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
             {editMode ? (
-                <div className="relative z-10">
+                <div className="relative z-20 space-y-2 rounded-lg bg-[#1A1A1A]/90 p-2 ring-1 ring-[var(--dashboard-accent-gold,#B8956B)]/40 backdrop-blur-sm">
+                    <div className="flex items-center justify-between gap-2 px-1">
+                        <span className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--dashboard-accent-gold,#B8956B)]">
+                            {fieldLabel}
+                        </span>
+                        <div className="flex shrink-0 gap-1 rounded-md border border-white/10 bg-black/40 p-0.5">
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-[var(--dashboard-accent-gold,#B8956B)] hover:bg-[var(--dashboard-accent-gold,#B8956B)]/15"
+                                onClick={handleSave}
+                                disabled={isSaving}
+                                aria-label="Save changes"
+                            >
+                                {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                            </Button>
+                            <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-white/70 hover:bg-white/10 hover:text-white"
+                                onClick={handleCancel}
+                                disabled={isSaving}
+                                aria-label="Cancel editing"
+                            >
+                                <X className="w-4 h-4" />
+                            </Button>
+                        </div>
+                    </div>
+
                     {type === 'textarea' ? (
                         <textarea
                             ref={inputRef as React.RefObject<HTMLTextAreaElement>}
                             value={tempValue}
                             onChange={(e) => setTempValue(e.target.value)}
-                            className={cn(
-                                "w-full p-2 border-2 border-[var(--dashboard-accent-gold,#B8956B)] rounded-md bg-white text-black min-h-[100px] outline-none ring-2 ring-[var(--dashboard-accent-gold,#B8956B)]/20",
-                                className
-                            )}
+                            className={cn(EDIT_CONTROL_BASE, "min-h-[120px] p-3 text-base leading-relaxed")}
+                            placeholder={emptyPlaceholder}
                             onKeyDown={(e) => {
                                 if (e.key === 'Escape') handleCancel()
                                 if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSave()
@@ -204,38 +252,14 @@ export function EditableContent({
                             type="text"
                             value={tempValue}
                             onChange={(e) => setTempValue(e.target.value)}
-                            className={cn(
-                                "w-full p-1 border-2 border-[var(--dashboard-accent-gold,#B8956B)] rounded-md bg-white text-black outline-none ring-2 ring-[var(--dashboard-accent-gold,#B8956B)]/20",
-                                className
-                            )}
+                            className={cn(EDIT_CONTROL_BASE, "p-3 text-base")}
+                            placeholder={emptyPlaceholder}
                             onKeyDown={(e) => {
                                 if (e.key === 'Escape') handleCancel()
                                 if (e.key === 'Enter') handleSave()
                             }}
                         />
                     )}
-                    <div className="absolute right-2 top-full mt-1 flex gap-1 z-20 bg-background/90 p-1 rounded-md shadow-lg border">
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-6 w-6 text-[var(--dashboard-accent-gold,#B8956B)] hover:text-[var(--dashboard-accent-gold,#B8956B)] hover:bg-[var(--dashboard-accent-gold,#B8956B)]/10"
-                            onClick={handleSave}
-                            disabled={isSaving}
-                            aria-label="Save changes"
-                        >
-                            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                        </Button>
-                        <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-6 w-6 text-[var(--dashboard-text-muted,#666)] hover:bg-muted"
-                            onClick={handleCancel}
-                            disabled={isSaving}
-                            aria-label="Cancel editing"
-                        >
-                            <X className="w-4 h-4" />
-                        </Button>
-                    </div>
                 </div>
             ) : (
                 <div
