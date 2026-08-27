@@ -1,7 +1,13 @@
 import { createClient as createSupabaseJsClient } from '@supabase/supabase-js'
 import { createServiceClient } from '@/lib/supabase/server'
 import {
+  getSupabaseAnonKey,
+  getSupabaseServiceRoleKey,
+  getSupabaseUrl,
+} from '@/lib/supabase/env'
+import {
   adaptCategories,
+  adaptProduct,
   adaptProducts,
   type AppCategory,
   type AppProduct,
@@ -29,11 +35,11 @@ const PRODUCT_LIST_SELECT = `
 
 function getCatalogClient() {
   // Prefer service role (bypasses RLS). Fall back to anon key from Vercel integration.
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (getSupabaseServiceRoleKey()) {
     return createServiceClient()
   }
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const url = getSupabaseUrl()
+  const key = getSupabaseAnonKey()
   if (!url || !key) {
     throw new Error('No Supabase credentials available for catalog queries')
   }
