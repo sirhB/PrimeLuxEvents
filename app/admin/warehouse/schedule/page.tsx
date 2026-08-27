@@ -1,5 +1,12 @@
+import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import dynamic from 'next/dynamic'
+import { Loader2 } from 'lucide-react'
+import { AdminPage } from '@/components/admin/page-shell'
+import {
+    fetchStaffOnShift,
+    fetchWarehouseScheduleTasks,
+} from '@/lib/warehouse/schedule-queries'
 
 const WarehouseScheduleContent = dynamic(
     () =>
@@ -8,31 +15,10 @@ const WarehouseScheduleContent = dynamic(
         )
 )
 
-export default async function WarehouseSchedulePage({
-    searchParams,
-}: {
-    searchParams: Promise<{ date?: string }>
-}) {
-    const { date } = await searchParams
-    const selectedDate = date || new Date().toISOString().split('T')[0]
-
+async function WarehouseScheduleLoader({ selectedDate }: { selectedDate: string }) {
     const supabase = await createClient()
 
-    const { data: tasks } = await supabase
-        .from('tasks')
-        .select(`
-            *,
-            orders (
-                id,
-                customer_name,
-                delivery_address,
-                delivery_time,
-                delivery_date
-            )
-        `)
-        .eq('task_type', 'warehouse')
-        .eq('due_date', selectedDate)
-        .order('scheduled_start', { ascending: true, nullsFirst: false })
+    const tasks = await fetchWarehouseScheduleTasks(supabase, selectedDate)
 
     const {
         data: { user },
@@ -44,23 +30,38 @@ export default async function WarehouseSchedulePage({
         .eq('user_id', user?.id || '')
 
     const roleIds = userRoles?.map((r) => r.role_id) || []
-
-    const { data: shifts } = await supabase
-        .from('staff_shifts')
-        .select('user_id')
-        .eq('shift_date', selectedDate)
-
-    const staffOnShift = shifts?.map((s) => s.user_id) || []
+    const staffOnShift = await fetchStaffOnShift(supabase, selectedDate)
 
     return (
-        <div className="p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            <WarehouseScheduleContent
-                initialTasks={tasks || []}
-                selectedDate={selectedDate}
-                userId={user?.id}
-                roleIds={roleIds}
-                staffOnShift={staffOnShift}
-            />
-        </div>
+        <WarehouseScheduleContent
+            initialTasks={tasks}
+            selectedDate={selectedDate}
+            userId={user?.id}
+            roleIds={roleIds}
+            staffOnShift={staffOnShift}
+        />
+    )
+}
+
+export default async function WarehouseSchedulePage({
+    searchParams,
+}: {
+    searchParams: Promise<{ date?: string }>
+}) {
+    const { date } = await searchParams
+    const selectedDate = date || new Date().toISOString().split('T')[0]
+
+    return (
+        <AdminPage>
+            <Suspense
+                fallback={
+                    <div className="flex justify-center py-24">
+                        <Loader2 className="h-8 w-8 animate-spin text-[var(--dashboard-text-muted)]" />
+                    </div>
+                }
+            >
+                <WarehouseScheduleLoader selectedDate={selectedDate} />
+            </Suspense>
+        </AdminPage>
     )
 }

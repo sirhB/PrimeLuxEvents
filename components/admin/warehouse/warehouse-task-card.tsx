@@ -75,7 +75,7 @@ export function WarehouseTaskCard({ task, selected, onClick, compact }: Warehous
 
                 <div className="flex items-center justify-between mt-auto pt-2 border-t border-[var(--dashboard-border)]">
                     <div className="flex items-center gap-3 text-[10px] text-[var(--dashboard-text-muted)]">
-                        {task.scheduled_start && (
+                        {task.scheduled_start && typeof task.scheduled_start === 'string' && (
                             <span className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
                                 {task.scheduled_start.slice(0, 5)}
