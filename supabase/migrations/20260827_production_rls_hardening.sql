@@ -96,6 +96,10 @@ END $$;
 -- Payments — webhook uses service role; staff can read
 -- ---------------------------------------------------------------------------
 DO $$
+DECLARE
+  has_user_id boolean := false;
+  has_customer_email boolean := false;
+  owner_pred text;
 BEGIN
   IF to_regclass('public.payments') IS NULL THEN
     RETURN;
@@ -113,7 +117,33 @@ BEGIN
       USING (public.is_staff())
   $p$;
 
-  EXECUTE $p$
+  -- Customer ownership predicate depends on which orders columns exist (plux may differ)
+  IF to_regclass('public.orders') IS NULL THEN
+    RETURN;
+  END IF;
+
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'orders' AND column_name = 'user_id'
+  ) INTO has_user_id;
+
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'orders' AND column_name = 'customer_email'
+  ) INTO has_customer_email;
+
+  IF has_user_id AND has_customer_email THEN
+    owner_pred := 'o.user_id = auth.uid() OR lower(o.customer_email) = lower(auth.jwt() ->> ''email'')';
+  ELSIF has_user_id THEN
+    owner_pred := 'o.user_id = auth.uid()';
+  ELSIF has_customer_email THEN
+    owner_pred := 'lower(o.customer_email) = lower(auth.jwt() ->> ''email'')';
+  ELSE
+    -- No customer linkage columns — staff-only reads are enough
+    RETURN;
+  END IF;
+
+  EXECUTE format($p$
     CREATE POLICY "Customers can view payments for their orders"
       ON public.payments FOR SELECT
       TO authenticated
@@ -121,13 +151,10 @@ BEGIN
         EXISTS (
           SELECT 1 FROM public.orders o
           WHERE o.id = payments.order_id
-            AND (
-              o.user_id = auth.uid()
-              OR lower(o.customer_email) = lower(auth.jwt() ->> 'email')
-            )
+            AND (%s)
         )
       )
-  $p$;
+  $p$, owner_pred);
 END $$;
 
 -- ---------------------------------------------------------------------------
