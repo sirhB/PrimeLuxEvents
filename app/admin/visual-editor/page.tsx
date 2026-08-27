@@ -14,6 +14,17 @@ import { useEditorContent } from "@/components/admin/visual-editor/editor-conten
 import { StageFrame } from "@/components/admin/visual-editor/stage-frame"
 import { type PreviewDevice } from "@/lib/admin/visual-editor-config"
 
+function isMissingContentTableError(message: string | null | undefined): boolean {
+  if (!message) return false
+  const lower = message.toLowerCase()
+  return (
+    lower.includes("schema cache") ||
+    lower.includes("could not find the table") ||
+    lower.includes("public.content") ||
+    lower.includes("relation") && lower.includes("content") && lower.includes("does not exist")
+  )
+}
+
 function EditorWorkspace({
     activePage,
     onPageChange,
@@ -60,10 +71,27 @@ function EditorWorkspace({
         }
 
         if (loadError) {
+            const missingTable = isMissingContentTableError(loadError)
             return (
-                <div className="flex h-[40vh] flex-col items-center justify-center gap-3 p-8 text-center">
-                    <p className="text-sm font-medium text-gray-800">Couldn’t load this page’s content</p>
-                    <p className="max-w-sm text-xs text-gray-500">{loadError}</p>
+                <div className="flex h-[50vh] flex-col items-center justify-center gap-4 p-8 text-center">
+                    <p className="text-sm font-medium text-gray-900">
+                        {missingTable ? 'CMS database not set up yet' : "Couldn’t load this page’s content"}
+                    </p>
+                    {missingTable ? (
+                        <div className="max-w-md space-y-2 text-xs leading-relaxed text-gray-600">
+                            <p>
+                                This Supabase project is missing the <code className="rounded bg-gray-100 px-1">public.content</code> table
+                                the Site editor uses to store page copy.
+                            </p>
+                            <p>
+                                In the Supabase SQL Editor, run{' '}
+                                <code className="rounded bg-gray-100 px-1">supabase/migrations/20260827_ensure_content_cms.sql</code>
+                                , then try again.
+                            </p>
+                        </div>
+                    ) : (
+                        <p className="max-w-sm text-xs text-gray-500">{loadError}</p>
+                    )}
                     <button
                         type="button"
                         onClick={() => void editor.loadPage(activePage)}

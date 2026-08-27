@@ -155,9 +155,16 @@ export function EditorContentProvider({ children }: { children: ReactNode }) {
 
         if (contentRes.error) {
           console.error('Error fetching content:', contentRes.error)
-          setLoadError(contentRes.error.message)
+          const message = contentRes.error.message
+          setLoadError(message)
           setContentState({})
-          toast.error('Failed to load content')
+          // Missing table is a setup issue — show in-canvas guidance instead of toast spam
+          const isMissingTable =
+            message.toLowerCase().includes('schema cache') ||
+            message.toLowerCase().includes('could not find the table')
+          if (!isMissingTable) {
+            toast.error('Failed to load content')
+          }
         } else {
           const contentMap = (contentRes.data ?? []).reduce(
             (acc: ContentMap, item) => {
