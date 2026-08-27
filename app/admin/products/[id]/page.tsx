@@ -3,6 +3,7 @@ import { ProductForm } from '@/components/admin/product-form'
 import { notFound } from 'next/navigation'
 import { AdminQRCode } from '@/components/admin/qr-code'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { adaptProduct, type LiveProduct } from '@/lib/catalog/adapters'
 
 export default async function EditProductPage({
     params,
@@ -14,19 +15,22 @@ export default async function EditProductPage({
 
     const [productResult, categoriesResult] = await Promise.all([
         supabase.from('products').select('*').eq('id', id).single(),
-        supabase.from('categories').select('*'),
+        supabase.from('categories').select('id, name, slug'),
     ])
 
-    // Fetch variants if this product is part of a group
-    let variants: any[] = []
-    if (productResult.data && productResult.data.group_id) {
-        const { data: variantsData } = await supabase
-            .from('products')
-            .select('id, name, color, image_url, slug')
-            .eq('group_id', productResult.data.group_id)
-            .order('created_at', { ascending: true })
+    if (!productResult.data) {
+        notFound()
+    }
 
-        variants = variantsData || []
+    const adapted = adaptProduct(productResult.data as LiveProduct)
+    const productForForm = {
+        ...productResult.data,
+        ...adapted,
+        // form reads both legacy and plux field names
+        price: adapted?.price ?? 0,
+        cost: adapted?.cost ?? 0,
+        stock: adapted?.quantity_available ?? 1,
+        images: adapted?.images ?? [],
     }
 
     return (
@@ -41,9 +45,9 @@ export default async function EditProductPage({
             <div className="grid lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-3">
                     <ProductForm
-                        product={productResult.data}
+                        product={productForForm}
                         categories={categoriesResult.data || []}
-                        variants={variants}
+                        variants={[]}
                     />
                 </div>
                 <div className="space-y-6">
@@ -57,7 +61,7 @@ export default async function EditProductPage({
                                 label="Product QR Label"
                             />
                             <div className="text-center">
-                                <p className="text-[10px] text-gray-500 font-medium">SKU: {productResult.data?.sku || 'N/A'}</p>
+                                <p className="text-[10px] text-gray-500 font-medium">SKU: {productForForm?.sku || 'N/A'}</p>
                                 <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-tighter">Scan to view in warehouse</p>
                             </div>
                         </CardContent>

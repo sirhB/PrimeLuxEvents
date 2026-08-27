@@ -23,7 +23,7 @@ export default async function CategoriesPage({
 
     let query = supabase
         .from('categories')
-        .select('*, products(count)', { count: 'exact' })
+        .select('id, name, slug, description, sort_order, is_active, created_at', { count: 'exact' })
 
     if (search) {
         query = query.or(`name.ilike.%${search}%,slug.ilike.%${search}%,description.ilike.%${search}%`)
@@ -48,17 +48,23 @@ export default async function CategoriesPage({
 
     const { data: rawCategories, count } = await query.range(start, end)
 
-    // Transform to flatten product count and match interface
-    // Interface expected: id, name, slug, description, image_url, is_featured, product_count, created_at
+    // Count products per category (plux has no nested products(count) guarantee)
+    const { data: productRows } = await supabase.from('products').select('category_id')
+    const countByCat = new Map<string, number>()
+    for (const row of productRows || []) {
+        if (!row.category_id) continue
+        countByCat.set(row.category_id, (countByCat.get(row.category_id) || 0) + 1)
+    }
+
     const categories = rawCategories?.map((cat: any) => ({
         id: cat.id,
         name: cat.name,
         slug: cat.slug,
         description: cat.description,
-        image_url: cat.image_url,
-        is_featured: cat.is_featured,
+        image_url: null,
+        is_featured: false,
         created_at: cat.created_at,
-        product_count: cat.products?.[0]?.count || 0
+        product_count: countByCat.get(cat.id) || 0,
     })) || []
 
     async function deleteCategory(id: string) {

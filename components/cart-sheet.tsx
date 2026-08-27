@@ -30,11 +30,27 @@ export function CartSheet() {
       const supabase = createClient()
       const { data } = await supabase
         .from('products')
-        .select('*, categories(name, slug)')
+        .select('id, name, slug, description, price_cents, image_url, gallery_images, category_id, is_active')
         .in('id', productIds)
 
       if (data) {
-        setProducts(data)
+        const { data: categories } = await supabase
+          .from('categories')
+          .select('id, name, slug')
+
+        const byId = new Map((categories || []).map((c: any) => [c.id, c]))
+        setProducts(
+          data.map((row: any) => {
+            const cat = row.category_id ? byId.get(row.category_id) : null
+            const price = typeof row.price_cents === 'number' ? row.price_cents : 0
+            return {
+              ...row,
+              price,
+              rental_price_daily: price,
+              categories: cat ? { name: cat.name, slug: cat.slug } : null,
+            }
+          }),
+        )
       }
     }
 

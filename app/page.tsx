@@ -2,6 +2,7 @@ import nextDynamic from "next/dynamic"
 import { getSiteContent } from "@/lib/content"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
+import { FeaturedCollection } from "@/components/featured-collection"
 
 const sectionFallback = (
   <div className="container mx-auto px-4 py-16 md:px-6">
@@ -18,7 +19,6 @@ const sectionFallback = (
 const HeroSection = nextDynamic(() => import("@/components/hero-section").then(m => m.HeroSection))
 const FeaturedCategories = nextDynamic(() => import("@/components/featured-categories").then(m => m.FeaturedCategories), { loading: () => sectionFallback })
 const InteractiveProcess = nextDynamic(() => import("@/components/interactive-process").then(m => m.InteractiveProcess), { loading: () => sectionFallback })
-const FeaturedCollection = nextDynamic(() => import("@/components/featured-collection").then(m => m.FeaturedCollection), { loading: () => sectionFallback })
 const BrandValuesSection = nextDynamic(() => import("@/components/brand-values-section").then(m => m.BrandValuesSection), { loading: () => sectionFallback })
 const TestimonialsSection = nextDynamic(() => import("@/components/testimonials-section").then(m => m.TestimonialsSection), { loading: () => sectionFallback })
 

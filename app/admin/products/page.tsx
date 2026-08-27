@@ -8,6 +8,7 @@ import { PaginationControls } from '@/components/admin/pagination-controls'
 import { ProductFilters } from '@/components/admin/product-filters'
 import { ProductsTable } from '@/components/admin/products-table'
 import { ProductStatsCards } from '@/components/admin/products/product-stats-cards'
+import { adaptProducts, type LiveProduct } from '@/lib/catalog/adapters'
 
 import { requirePermission } from '@/lib/auth/authorization'
 
@@ -25,152 +26,118 @@ export default async function ProductsPage({
     const start = (currentPage - 1) * pageSize
     const end = start + pageSize - 1
 
-    // Prepare the main query
     let query = supabase
         .from('products')
-        .select('*, categories(name)', { count: 'exact' })
+        .select('id, name, slug, description, category_id, sku, price_cents, cost_cents, image_url, gallery_images, specifications, is_active, created_at', { count: 'exact' })
 
-    // Apply filters
     if (category_id) query = query.eq('category_id', category_id)
     if (search) query = query.ilike('name', `%${search}%`)
 
-    // Apply stock filtering
-    if (stock_status === 'in_stock') {
-        query = query.gt('quantity_available', 5)
-    } else if (stock_status === 'low_stock') {
-        query = query.gt('quantity_available', 0).lte('quantity_available', 5)
-    } else if (stock_status === 'out_of_stock') {
-        query = query.eq('quantity_available', 0)
-    }
-
-    // Apply sorting
     switch (sort) {
         case 'oldest': query = query.order('created_at', { ascending: true }); break
-        case 'price_asc': query = query.order('price', { ascending: true }); break
-        case 'price_desc': query = query.order('price', { ascending: false }); break
+        case 'price_asc': query = query.order('price_cents', { ascending: true }); break
+        case 'price_desc': query = query.order('price_cents', { ascending: false }); break
         case 'name_asc': query = query.order('name', { ascending: true }); break
         case 'name_desc': query = query.order('name', { ascending: false }); break
         case 'newest':
         default: query = query.order('created_at', { ascending: false }); break
     }
 
-    // Execute all queries in parallel
-    const [categoriesRes, statsRes, lowStockRes, productsRes] = await Promise.all([
+    const [categoriesRes, statsRes, productsRes] = await Promise.all([
         supabase.from('categories').select('id, name').order('name'),
-        // Only select cost and quantity for value calculation to keep payload small
-        supabase.from('products').select('cost, quantity_available'),
-        // Targeted count for low stock
-        supabase.from('products').select('*', { count: 'exact', head: true }).lte('quantity_available', 5),
-        // Paginated products
-        query.range(start, end)
+        supabase.from('products').select('cost_cents, specifications'),
+        query.range(start, end),
     ])
 
     const categories = categoriesRes.data || []
-    const allProductsForStats = statsRes.data || []
-    const lowStockCount = lowStockRes.count || 0
-    const { data: products, count: totalProductsCount } = productsRes
+    const categoryById = new Map(categories.map((c: any) => [c.id, c]))
 
-    // Calculate metrics
-    const totalProducts = totalProductsCount || 0
-    const totalValue = allProductsForStats.reduce((sum, p) => sum + (p.cost || 0) * (p.quantity_available || 0), 0)
+    const adapted = adaptProducts(
+        ((productsRes.data || []) as LiveProduct[]).map((p) => ({
+            ...p,
+            categories: p.category_id
+                ? { name: categoryById.get(p.category_id)?.name || 'Uncategorized' }
+                : null,
+        })),
+    )
+
+    // Optional stock_status filter client-side (qty lives in specifications on plux)
+    const filtered = stock_status
+        ? adapted.filter((p) => {
+            const qty = p.quantity_available
+            if (stock_status === 'in_stock') return qty > 5
+            if (stock_status === 'low_stock') return qty > 0 && qty <= 5
+            if (stock_status === 'out_of_stock') return qty <= 0
+            return true
+        })
+        : adapted
+
+    const tableProducts = filtered.map((p) => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        stock: p.quantity_available,
+        categories: p.categories ? { name: p.categories.name } : null,
+        is_verified: true,
+        image_url: p.image_url,
+        sku: p.sku,
+    }))
+
+    const allProductsForStats = statsRes.data || []
+    const totalProducts = productsRes.count || 0
+    const totalValue = allProductsForStats.reduce((sum: number, p: any) => {
+        const cost = p.cost_cents || 0
+        const qty = p.specifications?.quantity_available ?? 1
+        return sum + cost * qty
+    }, 0)
+    const lowStockCount = allProductsForStats.filter((p: any) => {
+        const qty = p.specifications?.quantity_available ?? 1
+        return qty <= 5
+    }).length
     const categoriesCount = categories.length
 
     return (
         <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                            Inventory
-                        </span>
-                    </div>
-                    <div>
-                        <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                            Products
-                        </h1>
-                        <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md mt-2">
-                            Manage your product catalog, pricing, and inventory levels.
-                        </p>
-                    </div>
+                <div>
+                    <h1 className="text-3xl font-serif font-light tracking-tight">Products</h1>
+                    <p className="text-muted-foreground mt-1">Manage your rental catalog</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <Button asChild variant="outline" className="rounded-full border-[var(--dashboard-accent-gold)] text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/10 font-medium px-6">
-                        <Link href="/admin/products/verify">
-                            Verification Mode
-                        </Link>
-                    </Button>
-                    <Button asChild className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium px-6">
-                        <Link href="/admin/products/new">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Product
-                        </Link>
-                    </Button>
-                </div>
+                <Button asChild>
+                    <Link href="/admin/products/new">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Product
+                    </Link>
+                </Button>
             </div>
 
-            {/* Dashboard Statistics */}
             <ProductStatsCards
                 totalProducts={totalProducts}
-                lowStockCount={lowStockCount}
                 totalValue={totalValue}
+                lowStockCount={lowStockCount}
                 categoriesCount={categoriesCount}
             />
 
-            <Tabs defaultValue="products" className="w-full">
-                <TabsList className="glass-card border-none p-1 bg-black/20 mb-8 w-fit h-auto">
-                    <TabsTrigger value="products" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
-                        <Link href="/admin/products">Products</Link>
-                    </TabsTrigger>
-                    <TabsTrigger value="categories" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
-                        <Link href="/admin/categories">Categories</Link>
-                    </TabsTrigger>
-                    <TabsTrigger value="inventory" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
-                        <Link href="/admin/inventory">Inventory Tracking</Link>
-                    </TabsTrigger>
-                    <TabsTrigger value="packages" asChild className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-8 h-10 rounded-xl">
-                        <Link href="/admin/packages">Packages</Link>
-                    </TabsTrigger>
-                </TabsList>
-
-                <div className="flex items-center gap-2 mb-6">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Quick Filters:</span>
-                    <Tabs defaultValue={stock_status === 'low_stock' || stock_status === 'out_of_stock' ? 'inventory' : 'all'} className="w-auto">
-                        <TabsList className="bg-white/5 border-none p-0.5 h-8">
-                            <TabsTrigger value="all" asChild className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-[10px] uppercase font-bold tracking-widest px-4 h-7 rounded-lg">
-                                <Link href="/admin/products">All Products</Link>
-                            </TabsTrigger>
-                            <TabsTrigger value="inventory" asChild className="data-[state=active]:bg-white/10 data-[state=active]:text-white text-[10px] uppercase font-bold tracking-widest px-4 h-7 rounded-lg">
-                                <Link href="/admin/products?stock_status=low_stock">Needs Attention ({lowStockCount})</Link>
-                            </TabsTrigger>
-                        </TabsList>
-                    </Tabs>
+            <div className="flex flex-col gap-4">
+                <div className="flex flex-col md:flex-row gap-4 justify-between">
+                    <SearchInput placeholder="Search products..." />
+                    <ProductFilters categories={categories} />
                 </div>
 
-                <div className="space-y-6 mt-6 animate-fade-in">
-                    <div className="flex flex-col xxl:flex-row gap-6 items-start xxl:items-center justify-between glass-card p-6 rounded-3xl border-none">
-                        <div className="w-full max-w-md">
-                            <SearchInput placeholder="Search products..." />
-                        </div>
-                        <ProductFilters categories={categories || []} />
-                    </div>
+                <Tabs defaultValue="all" className="w-full">
+                    <TabsList>
+                        <TabsTrigger value="all">All</TabsTrigger>
+                    </TabsList>
+                </Tabs>
 
-                    <ProductsTable products={products || []} categories={categories} />
+                <ProductsTable products={tableProducts as any} categories={categories} />
 
-                    {totalProductsCount !== null && totalProductsCount > 0 && (
-                        <div className="mt-8 flex justify-center">
-                            <PaginationControls
-                                hasNextPage={end < totalProductsCount}
-                                hasPrevPage={start > 0}
-                                totalCount={totalProductsCount}
-                                currentPage={currentPage}
-                                pageSize={pageSize}
-                            />
-                        </div>
-                    )}
-                </div>
-            </Tabs>
-
+                <PaginationControls
+                    currentPage={currentPage}
+                    totalItems={totalProducts}
+                    pageSize={pageSize}
+                />
+            </div>
         </div>
     )
 }
-

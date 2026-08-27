@@ -31,8 +31,9 @@ export function CategoryForm({ category }: CategoryFormProps) {
             name: formData.get('name') as string,
             slug: formData.get('slug') as string,
             description: formData.get('description') as string,
-            image_url: imageUrl[0] || null,
-            is_featured: formData.get('is_featured') === 'on',
+            // plux has no image_url / is_featured on categories
+            is_active: true,
+            sort_order: category?.sort_order ?? 0,
         }
 
         try {

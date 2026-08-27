@@ -89,7 +89,9 @@ export default function CatalogClient({ heroTitle, products, categories, package
     }, [packages])
 
     const featuredProducts = useMemo(() => {
-        return products.filter(p => p.is_featured)
+        const marked = products.filter(p => p.is_featured)
+        // plux has no is_featured — fall back to newest products for the hero strip
+        return marked.length > 0 ? marked : products.slice(0, 8)
     }, [products])
 
     // Handlers
@@ -382,6 +384,34 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                                 imageUrl={category.image_url}
                                                 onClick={() => handleCategoryClick(category.name)}
                                             />
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* All products on main catalog (when not filtered) */}
+                        {!selectedCategory && !searchQuery && searchResults.length > 0 && (
+                            <section>
+                                <div className="mb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+                                    <div>
+                                        <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Inventory</span>
+                                        <h2 className="text-4xl md:text-7xl font-serif font-light text-white tracking-tighter">All Rentals</h2>
+                                    </div>
+                                    <p className="text-sm text-gray-500 font-light max-w-md">
+                                        {searchResults.length} pieces available. Select a category above to refine.
+                                    </p>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+                                    {searchResults.slice(0, 60).map((product, index) => (
+                                        <motion.div
+                                            key={product.id}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ duration: 0.4, delay: Math.min(index * 0.02, 0.2) }}
+                                        >
+                                            <ProductCard product={product} />
                                         </motion.div>
                                     ))}
                                 </div>

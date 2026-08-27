@@ -61,7 +61,9 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
     const supabase = createClient()
     const [loading, setLoading] = useState(false)
     const [mainImage, setMainImage] = useState(product?.image_url ? [product.image_url] : [])
-    const [galleryImages, setGalleryImages] = useState<string[]>(product?.images || [])
+    const [galleryImages, setGalleryImages] = useState<string[]>(
+        product?.images || product?.gallery_images || [],
+    )
     interface AssemblyItem {
         name: string
         quantity: number
@@ -304,31 +306,42 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
         // Convert price from dollars to cents for storage
         const priceInDollars = parseFloat(formData.get('price') as string)
         const priceInCents = Math.round(priceInDollars * 100)
+        const stock = parseInt(formData.get('stock') as string) || 1
+        const slug = (formData.get('slug') as string) || ''
+        const name = formData.get('name') as string
+        const sku =
+            (formData.get('sku') as string) ||
+            product?.sku ||
+            slug.toUpperCase().replace(/[^A-Z0-9]+/g, '-').slice(0, 40) ||
+            `SKU-${Date.now().toString(36).toUpperCase()}`
 
-        // Convert modifier price adjustments from dollars to cents
-        const modifiersInCents = modifiers.map(m => ({
-            ...m,
-            options: m.options?.map(o => ({
-                ...o,
-                priceAdjustment: Math.round(o.priceAdjustment * 100)
-            })) || []
-        }))
-
+        // plux schema: price_cents, gallery_images, specifications — drop legacy columns
         const data = {
-            name: formData.get('name') as string,
+            name,
             description: formData.get('description') as string,
-            price: priceInCents,
-            stock: parseInt(formData.get('stock') as string),
+            slug,
+            sku,
+            price_cents: priceInCents,
+            cost_cents: Math.round(parseFloat(formData.get('cost') as string || '0') * 100),
             category_id: (formData.get('category_id') as string) || null,
             image_url: mainImage[0] || null,
-            images: galleryImages,
-            is_featured: formData.get('is_featured') === 'on',
-            slug: formData.get('slug') as string,
-            modifiers: modifiersInCents,
-            assembly_items: assemblyItems.filter(item => item.name.trim() !== ''),
-            group_id: (formData.get('group_id') as string) || null,
-            color: (formData.get('color') as string) || null,
-            cost: Math.round(parseFloat(formData.get('cost') as string || '0') * 100),
+            gallery_images: galleryImages.length ? galleryImages : (mainImage[0] ? mainImage : null),
+            is_active: true,
+            specifications: {
+                quantity_available: stock,
+                // preserve advanced UI data that plux has no columns for
+                modifiers: modifiers.map(m => ({
+                    ...m,
+                    options: m.options?.map(o => ({
+                        ...o,
+                        priceAdjustment: Math.round(o.priceAdjustment * 100)
+                    })) || []
+                })),
+                assembly_items: assemblyItems.filter(item => item.name.trim() !== ''),
+                color: (formData.get('color') as string) || null,
+                group_id: (formData.get('group_id') as string) || null,
+                is_featured: formData.get('is_featured') === 'on',
+            },
         }
 
         try {
@@ -638,7 +651,11 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                                 type="number"
                                 step="0.01"
                                 min="0"
-                                defaultValue={product?.price ? (product.price / 100).toFixed(2) : ''}
+                                defaultValue={
+                                    (product?.price_cents ?? product?.price)
+                                        ? ((product.price_cents ?? product.price) / 100).toFixed(2)
+                                        : ''
+                                }
                                 placeholder="0.00"
                                 required
                             />
@@ -651,7 +668,11 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                                 type="number"
                                 step="0.01"
                                 min="0"
-                                defaultValue={product?.cost ? (product.cost / 100).toFixed(2) : ''}
+                                defaultValue={
+                                    (product?.cost_cents ?? product?.cost)
+                                        ? ((product.cost_cents ?? product.cost) / 100).toFixed(2)
+                                        : '0'
+                                }
                                 placeholder="0.00"
                             />
                         </div>
@@ -661,7 +682,12 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                                 id="stock"
                                 name="stock"
                                 type="number"
-                                defaultValue={product?.stock ?? 0}
+                                defaultValue={
+                                    product?.specifications?.quantity_available
+                                    ?? product?.quantity_available
+                                    ?? product?.stock
+                                    ?? 1
+                                }
                                 placeholder="0"
                                 required
                             />

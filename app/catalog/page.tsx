@@ -1,6 +1,6 @@
 import { getSiteContent } from "@/lib/content"
 import CatalogClient from "./catalog-client"
-import { createClient } from "@/lib/supabase/server"
+import { fetchCatalogCategories, fetchCatalogProducts } from "@/lib/catalog/queries"
 import { Metadata } from "next"
 
 export const revalidate = 60
@@ -12,34 +12,28 @@ export const metadata: Metadata = {
 
 export default async function CatalogPage() {
   const content = await getSiteContent()
-  const supabase = await createClient()
 
-  // Fetch products, categories, and packages separately to avoid relationship issues
-  const [productsRes, categoriesRes, packagesRes] = await Promise.all([
-    supabase.from('products').select('*').order('created_at', { ascending: false }).limit(50),
-    supabase.from('categories').select('*').order('name'),
-    supabase.from('packages').select('*').order('created_at', { ascending: false })
+  const [products, categories] = await Promise.all([
+    fetchCatalogProducts({ limit: 200, sort: 'newest' }),
+    fetchCatalogCategories(),
   ])
 
-  const products = productsRes.data || []
-  const categories = categoriesRes.data || []
-  const packages = packagesRes.data || []
+  // plux has no packages table yet — keep empty until packages are migrated
+  const packages: unknown[] = []
 
-  // Manually map category names and slugs to products to avoid joins
-  const productsWithCategories = products.map(product => {
-    const category = categories.find(c => c.id === product.category_id)
-    return {
-      ...product,
-      categories: category ? { name: category.name, slug: category.slug } : null
-    }
+  // Enrich categories with a representative product image when category has no image_url
+  const categoriesWithImages = categories.map((category) => {
+    if (category.image_url) return category
+    const sample = products.find((p) => p.category_id === category.id && p.image_url)
+    return { ...category, image_url: sample?.image_url ?? null }
   })
 
   return (
     <CatalogClient
       heroTitle={content['catalog.hero.title']}
-      products={productsWithCategories as any}
-      categories={categories}
-      packages={packages}
+      products={products as any}
+      categories={categoriesWithImages as any}
+      packages={packages as any}
     />
   )
 }

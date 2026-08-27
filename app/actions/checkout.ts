@@ -104,7 +104,15 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
     if (productIds.length > 0) {
         const { data, error } = await supabase.from('products').select('*').in('id', productIds)
         if (error) throw new Error('Failed to fetch products')
-        products = data || []
+        // plux uses price_cents — normalize for checkout math that reads product.price
+        products = (data || []).map((p: any) => ({
+            ...p,
+            price: typeof p.price_cents === 'number' ? p.price_cents : (p.price ?? 0),
+            quantity_available:
+                typeof p.quantity_available === 'number'
+                    ? p.quantity_available
+                    : (p.specifications?.quantity_available ?? 1),
+        }))
     }
 
     // Calculate subtotal
@@ -373,20 +381,38 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         for (const [productId, qty] of Object.entries(requiredQuantities)) {
             let product = totals.products.find(p => p.id === productId)
             if (!product) {
-                const { data } = await supabase.from('products').select('quantity_available, name').eq('id', productId).single()
+                const { data } = await supabase
+                    .from('products')
+                    .select('name, specifications, price_cents')
+                    .eq('id', productId)
+                    .single()
                 product = data
+                    ? {
+                          ...data,
+                          quantity_available: data.specifications?.quantity_available ?? 1,
+                          price: data.price_cents ?? 0,
+                      }
+                    : null
             }
 
             if (!product) continue
 
-            const { data: reservations } = await supabase
-                .from('rental_reservations')
-                .select('quantity')
-                .eq('product_id', productId)
-                .lte('start_date', endDate)
-                .gte('end_date', startDate)
+            // rental_reservations may not exist on plux — treat missing table as zero reserved
+            let totalReserved = 0
+            try {
+                const { data: reservations, error: resErr } = await supabase
+                    .from('rental_reservations')
+                    .select('quantity')
+                    .eq('product_id', productId)
+                    .lte('start_date', endDate)
+                    .gte('end_date', startDate)
+                if (!resErr) {
+                    totalReserved = reservations?.reduce((sum, r) => sum + r.quantity, 0) || 0
+                }
+            } catch {
+                totalReserved = 0
+            }
 
-            const totalReserved = reservations?.reduce((sum, r) => sum + r.quantity, 0) || 0
             const available = product.quantity_available || 1
 
             if (totalReserved + qty > available) {
