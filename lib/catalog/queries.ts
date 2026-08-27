@@ -1,3 +1,4 @@
+import { createClient as createSupabaseJsClient } from '@supabase/supabase-js'
 import { createServiceClient } from '@/lib/supabase/server'
 import {
   adaptCategories,
@@ -27,25 +28,16 @@ const PRODUCT_LIST_SELECT = `
 `
 
 function getCatalogClient() {
-  // Prefer service role (bypasses RLS). Fall back to anon/server client key.
-  try {
-    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return createServiceClient()
-    }
-  } catch (err) {
-    console.warn('Service role client unavailable, falling back:', err)
+  // Prefer service role (bypasses RLS). Fall back to anon key from Vercel integration.
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return createServiceClient()
   }
-  // Lazy import avoided — createServiceClient already validates.
-  // If only anon is configured (Vercel Supabase integration), use it.
-  const { createClient } = require('@supabase/supabase-js') as typeof import('@supabase/supabase-js')
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const key =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    process.env.SUPABASE_SERVICE_ROLE_KEY
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   if (!url || !key) {
     throw new Error('No Supabase credentials available for catalog queries')
   }
-  return createClient(url, key, {
+  return createSupabaseJsClient(url, key, {
     auth: { autoRefreshToken: false, persistSession: false },
   })
 }
