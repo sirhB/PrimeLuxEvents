@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
     Select,
@@ -18,7 +19,21 @@ interface ProductFiltersProps {
     categories: Category[]
 }
 
-export function ProductFilters({ categories }: ProductFiltersProps) {
+function ProductFiltersFallback() {
+    return (
+        <div className="flex flex-wrap gap-4">
+            {[1, 2, 3].map((key) => (
+                <Select key={key} disabled>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Loading..." />
+                    </SelectTrigger>
+                </Select>
+            ))}
+        </div>
+    )
+}
+
+function ProductFiltersInner({ categories }: ProductFiltersProps) {
     const router = useRouter()
     const searchParams = useSearchParams()
 
@@ -96,5 +111,13 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
                 </SelectContent>
             </Select>
         </div>
+    )
+}
+
+export function ProductFilters(props: ProductFiltersProps) {
+    return (
+        <Suspense fallback={<ProductFiltersFallback />}>
+            <ProductFiltersInner {...props} />
+        </Suspense>
     )
 }

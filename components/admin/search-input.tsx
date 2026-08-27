@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { Search } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTransition } from 'react'
@@ -7,11 +8,31 @@ import { Input } from '@/components/ui/input'
 import { useDebouncedCallback } from 'use-debounce'
 import { cn } from '@/lib/utils'
 
-export function SearchInput({
+function SearchInputFallback({
     placeholder,
-    className
+    className,
 }: {
-    placeholder?: string,
+    placeholder?: string
+    className?: string
+}) {
+    return (
+        <div className={cn('relative flex-1 md:max-w-md', className)}>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--dashboard-text-muted)]" />
+            <Input
+                type="search"
+                placeholder={placeholder || 'Search...'}
+                disabled
+                className="pl-9 h-11 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] placeholder:text-[var(--dashboard-text-muted)]/50"
+            />
+        </div>
+    )
+}
+
+function SearchInputInner({
+    placeholder,
+    className,
+}: {
+    placeholder?: string
     className?: string
 }) {
     const searchParams = useSearchParams()
@@ -25,7 +46,7 @@ export function SearchInput({
         } else {
             params.delete('search')
         }
-        params.set('page', '1') // Reset to first page on search
+        params.set('page', '1')
 
         startTransition(() => {
             replace(`?${params.toString()}`)
@@ -33,7 +54,7 @@ export function SearchInput({
     }, 300)
 
     return (
-        <div className={cn("relative flex-1 md:max-w-md", className)}>
+        <div className={cn('relative flex-1 md:max-w-md', className)}>
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--dashboard-text-muted)]" />
             <Input
                 type="search"
@@ -48,5 +69,13 @@ export function SearchInput({
                 </div>
             )}
         </div>
+    )
+}
+
+export function SearchInput(props: { placeholder?: string; className?: string }) {
+    return (
+        <Suspense fallback={<SearchInputFallback {...props} />}>
+            <SearchInputInner {...props} />
+        </Suspense>
     )
 }

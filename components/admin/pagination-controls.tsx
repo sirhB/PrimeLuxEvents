@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -12,7 +13,29 @@ interface PaginationControlsProps {
     pageSize: number
 }
 
-export function PaginationControls({
+function PaginationControlsFallback({
+    hasNextPage,
+    hasPrevPage,
+    currentPage,
+}: Pick<PaginationControlsProps, 'hasNextPage' | 'hasPrevPage' | 'currentPage'>) {
+    return (
+        <div className="flex items-center justify-center gap-1 py-4">
+            <Button variant="outline" size="icon-sm" disabled className="text-gray-600">
+                <ChevronLeft className="h-4 w-4" />
+                <span className="sr-only">Previous Page</span>
+            </Button>
+            <Button variant="default" size="icon-sm" disabled>
+                {currentPage}
+            </Button>
+            <Button variant="outline" size="icon-sm" disabled={!hasNextPage} className="text-gray-600">
+                <ChevronRight className="h-4 w-4" />
+                <span className="sr-only">Next Page</span>
+            </Button>
+        </div>
+    )
+}
+
+function PaginationControlsInner({
     hasNextPage,
     hasPrevPage,
     totalCount,
@@ -30,25 +53,21 @@ export function PaginationControls({
         router.push(`?${params.toString()}`)
     }
 
-    // Generate page numbers to display
     const getPageNumbers = () => {
         const pages: (number | string)[] = []
         const maxVisible = 5
 
         if (totalPages <= maxVisible) {
-            // Show all pages if total is small
             for (let i = 1; i <= totalPages; i++) {
                 pages.push(i)
             }
         } else {
-            // Always show first page
             pages.push(1)
 
             if (currentPage > 3) {
                 pages.push('...')
             }
 
-            // Show pages around current page
             const start = Math.max(2, currentPage - 1)
             const end = Math.min(totalPages - 1, currentPage + 1)
 
@@ -60,7 +79,6 @@ export function PaginationControls({
                 pages.push('...')
             }
 
-            // Always show last page
             pages.push(totalPages)
         }
 
@@ -95,10 +113,10 @@ export function PaginationControls({
                 return (
                     <Button
                         key={pageNum}
-                        variant={isActive ? "default" : "ghost"}
+                        variant={isActive ? 'default' : 'ghost'}
                         size="icon-sm"
                         onClick={() => handlePageChange(pageNum)}
-                        className={isActive ? "" : "text-gray-600 hover:text-gray-900"}
+                        className={isActive ? '' : 'text-gray-600 hover:text-gray-900'}
                     >
                         {pageNum}
                     </Button>
@@ -116,5 +134,21 @@ export function PaginationControls({
                 <span className="sr-only">Next Page</span>
             </Button>
         </div>
+    )
+}
+
+export function PaginationControls(props: PaginationControlsProps) {
+    return (
+        <Suspense
+            fallback={
+                <PaginationControlsFallback
+                    hasNextPage={props.hasNextPage}
+                    hasPrevPage={props.hasPrevPage}
+                    currentPage={props.currentPage}
+                />
+            }
+        >
+            <PaginationControlsInner {...props} />
+        </Suspense>
     )
 }

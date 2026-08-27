@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import { cache } from 'react'
+import { redirect } from 'next/navigation'
 
 export interface UserProfile {
   id: string
@@ -159,12 +160,29 @@ export const getCurrentUser = cache(async (): Promise<UserProfile | null> => {
   }
 })
 
+function userHasPermission(user: UserProfile, permissionName: string): boolean {
+  if (user.roles.some((role) => role.name === 'admin')) {
+    return true
+  }
+
+  if (user.permissions.some((permission) => permission.name === permissionName)) {
+    return true
+  }
+
+  const [resource] = permissionName.split('.')
+  if (resource && user.permissions.some((permission) => permission.name === `${resource}.manage`)) {
+    return true
+  }
+
+  return false
+}
+
 // Check if user has a specific permission
 export async function hasPermission(permissionName: string): Promise<boolean> {
   const user = await getCurrentUser()
   if (!user) return false
 
-  return user.permissions.some(permission => permission.name === permissionName)
+  return userHasPermission(user, permissionName)
 }
 
 // Check if user has any of the specified permissions
@@ -172,9 +190,7 @@ export async function hasAnyPermission(permissionNames: string[]): Promise<boole
   const user = await getCurrentUser()
   if (!user) return false
 
-  return user.permissions.some(permission =>
-    permissionNames.includes(permission.name)
-  )
+  return permissionNames.some((permissionName) => userHasPermission(user, permissionName))
 }
 
 // Check if user has a specific role
@@ -230,7 +246,7 @@ export async function getResourcePermissions(resource: string): Promise<Permissi
 export async function requireAuth(): Promise<UserProfile> {
   const user = await getCurrentUser()
   if (!user) {
-    throw new Error('Authentication required')
+    redirect('/login')
   }
   return user
 }
@@ -241,7 +257,7 @@ export async function requirePermission(permissionName: string): Promise<UserPro
 
   const hasPerm = await hasPermission(permissionName)
   if (!hasPerm) {
-    throw new Error(`Permission required: ${permissionName}`)
+    redirect('/unauthorized')
   }
 
   return user
@@ -253,7 +269,7 @@ export async function requireRole(roleName: string): Promise<UserProfile> {
 
   const hasRoleCheck = await hasRole(roleName)
   if (!hasRoleCheck) {
-    throw new Error(`Role required: ${roleName}`)
+    redirect('/unauthorized')
   }
 
   return user
