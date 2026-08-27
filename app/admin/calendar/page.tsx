@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, CheckCircle
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { AdminPage, AdminPageHeader } from '@/components/admin/page-shell'
 import { WAREHOUSE_CATEGORY_LABELS, type WarehouseCategory } from '@/lib/warehouse/types'
 
 const warehouseCategoryColors: Record<WarehouseCategory, string> = {
@@ -54,39 +54,29 @@ export default async function CalendarPage({
     const days = eachDayOfInterval({ start: viewStart, end: viewEnd })
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                            Logistics
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="Logistics"
+                title="Master Calendar"
+                description="Unified view of all tasks, deliveries, and appointments."
+                actions={
+                    <div className="flex items-center gap-2 rounded-md border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] p-1">
+                        <Button variant="ghost" size="icon" asChild>
+                            <Link href={`/admin/calendar?month=${format(prevMonth, 'yyyy-MM-dd')}`}>
+                                <ChevronLeft className="h-4 w-4" />
+                            </Link>
+                        </Button>
+                        <span className="min-w-[140px] text-center text-sm font-semibold">
+                            {format(currentMonth, 'MMMM yyyy')}
                         </span>
+                        <Button variant="ghost" size="icon" asChild>
+                            <Link href={`/admin/calendar?month=${format(nextMonth, 'yyyy-MM-dd')}`}>
+                                <ChevronRight className="h-4 w-4" />
+                            </Link>
+                        </Button>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                        Master Calendar
-                    </h1>
-                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
-                        Unified view of all tasks, deliveries, and appointments.
-                    </p>
-                </div>
-
-                <div className="flex items-center gap-4 glass-card p-2 rounded-2xl border-none bg-black/20">
-                    <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/admin/calendar?month=${format(prevMonth, 'yyyy-MM-dd')}`}>
-                            <ChevronLeft className="h-4 w-4" />
-                        </Link>
-                    </Button>
-                    <span className="text-lg font-serif min-w-[140px] text-center">
-                        {format(currentMonth, 'MMMM yyyy')}
-                    </span>
-                    <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/admin/calendar?month=${format(nextMonth, 'yyyy-MM-dd')}`}>
-                            <ChevronRight className="h-4 w-4" />
-                        </Link>
-                    </Button>
-                </div>
-            </div>
+                }
+            />
 
             {/* Calendar Grid */}
             <div className="glass-card border-none overflow-hidden rounded-[2rem] shadow-2xl">
@@ -202,6 +192,6 @@ export default async function CalendarPage({
                     <span>Urgent Task</span>
                 </div>
             </div>
-        </div>
+        </AdminPage>
     )
 }

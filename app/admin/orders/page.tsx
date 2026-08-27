@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { OrdersContent } from '@/components/admin/orders/orders-content'
 import { requirePermission } from '@/lib/auth/authorization'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default async function OrdersPage({
     searchParams,
@@ -76,32 +78,20 @@ export default async function OrdersPage({
     const deliveredOrdersCount = deliveredOrdersResult.count || 0
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                            Commerce
-                        </span>
-                    </div>
-                    <div>
-                        <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                            Orders
-                        </h1>
-                        <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md mt-2">
-                            Overview of your store's performance and recent orders.
-                        </p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Button asChild className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium px-6">
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="Commerce"
+                title="Orders"
+                description="Overview of your store's performance and recent orders."
+                actions={
+                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90">
                         <Link href="/admin/orders/new">
                             <Plus className="mr-2 h-4 w-4" />
                             Create Order
                         </Link>
                     </Button>
-                </div>
-            </div>
+                }
+            />
 
             <OrdersContent
                 totalRevenue={totalRevenue}
@@ -118,7 +108,7 @@ export default async function OrdersPage({
                 start={start}
                 end={end}
             />
-        </div>
+        </AdminPage>
     )
 }
 

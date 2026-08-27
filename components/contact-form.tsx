@@ -12,7 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { createClient } from "@/lib/supabase/client"
+import { submitConsultationRequest } from "@/app/actions/submit-consultation"
 import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle2, AlertCircle, ArrowRight } from "lucide-react"
 
@@ -83,17 +83,14 @@ export function ContactForm() {
             has_planner: hasPlanner === 'yes',
             planner_name: hasPlanner === 'yes' ? (formData.get('planner') as string)?.trim() || null : null,
             message,
-            status: 'new_request',
+            status: 'new_request' as const,
         }
 
         try {
-            const supabase = createClient()
-            const { data, error } = await supabase
-                .from('consultations')
-                .insert([consultationData])
-                .select()
-
-            if (error) throw new Error(error.message)
+            const result = await submitConsultationRequest(consultationData)
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to submit request')
+            }
 
             setSubmitMessage({
                 type: 'success',

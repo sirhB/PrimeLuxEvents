@@ -1,27 +1,31 @@
-# PrimeLux Events - Admin Functionality
+# PrimeLux Events — Admin
 
-The Admin Dashboard provides a powerful suite of tools to manage every aspect of the event rental business.
+Operational console for the luxury event rental business. Staff roles (`admin`, `manager`, `staff`) access `/admin` after login.
 
-## 1. CRM & Lead Management
-- **Leads Board**: A Kanban-style board to track inquiries from 'New' to 'Confirmed'.
-- **Customer Database**: Centralized view of all customers, their order history, and total spend.
-- **Consultations**: Manage and track all consultation requests and communications.
+## Navigation
 
-## 2. Order Processing
-- **Order Management**: View, filter, and process all rental orders.
-- **Order Details**: Comprehensive breakdown of items, pricing, and logistics for each booking.
-- **Packing Slips**: Generate professional packing slips for the warehouse team.
+| Section | Pages |
+|---------|--------|
+| **Home** | Dashboard, Analytics, Activity |
+| **Pipeline** | Orders, Leads, Appointments, Messages, Customers, Discounts |
+| **Fulfillment** | Logistics, Delivery, Scanner, Pack slips, Inventory, Warehouse, Bags, Tasks, Calendar |
+| **Catalog** | Products, Categories, Packages, Portfolio, Site editor |
+| **Admin** | Staff, Settings |
 
-## 3. Inventory Control
-- **Product Management**: Add, edit, and organize rental items with ease.
-- **Category Control**: Manage catalog structure and featured categories.
-- **Inventory Tracking**: Monitor stock levels and availability in real-time.
+Mobile uses a compact bottom bar (Orders / Leads / Scan / Inbox / Menu) with the full tree in the slide-out sidebar. Desktop search is command-palette driven (`⌘K` / `Ctrl+K`).
 
-## 4. Appointments & Logistics
-- **Appointment Calendar**: Manage showroom visits and team schedules.
-- **Delivery Logistics**: Track delivery locations and coordinate setup/pickup times.
+## Capabilities
 
-## 5. Content & Settings
-- **CMS (Content Management System)**: Update website text, images, and FAQs directly from the dashboard.
-- **Global Settings**: Manage company contact info, social links, and business hours.
-- **Staff Management**: Create and manage staff accounts with controlled permissions.
+- **CRM:** Lead kanban, customers, consultations, messaging
+- **Orders:** Create/process bookings, invoices, bag assignment, pack slips
+- **Inventory:** Products, categories, packages, stock views, warehouse locations, QR scan picking
+- **Ops:** Logistics hub, delivery, calendar, team tasks, appointments
+- **Content:** Portfolio + visual site editor
+- **System:** Staff/permissions, global settings, activity audit
+
+## Shell architecture
+
+- Layout: `app/admin/layout.tsx` → `AdminLayoutContent`
+- Nav config: `lib/admin/nav.ts` (single source for sidebar, mobile tabs, command palette)
+- Page chrome: `components/admin/page-shell.tsx` (`AdminPage`, `AdminPageHeader`, panels, stats)
+- Theme tokens: `--dashboard-*` in `app/globals.css` (Atelier Rail graphite + brass)

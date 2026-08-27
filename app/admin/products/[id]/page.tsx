@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { AdminQRCode } from '@/components/admin/qr-code'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { adaptProduct, type LiveProduct } from '@/lib/catalog/adapters'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default async function EditProductPage({
     params,
@@ -34,13 +36,12 @@ export default async function EditProductPage({
     }
 
     return (
-        <div className="flex flex-col gap-6">
-            <div className="flex justify-between items-end">
-                <div>
-                    <h1 className="text-3xl font-serif font-light tracking-tight">Edit Product</h1>
-                    <p className="text-sm text-muted-foreground mt-1">Manage product details, inventory, and variants.</p>
-                </div>
-            </div>
+        <AdminPage>
+            <AdminPageHeader
+                breadcrumbs={[{ label: 'Products', href: '/admin/products' }, { label: adapted?.name || 'Edit' }]}
+                title="Edit Product"
+                description="Manage product details, inventory, and variants."
+            />
 
             <div className="grid lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-3">
@@ -68,6 +69,6 @@ export default async function EditProductPage({
                     </Card>
                 </div>
             </div>
-        </div>
+        </AdminPage>
     )
 }

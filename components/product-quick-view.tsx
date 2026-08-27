@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { cn, formatCurrency } from "@/lib/utils"
+import { resolvePriceCents } from "@/lib/catalog/adapters"
 
 interface Product {
     id: string
@@ -52,7 +53,7 @@ export function ProductQuickView({
         ? product.images
         : [product.image_url]
 
-    const rentalPrice = product.rental_price_daily || product.price
+    const rentalPrice = resolvePriceCents(product)
     const hasWeekendRate = product.rental_price_weekend && product.rental_price_weekend !== rentalPrice
     const hasWeeklyRate = product.rental_price_weekly && product.rental_price_weekly !== rentalPrice
 

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Truck, MapPin, Calendar, Search, Filter, Map as MapIcon, List, Package } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export function LogisticsContent() {
     const [orders, setOrders] = useState<any[]>([])
@@ -29,19 +30,18 @@ export function LogisticsContent() {
     }, [selectedDate])
 
     return (
-        <div className="flex flex-col gap-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-4xl font-serif font-light tracking-tight text-[var(--dashboard-text)]">Logistics Hub</h1>
-                    <p className="text-[var(--dashboard-text-muted)] mt-1 uppercase tracking-widest font-bold text-xs">Route Optimization & Deployment</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="flex bg-black/20 p-1 rounded-xl glass-card">
+        <div className="flex flex-col gap-6">
+            <AdminPageHeader
+                eyebrow="Logistics"
+                title="Logistics Hub"
+                description="Route optimization and deployment."
+                actions={
+                    <div className="flex bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] p-1 rounded-md">
                         <Button
                             variant={viewMode === 'map' ? 'secondary' : 'ghost'}
                             size="sm"
                             onClick={() => setViewMode('map')}
-                            className="rounded-lg px-4"
+                            className="rounded-md px-4"
                         >
                             <MapIcon className="h-4 w-4 mr-2" />
                             Map
@@ -50,14 +50,14 @@ export function LogisticsContent() {
                             variant={viewMode === 'list' ? 'secondary' : 'ghost'}
                             size="sm"
                             onClick={() => setViewMode('list')}
-                            className="rounded-lg px-4"
+                            className="rounded-md px-4"
                         >
                             <List className="h-4 w-4 mr-2" />
                             Schedule
                         </Button>
                     </div>
-                </div>
-            </div>
+                }
+            />
 
             <div className="grid lg:grid-cols-4 gap-8">
                 <div className="lg:col-span-1 space-y-6">

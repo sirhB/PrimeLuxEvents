@@ -14,8 +14,9 @@ import {
 import { formatCents } from '@/lib/format-money'
 import { Button } from '@/components/ui/button'
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns'
+import { AdminPage, AdminPageHeader } from '@/components/admin/page-shell'
 
-const COLORS = ['#D4AF37', '#111111', '#444444', '#888888', '#AAAAAA']
+const COLORS = ['#c4a574', '#3d9a78', '#5b8def', '#d4924a', '#8a929c']
 
 export default function AnalyticsDashboard() {
     const [revenueData, setRevenueData] = useState<any[]>([])
@@ -71,10 +72,12 @@ export default function AnalyticsDashboard() {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center py-24 text-gray-300">
-                <Loader2 className="h-8 w-8 animate-spin mb-4" />
-                <p>Generating insights...</p>
-            </div>
+            <AdminPage>
+                <div className="flex flex-col items-center justify-center py-24 text-[var(--dashboard-text-muted)]">
+                    <Loader2 className="mb-4 h-8 w-8 animate-spin text-[var(--dashboard-accent-gold)]" />
+                    <p>Loading analytics…</p>
+                </div>
+            </AdminPage>
         )
     }
 
@@ -93,72 +96,77 @@ export default function AnalyticsDashboard() {
     const avgTrend = firstHalfAvg > 0 ? ((secondHalfAvg - firstHalfAvg) / firstHalfAvg) * 100 : 0
 
     return (
-        <div className="flex flex-col gap-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-4xl font-serif font-light tracking-tight">Intelligence Dashboard</h1>
-                    <p className="text-gray-400 mt-1 uppercase tracking-widest font-bold text-xs">Financial Performance & Trends</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="rounded-xl border-gray-200"
-                        onClick={() => setRangeDays(rangeDays === 30 ? 90 : 30)}
-                    >
-                        <Calendar className="h-4 w-4 mr-2" />
-                        Last {rangeDays} Days
-                    </Button>
-                    <Button size="sm" className="rounded-xl bg-black text-white hover:bg-gold hover:text-black" onClick={exportCsv}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Export Report
-                    </Button>
-                </div>
-            </div>
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="Insights"
+                title="Analytics"
+                description="Revenue, conversion, and catalog demand."
+                actions={
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="rounded-md"
+                            onClick={() => setRangeDays(rangeDays === 30 ? 90 : 30)}
+                        >
+                            <Calendar className="h-4 w-4 mr-2" />
+                            Last {rangeDays} Days
+                        </Button>
+                        <Button
+                            size="sm"
+                            className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90"
+                            onClick={exportCsv}
+                        >
+                            <Download className="h-4 w-4 mr-2" />
+                            Export report
+                        </Button>
+                    </div>
+                }
+            />
 
             {/* Top Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
                 {[
                     { label: 'Total Revenue', value: formatCents(totalRevenue), icon: DollarSign, trend: `${revTrend >= 0 ? '+' : ''}${revTrend.toFixed(1)}%`, isUp: revTrend >= 0 },
                     { label: 'Total Orders', value: totalOrders, icon: ShoppingBag, trend: `${orderTrend >= 0 ? '+' : ''}${orderTrend.toFixed(1)}%`, isUp: orderTrend >= 0 },
                     { label: 'Avg Order Value', value: formatCents(avgOrder), icon: TrendingUp, trend: `${avgTrend >= 0 ? '+' : ''}${avgTrend.toFixed(1)}%`, isUp: avgTrend >= 0 },
                     { label: 'Lead Conversion', value: `${conversionRate.toFixed(1)}%`, icon: Users, trend: 'leads → orders', isUp: conversionRate >= 0 }
                 ].map((metric, i) => (
-                    <Card key={i} className="rounded-3xl border-none shadow-sm bg-white overflow-hidden group hover:shadow-xl transition-all duration-300">
-                        <CardContent className="p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="h-10 w-10 rounded-2xl bg-gray-50 flex items-center justify-center group-hover:bg-gold/10 transition-colors">
-                                    <metric.icon className="h-5 w-5 text-gray-400 group-hover:text-gold" />
+                    <Card key={i} className="overflow-hidden rounded-[var(--dashboard-radius)] border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-none">
+                        <CardContent className="p-4">
+                            <div className="mb-3 flex items-center justify-between">
+                                <div className="flex h-9 w-9 items-center justify-center rounded-md border border-[var(--dashboard-border)] bg-[var(--dashboard-card-hover)]">
+                                    <metric.icon className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                                 </div>
-                                <div className={`flex items-center gap-1 text-[10px] font-bold ${metric.isUp ? 'text-green-600' : 'text-red-600'}`}>
+                                <div className={`flex items-center gap-1 text-[10px] font-bold ${metric.isUp ? 'text-[var(--dashboard-accent-green)]' : 'text-[var(--dashboard-accent-red)]'}`}>
                                     {metric.isUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                                     {metric.trend}
                                 </div>
                             </div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">{metric.label}</p>
-                            <p className="text-2xl font-serif">{metric.value}</p>
+                            <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--dashboard-text-muted)]">{metric.label}</p>
+                            <p className="text-2xl font-semibold tabular-nums text-[var(--dashboard-text)]">{metric.value}</p>
                         </CardContent>
                     </Card>
                 ))}
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="grid gap-5 lg:grid-cols-3">
                 {/* Revenue Line Chart */}
-                <Card className="lg:col-span-2 rounded-[2.5rem] border-none shadow-sm overflow-hidden bg-white">
-                    <CardHeader className="p-8 pb-0">
-                        <CardTitle className="text-xl font-serif">Revenue Overview</CardTitle>
+                <Card className="overflow-hidden rounded-[var(--dashboard-radius)] border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-none lg:col-span-2">
+                    <CardHeader className="p-5 pb-0">
+                        <CardTitle className="text-sm font-semibold">Revenue overview</CardTitle>
                     </CardHeader>
-                    <CardContent className="p-8 pt-4">
+                    <CardContent className="p-5 pt-4">
                         <div className="h-[350px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={revenueData}>
                                     <defs>
                                         <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#D4AF37" stopOpacity={0} />
+                                            <stop offset="5%" stopColor="#c4a574" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#c4a574" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0F0F0" />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
                                     <XAxis
                                         dataKey="formattedDate"
                                         axisLine={false}
@@ -177,7 +185,7 @@ export default function AnalyticsDashboard() {
                                     <Area
                                         type="monotone"
                                         dataKey="revenue"
-                                        stroke="#D4AF37"
+                                        stroke="#c4a574"
                                         strokeWidth={3}
                                         fillOpacity={1}
                                         fill="url(#colorRev)"
@@ -189,11 +197,11 @@ export default function AnalyticsDashboard() {
                 </Card>
 
                 {/* Status Pie Chart */}
-                <Card className="rounded-[2.5rem] border-none shadow-sm overflow-hidden bg-white">
-                    <CardHeader className="p-8 pb-0">
-                        <CardTitle className="text-xl font-serif">Order Status</CardTitle>
+                <Card className="overflow-hidden rounded-[var(--dashboard-radius)] border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-none">
+                    <CardHeader className="p-5 pb-0">
+                        <CardTitle className="text-sm font-semibold">Order status</CardTitle>
                     </CardHeader>
-                    <CardContent className="p-8 pt-4">
+                    <CardContent className="p-5 pt-4">
                         <div className="h-[350px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -212,7 +220,7 @@ export default function AnalyticsDashboard() {
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
+                                        contentStyle={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)', background: '#181d24', color: '#eef0f2' }}
                                     />
                                     <Legend verticalAlign="bottom" height={36} iconType="circle" />
                                 </PieChart>
@@ -223,39 +231,39 @@ export default function AnalyticsDashboard() {
             </div>
 
             {/* Popular Items bar Chart */}
-            <Card className="rounded-[2.5rem] border-none shadow-sm overflow-hidden bg-white">
-                <CardHeader className="p-8 pb-0">
-                    <CardTitle className="text-xl font-serif">Most Popular Inventory</CardTitle>
+            <Card className="overflow-hidden rounded-[var(--dashboard-radius)] border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-none">
+                <CardHeader className="p-5 pb-0">
+                    <CardTitle className="text-sm font-semibold">Most popular inventory</CardTitle>
                 </CardHeader>
-                <CardContent className="p-8 pt-4">
+                <CardContent className="p-5 pt-4">
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={popularData} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F0F0F0" />
+                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.06)" />
                                 <XAxis type="number" hide />
                                 <YAxis
                                     dataKey="name"
                                     type="category"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fontSize: 11, fill: '#444', fontWeight: '500' }}
+                                    tick={{ fontSize: 11, fill: '#8a929c', fontWeight: '500' }}
                                     width={150}
                                 />
                                 <Tooltip
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
-                                    cursor={{ fill: '#F9F9F9' }}
+                                    contentStyle={{ borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)', background: '#181d24', color: '#eef0f2' }}
+                                    cursor={{ fill: 'rgba(255,255,255,0.04)' }}
                                 />
                                 <Bar
                                     dataKey="total_rented"
-                                    fill="#111111"
-                                    radius={[0, 10, 10, 0]}
-                                    barSize={20}
+                                    fill="#c4a574"
+                                    radius={[0, 6, 6, 0]}
+                                    barSize={18}
                                 />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </CardContent>
             </Card>
-        </div>
+        </AdminPage>
     )
 }

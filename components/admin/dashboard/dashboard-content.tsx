@@ -1,63 +1,35 @@
 "use client"
 
-import { Loader2 } from 'lucide-react'
-import nextDynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { PullToRefresh } from '@/components/admin/pull-to-refresh'
-
-const MetricsOverview = nextDynamic(() => import('@/components/admin/dashboard/metrics-overview').then(m => m.MetricsOverview), {
-    loading: () => <div className="h-32 w-full animate-pulse bg-[var(--dashboard-card)] rounded-3xl" />,
-    ssr: false
-})
-const RevenueChartEnhanced = nextDynamic(() => import('@/components/admin/dashboard/revenue-chart-enhanced').then(m => m.RevenueChartEnhanced), {
-    loading: () => <div className="h-[400px] w-full flex items-center justify-center bg-[var(--dashboard-card)] rounded-3xl"><Loader2 className="h-8 w-8 animate-spin text-[var(--dashboard-accent-gold)]" /></div>,
-    ssr: false
-})
-const ActivityFeed = nextDynamic(() => import('@/components/admin/dashboard/activity-feed').then(m => m.ActivityFeed), {
-    loading: () => <div className="h-[400px] w-full animate-pulse bg-[var(--dashboard-card)] rounded-3xl" />,
-    ssr: false
-})
-const LaunchReadinessTracker = nextDynamic(() => import('@/components/admin/dashboard/launch-readiness-tracker').then(m => m.LaunchReadinessTracker), {
-    loading: () => <div className="h-24 w-full animate-pulse bg-[var(--dashboard-card)] rounded-3xl" />,
-    ssr: false
-})
-const QuickActionsWidget = nextDynamic(() => import('@/components/admin/dashboard/quick-actions-widget').then(m => m.QuickActionsWidget), {
-    loading: () => <div className="h-24 w-full animate-pulse bg-[var(--dashboard-card)] rounded-3xl" />,
-    ssr: false
-})
+import { MetricsOverview } from '@/components/admin/dashboard/metrics-overview'
+import { RevenueChartEnhanced } from '@/components/admin/dashboard/revenue-chart-enhanced'
+import { ActivityFeed } from '@/components/admin/dashboard/activity-feed'
+import { LaunchReadinessTracker } from '@/components/admin/dashboard/launch-readiness-tracker'
+import { QuickActionsWidget } from '@/components/admin/dashboard/quick-actions-widget'
 
 export function DashboardContent() {
-    const router = useRouter()
+  const router = useRouter()
 
-    const handleRefresh = async () => {
-        router.refresh()
-        // Simulate a small delay for smoother transition
-        await new Promise(resolve => setTimeout(resolve, 1000))
-    }
+  const handleRefresh = async () => {
+    router.refresh()
+  }
 
-    return (
-        <PullToRefresh onRefresh={handleRefresh}>
-            {/* Metrics Overview */}
-            <MetricsOverview />
-
-            {/* Launch Readiness Tracker */}
-            <LaunchReadinessTracker />
-
-            {/* Main Content - 2 Column Layout */}
-            <div className="grid gap-8 grid-cols-1 xl:grid-cols-3">
-                {/* Left Column - Revenue Chart (2/3 width) */}
-                <div className="xl:col-span-2">
-                    <RevenueChartEnhanced />
-                </div>
-
-                {/* Right Column - Activity Feed (1/3 width) */}
-                <div className="xl:col-span-1">
-                    <ActivityFeed />
-                </div>
-            </div>
-
-            {/* Quick Actions */}
-            <QuickActionsWidget />
-        </PullToRefresh>
-    )
+  return (
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="flex flex-col gap-5">
+        <MetricsOverview />
+        <LaunchReadinessTracker />
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+          <div className="xl:col-span-2">
+            <RevenueChartEnhanced />
+          </div>
+          <div className="xl:col-span-1">
+            <ActivityFeed />
+          </div>
+        </div>
+        <QuickActionsWidget />
+      </div>
+    </PullToRefresh>
+  )
 }

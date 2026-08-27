@@ -16,6 +16,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 const COLORS = ['Red', 'Blue', 'Green', 'Yellow', 'Black', 'White']
 
@@ -90,25 +92,26 @@ export default function BagsPage() {
     }
 
     return (
-        <div className="flex flex-col gap-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-4xl font-serif font-light tracking-tight">Warehouse Bags</h1>
-                    <p className="text-gray-400 mt-1 uppercase tracking-widest font-bold text-xs">Inventory & Logistics Tags</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="rounded-xl border-gray-200">
-                        <Package className="h-4 w-4 mr-2" />
-                        Bulk Print QR
-                    </Button>
-                    <Button
-                        className="rounded-xl bg-black text-white hover:bg-gold hover:text-black"
-                        onClick={openCreateDialog}
-                    >
-                        Add New Bag
-                    </Button>
-                </div>
-            </div>
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="Warehouse"
+                title="Warehouse Bags"
+                description="Inventory and logistics tags."
+                actions={
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" className="rounded-md">
+                            <Package className="h-4 w-4 mr-2" />
+                            Bulk Print QR
+                        </Button>
+                        <Button
+                            className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90"
+                            onClick={openCreateDialog}
+                        >
+                            Add New Bag
+                        </Button>
+                    </div>
+                }
+            />
 
             <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 <Button
@@ -196,6 +199,6 @@ export default function BagsPage() {
                 bag={selectedBag}
                 onSuccess={fetchBags}
             />
-        </div>
+        </AdminPage>
     )
 }

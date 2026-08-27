@@ -1,6 +1,13 @@
+import { createClient as createSupabaseJsClient } from '@supabase/supabase-js'
 import { createServiceClient } from '@/lib/supabase/server'
 import {
+  getSupabaseAnonKey,
+  getSupabaseServiceRoleKey,
+  getSupabaseUrl,
+} from '@/lib/supabase/env'
+import {
   adaptCategories,
+  adaptProduct,
   adaptProducts,
   type AppCategory,
   type AppProduct,
@@ -27,9 +34,18 @@ const PRODUCT_LIST_SELECT = `
 `
 
 function getCatalogClient() {
-  // Server-side catalog reads use service role so products always load
-  // even when anon RLS policies are not yet configured on plux.
-  return createServiceClient()
+  // Prefer service role (bypasses RLS). Fall back to anon key from Vercel integration.
+  if (getSupabaseServiceRoleKey()) {
+    return createServiceClient()
+  }
+  const url = getSupabaseUrl()
+  const key = getSupabaseAnonKey()
+  if (!url || !key) {
+    throw new Error('No Supabase credentials available for catalog queries')
+  }
+  return createSupabaseJsClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
 }
 
 export async function fetchCatalogProducts(options?: {

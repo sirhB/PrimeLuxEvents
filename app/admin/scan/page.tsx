@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/client'
 import { updateProductStock, markPickItemComplete, getPickTaskForOrder } from './actions'
 import { toast } from 'sonner'
 import type { ChecklistItem } from '@/lib/warehouse/types'
+import { AdminPage, AdminPageHeader } from '@/components/admin/page-shell'
 
 type ScanMode = 'navigation' | 'inventory' | 'picking'
 
@@ -203,20 +204,24 @@ function ScanPageContent() {
     }
 
     return (
-        <div className="flex flex-col gap-6 max-w-2xl mx-auto py-8 px-4">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" asChild className="rounded-full hover:bg-gray-100">
+        <AdminPage className="max-w-2xl mx-auto">
+            <AdminPageHeader
+                breadcrumbs={[
+                    { label: 'Dashboard', href: '/admin' },
+                    { label: 'Warehouse Schedule', href: '/admin/warehouse/schedule' },
+                    { label: 'Scanner' },
+                ]}
+                eyebrow="Warehouse"
+                title="Scanner V2"
+                description="Logistics and inventory — picking progress saves to warehouse tasks."
+                actions={
+                    <Button variant="ghost" size="icon" asChild className="rounded-md">
                         <Link href="/admin/warehouse/schedule">
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>
-                    <div>
-                        <h1 className="text-3xl font-serif font-light tracking-tight">Scanner V2</h1>
-                        <p className="text-sm text-gray-400 mt-1 uppercase tracking-widest font-bold">Logistics & Inventory</p>
-                    </div>
-                </div>
-            </div>
+                }
+            />
 
             <Tabs
                 value={mode}
@@ -416,7 +421,18 @@ function ScanPageContent() {
                     )}
                 </CardContent>
             </Card>
-        </div>
+
+            <div className="grid grid-cols-2 gap-4">
+                <div className={`p-4 rounded-3xl border flex flex-col items-center gap-2 text-center transition-all ${mode === 'inventory' ? 'bg-gold/10 border-gold shadow-lg' : 'bg-white/50 border-transparent shadow-sm'}`}>
+                    <Package className={`h-5 w-5 ${mode === 'inventory' ? 'text-gold' : 'text-gray-300'}`} />
+                    <span className="text-[10px] font-bold uppercase tracking-tight">Stock Control</span>
+                </div>
+                <div className={`p-4 rounded-3xl border flex flex-col items-center gap-2 text-center transition-all ${mode === 'picking' ? 'bg-gold/10 border-gold shadow-lg' : 'bg-white/50 border-transparent shadow-sm'}`}>
+                    <ShoppingBag className={`h-5 w-5 ${mode === 'picking' ? 'text-gold' : 'text-gray-300'}`} />
+                    <span className="text-[10px] font-bold uppercase tracking-tight">Order Picking</span>
+                </div>
+            </div>
+        </AdminPage>
     )
 }
 

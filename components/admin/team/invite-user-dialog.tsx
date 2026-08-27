@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { Plus, X, UserPlus } from 'lucide-react'
+import { X, UserPlus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
@@ -25,7 +25,6 @@ interface InviteUserDialogProps {
 export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
     const [open, setOpen] = useState(false)
     const [email, setEmail] = useState('')
-    const [tempPassword, setTempPassword] = useState('')
     const [invitationLink, setInvitationLink] = useState('')
     const [selectedRoles, setSelectedRoles] = useState<string[]>([])
     const [availableRoles, setAvailableRoles] = useState<Role[]>([])
@@ -35,7 +34,6 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
     const handleOpenChange = async (newOpen: boolean) => {
         setOpen(newOpen)
         if (newOpen && availableRoles.length === 0) {
-            // Fetch available roles when dialog opens
             setLoadingRoles(true)
             try {
                 const supabase = createClient()
@@ -59,15 +57,6 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
         if (!selectedRoles.includes(roleId)) {
             setSelectedRoles([...selectedRoles, roleId])
         }
-    }
-
-    const generateTempPassword = () => {
-        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*'
-        let password = ''
-        for (let i = 0; i < 12; i++) {
-            password += chars.charAt(Math.floor(Math.random() * chars.length))
-        }
-        setTempPassword(password)
     }
 
     const removeRole = (roleId: string) => {
@@ -97,7 +86,6 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
                 body: JSON.stringify({
                     email: email.trim(),
                     role_ids: selectedRoles,
-                    temp_password: tempPassword
                 })
             })
 
@@ -110,14 +98,6 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
             toast.success('Invitation created successfully!')
             const url = `${window.location.origin}/invite/${data.invitation.invitation_token}`
             setInvitationLink(url)
-            // Note: We don't clear email/tempPassword yet so the admin can copy the link
-            // setOpen(false)
-
-            // Here you would typically send an email with the invitation link
-            // For now, show the invitation URL that can be shared
-            const invitationUrl = `${window.location.origin}/invite/${data.invitation.invitation_token}`
-            console.log('Invitation URL:', invitationUrl) // In production, this would be emailed
-
         } catch (error: any) {
             console.error('Error creating invitation:', error)
             toast.error(error.message || 'Failed to send invitation')
@@ -142,7 +122,7 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
                 <DialogHeader>
                     <DialogTitle>Invite Team Member</DialogTitle>
                     <DialogDescription>
-                        Create an invitation for a new team member. Set a temporary password they'll use to verify their identity.
+                        Create a one-time invitation link. Anyone with the link can set their own password and join with the selected roles.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -157,31 +137,6 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
                             placeholder="colleague@company.com"
                             required
                         />
-                    </div>
-
-                    <div>
-                        <Label htmlFor="tempPassword">Temporary Password</Label>
-                        <div className="flex gap-2">
-                            <Input
-                                id="tempPassword"
-                                type="text"
-                                value={tempPassword}
-                                onChange={(e) => setTempPassword(e.target.value)}
-                                placeholder="Temporary password"
-                                required
-                            />
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={generateTempPassword}
-                                className="shrink-0"
-                            >
-                                Generate
-                            </Button>
-                        </div>
-                        <p className="text-[10px] text-[var(--dashboard-text-muted)] font-bold uppercase tracking-wider mt-1">
-                            The user will need this password to finalize their account.
-                        </p>
                     </div>
 
                     <div>
@@ -207,7 +162,6 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
                             <p className="text-sm text-gray-500 mt-1">Loading roles...</p>
                         )}
 
-                        {/* Selected Roles */}
                         {selectedRoles.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {selectedRoles.map((roleId) => {
@@ -257,17 +211,15 @@ export function InviteUserDialog({ trigger }: InviteUserDialogProps) {
                                     {invitationLink}
                                 </code>
                             </div>
-                            <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Temporary Password</span>
-                                <code className="text-sm text-[var(--dashboard-accent-gold)] font-mono">{tempPassword}</code>
-                            </div>
+                            <p className="text-xs text-[var(--dashboard-text-muted)]">
+                                Share this link privately. It expires in 7 days and does not require a temporary password.
+                            </p>
                             <Button
                                 type="button"
                                 className="w-full mt-2"
                                 onClick={() => {
                                     setOpen(false)
                                     setEmail('')
-                                    setTempPassword('')
                                     setInvitationLink('')
                                     setSelectedRoles([])
                                 }}

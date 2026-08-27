@@ -9,7 +9,8 @@ import dynamic from 'next/dynamic'
 import { LayoutGrid, Columns2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { LeadKanban } from './lead-kanban'
-import { type ConsultationStatus } from './types'
+import { type Consultation, type ConsultationStatus } from './types'
+import { haptics } from '@/lib/utils/haptics'
 
 // Dynamic imports for heavy components
 const LeadDetailsPane = dynamic(() => import('@/components/admin/consultations/lead-details-pane').then(m => m.LeadDetailsPane), {

@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { CategoryForm } from '@/components/admin/category-form'
 import { notFound } from 'next/navigation'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default async function EditCategoryPage({
     params,
@@ -20,9 +22,13 @@ export default async function EditCategoryPage({
     }
 
     return (
-        <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-bold tracking-tight">Edit Category</h1>
+        <AdminPage>
+            <AdminPageHeader
+                breadcrumbs={[{ label: 'Categories', href: '/admin/categories' }, { label: category.name }]}
+                title="Edit Category"
+                description="Update category name, slug, and description."
+            />
             <CategoryForm category={category} />
-        </div>
+        </AdminPage>
     )
 }

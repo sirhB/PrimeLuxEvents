@@ -1,9 +1,16 @@
 import { PortfolioCategoryForm } from '@/components/admin/portfolio-category-form'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default function NewPortfolioCategoryPage() {
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
+        <AdminPage>
+            <AdminPageHeader
+                breadcrumbs={[{ label: 'Portfolio', href: '/admin/portfolio' }, { label: 'New' }]}
+                title="New Portfolio Category"
+                description="Create a gallery category for your event portfolio."
+            />
             <PortfolioCategoryForm />
-        </div>
+        </AdminPage>
     )
 }

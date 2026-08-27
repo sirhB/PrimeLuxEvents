@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dialog"
 import { Plus, Trash, Search, ShoppingCart, Calendar as CalendarIcon, Package, User, CreditCard, Minus, Copy, Check, ExternalLink, Camera, Upload, Loader2, X as CloseIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { resolvePriceCents } from '@/lib/catalog/adapters'
 import { createOrder } from '@/app/admin/orders/actions'
 import { formatCurrency } from '@/lib/stripe'
 import { Calendar } from '@/components/ui/calendar'
@@ -118,12 +119,15 @@ export function OrderForm() {
     const searchProducts = async (query: string) => {
         const { data, error } = await supabase
             .from('products')
-            .select('id, name, price, image_url')
+            .select('id, name, price_cents, image_url')
             .ilike('name', `%${query}%`)
             .limit(10)
 
         if (error) throw error
-        return data || []
+        return (data || []).map((p: any) => ({
+            ...p,
+            price: resolvePriceCents(p),
+        }))
     }
 
     const addToCart = (product: any) => {
@@ -139,7 +143,7 @@ export function OrderForm() {
             return [...prev, {
                 id: product.id,
                 name: product.name,
-                price: product.price,
+                price: resolvePriceCents(product),
                 quantity: 1,
                 image_url: product.image_url
             }]

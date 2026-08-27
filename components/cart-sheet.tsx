@@ -8,6 +8,7 @@ import { ShoppingBag, Trash2, Plus, Minus, Check, ArrowRight, X } from "lucide-r
 import { useCart } from "@/components/providers/cart-provider"
 import { createClient } from "@/lib/supabase/client"
 import { formatCurrency } from "@/lib/utils"
+import { resolvePriceCents } from "@/lib/catalog/adapters"
 import { motion, AnimatePresence } from "framer-motion"
 
 export function CartSheet() {
@@ -42,7 +43,7 @@ export function CartSheet() {
         setProducts(
           data.map((row: any) => {
             const cat = row.category_id ? byId.get(row.category_id) : null
-            const price = typeof row.price_cents === 'number' ? row.price_cents : 0
+            const price = resolvePriceCents(row)
             return {
               ...row,
               price,
@@ -114,7 +115,7 @@ export function CartSheet() {
                   // Handle Package Items
                   if (item.packageId && item.packageData) {
                     const { name, price } = item.packageData
-                    const itemPrice = price
+                    const itemPrice = resolvePriceCents({ price })
 
                     return (
                       <motion.div
@@ -191,7 +192,7 @@ export function CartSheet() {
                   const product = products.find((p) => p.id === item.productId)
                   if (!product) return null
 
-                  const price = product.rental_price_daily || product.price
+                  const price = resolvePriceCents(product)
                   const modifiersPrice = Object.values(item.modifiers || {}).reduce((acc: number, curr: any) => {
                     return acc + (curr.priceAdjustment || 0)
                   }, 0)
@@ -277,12 +278,12 @@ export function CartSheet() {
                 <span className="font-serif text-3xl font-light text-gold">
                   {formatCurrency(items.reduce((acc, item) => {
                     if (item.packageId && item.packageData) {
-                      return acc + (item.packageData.price * item.quantity)
+                      return acc + (resolvePriceCents({ price: item.packageData.price }) * item.quantity)
                     }
                     if (item.productId) {
                       const product = products.find(p => p.id === item.productId)
                       if (!product) return acc
-                      const price = product.rental_price_daily || product.price
+                      const price = resolvePriceCents(product)
                       const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
                       return acc + (price + modifiersPrice) * item.quantity
                     }
@@ -294,12 +295,12 @@ export function CartSheet() {
               {(() => {
                 const subtotal = items.reduce((acc, item) => {
                   if (item.packageId && item.packageData) {
-                    return acc + (item.packageData.price * item.quantity)
+                    return acc + (resolvePriceCents({ price: item.packageData.price }) * item.quantity)
                   }
                   if (item.productId) {
                     const product = products.find(p => p.id === item.productId)
                     if (!product) return acc
-                    const price = product.rental_price_daily || product.price
+                    const price = resolvePriceCents(product)
                     const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
                     return acc + (price + modifiersPrice) * item.quantity
                   }
@@ -333,12 +334,12 @@ export function CartSheet() {
               onClick={() => {
                 const subtotal = items.reduce((acc, item) => {
                   if (item.packageId && item.packageData) {
-                    return acc + (item.packageData.price * item.quantity)
+                    return acc + (resolvePriceCents({ price: item.packageData.price }) * item.quantity)
                   }
                   if (item.productId) {
                     const product = products.find(p => p.id === item.productId)
                     if (!product) return acc
-                    const price = product.rental_price_daily || product.price
+                    const price = resolvePriceCents(product)
                     const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
                     return acc + (price + modifiersPrice) * item.quantity
                   }
@@ -352,12 +353,12 @@ export function CartSheet() {
               }}
               disabled={items.reduce((acc, item) => {
                 if (item.packageId && item.packageData) {
-                  return acc + (item.packageData.price * item.quantity)
+                  return acc + (resolvePriceCents({ price: item.packageData.price }) * item.quantity)
                 }
                 if (item.productId) {
                   const product = products.find(p => p.id === item.productId)
                   if (!product) return acc
-                  const price = product.rental_price_daily || product.price
+                  const price = resolvePriceCents(product)
                   const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
                   return acc + (price + modifiersPrice) * item.quantity
                 }

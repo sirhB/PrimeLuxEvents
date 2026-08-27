@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { AdminQRCode } from '@/components/admin/qr-code'
 import { ArrowLeft, Loader2, MapPin, Printer } from 'lucide-react'
 import Link from 'next/link'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export default function WarehouseLocationDetailPage() {
   const params = useParams()
@@ -54,23 +56,25 @@ export default function WarehouseLocationDetailPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-      <div className="flex items-center gap-3 print:hidden">
-        <Button variant="ghost" size="icon" onClick={() => router.push('/admin/warehouse/locations')}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h1 className="font-serif text-4xl font-light text-[var(--dashboard-text)]">{location.name}</h1>
-          <p className="text-xs uppercase tracking-widest text-[var(--dashboard-text-muted)]">{location.type}</p>
-        </div>
-      </div>
+    <AdminPage>
+      <AdminPageHeader
+        breadcrumbs={[{ label: 'Locations', href: '/admin/warehouse/locations' }, { label: location.name }]}
+        eyebrow="Warehouse"
+        title={location.name}
+        description={location.type}
+        actions={
+          <Button variant="ghost" size="icon" className="rounded-md print:hidden" onClick={() => router.push('/admin/warehouse/locations')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        }
+      />
 
       <Card className="mx-auto w-full max-w-md border-none glass-card print:shadow-none print:border">
         <CardHeader className="text-center">
           <div className="mx-auto mb-2 rounded-xl bg-[var(--dashboard-accent-gold)]/10 p-3 text-[var(--dashboard-accent-gold)] w-fit">
             <MapPin className="h-5 w-5" />
           </div>
-          <CardTitle className="font-serif text-2xl">{location.name}</CardTitle>
+          <CardTitle className="text-base font-semibold">{location.name}</CardTitle>
           <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">{location.type}</p>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-6 pb-8">
@@ -82,6 +86,6 @@ export default function WarehouseLocationDetailPage() {
           </Button>
         </CardContent>
       </Card>
-    </div>
+    </AdminPage>
   )
 }

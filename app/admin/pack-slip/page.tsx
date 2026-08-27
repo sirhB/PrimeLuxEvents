@@ -34,6 +34,7 @@ import {
 } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { AdminPage, AdminPageHeader } from '@/components/admin/page-shell'
 
 interface AssemblyItem {
     name: string
@@ -307,28 +308,24 @@ function PackSlipPageContent() {
     }
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen text-[var(--dashboard-text)]">
-            {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
-                <div className="space-y-1">
-                    <h1 className="text-4xl font-serif font-light tracking-tight">Pack Slip Generator</h1>
-                    <p className="text-[var(--dashboard-text-muted)] font-light">
-                        Plan and prepare your upcoming events deliveries
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    {hasSearched && (
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="Warehouse"
+                title="Pack slips"
+                description="Prepare manifests for upcoming deliveries."
+                actions={
+                    hasSearched ? (
                         <Button
                             variant="outline"
                             onClick={handlePrint}
-                            className="glass-card border-none hover:bg-[var(--dashboard-card-hover)] text-[var(--dashboard-text)]"
+                            className="rounded-md print:hidden"
                         >
                             <Printer className="h-4 w-4 mr-2" />
-                            Print Manifest
+                            Print manifest
                         </Button>
-                    )}
-                </div>
-            </div>
+                    ) : undefined
+                }
+            />
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full print:hidden">
                 <TabsList className="glass-card border-none p-1 bg-black/20 mb-6 w-fit">
@@ -711,7 +708,7 @@ function PackSlipPageContent() {
                     }
                 }
             `}</style>
-        </div>
+        </AdminPage>
     )
 }
 

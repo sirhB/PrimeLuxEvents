@@ -3,6 +3,8 @@ import dynamic from 'next/dynamic'
 import { requirePermission } from '@/lib/auth/authorization'
 import Link from 'next/link'
 import { formatCentsWithCommas } from '@/lib/format-money'
+import { AdminPage } from '@/components/admin/page-shell'
+import { AdminPageHeader } from '@/components/admin/page-shell'
 
 const CustomersClient = dynamic(() => import('./customers-client').then(mod => mod.CustomersClient))
 const CustomerStatsCards = dynamic(() => import('@/components/admin/customers/customer-stats-cards').then(mod => mod.CustomerStatsCards))
@@ -138,24 +140,13 @@ export default async function CustomersPage({
     const paginatedCustomers = filteredCustomers.slice(start, start + pageSize)
 
     return (
-        <div className="flex flex-col gap-8 p-4 md:p-8 bg-[var(--dashboard-background)] min-h-screen">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-[0.2em] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-accent-gold)]/20">
-                            CRM
-                        </span>
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-serif font-light text-[var(--dashboard-text)] tracking-tight">
-                        Customers
-                    </h1>
-                    <p className="text-[var(--dashboard-text-muted)] font-light text-base max-w-md">
-                        Customer insights and relationship management.
-                    </p>
-                </div>
-            </div>
+        <AdminPage>
+            <AdminPageHeader
+                eyebrow="CRM"
+                title="Customers"
+                description="Customer insights and relationship management."
+            />
 
-            {/* Dashboard Statistics */}
             <CustomerStatsCards
                 totalCustomers={totalCustomers}
                 newThisMonth={newThisMonth}
@@ -168,7 +159,7 @@ export default async function CustomersPage({
                 <TopCustomersWidget customers={customers} />
                 <div className="glass-card border-none p-6 space-y-4">
                     <div>
-                        <h3 className="font-serif text-xl text-[var(--dashboard-text)]">Recent Activity</h3>
+                        <h3 className="text-base font-semibold text-[var(--dashboard-text)]">Recent Activity</h3>
                         <p className="text-xs text-[var(--dashboard-text-muted)] uppercase tracking-widest">Latest customer orders</p>
                     </div>
                     <div className="space-y-3">
@@ -206,7 +197,7 @@ export default async function CustomersPage({
                 currentPage={currentPage}
                 pageSize={pageSize}
             />
-        </div>
+        </AdminPage>
     )
 }
 

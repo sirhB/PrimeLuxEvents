@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
 
 export async function GET(
@@ -10,10 +9,9 @@ export async function GET(
         const { token } = await params
         const supabase = createServiceRoleClient()
 
-        // Find the invitation
         const { data: invitation, error: invitationError } = await supabase
             .from('user_invitations')
-            .select('*')
+            .select('id, email, role_ids, expires_at, status')
             .eq('invitation_token', token)
             .single()
 
@@ -24,7 +22,6 @@ export async function GET(
             )
         }
 
-        // Check if invitation is still valid
         if (invitation.status !== 'pending') {
             return NextResponse.json(
                 { error: 'Invitation has already been used or cancelled' },
@@ -33,7 +30,6 @@ export async function GET(
         }
 
         if (new Date(invitation.expires_at) < new Date()) {
-            // Mark as expired
             await supabase
                 .from('user_invitations')
                 .update({ status: 'expired' })
@@ -50,7 +46,6 @@ export async function GET(
             email: invitation.email,
             role_ids: invitation.role_ids,
             expires_at: invitation.expires_at,
-            requires_temp_password: !!invitation.temp_password
         })
 
     } catch (error) {
@@ -70,16 +65,15 @@ export async function POST(
         const { token } = await params
         const supabase = createServiceRoleClient()
         const body = await request.json()
-        const { password, full_name, temp_password } = body
+        const { password, full_name } = body
 
-        if (!password || password.length < 6) {
+        if (!password || password.length < 8) {
             return NextResponse.json(
-                { error: 'Password must be at least 6 characters' },
+                { error: 'Password must be at least 8 characters' },
                 { status: 400 }
             )
         }
 
-        // Find and validate the invitation
         const { data: invitation, error: invitationError } = await supabase
             .from('user_invitations')
             .select('*')
@@ -95,56 +89,80 @@ export async function POST(
             )
         }
 
-        // Verify temp password
-        if (invitation.temp_password && invitation.temp_password !== temp_password) {
-            return NextResponse.json(
-                { error: 'Incorrect temporary password' },
-                { status: 400 }
-            )
-        }
-
-        // Create the user account
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        // Possession of the invitation token is sufficient — no secondary plaintext password
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
             email: invitation.email,
             password,
-            options: {
-                data: {
-                    full_name: full_name || null
-                }
+            email_confirm: true,
+            user_metadata: {
+                full_name: full_name || null
             }
         })
 
         if (authError) {
-            return NextResponse.json(
-                { error: authError.message },
-                { status: 400 }
-            )
+            // Fall back to signUp if admin API is unavailable
+            const { data: signupData, error: signupError } = await supabase.auth.signUp({
+                email: invitation.email,
+                password,
+                options: {
+                    data: {
+                        full_name: full_name || null
+                    }
+                }
+            })
+            if (signupError) {
+                return NextResponse.json(
+                    { error: signupError.message || authError.message },
+                    { status: 400 }
+                )
+            }
+            if (!signupData.user) {
+                return NextResponse.json(
+                    { error: 'Failed to create user account' },
+                    { status: 500 }
+                )
+            }
+            return await finalizeInvitation(supabase, invitation, signupData.user, full_name)
         }
 
-        const authUser = authData.user
-        if (!authUser) {
+        if (!authData.user) {
             return NextResponse.json(
                 { error: 'Failed to create user account' },
                 { status: 500 }
             )
         }
 
-        // Create user profile
-        const { error: profileError } = await supabase
-            .from('user_profiles')
-            .insert({
-                id: authUser.id,
-                email: invitation.email,
-                full_name: full_name || null,
-                is_active: true
-            })
+        return await finalizeInvitation(supabase, invitation, authData.user, full_name)
 
-        if (profileError) {
-            console.error('Error creating user profile:', profileError)
-            // Continue anyway - profile can be created later
-        }
+    } catch (error) {
+        console.error('Error accepting invitation:', error)
+        return NextResponse.json(
+            { error: 'Failed to accept invitation' },
+            { status: 500 }
+        )
+    }
+}
 
-        // Assign roles
+async function finalizeInvitation(
+    supabase: ReturnType<typeof createServiceRoleClient>,
+    invitation: { id: string; email: string; role_ids: string[]; invited_by: string | null },
+    authUser: { id: string; email?: string | null },
+    fullName?: string | null
+) {
+    const { error: profileError } = await supabase
+        .from('user_profiles')
+        .upsert({
+            id: authUser.id,
+            email: invitation.email,
+            full_name: fullName || null,
+            is_active: true
+        }, { onConflict: 'id' })
+
+    if (profileError) {
+        console.error('Error creating user profile:', profileError)
+    }
+
+    if (Array.isArray(invitation.role_ids) && invitation.role_ids.length > 0) {
         const roleInserts = invitation.role_ids.map((roleId: string) => ({
             user_id: authUser.id,
             role_id: roleId,
@@ -157,39 +175,32 @@ export async function POST(
 
         if (rolesError) {
             console.error('Error assigning roles:', rolesError)
-            // Continue anyway - roles can be assigned later
         }
+    }
 
-        // Mark invitation as accepted
-        const { error: updateError } = await supabase
-            .from('user_invitations')
-            .update({
-                status: 'accepted',
-                accepted_at: new Date().toISOString()
-            })
-            .eq('id', invitation.id)
-
-        if (updateError) {
-            console.error('Error updating invitation status:', updateError)
-            return NextResponse.json(
-                { error: 'Failed to complete invitation process' },
-                { status: 500 }
-            )
-        }
-
-        return NextResponse.json({
-            success: true,
-            user: {
-                id: authUser.id,
-                email: authUser.email
-            }
+    // Clear any legacy plaintext temp_password and mark accepted
+    const { error: updateError } = await supabase
+        .from('user_invitations')
+        .update({
+            status: 'accepted',
+            accepted_at: new Date().toISOString(),
+            temp_password: null,
         })
+        .eq('id', invitation.id)
 
-    } catch (error) {
-        console.error('Error accepting invitation:', error)
+    if (updateError) {
+        console.error('Error updating invitation status:', updateError)
         return NextResponse.json(
-            { error: 'Failed to accept invitation' },
+            { error: 'Failed to complete invitation process' },
             { status: 500 }
         )
     }
+
+    return NextResponse.json({
+        success: true,
+        user: {
+            id: authUser.id,
+            email: authUser.email
+        }
+    })
 }

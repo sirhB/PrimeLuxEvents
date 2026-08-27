@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { userOwnsOrder } from '@/lib/orders/ownership'
 import { isStaffUser } from '@/lib/auth/roles'
+import { uploadSignatureImage } from '@/app/actions/upload-signature'
 
 export async function signOrder(orderId: string, signatureDataUrl: string) {
     const supabase = await createClient()
@@ -29,34 +30,16 @@ export async function signOrder(orderId: string, signatureDataUrl: string) {
             return { success: false, error: 'You do not have permission to sign this order' }
         }
 
-        // 1. Convert base64 to Blob
-        const base64Data = signatureDataUrl.split(',')[1]
-        const buffer = Buffer.from(base64Data, 'base64')
         const fileName = `${orderId}-${Date.now()}.png`
-
-        // 2. Upload to Supabase Storage
-        const { error: uploadError } = await supabase.storage
-            .from('signatures')
-            .upload(fileName, buffer, {
-                contentType: 'image/png',
-                upsert: true
-            })
-
-        if (uploadError) {
-            console.error('Upload error:', uploadError)
-            return { success: false, error: 'Failed to upload signature' }
+        const upload = await uploadSignatureImage(signatureDataUrl, fileName)
+        if (!upload.url) {
+            return { success: false, error: upload.error || 'Failed to upload signature' }
         }
 
-        // 3. Get Public URL
-        const { data: { publicUrl } } = supabase.storage
-            .from('signatures')
-            .getPublicUrl(fileName)
-
-        // 4. Update Order
         const { error: updateError } = await supabase
             .from('orders')
             .update({
-                signature_url: publicUrl,
+                signature_url: upload.url,
                 signed_at: new Date().toISOString()
             })
             .eq('id', orderId)
@@ -67,7 +50,7 @@ export async function signOrder(orderId: string, signatureDataUrl: string) {
         }
 
         revalidatePath(`/account/orders/${orderId}`)
-        return { success: true, url: publicUrl }
+        return { success: true, url: upload.url }
     } catch (err) {
         console.error('Unexpected error:', err)
         return { success: false, error: 'An unexpected error occurred' }
