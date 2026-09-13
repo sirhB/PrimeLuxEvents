@@ -16,6 +16,9 @@ type AdminChromeContextType = {
   setIsMobileOpen: (value: boolean) => void
   counts: BadgeCounts
   refreshCounts: () => Promise<void>
+  /** null while loading; string permission names once loaded */
+  permissionNames: string[] | null
+  roleNames: string[] | null
 }
 
 const AdminChromeContext = createContext<AdminChromeContextType | undefined>(undefined)
@@ -26,6 +29,8 @@ export function AdminSidebarProvider({ children }: { children: React.ReactNode }
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [counts, setCounts] = useState<BadgeCounts>(EMPTY_COUNTS)
+  const [permissionNames, setPermissionNames] = useState<string[] | null>(null)
+  const [roleNames, setRoleNames] = useState<string[] | null>(null)
   const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
@@ -64,6 +69,57 @@ export function AdminSidebarProvider({ children }: { children: React.ReactNode }
   }, [supabase])
 
   useEffect(() => {
+    let mounted = true
+    async function loadPermissions() {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
+        if (!user || !mounted) return
+
+        const { data: userRoles } = await supabase
+          .from('user_roles')
+          .select(
+            `
+            roles (
+              name,
+              role_permissions (
+                permissions ( name )
+              )
+            )
+          `,
+          )
+          .eq('user_id', user.id)
+
+        const roles: string[] = []
+        const permissions = new Set<string>()
+        for (const row of userRoles || []) {
+          const role = (row as { roles?: { name?: string; role_permissions?: Array<{ permissions?: { name?: string } | null }> | null } | null }).roles
+          if (!role) continue
+          if (role.name) roles.push(role.name)
+          for (const rp of role.role_permissions || []) {
+            const name = rp.permissions?.name
+            if (name) permissions.add(name)
+          }
+        }
+        if (!mounted) return
+        setRoleNames(roles)
+        setPermissionNames(Array.from(permissions))
+      } catch (error) {
+        console.error('Error loading admin permissions:', error)
+        if (mounted) {
+          setRoleNames([])
+          setPermissionNames([])
+        }
+      }
+    }
+    void loadPermissions()
+    return () => {
+      mounted = false
+    }
+  }, [supabase])
+
+  useEffect(() => {
     void refreshCounts()
 
     const channel = supabase
@@ -92,8 +148,10 @@ export function AdminSidebarProvider({ children }: { children: React.ReactNode }
       setIsMobileOpen,
       counts,
       refreshCounts,
+      permissionNames,
+      roleNames,
     }),
-    [isCollapsed, handleSetCollapsed, isMobileOpen, counts, refreshCounts],
+    [isCollapsed, handleSetCollapsed, isMobileOpen, counts, refreshCounts, permissionNames, roleNames],
   )
 
   return <AdminChromeContext.Provider value={value}>{children}</AdminChromeContext.Provider>

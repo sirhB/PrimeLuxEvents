@@ -77,7 +77,8 @@ interface OrderTaskInfo {
 
 function PackSlipPageContent() {
     const searchParams = useSearchParams()
-    const initialDate = searchParams.get('date')
+    const initialDate = searchParams.get('date') || searchParams.get('from')
+    const rangeTo = searchParams.get('to')
     const [date, setDate] = useState<string>(initialDate || new Date().toISOString().split('T')[0])
     const [loading, setLoading] = useState(false)
     const [items, setItems] = useState<PackItem[]>([])
@@ -124,7 +125,11 @@ function PackSlipPageContent() {
                 .map(([date, count]) => ({ date, orderCount: count }))
                 .slice(0, 10)
 
-            setUpcomingDates(dates)
+            setUpcomingDates(
+              rangeTo
+                ? dates.filter((item) => item.date >= (initialDate || item.date) && item.date <= rangeTo)
+                : dates
+            )
         } catch (error) {
             console.error('Error fetching upcoming dates:', error)
         }

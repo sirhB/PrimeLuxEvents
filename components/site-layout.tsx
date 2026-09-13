@@ -23,7 +23,11 @@ export function SiteLayout({
   return (
     <div className="ambient-bg flex min-h-screen flex-col">
       {!isPortal && header}
-      <main className={cn("relative z-[1] flex-1")}>{children}</main>
+      {isPortal ? (
+        <div className={cn("relative z-[1] flex-1")}>{children}</div>
+      ) : (
+        <main className={cn("relative z-[1] flex-1")}>{children}</main>
+      )}
       {!isPortal && footer}
       {!isPortal && <Toaster />}
       {!isPortal && <InstallPrompt surface="store" />}

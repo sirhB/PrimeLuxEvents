@@ -141,6 +141,10 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
               <Search className="h-4 w-4 shrink-0 text-[var(--dashboard-text-muted)]" />
               <input
                 ref={inputRef}
+                role="combobox"
+                aria-expanded={true}
+                aria-controls="admin-command-listbox"
+                aria-activedescendant={allItems[selectedIndex] ? `admin-command-option-${selectedIndex}` : undefined}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Jump to a page or action…"
@@ -158,7 +162,7 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
               </button>
             </div>
 
-            <div className="max-h-[50vh] overflow-y-auto p-2">
+            <div id="admin-command-listbox" role="listbox" aria-label="Commands" className="max-h-[50vh] overflow-y-auto p-2">
               {allItems.length === 0 && (
                 <p className="px-3 py-8 text-center text-sm text-[var(--dashboard-text-muted)]">
                   No matches for “{query}”
@@ -202,6 +206,9 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                       )}
                     <button
                       type="button"
+                      role="option"
+                      id={`admin-command-option-${index}`}
+                      aria-selected={selectedIndex === index}
                       onClick={() => handleSelect(item)}
                       onMouseEnter={() => setSelectedIndex(index)}
                       className={cn(

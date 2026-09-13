@@ -70,6 +70,8 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
                 onClick={() => setIsMobileOpen(true)}
                 className="-ml-1 rounded-md p-2 text-[var(--dashboard-text-muted)] transition-colors hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)] md:hidden"
                 aria-label="Open menu"
+                aria-controls="admin-mobile-nav"
+                aria-expanded={false}
               >
                 <Menu className="h-5 w-5" />
               </button>
@@ -104,7 +106,8 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
           </div>
         </header>
 
-        <main className="max-w-full flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 pb-24 sm:px-5 sm:py-5 md:px-6 md:pb-8">
+        <a href="#admin-main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-[var(--dashboard-accent-gold)] focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#121110]">Skip to main content</a>
+        <main id="admin-main" tabIndex={-1} className="max-w-full flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 pb-24 sm:px-5 sm:py-5 md:px-6 md:pb-8">
           {children}
         </main>
       </div>

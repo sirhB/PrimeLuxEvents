@@ -2,8 +2,7 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DashboardContent } from '@/components/admin/dashboard/dashboard-content'
-import { AdminPage } from '@/components/admin/page-shell'
-import { AdminPageHeader } from '@/components/admin/page-shell'
+import { AdminPage, AdminPageHeader } from '@/components/admin/page-shell'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,15 +11,23 @@ export default async function AdminDashboardPage() {
     <AdminPage>
       <AdminPageHeader
         eyebrow="Today"
-        title="Dashboard"
-        description="Orders, leads, and warehouse movement at a glance."
+        title="Ops Today"
+        description="What needs attention now, weekend readiness, and today’s warehouse work."
         actions={
-          <Link href="/admin/orders/new">
-            <Button className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90">
-              <Plus className="mr-2 h-4 w-4" />
-              New order
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" className="h-10 border-[var(--dashboard-border)] bg-transparent">
+              <Link href="/admin/week-prep">Week Prep</Link>
             </Button>
-          </Link>
+            <Button
+              asChild
+              className="h-10 bg-[var(--dashboard-accent-gold)] text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90"
+            >
+              <Link href="/admin/orders/new">
+                <Plus className="mr-2 h-4 w-4" />
+                New order
+              </Link>
+            </Button>
+          </div>
         }
       />
       <DashboardContent />

@@ -15,10 +15,18 @@ const WarehouseScheduleContent = dynamic(
         )
 )
 
-async function WarehouseScheduleLoader({ selectedDate }: { selectedDate: string }) {
+async function WarehouseScheduleLoader({
+    selectedDate,
+    from,
+    to,
+}: {
+    selectedDate: string
+    from?: string
+    to?: string
+}) {
     const supabase = await createClient()
 
-    const tasks = await fetchWarehouseScheduleTasks(supabase, selectedDate)
+    const tasks = await fetchWarehouseScheduleTasks(supabase, selectedDate, { from, to })
 
     const {
         data: { user },
@@ -36,6 +44,8 @@ async function WarehouseScheduleLoader({ selectedDate }: { selectedDate: string 
         <WarehouseScheduleContent
             initialTasks={tasks}
             selectedDate={selectedDate}
+            rangeFrom={from}
+            rangeTo={to}
             userId={user?.id}
             roleIds={roleIds}
             staffOnShift={staffOnShift}
@@ -46,10 +56,10 @@ async function WarehouseScheduleLoader({ selectedDate }: { selectedDate: string 
 export default async function WarehouseSchedulePage({
     searchParams,
 }: {
-    searchParams: Promise<{ date?: string }>
+    searchParams: Promise<{ date?: string; from?: string; to?: string }>
 }) {
-    const { date } = await searchParams
-    const selectedDate = date || new Date().toISOString().split('T')[0]
+    const { date, from, to } = await searchParams
+    const selectedDate = date || from || new Date().toISOString().split('T')[0]
 
     return (
         <AdminPage>
@@ -60,7 +70,7 @@ export default async function WarehouseSchedulePage({
                     </div>
                 }
             >
-                <WarehouseScheduleLoader selectedDate={selectedDate} />
+                <WarehouseScheduleLoader selectedDate={selectedDate} from={from} to={to} />
             </Suspense>
         </AdminPage>
     )
