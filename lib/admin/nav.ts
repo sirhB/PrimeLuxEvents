@@ -29,6 +29,7 @@ import {
   FileOutput,
   Plus,
   Handshake,
+  Sparkles,
 } from 'lucide-react'
 
 export type AdminNavItem = {
@@ -71,6 +72,12 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         label: 'Analytics',
         href: '/admin/analytics',
         keywords: ['reports', 'revenue'],
+      },
+      {
+        icon: Sparkles,
+        label: 'Innovate',
+        href: '/innovate',
+        keywords: ['studio', 'visualizer', 'atelier', 'backdrop', 'vip', 'custom'],
       },
     ],
   },

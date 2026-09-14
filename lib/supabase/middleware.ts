@@ -34,13 +34,18 @@ export async function updateSession(request: NextRequest) {
     // Verify user identity
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Check if user is accessing admin routes
-    if (request.nextUrl.pathname.startsWith('/admin')) {
+    const pathname = request.nextUrl.pathname
+    const isStaffPortal =
+        pathname.startsWith('/admin') || pathname.startsWith('/innovate')
+
+    // Staff portals: /admin and /innovate require active staff roles
+    if (isStaffPortal) {
         if (!user) {
             // No authenticated user, redirect to login
-            if (!request.nextUrl.pathname.startsWith('/admin/login')) {
+            if (!pathname.startsWith('/admin/login')) {
                 const url = request.nextUrl.clone()
                 url.pathname = '/login'
+                url.searchParams.set('next', pathname)
                 return NextResponse.redirect(url)
             }
         } else {
@@ -59,7 +64,6 @@ export async function updateSession(request: NextRequest) {
                 let isActive = false
 
                 if (isCacheValid && authCache) {
-                    // console.log('Middleware: Using cached auth for user:', user.id)
                     isActive = authCache.active
                     hasAdminAccess = authCache.roles.some((role: string) =>
                         ['admin', 'manager', 'staff'].includes(role)
