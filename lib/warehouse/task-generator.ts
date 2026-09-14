@@ -190,10 +190,20 @@ export async function generateWarehouseTasksForDeliveryDate(
     supabase: SupabaseClient,
     deliveryDate: string
 ): Promise<{ success: boolean; generated: number; errors: string[] }> {
+    return generateWarehouseTasksForDeliveryDateRange(supabase, deliveryDate, deliveryDate)
+}
+
+/** Generate pick/pack/load chains for all eligible orders in a delivery date range (inclusive). */
+export async function generateWarehouseTasksForDeliveryDateRange(
+    supabase: SupabaseClient,
+    startDate: string,
+    endDate: string
+): Promise<{ success: boolean; generated: number; errors: string[] }> {
     const { data: orders, error } = await supabase
         .from('orders')
         .select('id, status')
-        .eq('delivery_date', deliveryDate)
+        .gte('delivery_date', startDate)
+        .lte('delivery_date', endDate)
 
     if (error) {
         return { success: false, generated: 0, errors: [error.message] }

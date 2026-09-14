@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useId, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -35,6 +35,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   ADMIN_NAV_GROUPS,
+  filterNavGroupsByPermission,
   isAdminRouteActive,
   type AdminNavItem,
 } from '@/lib/admin/nav'
@@ -56,11 +57,12 @@ function SidebarItem({
     <Link
       href={item.href}
       onClick={() => {
-        haptics.impact()
+        void haptics.impact('light')
         onClick?.()
       }}
+      aria-current={isActive ? 'page' : undefined}
       className={cn(
-        'relative flex items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium transition-colors',
+        'relative flex items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent-gold)]/60',
         isActive
           ? 'bg-[var(--dashboard-card-hover)] text-[var(--dashboard-text)]'
           : 'text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)]/70 hover:text-[var(--dashboard-text)]',
@@ -77,8 +79,10 @@ function SidebarItem({
           'h-[18px] w-[18px] shrink-0',
           isActive ? 'text-[var(--dashboard-accent-gold)]' : 'opacity-80',
         )}
+        aria-hidden
       />
       {!isCollapsed && <span className="truncate">{item.label}</span>}
+      {isCollapsed && <span className="sr-only">{item.label}</span>}
     </Link>
   )
 
@@ -104,16 +108,19 @@ function SidebarSection({
   items,
   isCollapsed,
   pathname,
+  defaultCollapsed,
   onItemClick,
 }: {
   title: string
   items: AdminNavItem[]
   isCollapsed: boolean
   pathname: string
+  defaultCollapsed?: boolean
   onItemClick: () => void
 }) {
+  const panelId = useId()
   const isActiveGroup = items.some((item) => isAdminRouteActive(pathname, item.href))
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(() => (defaultCollapsed ? isActiveGroup : true))
 
   useEffect(() => {
     if (isActiveGroup) setIsOpen(true)
@@ -140,16 +147,22 @@ function SidebarSection({
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className="mb-0.5 flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--dashboard-text-muted)] transition-colors hover:bg-[var(--dashboard-card)]/60 hover:text-[var(--dashboard-text)]"
+        aria-expanded={isOpen}
+        aria-controls={panelId}
+        className="mb-0.5 flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--dashboard-text-muted)] transition-colors hover:bg-[var(--dashboard-card)]/60 hover:text-[var(--dashboard-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent-gold)]/60"
       >
         <span>{title}</span>
         <ChevronDown
+          aria-hidden
           className={cn('h-3 w-3 transition-transform', !isOpen && '-rotate-90 opacity-50')}
         />
       </button>
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
+            id={panelId}
+            role="group"
+            aria-label={title}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -174,9 +187,21 @@ function SidebarSection({
 
 export function ModernSidebar() {
   const pathname = usePathname()
-  const { isCollapsed, setIsCollapsed, isMobileOpen, setIsMobileOpen } = useAdminSidebar()
+  const {
+    isCollapsed,
+    setIsCollapsed,
+    isMobileOpen,
+    setIsMobileOpen,
+    permissionNames,
+    roleNames,
+  } = useAdminSidebar()
   const [user, setUser] = useState<{ email?: string; fullName?: string } | null>(null)
   const supabase = createClient()
+
+  const navGroups = useMemo(
+    () => filterNavGroupsByPermission(ADMIN_NAV_GROUPS, permissionNames, roleNames),
+    [permissionNames, roleNames],
+  )
 
   useEffect(() => {
     let mounted = true
@@ -219,6 +244,8 @@ export function ModernSidebar() {
       </AnimatePresence>
 
       <aside
+        id="admin-mobile-nav"
+        aria-label="Admin navigation"
         className={cn(
           'fixed inset-y-0 left-0 z-[70] flex flex-col border-r border-[var(--dashboard-border)] bg-[var(--dashboard-surface)] transition-[width,transform] duration-300 ease-out',
           isCollapsed ? 'md:w-[4.5rem]' : 'md:w-60',
@@ -232,7 +259,7 @@ export function ModernSidebar() {
           <Link
             href="/admin"
             className={cn(
-              'flex min-w-0 items-center gap-2.5 overflow-hidden',
+              'flex min-w-0 items-center gap-2.5 overflow-hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent-gold)]/60',
               isCollapsed && !isMobileOpen && 'md:justify-center',
             )}
             onClick={() => setIsMobileOpen(false)}
@@ -258,10 +285,11 @@ export function ModernSidebar() {
               isCollapsed && 'mx-auto',
             )}
             onClick={() => {
-              haptics.impact()
+              void haptics.impact('light')
               setIsCollapsed(!isCollapsed)
             }}
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-expanded={!isCollapsed}
           >
             {isCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
           </Button>
@@ -277,14 +305,18 @@ export function ModernSidebar() {
           </Button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-2 pb-8 scrollbar-thin">
-          {ADMIN_NAV_GROUPS.map((group) => (
+        <nav
+          className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-2 pb-8 scrollbar-thin"
+          aria-label="Admin sections"
+        >
+          {navGroups.map((group) => (
             <SidebarSection
               key={group.title}
               title={group.title}
               items={group.items}
               isCollapsed={isCollapsed && !isMobileOpen}
               pathname={pathname}
+              defaultCollapsed={group.defaultCollapsed}
               onItemClick={() => setIsMobileOpen(false)}
             />
           ))}
@@ -296,7 +328,7 @@ export function ModernSidebar() {
               <button
                 type="button"
                 className={cn(
-                  'flex w-full items-center gap-2.5 rounded-md p-2 text-left outline-none transition-colors hover:bg-[var(--dashboard-card-hover)]',
+                  'flex w-full items-center gap-2.5 rounded-md p-2 text-left outline-none transition-colors hover:bg-[var(--dashboard-card-hover)] focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent-gold)]/60',
                   isCollapsed && !isMobileOpen && 'justify-center',
                 )}
               >

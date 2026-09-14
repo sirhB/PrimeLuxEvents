@@ -4,11 +4,18 @@ import { DeliveryStatsCards } from '@/components/admin/delivery/delivery-stats-c
 import { AdminPage } from '@/components/admin/page-shell'
 import { AdminPageHeader } from '@/components/admin/page-shell'
 
-export default async function DeliveryPage() {
+export default async function DeliveryPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ from?: string; to?: string; date?: string }>
+}) {
     const supabase = await createClient()
+    const params = await searchParams
+    const from = params.from
+    const to = params.to || params.date
 
     // Fetch delivery tasks that are not completed (or completed today)
-    const { data: tasks } = await supabase
+    let tasksQuery = supabase
         .from('tasks')
         .select(`
             *,
@@ -16,13 +23,22 @@ export default async function DeliveryPage() {
                 id,
                 customer_name,
                 delivery_address,
-                delivery_time
+                delivery_time,
+                delivery_date
             )
         `)
         .eq('task_type', 'delivery')
         .neq('status', 'completed')
         .order('route_order', { ascending: true })
         .order('created_at', { ascending: false })
+
+    if (from && to) {
+        tasksQuery = tasksQuery.gte('due_date', from).lte('due_date', to)
+    } else if (to) {
+        tasksQuery = tasksQuery.eq('due_date', to)
+    }
+
+    const { data: tasks } = await tasksQuery
 
     // Fetch today's completed tasks
     const today = new Date()
@@ -45,7 +61,13 @@ export default async function DeliveryPage() {
             <AdminPageHeader
                 eyebrow="Logistics"
                 title="Delivery Planner"
-                description="Optimize routes and manage distribution logistics."
+                description={
+                    from && to
+                        ? `Routes for ${from} → ${to}.`
+                        : to
+                          ? `Routes for ${to}.`
+                          : 'Optimize routes and manage distribution logistics.'
+                }
             />
 
             {/* Dashboard Statistics */}

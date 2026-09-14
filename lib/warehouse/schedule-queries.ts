@@ -24,15 +24,22 @@ function normalizeTasks(raw: unknown[]): WarehouseTask[] {
 
 export async function fetchWarehouseScheduleTasks(
     supabase: SupabaseClient,
-    selectedDate: string
+    selectedDate: string,
+    options?: { from?: string; to?: string }
 ): Promise<WarehouseTask[]> {
-    const base = supabase
+    let base = supabase
         .from('tasks')
         .select(TASK_SELECT)
         .eq('task_type', 'warehouse')
-        .eq('due_date', selectedDate)
+
+    if (options?.from && options?.to) {
+        base = base.gte('due_date', options.from).lte('due_date', options.to)
+    } else {
+        base = base.eq('due_date', selectedDate)
+    }
 
     const withScheduleOrder = await base
+        .order('due_date', { ascending: true })
         .order('scheduled_start', { ascending: true, nullsFirst: false })
 
     if (!withScheduleOrder.error) {
@@ -45,19 +52,25 @@ export async function fetchWarehouseScheduleTasks(
         message.includes('warehouse_category') ||
         message.includes('does not exist')
     ) {
-        const fallback = await supabase
+        let fallback = supabase
             .from('tasks')
             .select(TASK_SELECT)
             .eq('task_type', 'warehouse')
-            .eq('due_date', selectedDate)
-            .order('created_at', { ascending: false })
 
-        if (fallback.error) {
-            console.error('Warehouse schedule tasks query failed:', fallback.error.message)
+        if (options?.from && options?.to) {
+            fallback = fallback.gte('due_date', options.from).lte('due_date', options.to)
+        } else {
+            fallback = fallback.eq('due_date', selectedDate)
+        }
+
+        const fallbackResult = await fallback.order('created_at', { ascending: false })
+
+        if (fallbackResult.error) {
+            console.error('Warehouse schedule tasks query failed:', fallbackResult.error.message)
             return []
         }
 
-        return normalizeTasks(fallback.data || [])
+        return normalizeTasks(fallbackResult.data || [])
     }
 
     console.error('Warehouse schedule tasks query failed:', message)

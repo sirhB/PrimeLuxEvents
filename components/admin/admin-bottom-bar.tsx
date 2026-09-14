@@ -95,6 +95,9 @@ export function AdminBottomBar() {
           <button
             type="button"
             onClick={() => setIsMobileOpen(!isMobileOpen)}
+            aria-expanded={isMobileOpen}
+            aria-controls="admin-mobile-nav"
+            aria-label={isMobileOpen ? "Close menu" : "Open menu"}
             className={cn(
               'flex flex-col items-center gap-0.5 px-1 py-2 text-[10px] font-medium',
               isMobileOpen ? 'text-[var(--dashboard-accent-gold)]' : 'text-[var(--dashboard-text-muted)]',

@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 import {
   LayoutDashboard,
+  ClipboardCheck,
   TrendingUp,
   Activity,
   ShoppingCart,
@@ -42,72 +43,178 @@ export type AdminNavItem = {
 export type AdminNavGroup = {
   title: string
   items: AdminNavItem[]
+  /** When true, group starts collapsed unless a child route is active */
+  defaultCollapsed?: boolean
 }
 
 /** Canonical admin information architecture */
 export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
-    title: 'Home',
+    title: 'Today',
     items: [
-      { icon: LayoutDashboard, label: 'Dashboard', href: '/admin', keywords: ['home', 'overview'] },
-      { icon: TrendingUp, label: 'Analytics', href: '/admin/analytics', keywords: ['reports', 'revenue'] },
+      {
+        icon: LayoutDashboard,
+        label: 'Ops home',
+        href: '/admin',
+        keywords: ['home', 'overview', 'dashboard', 'today'],
+      },
+      {
+        icon: ClipboardCheck,
+        label: 'Week Prep',
+        href: '/admin/week-prep',
+        keywords: ['weekend', 'prep', 'readiness', 'fulfillment'],
+      },
+      { icon: Calendar, label: 'Calendar', href: '/admin/calendar', keywords: ['schedule'] },
       { icon: Activity, label: 'Activity', href: '/admin/activity', keywords: ['feed', 'audit'] },
+      {
+        icon: TrendingUp,
+        label: 'Analytics',
+        href: '/admin/analytics',
+        keywords: ['reports', 'revenue'],
+      },
     ],
   },
   {
     title: 'Pipeline',
     items: [
-      { icon: ShoppingCart, label: 'Orders', href: '/admin/orders', permission: 'orders.view', keywords: ['sales', 'bookings'] },
-      { icon: FileText, label: 'Leads', href: '/admin/consultations', keywords: ['consultations', 'inquiries', 'crm'] },
-      { icon: CalendarCheck, label: 'Appointments', href: '/admin/appointments', keywords: ['showroom', 'visits'] },
-      { icon: MessageSquare, label: 'Messages', href: '/admin/messages', keywords: ['inbox', 'chat'] },
-      { icon: Users, label: 'Customers', href: '/admin/customers', permission: 'customers.view', keywords: ['clients'] },
+      {
+        icon: ShoppingCart,
+        label: 'Orders',
+        href: '/admin/orders',
+        permission: 'orders.view',
+        keywords: ['sales', 'bookings'],
+      },
+      {
+        icon: FileText,
+        label: 'Leads',
+        href: '/admin/consultations',
+        keywords: ['consultations', 'inquiries', 'crm'],
+      },
+      {
+        icon: CalendarCheck,
+        label: 'Appointments',
+        href: '/admin/appointments',
+        keywords: ['showroom', 'visits'],
+      },
+      {
+        icon: MessageSquare,
+        label: 'Messages',
+        href: '/admin/messages',
+        keywords: ['inbox', 'chat'],
+      },
+      {
+        icon: Users,
+        label: 'Customers',
+        href: '/admin/customers',
+        permission: 'customers.view',
+        keywords: ['clients'],
+      },
+    ],
+  },
+  {
+    title: 'Fulfillment',
+    items: [
+      {
+        icon: CalendarDays,
+        label: 'Warehouse schedule',
+        href: '/admin/warehouse/schedule',
+        keywords: ['pick', 'pack', 'load', 'warehouse tasks'],
+      },
+      { icon: QrCode, label: 'Scanner', href: '/admin/scan', keywords: ['qr', 'pick'] },
+      {
+        icon: FileOutput,
+        label: 'Pack slips',
+        href: '/admin/pack-slip',
+        keywords: ['packing', 'warehouse slip'],
+      },
+      { icon: Box, label: 'Delivery', href: '/admin/delivery', keywords: ['routes', 'dropoff'] },
+      { icon: Briefcase, label: 'Bags', href: '/admin/bags', keywords: ['kits', 'manifests'] },
+      { icon: Archive, label: 'Inventory', href: '/admin/inventory', keywords: ['stock'] },
+      {
+        icon: MapPin,
+        label: 'Warehouse',
+        href: '/admin/warehouse/locations',
+        keywords: ['locations', 'bins'],
+      },
+      { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks', keywords: ['todo', 'team'] },
+      { icon: Truck, label: 'Logistics', href: '/admin/logistics', keywords: ['hub', 'ops', 'map'] },
+    ],
+  },
+  {
+    title: 'Catalog',
+    defaultCollapsed: true,
+    items: [
+      {
+        icon: Package,
+        label: 'Products',
+        href: '/admin/products',
+        permission: 'products.view',
+        keywords: ['items', 'rentals'],
+      },
+      { icon: Layers, label: 'Categories', href: '/admin/categories', keywords: ['taxonomy'] },
+      { icon: ClipboardList, label: 'Packages', href: '/admin/packages', keywords: ['bundles'] },
+      {
+        icon: ImageIcon,
+        label: 'Portfolio',
+        href: '/admin/portfolio',
+        keywords: ['gallery', 'events'],
+      },
+      {
+        icon: PenLine,
+        label: 'Site editor',
+        href: '/admin/visual-editor',
+        keywords: ['cms', 'content', 'visual'],
+      },
+    ],
+  },
+  {
+    title: 'Manage',
+    defaultCollapsed: true,
+    items: [
       {
         icon: Handshake,
         label: 'Preferred partners',
         href: '/admin/partners',
         keywords: ['planners', 'decorators', 'preferred', 'trade', 'partner', 'vendor'],
       },
-      { icon: Tag, label: 'Discounts', href: '/admin/marketing/discounts', keywords: ['coupons', 'promo', 'marketing'] },
-    ],
-  },
-  {
-    title: 'Fulfillment',
-    items: [
-      { icon: Truck, label: 'Logistics', href: '/admin/logistics', keywords: ['hub', 'ops'] },
-      { icon: CalendarDays, label: 'Warehouse schedule', href: '/admin/warehouse/schedule', keywords: ['pick', 'pack', 'load', 'warehouse tasks'] },
-      { icon: Box, label: 'Delivery', href: '/admin/delivery', keywords: ['routes', 'dropoff'] },
-      { icon: QrCode, label: 'Scanner', href: '/admin/scan', keywords: ['qr', 'pick'] },
-      { icon: FileOutput, label: 'Pack slips', href: '/admin/pack-slip', keywords: ['packing', 'warehouse slip'] },
-      { icon: Archive, label: 'Inventory', href: '/admin/inventory', keywords: ['stock'] },
-      { icon: MapPin, label: 'Warehouse', href: '/admin/warehouse/locations', keywords: ['locations', 'bins'] },
-      { icon: Briefcase, label: 'Bags', href: '/admin/bags', keywords: ['kits', 'manifests'] },
-      { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks', keywords: ['todo', 'team'] },
-      { icon: Calendar, label: 'Calendar', href: '/admin/calendar', keywords: ['schedule'] },
-    ],
-  },
-  {
-    title: 'Catalog',
-    items: [
-      { icon: Package, label: 'Products', href: '/admin/products', permission: 'products.view', keywords: ['items', 'rentals'] },
-      { icon: Layers, label: 'Categories', href: '/admin/categories', keywords: ['taxonomy'] },
-      { icon: ClipboardList, label: 'Packages', href: '/admin/packages', keywords: ['bundles'] },
-      { icon: ImageIcon, label: 'Portfolio', href: '/admin/portfolio', keywords: ['gallery', 'events'] },
-      { icon: PenLine, label: 'Site editor', href: '/admin/visual-editor', keywords: ['cms', 'content', 'visual'] },
-    ],
-  },
-  {
-    title: 'Admin',
-    items: [
-      { icon: UserCog, label: 'Staff', href: '/admin/team', permission: 'team.view', keywords: ['users', 'roles', 'permissions'] },
-      { icon: CalendarDays, label: 'Staff shifts', href: '/admin/team/shifts', keywords: ['schedule', 'shifts', 'roster'] },
-      { icon: Settings, label: 'Settings', href: '/admin/settings', permission: 'settings.view', keywords: ['company', 'hours'] },
+      {
+        icon: Tag,
+        label: 'Discounts',
+        href: '/admin/marketing/discounts',
+        keywords: ['coupons', 'promo', 'marketing'],
+      },
+      {
+        icon: UserCog,
+        label: 'Staff',
+        href: '/admin/team',
+        permission: 'users.view',
+        keywords: ['users', 'roles', 'permissions'],
+      },
+      {
+        icon: CalendarDays,
+        label: 'Staff shifts',
+        href: '/admin/team/shifts',
+        keywords: ['schedule', 'shifts', 'roster'],
+      },
+      {
+        icon: Settings,
+        label: 'Settings',
+        href: '/admin/settings',
+        permission: 'settings.view',
+        keywords: ['company', 'hours'],
+      },
     ],
   },
 ]
 
 export const ADMIN_QUICK_ACTIONS: AdminNavItem[] = [
   { icon: Plus, label: 'New order', href: '/admin/orders/new', keywords: ['create'] },
+  {
+    icon: ClipboardCheck,
+    label: 'Open Week Prep',
+    href: '/admin/week-prep',
+    keywords: ['weekend', 'prep', 'ready'],
+  },
   { icon: Plus, label: 'New product', href: '/admin/products/new', keywords: ['add', 'create'] },
   { icon: Plus, label: 'New package', href: '/admin/packages/new', keywords: ['add', 'create'] },
   {
@@ -121,7 +228,7 @@ export const ADMIN_QUICK_ACTIONS: AdminNavItem[] = [
 /** Primary mobile tabs (scan + menu are chrome, not listed here) */
 export const ADMIN_MOBILE_TABS: AdminNavItem[] = [
   { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
-  { icon: FileText, label: 'Leads', href: '/admin/consultations' },
+  { icon: ClipboardCheck, label: 'Week Prep', href: '/admin/week-prep' },
   { icon: MessageSquare, label: 'Inbox', href: '/admin/messages' },
 ]
 
@@ -132,4 +239,33 @@ export function isAdminRouteActive(pathname: string, href: string): boolean {
 
 export function flattenAdminNav(): AdminNavItem[] {
   return ADMIN_NAV_GROUPS.flatMap((group) => group.items)
+}
+
+/** Client-side permission check mirroring server manage.* inheritance + admin role */
+export function canAccessNavItem(
+  permissionNames: string[] | null | undefined,
+  roleNames: string[] | null | undefined,
+  item: AdminNavItem,
+): boolean {
+  if (!item.permission) return true
+  // Until permissions load, show all items to avoid empty nav flash
+  if (permissionNames == null) return true
+  if (roleNames?.includes('admin')) return true
+  if (permissionNames.includes(item.permission)) return true
+  const [resource] = item.permission.split('.')
+  if (resource && permissionNames.includes(`${resource}.manage`)) return true
+  return false
+}
+
+export function filterNavGroupsByPermission(
+  groups: AdminNavGroup[],
+  permissionNames: string[] | null | undefined,
+  roleNames: string[] | null | undefined = null,
+): AdminNavGroup[] {
+  return groups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => canAccessNavItem(permissionNames, roleNames, item)),
+    }))
+    .filter((group) => group.items.length > 0)
 }

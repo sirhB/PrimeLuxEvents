@@ -38,6 +38,8 @@ import {
 interface WarehouseScheduleContentProps {
     initialTasks: WarehouseTask[]
     selectedDate: string
+    rangeFrom?: string
+    rangeTo?: string
     userId?: string
     roleIds: string[]
     staffOnShift?: string[]
@@ -46,10 +48,13 @@ interface WarehouseScheduleContentProps {
 export function WarehouseScheduleContent({
     initialTasks,
     selectedDate,
+    rangeFrom,
+    rangeTo,
     userId,
     roleIds,
     staffOnShift = [],
 }: WarehouseScheduleContentProps) {
+    const isRangeMode = Boolean(rangeFrom && rangeTo)
     const router = useRouter()
     const [tasks, setTasks] = useState<WarehouseTask[]>(
         Array.isArray(initialTasks) ? initialTasks : []
@@ -245,8 +250,15 @@ export function WarehouseScheduleContent({
                                 className="w-full bg-black/10 border border-[var(--dashboard-border)] rounded-xl p-3 text-sm focus:ring-2 focus:ring-[var(--dashboard-accent-gold)] outline-none text-[var(--dashboard-text)]"
                             />
                             <p className="text-xs text-[var(--dashboard-text-muted)] mt-2">
-                                {format(new Date(selectedDate + 'T12:00:00'), 'EEEE, MMMM d, yyyy')}
+                                {isRangeMode
+                                    ? `${rangeFrom} → ${rangeTo}`
+                                    : format(new Date(selectedDate + 'T12:00:00'), 'EEEE, MMMM d, yyyy')}
                             </p>
+                            {isRangeMode && (
+                                <p className="mt-2 text-[11px] text-[var(--dashboard-accent-gold)]">
+                                    Week range from Week Prep. Pick a day to focus.
+                                </p>
+                            )}
                         </CardContent>
                     </Card>
 
