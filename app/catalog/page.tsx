@@ -29,7 +29,7 @@ export default async function CatalogPage() {
 
   if (!loadError && products.length === 0 && categories.length === 0) {
     loadError =
-      'Catalog is empty. Check Vercel env: NEXT_PUBLIC_SUPABASE_URL must be https://bxktvrvpksxaijhdjegh.supabase.co and SUPABASE_SERVICE_ROLE_KEY must be set (or enable public RLS on plux).'
+      'Catalog is empty. Seed the linked Supabase project (categories/products) and ensure public SELECT RLS is enabled — or confirm Vercel NEXT_PUBLIC_SUPABASE_URL / ANON_KEY point at the seeded database.'
     console.error(loadError)
   }
 
