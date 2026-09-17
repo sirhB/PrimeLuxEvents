@@ -8,7 +8,7 @@ const defaultValues = [
     icon: Diamond,
     title: "Thoughtful inventory",
     description:
-      "Chairs, tables, lighting, and more—chosen to mix well together and look good in photos.",
+      "Chairs, tables, lighting, and more—chosen to work well together and look good in photos.",
   },
   {
     icon: Award,
@@ -20,13 +20,13 @@ const defaultValues = [
     icon: Clock,
     title: "Delivery and pickup",
     description:
-      "We bring items to your venue and pick them up after. Setup help is available if you need it.",
+      "We bring everything to your venue and pick it up after. Setup help is available when you need it.",
   },
   {
     icon: HeartHandshake,
     title: "Real human help",
     description:
-      "Questions about sizing or layout? Message us—we will walk you through it.",
+      "Questions about sizing or layout? Reach out—we will walk you through it.",
   },
 ]
 
@@ -40,8 +40,8 @@ interface BrandValuesSectionProps {
 }
 
 export function BrandValuesSection({
-  title = "Why people book with us",
-  description = "We rent the furniture and handle the logistics so planning your event feels more manageable.",
+  title = "Why planners and couples choose PrimeLux",
+  description = "We provide the furniture and handle the logistics so planning your event feels more manageable.",
   items,
 }: BrandValuesSectionProps) {
   const displayValues = items

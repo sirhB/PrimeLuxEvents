@@ -75,7 +75,7 @@ export function GalleryLanding({ content, categories, isEditing = false }: Galle
 
                         <EditableContent
                             contentKey="gallery.hero.description"
-                            initialValue={content['gallery.hero.description'] || "Real events where our rentals were used—weddings, parties, and company gatherings."}
+                            initialValue={content['gallery.hero.description'] || "A look at real events featuring our rentals—weddings, parties, and company gatherings."}
                             type="textarea"
                             isEditing={isEditing}
                             as={motion.p}

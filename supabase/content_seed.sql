@@ -1,19 +1,19 @@
--- About Page Content (ELI12: clear, professional, no luxury fluff)
+-- About Page Content (Warm professional + Clear & confident)
 INSERT INTO content (key, value, type) VALUES
-('about.hero.title', 'Event rentals that look great and show up on time', 'text'),
-('about.hero.description', 'PrimeLux Events rents furniture, lighting, and decor for weddings, parties, and company events. Browse online, book what you need, and we deliver.', 'text'),
+('about.hero.title', 'Beautiful event rentals, delivered on time', 'text'),
+('about.hero.description', 'PrimeLux Events rents furniture, lighting, and décor for weddings, parties, and corporate gatherings. Browse online, reserve what you need, and we handle delivery.', 'text'),
 ('about.hero.image', '/luxury-event-setup-ballroom-chandelier.jpg', 'image'),
 ('about.story.title', 'Our Story', 'text'),
-('about.story.p1', 'PrimeLux started because good event furniture was hard to find—pieces that looked nice, stayed clean, and actually arrived when promised. We built a warehouse and a simple online catalog to fix that.', 'text'),
-('about.story.p2', 'Today we work with couples, planners, and businesses across Connecticut and nearby states. Whether it is a backyard wedding or a hotel ballroom, we help you pick pieces that fit the space and the budget.', 'text'),
-('about.story.p3', 'We care about clear quotes, careful delivery, and a straightforward pickup. You should always know what you are getting and when it shows up.', 'text'),
+('about.story.p1', 'PrimeLux began with a simple goal: make it easier to rent event furniture that looks great, stays well maintained, and arrives when promised. We built a warehouse and an online catalog around that idea.', 'text'),
+('about.story.p2', 'Today we work with couples, planners, and businesses across Connecticut and nearby states. From backyard celebrations to hotel ballrooms, we help you choose pieces that fit the space and the budget.', 'text'),
+('about.story.p3', 'Clear quotes, careful delivery, and a straightforward pickup are part of every order. You should always know what you are getting and when it shows up.', 'text'),
 ('about.story.image', '/elegant-wedding-reception-table-setting.jpg', 'image'),
-('about.values.title', 'How we work', 'text'),
-('about.values.description', 'Simple standards we stick to on every order.', 'text'),
+('about.values.title', 'What you can expect', 'text'),
+('about.values.description', 'Practical standards we stick to on every rental.', 'text'),
 ('about.values.items', '[
   {
-    "title": "Solid pieces",
-    "description": "We choose rentals that hold up well and photograph nicely—not just whatever is cheapest."
+    "title": "Pieces that photograph well",
+    "description": "We stock rentals that hold up in real venues and look polished in photos—not just whatever is cheapest."
   },
   {
     "title": "Cleaned and checked",
@@ -24,7 +24,7 @@ INSERT INTO content (key, value, type) VALUES
     "description": "Our crew handles transport and timing so you can focus on your guests."
   }
 ]', 'json'),
-('about.cta.title', 'Ready to pick your rentals?', 'text'),
+('about.cta.title', 'Ready to choose your rentals?', 'text'),
 ('about.cta.description', 'Browse the catalog and build a quote online in a few minutes.', 'text'),
 ('about.cta.primary', 'Start Your Quote', 'text'),
 ('about.cta.secondary', 'Contact Us', 'text')
@@ -32,36 +32,36 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
 -- Home Page Content
 INSERT INTO content (key, value, type) VALUES
-('home.hero.title', 'Event rentals for weddings and parties in Connecticut', 'text'),
-('home.hero.subtitle', 'Furniture, lighting, tents, and decor you can browse and book online. We deliver to CT, RI, and MA.', 'text'),
+('home.hero.title', 'Beautiful event rentals for celebrations across Connecticut', 'text'),
+('home.hero.subtitle', 'Furniture, lighting, tents, and décor you can browse and book online. We deliver throughout CT, RI, and MA.', 'text'),
 ('home.hero.cta_primary', 'Browse Catalog', 'text'),
 ('home.hero.cta_secondary', 'How It Works', 'text'),
-('home.values.title', 'Why people book with us', 'text'),
-('home.values.description', 'We rent the furniture and handle the logistics so planning your event feels more manageable.', 'text'),
+('home.values.title', 'Why planners and couples choose PrimeLux', 'text'),
+('home.values.description', 'We provide the furniture and handle the logistics so planning your event feels more manageable.', 'text'),
 ('home.values.items', '[
   {
     "title": "Thoughtful inventory",
-    "description": "Chairs, tables, lighting, linens, and more—chosen to mix well together and look good in photos."
+    "description": "Chairs, tables, lighting, linens, and more—chosen to work well together and look good in photos."
   },
   {
     "title": "Quality you can count on",
-    "description": "Every item is cleaned and checked before delivery so it arrives ready to use."
+    "description": "Every item is cleaned and checked before delivery so it arrives ready for your guests."
   },
   {
     "title": "Delivery and pickup",
-    "description": "We bring items to your venue and pick them up after. Setup help is available if you need it."
+    "description": "We bring everything to your venue and pick it up after. Setup help is available when you need it."
   },
   {
     "title": "Real human help",
-    "description": "Questions about sizing, quantities, or layout? Message us—we will walk you through it."
+    "description": "Questions about sizing, quantities, or layout? Reach out—we will walk you through it."
   }
 ]', 'json'),
-('home.services.title', 'What we offer', 'text'),
-('home.services.description', 'Rentals first—and support when you want a hand with design or setup.', 'text'),
+('home.services.title', 'How we can help', 'text'),
+('home.services.description', 'Rentals are the foundation. These extras are here when you want design advice or on-site support.', 'text'),
 ('home.services.items', '[
   {
     "title": "Event layout help",
-    "description": "We can help you map chairs, tables, and lounges so the room works for your guest count."
+    "description": "We can help map chairs, tables, and lounges so the room works for your guest count."
   },
   {
     "title": "Delivery and setup",
@@ -103,7 +103,7 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 -- Contact Page Content (Shelton CT identity)
 INSERT INTO content (key, value, type) VALUES
 ('contact.hero.title', 'Get in Touch', 'text'),
-('contact.hero.description', 'Tell us about your event date and venue. Our Shelton showroom is available by appointment—use the form or call us to set up a visit.', 'text'),
+('contact.hero.description', 'Tell us about your event date and venue. Our Shelton showroom is available by appointment—use the form or call us to schedule a visit.', 'text'),
 ('contact.info.address.title', 'Visit Our Showroom', 'text'),
 ('contact.info.address.value', '2 Research Dr\nShelton, CT 06484', 'text'),
 ('contact.info.address.hours', 'By Appointment Only', 'text'),
@@ -118,7 +118,7 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 -- Services Page Content
 INSERT INTO content (key, value, type) VALUES
 ('services.hero.title', 'Our Services', 'text'),
-('services.hero.description', 'Rentals are the core. These extras help when you want design advice, delivery help, or on-site setup.', 'text'),
+('services.hero.description', 'Rentals come first. These services help when you want design advice, delivery support, or on-site setup.', 'text'),
 ('services.list.design.title', 'Design Consultation', 'text'),
 ('services.list.design.description', 'Not sure what to order? We will help you pick pieces that match your venue, colors, and guest count. Bring a mood board or just a rough idea—we will walk the catalog with you.', 'text'),
 ('services.list.design.features', '[
@@ -129,7 +129,7 @@ INSERT INTO content (key, value, type) VALUES
 ('services.list.design.image', '/service-design.png', 'image'),
 
 ('services.list.delivery.title', 'Delivery', 'text'),
-('services.list.delivery.description', 'Our team delivers to your venue in a scheduled window. Items are wrapped and handled carefully so they arrive ready for your event.', 'text'),
+('services.list.delivery.description', 'We bring everything to your venue in a scheduled window. Items are packed carefully so they arrive ready for your event.', 'text'),
 ('services.list.delivery.features', '[
   "Scheduled delivery windows",
   "Status updates",
@@ -138,7 +138,7 @@ INSERT INTO content (key, value, type) VALUES
 ('services.list.delivery.image', '/logistics-planning.jpg', 'image'),
 
 ('services.list.setup.title', 'Setup and Installation', 'text'),
-('services.list.setup.description', 'Want the room ready when you walk in? For an added fee we can place furniture, hang lighting, and follow your floor plan so the space is set before guests arrive.', 'text'),
+('services.list.setup.description', 'Want the room ready when you walk in? For an added fee we can place furniture, hang lighting, and follow your floor plan before guests arrive.', 'text'),
 ('services.list.setup.features', '[
   "Available as an add-on",
   "Follows your floor plan",
@@ -147,18 +147,18 @@ INSERT INTO content (key, value, type) VALUES
 ('services.list.setup.image', '/service-setup.png', 'image'),
 
 ('services.cta.title', 'Want help planning your order?', 'text'),
-('services.cta.description', 'Tell us the date and venue—we will point you to the right rentals.', 'text'),
+('services.cta.description', 'Share your date and venue—we will point you toward the right rentals.', 'text'),
 ('services.cta.button', 'Get in Touch', 'text')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
 -- How It Works Page Content
 INSERT INTO content (key, value, type) VALUES
 ('howitworks.hero.title', 'How renting works', 'text'),
-('howitworks.hero.description', 'Browse, build a quote, pay a deposit, and we deliver. Most of it you can do online without waiting on a sales call.', 'text'),
+('howitworks.hero.description', 'Browse, build a quote, pay a deposit, and we deliver. Most of the process you can finish online—without waiting on a sales call.', 'text'),
 ('howitworks.steps.list', '[
   {
     "title": "Browse and select",
-    "description": "Look through furniture, lighting, tents, and decor. Check photos, details, and availability, then add items to your cart.",
+    "description": "Explore furniture, lighting, tents, and décor. Check photos, details, and availability, then add items to your cart.",
     "details": ["Live availability", "Product details", "Clear categories"],
     "image": "/open-planner.png"
   },
@@ -256,7 +256,7 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 -- Gallery Page Content
 INSERT INTO content (key, value, type) VALUES
 ('gallery.hero.title', 'Our Portfolio', 'text'),
-('gallery.hero.description', 'Real events where our rentals were used—weddings, parties, and company gatherings.', 'text'),
+('gallery.hero.description', 'A look at real events featuring our rentals—weddings, parties, and company gatherings.', 'text'),
 ('gallery.images', '[
   {
     "id": "1",
@@ -332,7 +332,7 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 -- Catalog Page Content
 INSERT INTO content (key, value, type) VALUES
 ('catalog.hero.title', 'Rental Catalog', 'text'),
-('catalog.hero.subtitle', 'Furniture, lighting, tents, and decor for your event', 'text'),
+('catalog.hero.subtitle', 'Find the pieces for your space — lighting, seating, tents, and décor', 'text'),
 ('catalog.rental.policy.title', 'Rental Information', 'text'),
 ('catalog.rental.policy.description', 'Most rentals include a 24-hour period with delivery and pickup. Longer rentals and setup help are available.', 'text'),
 ('catalog.delivery.zones', '["Shelton", "Fairfield County", "New Haven County", "Hartford area", "Rhode Island", "Massachusetts"]', 'json'),
