@@ -37,21 +37,21 @@ export function HeroSection({
         <div className="hero-enter space-y-7 md:space-y-9">
           <p
             className="font-serif text-5xl font-light tracking-tight text-white md:text-7xl lg:text-8xl"
-            style={{ textShadow: "0 2px 24px rgba(26,36,32,0.45), 0 1px 2px rgba(26,36,32,0.55)" }}
+            style={{ textShadow: "0 1px 2px rgba(26,36,32,0.75)" }}
           >
             PrimeLux<span className="text-[var(--champagne)]">.</span>
           </p>
 
           <h1
             className="mx-auto max-w-3xl font-serif text-2xl font-light leading-snug tracking-tight text-white md:text-4xl lg:text-5xl"
-            style={{ textShadow: "0 2px 20px rgba(26,36,32,0.4), 0 1px 2px rgba(26,36,32,0.5)" }}
+            style={{ textShadow: "0 1px 2px rgba(26,36,32,0.7)" }}
           >
             {title}
           </h1>
 
           <p
-            className="mx-auto max-w-xl text-base font-light leading-relaxed text-white/90 md:text-lg"
-            style={{ textShadow: "0 1px 14px rgba(26,36,32,0.45), 0 1px 2px rgba(26,36,32,0.4)" }}
+            className="mx-auto max-w-xl text-base font-light leading-relaxed text-white md:text-lg"
+            style={{ textShadow: "0 1px 2px rgba(26,36,32,0.65)" }}
           >
             {subtitle}
           </p>
