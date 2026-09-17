@@ -1,218 +1,218 @@
--- About Page Content
+-- About Page Content (ELI12: clear, professional, no luxury fluff)
 INSERT INTO content (key, value, type) VALUES
-('about.hero.title', 'Curating Extraordinary Moments', 'text'),
-('about.hero.description', 'PrimeLux Events is the premier destination for luxury event rentals, bringing your vision to life with our curated collection of exquisite furniture and decor.', 'text'),
+('about.hero.title', 'Event rentals that look great and show up on time', 'text'),
+('about.hero.description', 'PrimeLux Events rents furniture, lighting, and decor for weddings, parties, and company events. Browse online, book what you need, and we deliver.', 'text'),
 ('about.hero.image', '/luxury-event-setup-ballroom-chandelier.jpg', 'image'),
 ('about.story.title', 'Our Story', 'text'),
-('about.story.p1', 'Founded in 2010, PrimeLux Events began with a simple mission: to elevate the standard of event rentals. We noticed a gap in the market for truly high-end, well-maintained furniture that could transform a space rather than just fill it.', 'text'),
-('about.story.p2', 'Over the past decade, we have grown from a small boutique collection to a comprehensive design house, partnering with the world''s top event planners and designers to execute weddings, galas, and corporate gatherings of distinction.', 'text'),
-('about.story.p3', 'Our commitment goes beyond inventory. We believe in the art of hospitality, ensuring that every interaction, from the first quote to the final pickup, is seamless and professional.', 'text'),
+('about.story.p1', 'PrimeLux started because good event furniture was hard to find—pieces that looked nice, stayed clean, and actually arrived when promised. We built a warehouse and a simple online catalog to fix that.', 'text'),
+('about.story.p2', 'Today we work with couples, planners, and businesses across Connecticut and nearby states. Whether it is a backyard wedding or a hotel ballroom, we help you pick pieces that fit the space and the budget.', 'text'),
+('about.story.p3', 'We care about clear quotes, careful delivery, and a straightforward pickup. You should always know what you are getting and when it shows up.', 'text'),
 ('about.story.image', '/elegant-wedding-reception-table-setting.jpg', 'image'),
-('about.values.title', 'The PrimeLux Standard', 'text'),
-('about.values.description', 'We hold ourselves to the highest standards of quality and service, ensuring your event is nothing short of perfection.', 'text'),
+('about.values.title', 'How we work', 'text'),
+('about.values.description', 'Simple standards we stick to on every order.', 'text'),
 ('about.values.items', '[
   {
-    "title": "Curated Excellence",
-    "description": "Every piece in our collection is hand-selected for its design, craftsmanship, and ability to make a statement."
+    "title": "Solid pieces",
+    "description": "We choose rentals that hold up well and photograph nicely—not just whatever is cheapest."
   },
   {
-    "title": "Impeccable Maintenance",
-    "description": "Our inventory is meticulously inspected and maintained after every event to ensure it arrives in pristine condition."
+    "title": "Cleaned and checked",
+    "description": "After every event we inspect and clean items before they go out again."
   },
   {
-    "title": "Seamless Logistics",
-    "description": "Our experienced logistics team handles the complexities of delivery and setup, so you can focus on your guests."
+    "title": "Delivery you can plan around",
+    "description": "Our crew handles transport and timing so you can focus on your guests."
   }
 ]', 'json'),
-('about.cta.title', 'Ready to elevate your event?', 'text'),
-('about.cta.description', 'Browse our collection and build your quote online instantly.', 'text'),
+('about.cta.title', 'Ready to pick your rentals?', 'text'),
+('about.cta.description', 'Browse the catalog and build a quote online in a few minutes.', 'text'),
 ('about.cta.primary', 'Start Your Quote', 'text'),
-('about.cta.secondary', 'Contact Support', 'text')
+('about.cta.secondary', 'Contact Us', 'text')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
 -- Home Page Content
 INSERT INTO content (key, value, type) VALUES
-('home.hero.title', 'Curating Unforgettable Moments of Luxury', 'text'),
-('home.hero.subtitle', 'Premier event rentals and styling for weddings, galas, and corporate gatherings. Browse our collection and book directly online.', 'text'),
-('home.hero.cta_primary', 'Rent Online', 'text'),
+('home.hero.title', 'Event rentals for weddings and parties in Connecticut', 'text'),
+('home.hero.subtitle', 'Furniture, lighting, tents, and decor you can browse and book online. We deliver to CT, RI, and MA.', 'text'),
+('home.hero.cta_primary', 'Browse Catalog', 'text'),
 ('home.hero.cta_secondary', 'How It Works', 'text'),
-('home.values.title', 'The PrimeLux Standard', 'text'),
-('home.values.description', 'We don''t just rent furniture; we curate experiences. Our commitment to excellence sets the foundation for unforgettable events.', 'text'),
+('home.values.title', 'Why people book with us', 'text'),
+('home.values.description', 'We rent the furniture and handle the logistics so planning your event feels more manageable.', 'text'),
 ('home.values.items', '[
   {
-    "title": "Curated Excellence",
-    "description": "Every piece in our collection is hand-selected for its craftsmanship, aesthetic appeal, and ability to transform a space."
+    "title": "Thoughtful inventory",
+    "description": "Chairs, tables, lighting, linens, and more—chosen to mix well together and look good in photos."
   },
   {
-    "title": "Uncompromising Quality",
-    "description": "We maintain our inventory to the highest standards. Each item is inspected, cleaned, and perfected before it arrives at your event."
+    "title": "Quality you can count on",
+    "description": "Every item is cleaned and checked before delivery so it arrives ready to use."
   },
   {
-    "title": "Seamless Logistics",
-    "description": "Our white-glove delivery team handles every detail of transport and setup, ensuring a stress-free experience from start to finish."
+    "title": "Delivery and pickup",
+    "description": "We bring items to your venue and pick them up after. Setup help is available if you need it."
   },
   {
-    "title": "Personalized Service",
-    "description": "We believe in building relationships. Our dedicated design consultants work closely with you to bring your unique vision to life."
+    "title": "Real human help",
+    "description": "Questions about sizing, quantities, or layout? Message us—we will walk you through it."
   }
 ]', 'json'),
-('home.services.title', 'Our Services', 'text'),
-('home.services.description', 'Beyond rentals, we provide comprehensive styling and logistical support to ensure your event is flawless.', 'text'),
+('home.services.title', 'What we offer', 'text'),
+('home.services.description', 'Rentals first—and support when you want a hand with design or setup.', 'text'),
 ('home.services.items', '[
   {
-    "title": "Event Design & Styling",
-    "description": "Our expert designers work with you to create a cohesive look for your event, from color palettes to floor plans."
+    "title": "Event layout help",
+    "description": "We can help you map chairs, tables, and lounges so the room works for your guest count."
   },
   {
-    "title": "Delivery & Setup",
-    "description": "White-glove delivery service including full setup and breakdown of all rental items."
+    "title": "Delivery and setup",
+    "description": "Drop-off at your venue, with optional full setup and breakdown."
   },
   {
-    "title": "Custom Fabrication",
-    "description": "Need something unique? Our workshop can build custom backdrops, bars, and decor pieces."
+    "title": "Custom builds",
+    "description": "Need a specific backdrop or bar? Ask us—we can build certain pieces in our shop."
   },
   {
-    "title": "Venue Consultation",
-    "description": "We''ll visit your venue to recommend the best layout and rental items to maximize the space."
+    "title": "Venue walkthrough",
+    "description": "We can visit the space with you and suggest what will fit best."
   }
 ]', 'json'),
-('home.testimonials.title', 'Client Stories', 'text'),
-('home.testimonials.description', 'Hear from those who have experienced the PrimeLux difference.', 'text'),
+('home.testimonials.title', 'What clients say', 'text'),
+('home.testimonials.description', 'A few notes from recent events.', 'text'),
 ('home.testimonials.items', '[
   {
-    "quote": "PrimeLux transformed our wedding venue into a dream. The velvet lounge furniture was the talk of the night, and the service was impeccable.",
+    "quote": "The lounge furniture looked amazing and the crew was on time. Guests kept asking where we got everything.",
     "author": "Isabella & Marcus",
-    "role": "Wedding at The Plaza",
+    "role": "Wedding clients",
     "image": "/elegant-bride.png"
   },
   {
-    "quote": "As an event planner, I need partners I can rely on. PrimeLux delivers consistency, quality, and style every single time. They are my go-to.",
+    "quote": "As a planner I need vendors who do what they say. PrimeLux is reliable on quality and timing.",
     "author": "Sarah Jenkins",
-    "role": "Senior Planner, Elite Events",
+    "role": "Event planner",
     "image": "/open-planner.png"
   },
   {
-    "quote": "The attention to detail is unmatched. From the initial consultation to the final pickup, the team was professional, punctual, and a joy to work with.",
+    "quote": "Clear communication from quote to pickup. Easy to work with for a large company dinner.",
     "author": "David Chen",
-    "role": "Corporate Gala Organizer",
+    "role": "Corporate event organizer",
     "image": "/diverse-executive-team.png"
   }
 ]', 'json')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
--- Contact Page Content
+-- Contact Page Content (Shelton CT identity)
 INSERT INTO content (key, value, type) VALUES
 ('contact.hero.title', 'Get in Touch', 'text'),
-('contact.hero.description', 'We''d love to hear about your upcoming event. Our Beverly Hills showroom is open for viewing by appointment only. Fill out the form or contact us directly to schedule your visit.', 'text'),
+('contact.hero.description', 'Tell us about your event date and venue. Our Shelton showroom is available by appointment—use the form or call us to set up a visit.', 'text'),
 ('contact.info.address.title', 'Visit Our Showroom', 'text'),
-('contact.info.address.value', '123 Luxury Lane, Suite 100\nBeverly Hills, CA 90210', 'text'),
+('contact.info.address.value', '2 Research Dr\nShelton, CT 06484', 'text'),
 ('contact.info.address.hours', 'By Appointment Only', 'text'),
 ('contact.info.phone.title', 'Call Us', 'text'),
-('contact.info.phone.value', '(310) 555-0123', 'text'),
+('contact.info.phone.value', '(203) 633-4744', 'text'),
 ('contact.info.phone.hours', 'Mon-Fri: 9am - 6pm', 'text'),
 ('contact.info.email.title', 'Email Us', 'text'),
-('contact.info.email.value', 'hello@primeluxevents.com', 'text'),
+('contact.info.email.value', 'primeluxevents@gmail.com', 'text'),
 ('contact.form.title', 'Send us a Message', 'text')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
 -- Services Page Content
 INSERT INTO content (key, value, type) VALUES
 ('services.hero.title', 'Our Services', 'text'),
-('services.hero.description', 'Beyond our exceptional inventory, we offer a suite of services designed to make your event planning experience seamless and stress-free.', 'text'),
+('services.hero.description', 'Rentals are the core. These extras help when you want design advice, delivery help, or on-site setup.', 'text'),
 ('services.list.design.title', 'Design Consultation', 'text'),
-('services.list.design.description', 'Not sure where to start? Our expert design team is here to help. We offer complimentary design consultations to help you curate the perfect look for your event. Whether you have a full mood board or just a vague idea, we''ll guide you through our collection to find pieces that bring your vision to life.', 'text'),
+('services.list.design.description', 'Not sure what to order? We will help you pick pieces that match your venue, colors, and guest count. Bring a mood board or just a rough idea—we will walk the catalog with you.', 'text'),
 ('services.list.design.features', '[
-  "Personalized style recommendations",
-  "Floor plan assistance",
-  "Custom mood boards"
+  "Style recommendations",
+  "Floor plan help",
+  "Simple mood boards"
 ]', 'json'),
 ('services.list.design.image', '/service-design.png', 'image'),
 
-('services.list.delivery.title', 'White Glove Delivery', 'text'),
-('services.list.delivery.description', 'Our logistics team is the backbone of our operation. We pride ourselves on punctuality and professionalism. Our uniformed delivery crew handles every item with care, ensuring that your rentals arrive in perfect condition and on time, every time.', 'text'),
+('services.list.delivery.title', 'Delivery', 'text'),
+('services.list.delivery.description', 'Our team delivers to your venue in a scheduled window. Items are wrapped and handled carefully so they arrive ready for your event.', 'text'),
 ('services.list.delivery.features', '[
   "Scheduled delivery windows",
-  "Real-time tracking updates",
-  "Careful handling and protection"
+  "Status updates",
+  "Careful packing and handling"
 ]', 'json'),
 ('services.list.delivery.image', '/logistics-planning.jpg', 'image'),
 
-('services.list.setup.title', 'Setup & Installation', 'text'),
-('services.list.setup.description', 'Want to walk into a fully realized event? For an additional fee, our team can handle the complete setup and installation of your rentals. From placing chairs to hanging lighting, we ensure everything is positioned exactly according to your floor plan.', 'text'),
+('services.list.setup.title', 'Setup and Installation', 'text'),
+('services.list.setup.description', 'Want the room ready when you walk in? For an added fee we can place furniture, hang lighting, and follow your floor plan so the space is set before guests arrive.', 'text'),
 ('services.list.setup.features', '[
-  "Available as an add-on service",
-  "Execution of detailed floor plans",
-  "On-site styling assistance"
+  "Available as an add-on",
+  "Follows your floor plan",
+  "On-site placement help"
 ]', 'json'),
 ('services.list.setup.image', '/service-setup.png', 'image'),
 
-('services.cta.title', 'Experience the PrimeLux Difference', 'text'),
-('services.cta.description', 'Let us handle the details so you can enjoy the moment. Contact us today to discuss your event needs.', 'text'),
+('services.cta.title', 'Want help planning your order?', 'text'),
+('services.cta.description', 'Tell us the date and venue—we will point you to the right rentals.', 'text'),
 ('services.cta.button', 'Get in Touch', 'text')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
 -- How It Works Page Content
 INSERT INTO content (key, value, type) VALUES
-('howitworks.hero.title', 'The PrimeLux Experience', 'text'),
-('howitworks.hero.description', 'We''ve refined the rental process into a seamless digital experience. From browsing to booking, control every detail of your event rentals online, on your time.', 'text'),
+('howitworks.hero.title', 'How renting works', 'text'),
+('howitworks.hero.description', 'Browse, build a quote, pay a deposit, and we deliver. Most of it you can do online without waiting on a sales call.', 'text'),
 ('howitworks.steps.list', '[
   {
-    "title": "Browse & Select",
-    "description": "Explore our extensive catalog of luxury furniture and decor online. Our platform allows you to view real-time availability, detailed specifications, and high-resolution images. Simply add items to your cart to start building your event.",
-    "details": ["Real-Time Availability", "Detailed Product Specs", "Curated Collections"],
+    "title": "Browse and select",
+    "description": "Look through furniture, lighting, tents, and decor. Check photos, details, and availability, then add items to your cart.",
+    "details": ["Live availability", "Product details", "Clear categories"],
     "image": "/open-planner.png"
   },
   {
-    "title": "Build Your Quote",
-    "description": "Create a comprehensive quote instantly. Adjust quantities, select your event dates, and input venue details directly in your cart. No waiting for a salesperson—you have full control over your rental list and budget.",
-    "details": ["Instant Pricing", "Self-Service Cart", "Budget Management"],
+    "title": "Build your quote",
+    "description": "Set quantities, event dates, and venue info in your cart. Pricing updates as you go so you can stay on budget.",
+    "details": ["Instant pricing", "Self-serve cart", "Budget visibility"],
     "image": "/design-consultation.jpg"
   },
   {
-    "title": "Secure Reservation",
-    "description": "Ready to book? Secure your items immediately with a 50% deposit through our secure online portal. You''ll receive an instant confirmation and a detailed contract. Our logistics team will then reach out to coordinate the finer details.",
-    "details": ["Instant Booking", "Secure Online Payment", "Immediate Confirmation"],
+    "title": "Reserve with a deposit",
+    "description": "Pay a 50% deposit online to hold your items. You get confirmation right away, then we coordinate delivery details with you.",
+    "details": ["Online booking", "Secure payment", "Instant confirmation"],
     "image": "/concierge-service.jpg"
   },
   {
-    "title": "Professional Delivery",
-    "description": "On the day of your event, our uniformed team arrives on time to deliver your items to a secure drop-off location. Need us to handle the heavy lifting? Full setup and installation services are available for an additional fee.",
-    "details": ["Uniformed Delivery Team", "Scheduled Drop-off", "Setup Available (Add-on)"],
+    "title": "We deliver",
+    "description": "On event day our crew drops off at your venue. Full setup is optional if you want help placing everything.",
+    "details": ["On-time delivery", "Scheduled drop-off", "Setup available"],
     "image": "/logistics-planning.jpg"
   },
   {
-    "title": "Seamless Retrieval",
-    "description": "Standard rentals cover a 24-hour period. We typically schedule pickup for the day following your event to ensure a stress-free conclusion. Same-night or custom pickup times can be arranged upon request.",
-    "details": ["24-Hour Rental Period", "Next-Day Pickup", "Flexible Scheduling"],
+    "title": "We pick up",
+    "description": "Standard rentals cover about 24 hours. We usually pick up the next day. Same-night pickup can be arranged if needed.",
+    "details": ["24-hour rental", "Next-day pickup", "Flexible timing"],
     "image": "/event-breakdown.jpg"
   }
 ]', 'json'),
-('howitworks.concierge.title', 'Need a Custom Touch?', 'text'),
-('howitworks.concierge.description', 'While our platform is designed for self-service, our Concierge Team is available for large-scale productions requiring custom sourcing or complex logistics.', 'text'),
-('howitworks.concierge.button', 'Contact Concierge', 'text'),
+('howitworks.concierge.title', 'Need something custom?', 'text'),
+('howitworks.concierge.description', 'Most orders are self-serve. For large events or special sourcing, our team can help with logistics and one-off pieces.', 'text'),
+('howitworks.concierge.button', 'Talk to Our Team', 'text'),
 ('howitworks.concierge.list.title', 'What We Offer', 'text'),
-('howitworks.concierge.list.item1', 'Custom furniture sourcing', 'text'),
-('howitworks.concierge.list.item2', 'Complex event logistics coordination', 'text'),
-('howitworks.concierge.list.item3', 'Dedicated event planning support', 'text'),
+('howitworks.concierge.list.item1', 'Help finding special furniture', 'text'),
+('howitworks.concierge.list.item2', 'Complex delivery planning', 'text'),
+('howitworks.concierge.list.item3', 'Extra planning support for big events', 'text'),
 ('howitworks.faq.title', 'Common Questions', 'text'),
-('howitworks.faq.description', 'Everything you need to know about renting with us.', 'text'),
+('howitworks.faq.description', 'Quick answers about renting with us.', 'text'),
 ('howitworks.faq.button', 'View All FAQs', 'text'),
 ('howitworks.faq.list', '[
   {
     "question": "Can I book everything online without talking to anyone?",
-    "answer": "Yes! Our platform is designed for a complete self-service experience. You can browse, build your quote, and secure your rentals entirely online. If you need assistance, our support team is just a click away."
+    "answer": "Yes. You can browse, build a quote, and reserve online. If you get stuck, our team is available by phone or message."
   },
   {
     "question": "How far in advance should I book?",
-    "answer": "We recommend booking as soon as you have your venue and date secured. For peak wedding seasons (May-October), 6-9 months in advance is ideal to ensure availability of our most popular items."
+    "answer": "Book once you have a date and venue. For busy wedding months (May–October), 6–9 months ahead is safest for popular items."
   },
   {
-    "question": "Do you offer delivery outside the metro area?",
-    "answer": "Yes, we travel! We regularly service events up to 150 miles from our warehouse. Long-distance delivery fees are calculated based on mileage and crew requirements."
+    "question": "Do you deliver outside the local area?",
+    "answer": "Yes. We regularly deliver within about 150 miles of our warehouse. Longer trips may include a mileage fee."
   },
   {
     "question": "Is setup included in the delivery fee?",
-    "answer": "Our standard delivery fee covers drop-off at a designated location. Full setup and installation—placing chairs, styling lounges, etc.—is a separate service that can be added to your quote for an additional fee."
+    "answer": "Standard delivery is drop-off at a designated spot. Full setup—placing chairs, arranging lounges, and so on—is an add-on you can include in your quote."
   }
 ]', 'json')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
@@ -220,35 +220,35 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 -- FAQ Page Content
 INSERT INTO content (key, value, type) VALUES
 ('faq.hero.title', 'Frequently Asked Questions', 'text'),
-('faq.hero.description', 'Everything you need to know about renting with PrimeLux Events.', 'text'),
+('faq.hero.description', 'Straight answers about renting with PrimeLux Events.', 'text'),
 ('faq.list', '[
   {
     "question": "How far in advance should I book?",
-    "answer": "We recommend booking as soon as you have your date and venue secured. For peak seasons (spring and fall), we suggest booking 6-9 months in advance to ensure availability of your desired items. However, we can often accommodate last-minute requests depending on inventory."
+    "answer": "Book as soon as you have a date and venue. For spring and fall, 6–9 months ahead helps lock in popular items. Last-minute orders are sometimes possible if stock allows."
   },
   {
     "question": "How long is the rental period?",
-    "answer": "Our standard rental period is 24 hours. We typically deliver on the day of the event and pick up the following day. If you need the items for longer or require a same-night pickup, please let us know so we can adjust your quote accordingly."
+    "answer": "Most rentals are about 24 hours—we deliver for the event and pick up the next day. Longer holds or same-night pickup can be arranged; we will adjust the quote."
   },
   {
     "question": "Do you offer delivery and setup?",
-    "answer": "We offer professional delivery to your venue. Standard delivery includes drop-off at a designated area. Full setup and installation (placing furniture, styling decor) is available for an additional fee. Please request this service when building your quote so we can allocate the proper time and crew."
+    "answer": "Yes. Delivery to your venue is available. Drop-off is included in standard delivery; full setup and styling is an optional add-on."
   },
   {
     "question": "What is your cancellation policy?",
-    "answer": "Orders cancelled more than 30 days prior to the event date are eligible for a full refund less a 10% administrative fee. Cancellations made within 30 days of the event are subject to a 50% cancellation fee. Orders cannot be cancelled within 7 days of the scheduled delivery."
+    "answer": "Cancel more than 30 days before the event for a refund minus a 10% admin fee. Within 30 days, a 50% fee applies. Within 7 days of delivery, orders cannot be cancelled."
   },
   {
     "question": "Can I view the items in person?",
-    "answer": "Absolutely. We invite you to visit our showroom in Beverly Hills to see our collection in person. Please contact us to schedule an appointment with one of our design consultants."
+    "answer": "Yes. Visit our Shelton showroom by appointment. Call or message us to schedule a time."
   },
   {
     "question": "Do you require a deposit?",
-    "answer": "Yes, a 50% non-refundable deposit is required to secure your items for your date. The remaining balance is due 14 days prior to your event."
+    "answer": "A 50% deposit holds your items. The rest is due 14 days before the event."
   },
   {
     "question": "What happens if an item is damaged?",
-    "answer": "We charge a mandatory damage waiver fee on all rentals which covers minor wear and tear. However, significant damage, loss, or theft is the responsibility of the client and will be billed at the replacement cost of the item."
+    "answer": "A damage waiver covers light wear. Major damage, loss, or theft is billed at replacement cost."
   }
 ]', 'json')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
@@ -256,42 +256,42 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 -- Gallery Page Content
 INSERT INTO content (key, value, type) VALUES
 ('gallery.hero.title', 'Our Portfolio', 'text'),
-('gallery.hero.description', 'Explore a curated selection of our most memorable events. From intimate gatherings to grand galas, see how our pieces bring visions to life.', 'text'),
+('gallery.hero.description', 'Real events where our rentals were used—weddings, parties, and company gatherings.', 'text'),
 ('gallery.images', '[
   {
     "id": "1",
     "src": "/luxury-event-setup-ballroom-chandelier.jpg",
-    "alt": "Grand Ballroom Wedding",
+    "alt": "Ballroom wedding setup",
     "category": "Weddings"
   },
   {
     "id": "2",
     "src": "/elegant-wedding-reception-table-setting.jpg",
-    "alt": "Outdoor Garden Reception",
+    "alt": "Garden reception tables",
     "category": "Weddings"
   },
   {
     "id": "3",
     "src": "/emerald-green-velvet-sofa.jpg",
-    "alt": "Corporate Gala Lounge",
+    "alt": "Lounge seating for a company event",
     "category": "Corporate"
   },
   {
     "id": "4",
     "src": "/gold-chiavari-chair.jpg",
-    "alt": "Gold Themed Anniversary",
+    "alt": "Anniversary dinner chairs",
     "category": "Social"
   },
   {
     "id": "5",
     "src": "/rustic-wooden-dining-table.jpg",
-    "alt": "Rustic Chic Dinner",
+    "alt": "Farm-style dinner tables",
     "category": "Social"
   },
   {
     "id": "6",
     "src": "/crystal-chandelier.png",
-    "alt": "Luxury Lighting Setup",
+    "alt": "Hanging lighting over a reception",
     "category": "Weddings"
   }
 ]', 'json')
@@ -299,32 +299,32 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
 -- Journal Page Content
 INSERT INTO content (key, value, type) VALUES
-('journal.hero.title', 'The Edit', 'text'),
-('journal.hero.description', 'Trends, inspiration, and expert advice from the world of luxury events.', 'text'),
+('journal.hero.title', 'Ideas and tips', 'text'),
+('journal.hero.description', 'Practical notes on layouts, lighting, and planning from our team.', 'text'),
 ('journal.posts', '[
   {
     "id": "1",
-    "title": "2025 Wedding Trends: The Return of Opulence",
-    "excerpt": "From cascading florals to gold accents, discover why maximalism is making a comeback in luxury weddings.",
+    "title": "Wedding trends we are seeing this year",
+    "excerpt": "What couples are asking for—from fuller florals to warmer metal accents—and how to rent for that look.",
     "date": "October 12, 2024",
     "image": "/luxury-event-setup-ballroom-chandelier.jpg",
     "category": "Trends"
   },
   {
     "id": "2",
-    "title": "Creating the Perfect Lounge Area",
-    "excerpt": "Tips for designing comfortable and stylish conversation spaces for your corporate event or reception.",
+    "title": "How to set up a comfortable lounge area",
+    "excerpt": "Simple tips for seating groups so people can talk and rest during a reception or company event.",
     "date": "September 28, 2024",
     "image": "/emerald-green-velvet-sofa.jpg",
     "category": "Design"
   },
   {
     "id": "3",
-    "title": "Lighting: The Secret to Atmosphere",
-    "excerpt": "How to use chandeliers, pin-spots, and uplighting to transform any venue into a magical space.",
+    "title": "Lighting that changes the room",
+    "excerpt": "How chandeliers, pin spots, and uplights can make a plain venue feel finished.",
     "date": "September 15, 2024",
     "image": "/crystal-chandelier.png",
-    "category": "Expert Advice"
+    "category": "Tips"
   }
 ]', 'json')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
@@ -332,14 +332,13 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 -- Catalog Page Content
 INSERT INTO content (key, value, type) VALUES
 ('catalog.hero.title', 'Rental Catalog', 'text'),
-('catalog.hero.subtitle', 'Premium event rentals for unforgettable celebrations', 'text'),
+('catalog.hero.subtitle', 'Furniture, lighting, tents, and decor for your event', 'text'),
 ('catalog.rental.policy.title', 'Rental Information', 'text'),
-('catalog.rental.policy.description', 'All rentals include a 24-hour period with delivery and pickup. Extended rental periods and setup services available.', 'text'),
-('catalog.delivery.zones', '["Beverly Hills", "Los Angeles", "Santa Monica", "Malibu", "Pasadena", "Orange County"]', 'json'),
+('catalog.rental.policy.description', 'Most rentals include a 24-hour period with delivery and pickup. Longer rentals and setup help are available.', 'text'),
+('catalog.delivery.zones', '["Shelton", "Fairfield County", "New Haven County", "Hartford area", "Rhode Island", "Massachusetts"]', 'json'),
 ('catalog.pricing.tiers', '{
   "daily": "Base daily rate for 1-day rentals",
-  "weekend": "Special rate for 2-3 day weekend events",
-  "weekly": "Discounted rate for 7+ day rentals"
+  "weekend": "Rate for 2–3 day weekend events",
+  "weekly": "Lower rate for 7+ day rentals"
 }', 'json')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
-

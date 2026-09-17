@@ -46,8 +46,8 @@ export function ProductCard({ product, isFavorited = false }: ProductCardProps) 
 
     return (
         <Link href={productUrl} className="group relative block h-full">
-            <article className="spotlight-frame flex h-full flex-col overflow-hidden rounded-2xl border border-border/10 bg-white shadow-[0_10px_40px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.1)]">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-t-2xl bg-[var(--linen,#F7F4EF)]">
+            <article className="spotlight-frame flex h-full flex-col overflow-hidden rounded-2xl border border-border/10 bg-card text-card-foreground shadow-[0_10px_40px_rgba(0,0,0,0.25)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-t-2xl bg-[var(--surface-muted)]">
                     {imageUrl ? (
                         <Image
                             src={imageUrl}
@@ -57,7 +57,7 @@ export function ProductCard({ product, isFavorited = false }: ProductCardProps) 
                             className="object-contain p-6 transition-transform duration-700 ease-out group-hover:scale-105"
                         />
                     ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-neutral-50 text-neutral-300">
+                        <div className="absolute inset-0 flex items-center justify-center bg-[var(--surface-muted)] text-muted-foreground">
                             <span className="text-xs font-medium uppercase tracking-widest">Image coming soon</span>
                         </div>
                     )}
@@ -67,8 +67,8 @@ export function ProductCard({ product, isFavorited = false }: ProductCardProps) 
                 </div>
 
                 <div className="absolute left-4 top-4 z-10">
-                    <span className="rounded-full border border-border/10 bg-white/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--ink,#121110)] shadow-sm backdrop-blur-md">
-                        {product.categories?.name || 'Collection'}
+                    <span className="rounded-full border border-border/20 bg-[var(--surface-elevated)]/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground shadow-sm backdrop-blur-md">
+                        {product.categories?.name || 'Category'}
                     </span>
                 </div>
 
@@ -78,7 +78,7 @@ export function ProductCard({ product, isFavorited = false }: ProductCardProps) 
                             {product.name}
                         </h3>
                         {product.description && (
-                            <p className="line-clamp-2 text-sm font-light leading-relaxed text-muted-foreground/70">
+                            <p className="line-clamp-2 text-sm font-light leading-relaxed text-muted-foreground">
                                 {product.description}
                             </p>
                         )}

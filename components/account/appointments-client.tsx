@@ -59,7 +59,7 @@ export function AppointmentsClient({ appointments }: { appointments: Appointment
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr]">
-      <Card className="border-border/60 bg-white/80">
+      <Card className="border-border/60 bg-card text-card-foreground">
         <CardHeader>
           <CardTitle className="font-serif text-2xl font-light">Book a showroom visit</CardTitle>
         </CardHeader>
@@ -99,7 +99,7 @@ export function AppointmentsClient({ appointments }: { appointments: Appointment
           </Card>
         ) : (
           appointments.map((appt) => (
-            <Card key={appt.id} className="border-border/60 bg-white/80">
+            <Card key={appt.id} className="border-border/60 bg-card text-card-foreground">
               <CardContent className="flex items-start justify-between gap-4 py-5">
                 <div className="space-y-1">
                   <p className="font-medium">

@@ -59,7 +59,7 @@ export function FeaturedCategories() {
                     <div className="max-w-2xl">
                         <div className="flex items-center gap-4 mb-6">
                             <span className="h-px w-8 bg-gold/50" />
-                            <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Curated Collections</span>
+                            <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Popular categories</span>
                         </div>
                         <h2 className="text-4xl md:text-7xl font-serif font-light text-white tracking-tight leading-[1.1]">The Art of the Archive</h2>
                     </div>

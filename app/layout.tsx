@@ -25,19 +25,19 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   metadataBase: new URL('https://primeluxevents.com'),
   title: {
-    default: 'PrimeLux Events | Luxury Event Rentals',
+    default: 'PrimeLux Events | Event Rentals in Connecticut',
     template: '%s | PrimeLux Events',
   },
-  description: 'Premium event rentals from Shelton, CT — serving Connecticut, Rhode Island, and Massachusetts. Furniture, decor, lighting, and packages for weddings and celebrations.',
-  keywords: ['luxury event rentals', 'party rentals Shelton CT', 'wedding rentals Connecticut', 'event design', 'furniture rental CT'],
+  description: 'Event rentals from Shelton, CT — serving Connecticut, Rhode Island, and Massachusetts. Furniture, decor, lighting, and packages for weddings and celebrations.',
+  keywords: ['event rentals Shelton CT', 'party rentals Connecticut', 'wedding rentals CT', 'furniture rental CT', 'event lighting rental'],
   manifest: '/manifest-store.webmanifest',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://primeluxevents.com',
     siteName: 'PrimeLux Events',
-    title: 'PrimeLux Events | Luxury Event Rentals',
-    description: 'Elevate your event with our curated collection of luxury rentals.',
+    title: 'PrimeLux Events | Event Rentals in Connecticut',
+    description: 'Furniture, lighting, and decor rentals you can browse and book online.',
     images: [
       {
         url: '/images/og-image.jpg',
@@ -49,8 +49,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PrimeLux Events | Luxury Event Rentals',
-    description: 'Elevate your event with our curated collection of luxury rentals.',
+    title: 'PrimeLux Events | Event Rentals in Connecticut',
+    description: 'Furniture, lighting, and decor rentals you can browse and book online.',
     images: ['/images/og-image.jpg'],
   },
   appleWebApp: {

@@ -144,8 +144,8 @@ export const services = [
 export const journalPosts = [
   {
     id: "1",
-    title: "2025 Wedding Trends: The Return of Opulence",
-    excerpt: "From cascading florals to gold accents, discover why maximalism is making a comeback in luxury weddings.",
+    title: "Wedding trends we are seeing this year",
+    excerpt: "What couples are asking for—from fuller florals to warmer metal accents—and how to rent for that look.",
     date: "October 12, 2024",
     image: "/luxury-event-setup-ballroom-chandelier.jpg",
     category: "Trends",

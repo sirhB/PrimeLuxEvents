@@ -80,7 +80,7 @@ export default async function ServicesPage() {
               <div className="relative aspect-video md:aspect-[4/3] bg-muted rounded-lg overflow-hidden">
                 <Image
                   src={content['services.list.delivery.image'] || "/images/service-logistics.png"}
-                  alt="White Glove Delivery"
+                  alt="Delivery crew unloading rentals"
                   fill
                   className="object-cover"
                 />

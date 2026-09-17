@@ -188,7 +188,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                     <div className="hero-enter max-w-4xl space-y-10">
                         <div className="flex items-center justify-center gap-3">
                             <span className="w-12 h-px bg-gold/30" />
-                            <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Curated Intelligence</span>
+                            <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Event Catalog</span>
                             <span className="w-12 h-px bg-gold/30" />
                         </div>
 
@@ -203,10 +203,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
                         <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto leading-relaxed">
                             {selectedCategory
-                                ? `Curated selection of premium ${selectedCategory.toLowerCase()} for your extraordinary events.`
+                                ? `${selectedCategory} rentals for weddings, parties, and other events.`
                                 : searchQuery
-                                    ? `Results for "${searchQuery}" in our luxury rental collection.`
-                                    : "Browse our exclusive categories of luxury event rentals, designed to transform any venue."
+                                    ? `Results for "${searchQuery}" in our rental catalog.`
+                                    : "Browse categories of furniture, lighting, tents, and decor for your event."
                             }
                         </p>
                     </div>
@@ -335,8 +335,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 {featuredPackages.length > 0 && (
                                     <section>
                                         <div className="mb-16">
-                                            <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Complete Solutions</span>
-                                            <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">Curated Packages</h2>
+                                            <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Bundles</span>
+                                            <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">Event Packages</h2>
                                         </div>
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-12">
                                             {featuredPackages.slice(0, 3).map((pkg, index) => (
@@ -367,7 +367,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                         {!selectedCategory && !searchQuery && (
                             <section>
                                 <div className="mb-16">
-                                    <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">The Collections</span>
+                                    <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Shop by type</span>
                                     <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">Browse Categories</h2>
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-8">
