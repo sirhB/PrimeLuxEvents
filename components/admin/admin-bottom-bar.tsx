@@ -44,7 +44,7 @@ export function AdminBottomBar() {
                 <span className="relative">
                   <Icon className="h-5 w-5" />
                   {badge > 0 && (
-                    <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--dashboard-accent-gold)] px-1 text-[9px] font-bold text-[#121110]">
+                    <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--dashboard-accent-gold)] px-1 text-[9px] font-bold text-[#0d1014]">
                       {badge > 99 ? '99+' : badge}
                     </span>
                   )}
@@ -60,7 +60,7 @@ export function AdminBottomBar() {
             className="-mt-4 flex flex-col items-center gap-0.5 text-[10px] font-medium text-[var(--dashboard-text-muted)]"
             aria-label="Open scanner"
           >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--dashboard-accent-gold)]/40 bg-[var(--dashboard-accent-gold)] text-[#121110] shadow-[0_8px_20px_-8px_rgba(196,165,116,0.7)]">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--dashboard-accent-gold)]/40 bg-[var(--dashboard-accent-gold)] text-[#0d1014] shadow-[0_8px_20px_-8px_rgba(194,168,130,0.7)]">
               <QrCode className="h-5 w-5" />
             </span>
             Scan
@@ -82,7 +82,7 @@ export function AdminBottomBar() {
                 <span className="relative">
                   <Icon className="h-5 w-5" />
                   {badge > 0 && (
-                    <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--dashboard-accent-gold)] px-1 text-[9px] font-bold text-[#121110]">
+                    <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--dashboard-accent-gold)] px-1 text-[9px] font-bold text-[#0d1014]">
                       {badge > 99 ? '99+' : badge}
                     </span>
                   )}

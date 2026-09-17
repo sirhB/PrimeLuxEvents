@@ -31,7 +31,7 @@ export function FeaturedProductCard({ product }: FeaturedProductCardProps) {
             href={`/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`}
             className="group relative block w-full h-full"
         >
-            <div className="relative h-full aspect-[16/10] md:aspect-[2/1] overflow-hidden rounded-sm bg-secondary border border-transparent transition-all duration-500 hover:border-[var(--champagne,#B8956B)]/30 spotlight-frame">
+            <div className="relative h-full aspect-[16/10] md:aspect-[2/1] overflow-hidden rounded-sm bg-secondary border border-transparent transition-all duration-500 hover:border-[var(--champagne,#c2a882)]/30 spotlight-frame">
                 {/* Image */}
                 {product.image_url ? (
                     <Image

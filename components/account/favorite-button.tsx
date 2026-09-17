@@ -58,7 +58,7 @@ export function FavoriteButton({
       <Heart
         className={cn(
           'h-4 w-4 transition-colors',
-          initialFavorited ? 'fill-[var(--champagne,#B8956B)] text-[var(--champagne,#B8956B)]' : 'text-muted-foreground',
+          initialFavorited ? 'fill-[var(--champagne,#c2a882)] text-[var(--champagne,#c2a882)]' : 'text-muted-foreground',
         )}
       />
     </Button>

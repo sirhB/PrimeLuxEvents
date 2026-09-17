@@ -92,7 +92,7 @@ export default async function CategoriesPage({
                 title="Categories"
                 description="Organize your products and manage catalog structure."
                 actions={
-                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90">
+                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#0d1014] hover:bg-[var(--dashboard-accent-gold)]/90">
                         <Link href="/admin/categories/new">
                             <Plus className="mr-2 h-4 w-4" />
                             Add Category

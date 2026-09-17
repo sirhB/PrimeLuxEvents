@@ -26,7 +26,7 @@ function brandName(partner: any) {
 function accent(partner: any) {
   const c = partner?.brand_accent_color?.trim()
   if (c && /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(c)) return c
-  return '#1c1917'
+  return '#0d1014'
 }
 
 export async function generateMetadata({

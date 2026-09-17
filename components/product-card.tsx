@@ -74,7 +74,7 @@ export function ProductCard({ product, isFavorited = false }: ProductCardProps) 
 
                 <div className="flex flex-grow flex-col gap-4 p-6">
                     <div className="space-y-2">
-                        <h3 className="line-clamp-1 font-serif text-xl font-light tracking-tight text-foreground transition-colors duration-300 group-hover:text-[var(--champagne,#B8956B)]">
+                        <h3 className="line-clamp-1 font-serif text-xl font-light tracking-tight text-foreground transition-colors duration-300 group-hover:text-[var(--champagne,#c2a882)]">
                             {product.name}
                         </h3>
                         {product.description && (
@@ -90,7 +90,7 @@ export function ProductCard({ product, isFavorited = false }: ProductCardProps) 
                             <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">per day</span>
                         </div>
                         {typeof product.quantity_available === 'number' && (
-                            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--sage,#8A9A8B)]">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--sage,#6f8f8a)]">
                                 {product.quantity_available > 0 ? 'Available' : 'Reserved'}
                             </span>
                         )}

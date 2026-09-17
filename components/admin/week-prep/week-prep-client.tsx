@@ -159,7 +159,7 @@ export function WeekPrepClient({
             type="button"
             onClick={handleGenerate}
             disabled={pending}
-            className="h-10 bg-[var(--dashboard-accent-gold)] text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90"
+            className="h-10 bg-[var(--dashboard-accent-gold)] text-[#0d1014] hover:bg-[var(--dashboard-accent-gold)]/90"
           >
             {pending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -210,7 +210,7 @@ export function WeekPrepClient({
               title="No deliveries this weekend"
               description="Confirmed orders with delivery dates in this Fri–Sun window will appear here."
               action={
-                <Button asChild className="bg-[var(--dashboard-accent-gold)] text-[#121110]">
+                <Button asChild className="bg-[var(--dashboard-accent-gold)] text-[#0d1014]">
                   <Link href="/admin/orders">View orders</Link>
                 </Button>
               }
