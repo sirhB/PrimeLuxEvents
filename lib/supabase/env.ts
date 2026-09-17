@@ -40,9 +40,7 @@ export function getSupabaseServiceRoleKey(): string | undefined {
 export function requireSupabaseUrl(): string {
   const url = getSupabaseUrl()
   if (!url) {
-    throw new Error(
-      'Missing NEXT_PUBLIC_SUPABASE_URL (expected https://bxktvrvpksxaijhdjegh.supabase.co)',
-    )
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL')
   }
   return url
 }
