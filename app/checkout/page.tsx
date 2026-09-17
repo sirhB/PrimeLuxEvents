@@ -464,24 +464,6 @@ export default function CheckoutPage() {
 
     }
 
-    const handleSubmit = async () => {
-        if (!agreesToRentalAgreement) {
-            setError("Please agree to the rental agreement terms before placing your order.")
-            return
-        }
-
-        if (!signatureData) {
-            setError("Please sign the rental agreement before placing your order.")
-            return
-        }
-
-        if (!clientSecret) {
-            setError("Payment is not ready. Go back to event details and continue again to initialize checkout.")
-            return
-        }
-    }
-
-
     if (items.length === 0 && isLoaded) return null
 
     const fieldClass =
