@@ -20,7 +20,7 @@ export function DealCard({ name, description, price, imageUrl, onViewDetails, de
             className="group relative w-full h-full cursor-pointer"
             onClick={onViewDetails}
         >
-            <div className="relative h-full overflow-hidden rounded-2xl bg-white border border-border/5 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col group-hover:-translate-y-2">
+            <div className="relative h-full overflow-hidden rounded-2xl bg-card text-card-foreground border border-border/10 shadow-[0_10px_30px_rgba(0,0,0,0.25)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-all duration-500 flex flex-col group-hover:-translate-y-2">
 
                 {/* Image Section */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-[var(--surface-elevated)]">
@@ -32,8 +32,8 @@ export function DealCard({ name, description, price, imageUrl, onViewDetails, de
                             className="object-cover transition-all duration-1000 ease-out group-hover:scale-110"
                         />
                     ) : (
-                        <div className="absolute inset-0 bg-neutral-50 flex items-center justify-center">
-                            <span className="text-neutral-300 text-xs font-bold tracking-widest uppercase">No Image</span>
+                        <div className="absolute inset-0 bg-[var(--surface-muted)] flex items-center justify-center">
+                            <span className="text-muted-foreground text-xs font-bold tracking-widest uppercase">No Image</span>
                         </div>
                     )}
 
@@ -61,13 +61,13 @@ export function DealCard({ name, description, price, imageUrl, onViewDetails, de
                         {name}
                     </h3>
 
-                    <p className="text-muted-foreground/70 text-[10px] md:text-sm mb-4 md:mb-8 line-clamp-2 flex-grow font-light leading-relaxed">
-                        {description || "Exclusive deal - don't miss out on this premium selection."}
+                    <p className="text-muted-foreground text-[10px] md:text-sm mb-4 md:mb-8 line-clamp-2 flex-grow font-light leading-relaxed">
+                        {description || "A limited-time price on this rental."}
                     </p>
 
-                    <div className="flex items-end justify-between mt-auto pt-6 border-t border-border/5">
+                    <div className="flex items-end justify-between mt-auto pt-6 border-t border-border/10">
                         <div>
-                            <div className="text-[8px] md:text-[10px] text-muted-foreground/50 line-through mb-0.5 md:mb-1 uppercase tracking-widest font-medium">
+                            <div className="text-[8px] md:text-[10px] text-muted-foreground line-through mb-0.5 md:mb-1 uppercase tracking-widest font-medium">
                                 Regular {formatCurrency(price * 1.3)}
                             </div>
                             <div className="flex items-baseline gap-2">

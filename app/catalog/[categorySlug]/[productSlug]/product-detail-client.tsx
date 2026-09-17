@@ -495,7 +495,7 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                                 <div className="h-px w-full bg-white/5 mb-6" />
                                                 {product.sku && (
                                                     <div className="flex justify-between py-2 border-b border-white/5 border-dashed">
-                                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Curated SKU</span>
+                                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">SKU</span>
                                                         <span className="text-gray-300">{product.sku}</span>
                                                     </div>
                                                 )}
@@ -506,7 +506,7 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                                     </div>
                                                 )}
                                                 <div className="flex justify-between py-2">
-                                                    <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Minimum Engagement</span>
+                                                    <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Minimum rental</span>
                                                     <span className="text-gray-300">
                                                         {product.minimum_rental_days || 1} {(product.minimum_rental_days || 1) === 1 ? 'day' : 'days'}
                                                     </span>
@@ -528,7 +528,7 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
 
                                         <AccordionItem value="rental" className="border border-white/5 rounded-2xl bg-white/5 backdrop-blur-sm overflow-hidden px-8 transition-all duration-500 hover:border-white/10">
                                             <AccordionTrigger className="text-lg font-serif font-light text-white hover:text-gold transition-all duration-500 py-6 border-none">
-                                                The Luxury Process
+                                                How renting works
                                             </AccordionTrigger>
                                             <AccordionContent className="space-y-6 text-base text-gray-400 pb-8 font-light">
                                                 <div className="h-px w-full bg-white/5 mb-6" />
@@ -573,10 +573,10 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                 Complete Your Vision
                             </span>
                             <h2 className="text-4xl md:text-6xl font-serif font-light mb-8 text-white tracking-tight">
-                                Curated Pairings
+                                Related items
                             </h2>
                             <p className="text-lg text-gray-500 max-w-2xl mx-auto font-light leading-relaxed">
-                                Discover complementary pieces selected by our stylists to create an cohesive and extraordinary atmosphere.
+                                Other pieces that often get rented with this one.
                             </p>
                         </div>
                         <RelatedProducts

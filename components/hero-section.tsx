@@ -23,7 +23,7 @@ export function HeroSection({
       <div className="hero-parallax absolute inset-0">
         <Image
           src="/images/luxury-event-hero.png"
-          alt="Luxury event setup with curated rental pieces"
+          alt="Event setup with rental furniture and lighting"
           fill
           className="object-cover opacity-45 contrast-125"
           priority

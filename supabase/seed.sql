@@ -42,52 +42,52 @@ BEGIN
   ('Marble Bar Counter', 'Luxurious white marble bar counter with gold trim.', 35000, '/marble-bar-counter.jpg', furniture_id, 3);
 END $$;
 
--- Seed Content
+-- Seed Content (kept in sync with content_seed.sql tone)
 INSERT INTO content (key, value, type) VALUES
-('home.hero.title', 'Curating Unforgettable Moments of Luxury', 'text'),
-('home.hero.subtitle', 'Premier event rentals and styling for weddings, galas, and corporate gatherings. Browse our collection and book directly online.', 'text'),
-('home.hero.cta_primary', 'Rent Online', 'text'),
+('home.hero.title', 'Event rentals for weddings and parties in Connecticut', 'text'),
+('home.hero.subtitle', 'Furniture, lighting, tents, and decor you can browse and book online. We deliver to CT, RI, and MA.', 'text'),
+('home.hero.cta_primary', 'Browse Catalog', 'text'),
 ('home.hero.cta_secondary', 'How It Works', 'text'),
 
-('home.values.title', 'The PrimeLux Standard', 'text'),
-('home.values.description', 'We don''t just rent furniture; we curate experiences. Our commitment to excellence sets the foundation for unforgettable events.', 'text'),
+('home.values.title', 'Why people book with us', 'text'),
+('home.values.description', 'We rent the furniture and handle the logistics so planning your event feels more manageable.', 'text'),
 ('home.values.items', '[
   {
-    "title": "Curated Excellence",
-    "description": "Every piece in our collection is hand-selected for its craftsmanship, aesthetic appeal, and ability to transform a space."
+    "title": "Thoughtful inventory",
+    "description": "Chairs, tables, lighting, linens, and more—chosen to mix well together and look good in photos."
   },
   {
-    "title": "Uncompromising Quality",
-    "description": "We maintain our inventory to the highest standards. Each item is inspected, cleaned, and perfected before it arrives at your event."
+    "title": "Quality you can count on",
+    "description": "Every item is cleaned and checked before delivery so it arrives ready to use."
   },
   {
-    "title": "Seamless Logistics",
-    "description": "Our white-glove delivery team handles every detail of transport and setup, ensuring a stress-free experience from start to finish."
+    "title": "Delivery and pickup",
+    "description": "We bring items to your venue and pick them up after. Setup help is available if you need it."
   },
   {
-    "title": "Personalized Service",
-    "description": "We believe in building relationships. Our dedicated design consultants work closely with you to bring your unique vision to life."
+    "title": "Real human help",
+    "description": "Questions about sizing, quantities, or layout? Message us—we will walk you through it."
   }
 ]', 'json'),
 
-('home.services.title', 'Our Services', 'text'),
-('home.services.description', 'Beyond rentals, we provide comprehensive styling and logistical support to ensure your event is flawless.', 'text'),
+('home.services.title', 'What we offer', 'text'),
+('home.services.description', 'Rentals first—and support when you want a hand with design or setup.', 'text'),
 ('home.services.items', '[
   {
-    "title": "Event Design & Styling",
-    "description": "Our expert designers work with you to create a cohesive look for your event, from color palettes to floor plans."
+    "title": "Event layout help",
+    "description": "We can help you map chairs, tables, and lounges so the room works for your guest count."
   },
   {
-    "title": "Delivery & Setup",
-    "description": "White-glove delivery service including full setup and breakdown of all rental items."
+    "title": "Delivery and setup",
+    "description": "Drop-off at your venue, with optional full setup and breakdown."
   },
   {
-    "title": "Custom Fabrication",
-    "description": "Need something unique? Our workshop can build custom backdrops, bars, and decor pieces."
+    "title": "Custom builds",
+    "description": "Need a specific backdrop or bar? Ask us—we can build certain pieces in our shop."
   },
   {
-    "title": "Venue Consultation",
-    "description": "We''ll visit your venue to recommend the best layout and rental items to maximize the space."
+    "title": "Venue walkthrough",
+    "description": "We can visit the space with you and suggest what will fit best."
   }
 ]', 'json'),
 

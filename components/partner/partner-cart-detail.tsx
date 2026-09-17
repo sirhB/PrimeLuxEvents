@@ -131,7 +131,7 @@ export function PartnerCartDetailClient({ cart }: { cart: Cart }) {
         )}
       </div>
 
-      <div className="grid gap-6 rounded-2xl border border-[var(--champagne,#B8956B)]/25 bg-white/50 p-6 sm:grid-cols-2">
+      <div className="grid gap-6 rounded-2xl border border-[var(--champagne,#B8956B)]/25 bg-card p-6 sm:grid-cols-2">
         <div className="space-y-2">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
             Client pays you (retail)
@@ -193,8 +193,8 @@ export function PartnerCartDetailClient({ cart }: { cart: Cart }) {
       )}
 
       {canSettle && clientSecret && stripePromise && (
-        <div className="space-y-4 rounded-2xl border bg-white p-6">
-          <h3 className="font-serif text-xl font-light">Settle with PrimeLux</h3>
+        <div className="space-y-4 rounded-2xl border border-border bg-card p-6">
+          <h3 className="font-serif text-xl font-light text-foreground">Settle with PrimeLux</h3>
           {settling ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" /> Creating order…

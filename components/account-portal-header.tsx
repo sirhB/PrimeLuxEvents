@@ -54,8 +54,8 @@ export function AccountPortalHeader({
         </div>
 
         {upcomingOrderDate ? (
-          <div className="rounded-2xl border border-[var(--champagne,#B8956B)]/20 bg-white/70 px-4 py-3 text-sm shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="rounded-2xl border border-[var(--champagne,#B8956B)]/30 bg-white/90 px-4 py-3 text-sm shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--ink,#121110)]/55">
               Next delivery
             </p>
             <p className="font-medium text-[var(--ink,#121110)]">

@@ -7,8 +7,8 @@ import { formatCurrency } from '@/lib/utils'
 import { ArrowRight, Check, Star, Sparkles } from 'lucide-react'
 
 export const metadata = {
-    title: 'Luxury Event Packages | PrimeLux Events',
-    description: 'Explore our curated event packages featuring premium rentals, decor, and exclusive savings.',
+    title: 'Event Packages | PrimeLux Events',
+    description: 'Ready-made rental packages that bundle popular pieces and save planning time.',
 }
 
 export default async function PackagesPage() {
@@ -30,7 +30,7 @@ export default async function PackagesPage() {
                 <div className="max-w-4xl mx-auto text-center space-y-8">
                     <div className="flex items-center justify-center gap-3">
                         <span className="w-12 h-px bg-gold/30" />
-                        <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Curated Intelligence</span>
+                        <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Packages</span>
                         <span className="w-12 h-px bg-gold/30" />
                     </div>
 
@@ -40,7 +40,7 @@ export default async function PackagesPage() {
                     </h1>
 
                     <p className="text-xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
-                        Simplify your planning with our thoughtfully designed collections, offering premium style at exceptional value.
+                        Pre-built bundles of popular rentals so you can plan faster and stay on budget.
                     </p>
                 </div>
             </section>

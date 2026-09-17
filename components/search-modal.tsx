@@ -196,7 +196,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                                                 </h4>
                                                                 <div className="flex items-center gap-3">
                                                                     <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-500">
-                                                                        {(Array.isArray(product.categories) ? product.categories[0]?.name : product.categories?.name) || "Curated"}
+                                                                        {(Array.isArray(product.categories) ? product.categories[0]?.name : product.categories?.name) || "Category"}
                                                                     </span>
                                                                     <span className="w-1 h-1 rounded-full bg-white/10" />
                                                                     <span className="text-sm font-serif text-gold">

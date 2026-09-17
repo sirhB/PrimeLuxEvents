@@ -233,7 +233,7 @@ export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
                                             "cursor-pointer group relative rounded-xl border-2 overflow-hidden transition-all duration-300",
                                             isSelected
                                                 ? "border-gold bg-gold/5 shadow-lg shadow-gold/10"
-                                                : "border-transparent bg-white hover:border-gold/30 hover:shadow-md"
+                                                : "border-border/20 bg-card hover:border-gold/30 hover:shadow-md"
                                         )}
                                     >
                                         <div className="flex h-full">
@@ -301,8 +301,8 @@ export default function PackageConfigurator({ pkg }: PackageConfiguratorProps) {
             {/* Right Column: Summary Sticky */}
             <div className="lg:col-span-1">
                 <div className="sticky top-24 space-y-6">
-                    <Card className="p-6 border-gold/20 bg-white/80 backdrop-blur-sm shadow-xl">
-                        <h3 className="font-serif text-xl mb-4">Package Summary</h3>
+                    <Card className="p-6 border-gold/20 bg-card/90 text-card-foreground backdrop-blur-sm shadow-xl">
+                        <h3 className="font-serif text-xl mb-4 text-foreground">Package Summary</h3>
 
                         <div className="space-y-4 mb-6">
                             {pkg.groups.map((group, idx) => {

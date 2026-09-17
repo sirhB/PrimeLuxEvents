@@ -102,7 +102,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                             className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-gold/10 border border-gold/20 text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-12"
                         >
                             <Sparkles className="h-3 w-3" />
-                            Premium Experience
+                            How it works
                         </motion.div>
 
                         <div className="relative mb-8">

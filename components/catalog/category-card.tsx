@@ -18,7 +18,7 @@ export function CategoryCard({ name, imageUrl, isSelected, onClick, productCount
         <motion.button
             onClick={onClick}
             className={cn(
-                "relative group overflow-hidden rounded-2xl w-full text-left border border-border/5 transition-all duration-500 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)]",
+                "relative group overflow-hidden rounded-2xl w-full text-left border border-border/10 transition-all duration-500 bg-card text-card-foreground shadow-[0_10px_30px_rgba(0,0,0,0.25)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.35)]",
                 isSelected ? "border-gold ring-4 ring-gold/10 shadow-xl shadow-gold/5" : "hover:border-gold/20"
             )}
             whileHover={{ y: -10 }}
@@ -34,9 +34,9 @@ export function CategoryCard({ name, imageUrl, isSelected, onClick, productCount
                         className="object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
                     />
                 ) : (
-                    <div className="absolute inset-0 bg-neutral-50 flex items-center justify-center">
-                        <div className="text-center text-neutral-300">
-                            <div className="w-12 h-12 mx-auto mb-2 opacity-30">
+                    <div className="absolute inset-0 bg-[var(--surface-muted)] flex items-center justify-center">
+                        <div className="text-center text-muted-foreground">
+                            <div className="w-12 h-12 mx-auto mb-2 opacity-40">
                                 <svg className="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zM4 7v10h16V7H4zm8 2l5 4H7l5-4z" />
                                 </svg>
@@ -70,14 +70,16 @@ export function CategoryCard({ name, imageUrl, isSelected, onClick, productCount
                             {name}
                         </h3>
                         {productCount && (
-                            <p className="text-xs text-muted-foreground/60 mt-1 uppercase tracking-[0.15em] font-medium">
-                                {productCount} premium {productCount === 1 ? 'piece' : 'pieces'}
+                            <p className="text-xs text-muted-foreground mt-1 uppercase tracking-[0.15em] font-medium">
+                                {productCount} {productCount === 1 ? 'item' : 'items'}
                             </p>
                         )}
                     </div>
                     <div className={cn(
-                        "h-10 w-10 rounded-full border border-border/10 flex items-center justify-center transition-all duration-500",
-                        isSelected ? "bg-gold border-gold text-black" : "bg-white group-hover:bg-gold group-hover:border-gold group-hover:text-black"
+                        "h-10 w-10 rounded-full border flex items-center justify-center transition-all duration-500",
+                        isSelected
+                            ? "bg-gold border-gold text-black"
+                            : "bg-[var(--surface-muted)] border-border text-foreground group-hover:bg-gold group-hover:border-gold group-hover:text-black"
                     )}>
                         <ArrowRight className={cn(
                             "h-4 w-4 transition-transform duration-500",

@@ -6,27 +6,27 @@ import { motion } from "framer-motion"
 const defaultValues = [
   {
     icon: Diamond,
-    title: "Curated Excellence",
+    title: "Thoughtful inventory",
     description:
-      "Every piece in our collection is hand-selected for its craftsmanship, aesthetic appeal, and ability to transform a space.",
+      "Chairs, tables, lighting, and more—chosen to mix well together and look good in photos.",
   },
   {
     icon: Award,
-    title: "Uncompromising Quality",
+    title: "Cleaned and checked",
     description:
-      "We maintain our inventory to the highest standards. Each item is inspected and perfected before it arrives at your event.",
+      "We inspect and clean each item after every event before it goes out again.",
   },
   {
     icon: Clock,
-    title: "Seamless Logistics",
+    title: "Delivery and pickup",
     description:
-      "Our white-glove delivery team handles every detail of transport and setup, ensuring a stress-free experience.",
+      "We bring items to your venue and pick them up after. Setup help is available if you need it.",
   },
   {
     icon: HeartHandshake,
-    title: "Personalized Service",
+    title: "Real human help",
     description:
-      "We believe in building relationships. Our dedicated consultants work closely with you to bring your unique vision to life.",
+      "Questions about sizing or layout? Message us—we will walk you through it.",
   },
 ]
 
@@ -40,8 +40,8 @@ interface BrandValuesSectionProps {
 }
 
 export function BrandValuesSection({
-  title = "The PrimeLux Standard",
-  description = "We don't just rent furniture; we curate experiences. Our commitment to excellence sets the foundation for unforgettable events.",
+  title = "Why people book with us",
+  description = "We rent the furniture and handle the logistics so planning your event feels more manageable.",
   items,
 }: BrandValuesSectionProps) {
   const displayValues = items

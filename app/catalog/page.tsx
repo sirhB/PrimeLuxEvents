@@ -7,7 +7,7 @@ export const revalidate = 0 // avoid serving a stale empty catalog during launch
 
 export const metadata: Metadata = {
   title: 'Catalog',
-  description: 'Browse our complete collection of luxury event rentals.',
+  description: 'Browse furniture, lighting, tents, and decor for your event.',
 }
 
 export default async function CatalogPage() {
