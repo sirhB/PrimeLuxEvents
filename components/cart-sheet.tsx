@@ -72,14 +72,12 @@ export function CartSheet() {
           <span className="sr-only">Cart</span>
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md flex flex-col h-full bg-[#1A1A1A] border-l border-white/5 p-0 overflow-hidden text-white">
-        <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
-
-        <SheetHeader className="px-8 pt-10 pb-6 border-b border-white/5 bg-white/5 backdrop-blur-xl relative z-10">
+      <SheetContent className="w-full sm:max-w-md flex flex-col h-full bg-[var(--surface)] border-l border-border p-0 overflow-hidden text-foreground">
+        <SheetHeader className="px-8 pt-10 pb-6 border-b border-border bg-[var(--surface-elevated)] relative z-10">
           <div className="flex items-center justify-between mb-2">
-            <SheetTitle className="font-serif text-3xl font-light tracking-tight text-white">Your Selection</SheetTitle>
+            <SheetTitle className="font-serif text-3xl font-light tracking-tight text-foreground">Your Selection</SheetTitle>
           </div>
-          <SheetDescription className="text-sm font-light text-gray-400">
+          <SheetDescription className="text-sm font-light text-muted-foreground">
             Review your curated items for your upcoming event.
           </SheetDescription>
         </SheetHeader>
@@ -92,12 +90,12 @@ export function CartSheet() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col items-center justify-center h-full text-center space-y-8"
               >
-                <div className="h-24 w-24 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                <div className="h-24 w-24 rounded-[var(--radius-cta)] bg-white/5 flex items-center justify-center border border-white/10">
                   <ShoppingBag className="h-10 w-10 text-gold/20" />
                 </div>
                 <div className="space-y-3">
-                  <p className="font-serif text-xl font-light text-white">Your collection is empty</p>
-                  <p className="text-sm text-gray-500 font-light max-w-[240px] mx-auto leading-relaxed">
+                  <p className="font-serif text-xl font-light text-foreground">Your collection is empty</p>
+                  <p className="text-sm text-muted-foreground font-light max-w-[240px] mx-auto leading-relaxed">
                     Browse our catalog to discover premium pieces for your next extraordinary event.
                   </p>
                 </div>
@@ -105,7 +103,7 @@ export function CartSheet() {
                   variant="ghost"
                   size="lg"
                   onClick={() => setIsOpen(false)}
-                  className="rounded-full px-10 border border-gold/30 hover:bg-gold hover:text-black transition-all duration-500 text-gold font-bold uppercase tracking-[0.2em] text-[10px]"
+                  className="rounded-[var(--radius-cta)] px-10 border border-gold/30 hover:bg-gold hover:text-black transition-all duration-500 text-gold font-bold uppercase tracking-[0.2em] text-[10px]"
                 >
                   Explore Catalog
                 </Button>
@@ -127,7 +125,7 @@ export function CartSheet() {
                         exit={{ opacity: 0, x: -20 }}
                         className="flex gap-6 group"
                       >
-                        <div className="h-28 w-24 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5 bg-white/5 relative">
+                        <div className="h-28 w-24 rounded-2xl overflow-hidden flex-shrink-0 border border-border bg-white/5 relative">
                           <div className="absolute inset-0 bg-gold/5 flex items-center justify-center">
                             <span className="text-[9px] text-gold font-bold uppercase tracking-widest">Package</span>
                           </div>
@@ -136,7 +134,7 @@ export function CartSheet() {
                           <div className="space-y-1">
                             <div className="flex justify-between items-start gap-4">
                               <div className="flex-1">
-                                <h3 className="font-serif text-lg font-light text-white leading-tight group-hover:text-gold transition-colors">{name}</h3>
+                                <h3 className="font-serif text-lg font-light text-foreground leading-tight group-hover:text-gold transition-colors">{name}</h3>
                               </div>
                               <button
                                 onClick={() => removeItem(item.id)}
@@ -152,12 +150,12 @@ export function CartSheet() {
                             {item.packageData.selectionsSummary && (
                               <div className="flex flex-wrap gap-1.5 mt-2">
                                 {item.packageData.selectionsSummary.flatMap((g: any) => g.items).slice(0, 4).map((sel: any, sIdx: number) => (
-                                  <span key={sIdx} className="text-[9px] text-gray-400 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">
+                                  <span key={sIdx} className="text-[9px] text-muted-foreground bg-white/5 px-2 py-0.5 rounded-[var(--radius-cta)] border border-border">
                                     {sel.name}
                                   </span>
                                 ))}
                                 {item.packageData.selectionsSummary.flatMap((g: any) => g.items).length > 4 && (
-                                  <span className="text-[9px] text-gray-500 px-1 italic">
+                                  <span className="text-[9px] text-muted-foreground px-1 italic">
                                     +{item.packageData.selectionsSummary.flatMap((g: any) => g.items).length - 4} more
                                   </span>
                                 )}
@@ -166,18 +164,18 @@ export function CartSheet() {
                           </div>
 
                           <div className="flex items-center justify-between mt-4">
-                            <div className="flex items-center gap-4 bg-white/5 rounded-full px-3 py-1 border border-white/5">
+                            <div className="flex items-center gap-4 bg-white/5 rounded-[var(--radius-cta)] px-3 py-1 border border-border">
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                 disabled={item.quantity <= 1}
-                                className="text-gray-500 hover:text-gold disabled:opacity-20 transition-colors"
+                                className="text-muted-foreground hover:text-gold disabled:opacity-20 transition-colors"
                               >
                                 <Minus className="h-3 w-3" />
                               </button>
-                              <span className="text-xs font-bold w-4 text-center text-white">{item.quantity}</span>
+                              <span className="text-xs font-bold w-4 text-center text-foreground">{item.quantity}</span>
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="text-gray-500 hover:text-gold transition-colors"
+                                className="text-muted-foreground hover:text-gold transition-colors"
                               >
                                 <Plus className="h-3 w-3" />
                               </button>
@@ -208,7 +206,7 @@ export function CartSheet() {
                       exit={{ opacity: 0, x: -20 }}
                       className="flex gap-6 group"
                     >
-                      <div className="h-28 w-24 rounded-2xl overflow-hidden flex-shrink-0 border border-white/5 bg-white/5">
+                      <div className="h-28 w-24 rounded-2xl overflow-hidden flex-shrink-0 border border-border bg-white/5">
                         <Link href={`/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`} onClick={() => setIsOpen(false)}>
                           <img
                             src={product.image_url || "/placeholder.svg"}
@@ -221,7 +219,7 @@ export function CartSheet() {
                         <div className="space-y-1">
                           <div className="flex justify-between items-start gap-4">
                             <Link href={`/catalog/${product.categories?.slug || 'uncategorized'}/${product.slug || product.id}`} onClick={() => setIsOpen(false)} className="flex-1">
-                              <h3 className="font-serif text-lg font-light text-white group-hover:text-gold transition-colors leading-tight">{product.name}</h3>
+                              <h3 className="font-serif text-lg font-light text-foreground group-hover:text-gold transition-colors leading-tight">{product.name}</h3>
                             </Link>
                             <button
                               onClick={() => removeItem(item.id)}
@@ -236,7 +234,7 @@ export function CartSheet() {
                               {Object.entries(item.modifiers).map(([key, option]: [string, any]) => (
                                 <div key={key} className="flex items-center gap-1">
                                   <span className="text-gold/40">{key}:</span>
-                                  <span className="text-gray-500">{option.label || option.name || option}</span>
+                                  <span className="text-muted-foreground">{option.label || option.name || option}</span>
                                 </div>
                               ))}
                             </div>
@@ -244,18 +242,18 @@ export function CartSheet() {
                         </div>
 
                         <div className="flex items-center justify-between mt-4">
-                          <div className="flex items-center gap-4 bg-white/5 rounded-full px-3 py-1 border border-white/5">
+                          <div className="flex items-center gap-4 bg-white/5 rounded-[var(--radius-cta)] px-3 py-1 border border-border">
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
                               disabled={item.quantity <= 1}
-                              className="text-gray-500 hover:text-gold disabled:opacity-20 transition-colors"
+                              className="text-muted-foreground hover:text-gold disabled:opacity-20 transition-colors"
                             >
                               <Minus className="h-3 w-3" />
                             </button>
-                            <span className="text-xs font-bold w-4 text-center text-white">{item.quantity}</span>
+                            <span className="text-xs font-bold w-4 text-center text-foreground">{item.quantity}</span>
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="text-gray-500 hover:text-gold transition-colors"
+                              className="text-muted-foreground hover:text-gold transition-colors"
                             >
                               <Plus className="h-3 w-3" />
                             </button>
@@ -272,10 +270,10 @@ export function CartSheet() {
         </div>
 
         {items.length > 0 && (
-          <div className="px-8 py-10 border-t border-white/5 bg-white/5 backdrop-blur-xl space-y-8 relative z-10">
+          <div className="px-8 py-10 border-t border-border bg-white/5 backdrop-blur-xl space-y-8 relative z-10">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500">Subtotal</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-muted-foreground">Subtotal</span>
                 <span className="font-serif text-3xl font-light text-gold">
                   {formatCurrency(items.reduce((acc, item) => {
                     if (item.packageId && item.packageData) {
@@ -324,8 +322,8 @@ export function CartSheet() {
                 }
 
                 return (
-                  <p className="text-[10px] text-gray-500 font-light leading-relaxed uppercase tracking-[0.2em] text-center">
-                    Final pricing will be calculated at checkout.
+                  <p className="text-[10px] text-muted-foreground font-light leading-relaxed uppercase tracking-[0.15em] text-center">
+                    Next: optional add-ons → event details → secure pay
                   </p>
                 )
               })()}
@@ -347,7 +345,7 @@ export function CartSheet() {
               }, 0) < 15000}
             />
             <Button
-              className="w-full h-16 bg-gold text-black rounded-full text-[11px] font-bold uppercase tracking-[0.3em] hover:bg-white transition-all duration-500 group shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gold"
+              className="lux-cta w-full !h-14 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => {
                 const subtotal = items.reduce((acc, item) => {
                   if (item.packageId && item.packageData) {
@@ -382,7 +380,7 @@ export function CartSheet() {
                 return acc
               }, 0) < 15000}
             >
-              Secure Checkout <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              Continue to checkout <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
             </div>
           </div>

@@ -20,7 +20,7 @@ export default async function PackagesPage() {
         .order('price', { ascending: true })
 
     return (
-        <main className="min-h-screen bg-[#1A1A1A] text-white selection:bg-gold selection:text-black pt-32 pb-24 md:pt-48 md:pb-40 relative overflow-hidden">
+        <main className="min-h-screen bg-background text-white selection:bg-gold selection:text-black pt-32 pb-24 md:pt-48 md:pb-40 relative overflow-hidden">
             {/* Background elements */}
             <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gold/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
             <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
@@ -52,7 +52,7 @@ export default async function PackagesPage() {
                         <Link
                             href={`/packages/${pkg.id}`}
                             key={pkg.id}
-                            className="group relative flex flex-col h-full rounded-3xl md:rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#1E1E1E]/50 backdrop-blur-sm transition-all duration-700 hover:border-gold/30 hover:-translate-y-2"
+                            className="group relative flex flex-col h-full rounded-3xl md:rounded-[2.5rem] overflow-hidden border border-white/5 bg-[var(--surface-elevated)]/50 backdrop-blur-sm transition-all duration-700 hover:border-gold/30 hover:-translate-y-2"
                         >
                             {/* Image Container */}
                             <div className="relative aspect-[4/5] overflow-hidden">
@@ -82,7 +82,7 @@ export default async function PackagesPage() {
                                         </div>
                                     )}
                                 </div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] via-transparent to-transparent opacity-60" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)] via-transparent to-transparent opacity-60" />
                             </div>
 
                             {/* Content */}

@@ -172,7 +172,7 @@ export function ProductGallery({ images, productName, className, selectedImage: 
                                     setIsAutoPlaying(false)
                                 }}
                                 className={cn(
-                                    "relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden transition-all duration-500 bg-gradient-to-br from-[#FDFBF7] to-[#F8F6F0]",
+                                    "relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden transition-all duration-500 bg-gradient-to-br from-[var(--surface-elevated)] to-[#F8F6F0]",
                                     selectedImage === index
                                         ? "ring-2 ring-gold shadow-[0_8px_30px_rgba(212,175,55,0.25)] scale-105"
                                         : "ring-1 ring-white/10 opacity-50 hover:opacity-100 hover:ring-gold/30 hover:scale-105"

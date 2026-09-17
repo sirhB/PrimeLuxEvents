@@ -10,6 +10,7 @@ import { useRef } from "react"
 import { EditableContent } from "@/components/admin/editable-content"
 import { EditableList } from "@/components/admin/editable-list"
 import { cn } from "@/lib/utils"
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion"
 
 interface HowItWorksPageContentProps {
     content: any
@@ -17,7 +18,36 @@ interface HowItWorksPageContentProps {
 }
 
 export function HowItWorksPageContent({ content, isEditing = false }: HowItWorksPageContentProps) {
-    const steps = content['howitworks.steps.list'] || []
+    const reduceMotion = usePrefersReducedMotion()
+    const defaultSteps = [
+        {
+            title: 'Browse the collection',
+            description: 'Explore furniture, décor, lighting, and packages from our Shelton showroom. Filter by category and check what fits your event.',
+            details: ['Real-time catalog', 'Packages & à la carte', 'CT · RI · MA delivery'],
+        },
+        {
+            title: 'Build your cart',
+            description: 'Add pieces with quantities for your guest count. Optional add-ons appear at checkout so you can finish the look in one flow.',
+            details: ['Instant line totals', 'Event date in cart', 'Easy edits'],
+        },
+        {
+            title: 'Event & delivery details',
+            description: 'Tell us venue address, delivery window, and pickup. We calculate delivery from our Shelton warehouse.',
+            details: ['Venue logistics', 'Pickup scheduling', 'Transparent fees'],
+        },
+        {
+            title: 'Sign & reserve',
+            description: 'Review the rental agreement, sign digitally, and pay a deposit or full balance securely with Stripe.',
+            details: ['Digital signature', 'Deposit or pay in full', 'Confirmation email'],
+        },
+        {
+            title: 'We deliver — you celebrate',
+            description: 'Our team delivers and picks up on schedule. Need the event hall or a showroom visit? Contact us anytime.',
+            details: ['On-time logistics', 'Showroom at 2 Research Dr', 'Dedicated support'],
+        },
+    ]
+
+    const steps = (content['howitworks.steps.list']?.length ? content['howitworks.steps.list'] : defaultSteps)
     const faqs = content['howitworks.faq.list'] || []
 
     // Hardcoded images for a premium feel as per the new design
@@ -36,13 +66,13 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
     })
 
     return (
-        <div ref={containerRef} className="bg-[#1A1A1A] text-white selection:bg-gold selection:text-black">
+        <div ref={containerRef} className="bg-background text-white selection:bg-gold selection:text-black">
             {/* Hero Section */}
             <section className="relative h-screen flex items-center justify-center overflow-hidden">
                 {/* Background Elements */}
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-10 mix-blend-overlay" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-[#1A1A1A]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-[var(--ink)]" />
                     <motion.div
                         initial={{ opacity: 0, scale: 1.1 }}
                         animate={{ opacity: 0.3, scale: 1 }}
@@ -60,9 +90,9 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
 
                 <div className="container mx-auto relative z-10 px-4 md:px-6 text-center">
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={reduceMotion ? false : { opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: "easeOut" }}
+                        transition={{ duration: reduceMotion ? 0 : 1, ease: "easeOut" }}
                         className="max-w-5xl mx-auto"
                     >
                         <motion.div
@@ -172,7 +202,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
             </section>
 
             {/* Concierge Service */}
-            <section className="py-24 md:py-48 bg-[#151515] relative overflow-hidden border-t border-white/5">
+            <section className="py-24 md:py-48 bg-[var(--surface)] relative overflow-hidden border-t border-white/5">
                 <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
                     <div className="grid lg:grid-cols-2 gap-24 items-center">
@@ -281,7 +311,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
             </section>
 
             {/* FAQ Section */}
-            <section className="py-24 md:py-48 bg-[#1A1A1A] relative overflow-hidden">
+            <section className="py-24 md:py-48 bg-background relative overflow-hidden">
                 <div className="container px-4 md:px-6 max-w-4xl mx-auto relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -387,7 +417,7 @@ function StepCard({ step, index }: { step: any, index: number }) {
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-700" />
 
                 {/* Step Number Badge */}
-                <div className="absolute top-8 left-8 w-16 h-16 rounded-full bg-[#1A1A1A]/80 backdrop-blur-md border border-white/10 flex items-center justify-center text-gold font-serif text-2xl z-20">
+                <div className="absolute top-8 left-8 w-16 h-16 rounded-full bg-background/80 backdrop-blur-md border border-white/10 flex items-center justify-center text-gold font-serif text-2xl z-20">
                     0{index + 1}
                 </div>
             </motion.div>

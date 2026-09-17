@@ -127,7 +127,7 @@ function OrderDetailContent() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+            <div className="min-h-screen flex items-center justify-center bg-[var(--surface-elevated)]">
                 <Loader2 className="h-12 w-12 animate-spin text-gold" />
             </div>
         )
@@ -135,7 +135,7 @@ function OrderDetailContent() {
 
     if (error || !order) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-[#FDFBF7] p-4 text-center">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--surface-elevated)] p-4 text-center">
                 <div className="h-20 w-20 rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-6">
                     <AlertCircle className="h-10 w-10" />
                 </div>
@@ -178,7 +178,7 @@ function OrderDetailContent() {
     }
 
     return (
-        <div className="min-h-screen bg-[#FDFBF7] py-24 md:py-32">
+        <div className="min-h-screen bg-[var(--surface-elevated)] py-24 md:py-32">
             <div className="container max-w-5xl mx-auto px-4">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
@@ -518,7 +518,7 @@ export default function OrderDetailPage() {
     return (
         <Suspense
             fallback={
-                <div className="min-h-screen flex items-center justify-center bg-[#FDFBF7]">
+                <div className="min-h-screen flex items-center justify-center bg-[var(--surface-elevated)]">
                     <Loader2 className="h-12 w-12 animate-spin text-gold" />
                 </div>
             }

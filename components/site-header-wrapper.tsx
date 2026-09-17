@@ -1,5 +1,6 @@
 import { getGlobalSettings } from '@/lib/content'
 import { SiteHeader } from '@/components/site-header'
+import { COMPANY } from '@/lib/company'
 
 export async function SiteHeaderWrapper() {
   const settings = await getGlobalSettings()
@@ -7,8 +8,8 @@ export async function SiteHeaderWrapper() {
   return (
     <SiteHeader
       initialSettings={{
-        company_email: settings.company_email || 'info@primeluxevents.com',
-        company_phone: settings.company_phone || '(555) 123-4567',
+        company_email: settings.company_email || COMPANY.email,
+        company_phone: settings.company_phone || COMPANY.phone,
       }}
     />
   )

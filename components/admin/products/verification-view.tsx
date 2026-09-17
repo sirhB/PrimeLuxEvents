@@ -281,7 +281,7 @@ export function VerificationView({ products: initialProducts, categories }: Veri
                                                 <SelectTrigger className="w-full bg-white/5 border-none rounded-xl h-12 text-sm">
                                                     <SelectValue placeholder="Select a category" />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-xl">
+                                                <SelectContent className="bg-[var(--dashboard-card)] border-white/10 text-white rounded-xl">
                                                     {categories.map((category) => (
                                                         <SelectItem key={category.id} value={category.id} className="focus:bg-[var(--dashboard-accent-gold)] focus:text-black">
                                                             {category.name}
@@ -349,7 +349,7 @@ export function VerificationView({ products: initialProducts, categories }: Veri
                                                     <Trash2 className="h-6 w-6" />
                                                 </Button>
                                             </AlertDialogTrigger>
-                                            <AlertDialogContent className="bg-[#1A1A1A] border-white/10 text-white">
+                                            <AlertDialogContent className="bg-[var(--dashboard-card)] border-white/10 text-white">
                                                 <AlertDialogHeader>
                                                     <AlertDialogTitle>Delete Product?</AlertDialogTitle>
                                                     <AlertDialogDescription className="text-[var(--dashboard-text-muted)]">

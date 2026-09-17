@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { Menu, Search, X, Phone, Mail, Instagram, Facebook } from "lucide-react"
+import { Menu, Search, X, Phone, Mail, Instagram } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -12,6 +12,7 @@ import { SearchModal } from "@/components/search-modal"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { PwaBackButton } from "@/components/pwa/pwa-back-button"
+import { COMPANY } from "@/lib/company"
 
 interface SiteHeaderProps {
   initialSettings?: {
@@ -22,8 +23,8 @@ interface SiteHeaderProps {
 
 export function SiteHeader({
   initialSettings = {
-    company_email: "info@primeluxevents.com",
-    company_phone: "(555) 123-4567",
+    company_email: COMPANY.email,
+    company_phone: COMPANY.phone,
   },
 }: SiteHeaderProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -82,17 +83,16 @@ export function SiteHeader({
 
   return (
     <>
-      {/* Top Bar */}
-      <div className="bg-[#1A1A1A] text-white py-2 px-4 text-[10px] font-bold uppercase tracking-[0.2em] relative z-50">
+      <div className="bg-[var(--surface)] text-foreground py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.2em] relative z-50 border-b border-border">
         <div className="container mx-auto flex justify-between items-center">
-          <p className="hidden md:block opacity-70">
-            Serving the Tri-State Area & New England
+          <p className="hidden md:block text-muted-foreground">
+            Serving {COMPANY.serviceArea}
           </p>
             <div className="flex items-center gap-6 w-full md:w-auto justify-center md:justify-end">
             <a href={`tel:${settings.company_phone.replace(/\D/g, '')}`} className="hover:text-gold transition-colors flex items-center gap-2">
               <Phone className="h-3 w-3" /> {settings.company_phone}
             </a>
-            <a href={`mailto:${settings.company_email}`} className="hover:text-gold transition-colors flex items-center gap-2">
+            <a href={`mailto:${settings.company_email}`} className="hover:text-gold transition-colors flex items-center gap-2 hidden sm:flex">
               <Mail className="h-3 w-3" /> {settings.company_email}
             </a>
             <Link href="/account" className="hover:text-gold transition-colors hidden sm:inline">
@@ -105,8 +105,8 @@ export function SiteHeader({
       <header
         ref={headerRef}
         className={cn(
-          "sticky top-0 z-50 w-full transition-all duration-500 bg-[#1A1A1A]/90 backdrop-blur-xl border-b border-white/5 shadow-2xl",
-          scrolled ? "py-3" : "py-6"
+          "sticky top-0 z-50 w-full transition-all duration-500 bg-[var(--ink)]/90 backdrop-blur-xl border-b border-border",
+          scrolled ? "py-3" : "py-5"
         )}
       >
 
@@ -119,17 +119,19 @@ export function SiteHeader({
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Open menu"
                   className={cn(
                     "hover:bg-gold/10 transition-colors",
                     headerTheme === 'dark' ? "text-white" : "text-black"
                   )}
                 >
                   <Menu className="h-6 w-6" />
+                  <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-full sm:w-[400px] bg-[#1A1A1A] border-r border-white/5 p-0 text-white">
+              <SheetContent side="left" className="w-full sm:w-[400px] bg-[var(--surface)] border-r border-border p-0 text-foreground">
                 <div className="flex flex-col h-full">
-                  <div className="p-8 border-b border-white/5">
+                  <div className="p-8 border-b border-border">
                     <Link href="/" onClick={() => setIsOpen(false)} className="font-serif text-2xl font-light tracking-tighter">
                       PrimeLux<span className="text-gold">.</span>
                     </Link>
@@ -155,14 +157,21 @@ export function SiteHeader({
                     <Link
                       href="/account"
                       onClick={() => setIsOpen(false)}
-                      className="text-2xl font-serif font-light text-white/70"
+                      className="text-2xl font-serif font-light text-muted-foreground"
                     >
                       Client Portal
                     </Link>
                   </nav>
-                  <div className="p-8 border-t border-white/5 flex gap-6">
-                    <Instagram className="h-5 w-5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer" />
-                    <Facebook className="h-5 w-5 opacity-50 hover:opacity-100 transition-opacity cursor-pointer" />
+                  <div className="p-8 border-t border-border">
+                    <a
+                      href="https://www.instagram.com/primeluxevents/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex text-muted-foreground hover:text-gold transition-colors"
+                      aria-label="Instagram"
+                    >
+                      <Instagram className="h-5 w-5" />
+                    </a>
                   </div>
                 </div>
               </SheetContent>
@@ -221,12 +230,7 @@ export function SiteHeader({
 
             <Link
               href="/contact"
-              className={cn(
-                "hidden md:block text-[11px] font-bold uppercase tracking-[0.2em] px-6 py-3 rounded-full transition-all duration-500 hover:scale-105",
-                headerTheme === 'dark'
-                  ? "bg-gold text-black hover:bg-white"
-                  : "bg-black text-white hover:bg-gold hover:text-black"
-              )}
+              className="hidden md:inline-flex lux-cta !min-h-10 !px-5 text-[10px]"
             >
               Inquire
             </Link>

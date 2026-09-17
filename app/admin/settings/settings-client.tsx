@@ -12,6 +12,7 @@ import { getDistanceBetweenAddresses } from '@/lib/geocoding'
 import Link from 'next/link'
 import { AdminPage } from '@/components/admin/page-shell'
 import { AdminPageHeader } from '@/components/admin/page-shell'
+import { COMPANY } from '@/lib/company'
 
 export default function SettingsClient() {
     const [isLoading, setIsLoading] = useState(true)
@@ -47,9 +48,9 @@ export default function SettingsClient() {
                     delivery_base_fee: (parseInt(settingsMap.delivery_base_fee || '5000') / 100).toString(),
                     delivery_per_mile_rate: (parseInt(settingsMap.delivery_per_mile_rate || '150') / 100).toString(),
                     warehouse_address: settingsMap.warehouse_address || '',
-                    company_address: settingsMap.company_address || '123 Luxury Lane, Suite 100, Beverly Hills, CA 90210',
-                    company_email: settingsMap.company_email || 'info@primeluxevents.com',
-                    company_phone: settingsMap.company_phone || '(555) 123-4567',
+                    company_address: settingsMap.company_address || COMPANY.address,
+                    company_email: settingsMap.company_email || COMPANY.email,
+                    company_phone: settingsMap.company_phone || COMPANY.phone,
                 })
             }
 
@@ -290,7 +291,7 @@ export default function SettingsClient() {
                                     value={settings.company_email}
                                     onChange={(e) => setSettings({ ...settings, company_email: e.target.value })}
                                     className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
-                                    placeholder="info@primeluxevents.com"
+                                    placeholder={COMPANY.email}
                                 />
                             </div>
                             <div className="space-y-3">
@@ -301,7 +302,7 @@ export default function SettingsClient() {
                                     value={settings.company_phone}
                                     onChange={(e) => setSettings({ ...settings, company_phone: e.target.value })}
                                     className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
-                                    placeholder="(555) 123-4567"
+                                    placeholder={COMPANY.phone}
                                 />
                             </div>
                         </div>
@@ -312,7 +313,7 @@ export default function SettingsClient() {
                                 value={settings.company_address}
                                 onChange={(e) => setSettings({ ...settings, company_address: e.target.value })}
                                 className="min-h-[100px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all resize-none"
-                                placeholder="123 Luxury Lane, Suite 100, Beverly Hills, CA 90210"
+                                placeholder={COMPANY.address}
                                 rows={3}
                             />
                         </div>
@@ -333,7 +334,7 @@ export default function SettingsClient() {
                                 value={settings.warehouse_address}
                                 onChange={(e) => setSettings({ ...settings, warehouse_address: e.target.value })}
                                 className="min-h-[100px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all resize-none"
-                                placeholder="123 Main St, New York, NY 10001"
+                                placeholder={COMPANY.warehouseAddress}
                                 rows={3}
                             />
                         </div>
@@ -354,7 +355,7 @@ export default function SettingsClient() {
                                 value={testAddress}
                                 onChange={(e) => setTestAddress(e.target.value)}
                                 className="min-h-[80px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all resize-none"
-                                placeholder="456 Park Ave, New York, NY 10022"
+                                placeholder="456 Park Ave, Bridgeport, CT 06604"
                                 rows={2}
                             />
                         </div>

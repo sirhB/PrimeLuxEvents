@@ -56,7 +56,7 @@ function SignupForm() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--linen,#F7F4EF)] px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--linen,var(--ink))] px-4">
       <Card className="w-full max-w-md border-border/60 bg-white/90 shadow-xl">
         <CardHeader className="space-y-2">
           <CardTitle className="font-serif text-3xl font-light tracking-tight">Create your portal</CardTitle>

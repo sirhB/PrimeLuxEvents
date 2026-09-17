@@ -111,7 +111,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                                 stiffness: 300,
                                 duration: 0.3
                             }}
-                            className="w-full max-w-2xl bg-[#1A1A1A] border border-white/5 rounded-2xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden pointer-events-auto flex flex-col max-h-[80vh] relative"
+                            className="w-full max-w-2xl bg-background border border-white/5 rounded-2xl shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden pointer-events-auto flex flex-col max-h-[80vh] relative"
                         >
                             <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 

@@ -25,11 +25,11 @@ export function JournalPageContent({ content, isEditing = false }: JournalPageCo
     const heroY = useTransform(scrollYProgress, [0, 1], [0, 100])
 
     return (
-        <div className="bg-[#1A1A1A] text-white selection:bg-gold selection:text-black">
+        <div className="bg-background text-white selection:bg-gold selection:text-black">
             {/* Hero Section */}
             <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#1A1A1A]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[var(--ink)]" />
                     <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-10 mix-blend-overlay" />
                     {posts.length > 0 && (
                         <Image
@@ -94,7 +94,7 @@ export function JournalPageContent({ content, isEditing = false }: JournalPageCo
             </section>
 
             {/* Posts Section */}
-            <section className="py-24 md:py-48 bg-[#1A1A1A]">
+            <section className="py-24 md:py-48 bg-background">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="space-y-32 md:space-y-64">
                         <EditableList
@@ -141,7 +141,7 @@ function JournalPostCard({ post, index }: { post: any, index: number }) {
         >
             {/* Image */}
             <div className={`lg:col-span-7 ${index % 2 === 1 ? 'lg:order-last' : ''}`}>
-                <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-[#1E1E1E] border border-white/5">
+                <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-[var(--surface-elevated)] border border-white/5">
                     <Image
                         src={post.image || "/images/journal-hero.png"}
                         alt={post.title}

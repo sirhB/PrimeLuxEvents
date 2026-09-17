@@ -117,7 +117,7 @@ export function ContactForm() {
         }
     }
 
-    const inputClasses = "bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-12 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light"
+    const inputClasses = "bg-transparent border-0 border-b border-white/20 rounded-none px-0 h-12 text-white focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-500 font-light"
     const labelClasses = "text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400"
 
     return (
@@ -136,7 +136,7 @@ export function ContactForm() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className={`p-6 rounded-2xl flex items-center gap-4 ${submitMessage.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-100' : 'bg-red-50 text-red-800 border border-red-100'}`}
+                        className={`p-6 rounded-md flex items-center gap-4 ${submitMessage.type === 'success' ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' : 'bg-red-500/10 text-red-300 border border-red-500/20'}`}
                     >
                         {submitMessage.type === 'success' ? <CheckCircle2 className="h-6 w-6 shrink-0" /> : <AlertCircle className="h-6 w-6 shrink-0" />}
                         <p className="text-sm font-medium">{submitMessage.text}</p>
@@ -150,7 +150,7 @@ export function ContactForm() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="p-6 rounded-2xl border border-red-100 bg-red-50 text-red-800 space-y-2"
+                        className="p-6 rounded-md border border-red-500/20 bg-red-500/10 text-red-300 space-y-2"
                     >
                         <div className="flex items-center gap-2 mb-2">
                             <AlertCircle className="h-4 w-4" />
@@ -183,7 +183,7 @@ export function ContactForm() {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="phone" className={labelClasses}>Phone Number *</Label>
-                    <Input id="phone" name="phone" placeholder="(555) 000-0000" type="tel" required className={inputClasses} />
+                    <Input id="phone" name="phone" placeholder="(203) 633-4744" type="tel" required className={inputClasses} />
                 </div>
             </div>
 
@@ -204,7 +204,7 @@ export function ContactForm() {
                     <SelectTrigger id="budget" className={inputClasses}>
                         <SelectValue placeholder="Select a budget range" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#FDFBF7] border-border/10">
+                    <SelectContent className="bg-[#1E1E1E] border-white/10 text-white">
                         <SelectItem value="under-1000">Under $1,000</SelectItem>
                         <SelectItem value="1000-5000">$1,000 - $5,000</SelectItem>
                         <SelectItem value="5000-10000">$5,000 - $10,000</SelectItem>
@@ -302,7 +302,7 @@ export function ContactForm() {
 
             <Button
                 type="submit"
-                className="w-full h-16 bg-[#1A1A1A] text-white rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-gold hover:text-black transition-all duration-500 group shadow-xl"
+                className="lux-cta w-full !h-14"
                 disabled={isSubmitting}
             >
                 {isSubmitting ? 'Sending Request...' : 'Send Consultation Request'}

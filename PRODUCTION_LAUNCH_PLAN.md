@@ -4,6 +4,8 @@ This plan covers launching **PrimeLux Events** (Next.js + Supabase + Stripe on V
 
 > **Implementation status (code):** Phase 0 hardening is in progress on branch `cursor/production-launch-plan-550f` — mock payments fail closed, Stripe webhook uses service role, checkout/consultation/signature writes go through service-role server actions, invite plaintext passwords removed, security headers added, CI workflow added, and migration `20260827_production_rls_hardening.sql` must be applied on Supabase before relying on the tightened RLS. **Database data safety follow-up:** apply `20260829_database_data_safety.sql` (staff-only ops RLS, signature/claim RPCs, staff-only user search, tighter GRANTs). Catalog reads use the anon key (no `cost_cents`); checkout amounts are server-authoritative; admin auth cache is HMAC-signed.
 
+> **Launch polish (branch `cursor/launch-polish-3635`):** Public identity defaults use Shelton CT (`2 Research Dr`, `(203) 633-4744`, `primeluxevents@gmail.com`, CT/RI/MA). Checkout no longer ships test customer data or mock place-order; payment intent must succeed before the Pay step. Terms/Privacy pages, sitemap/robots/OG, FAQ rental copy, hero brand, and checkout step workflow (skip empty add-ons, clickable completed steps) are in code. ESLint + single `package-lock.json`. **Ops still required before marketing launch** — see Phase 5 checklist below.
+
 **Stack assumptions**
 - App: Next.js 16 (App Router) on **Vercel**
 - Database / Auth / Storage: **Supabase** (PostgreSQL)
@@ -153,9 +155,9 @@ Add headers in `next.config.mjs` or Vercel config:
 ### 2.5 Build quality gates
 
 - [ ] Turn off `typescript.ignoreBuildErrors`
-- [ ] Add ESLint config so `npm run lint` is meaningful
-- [ ] Standardize on one lockfile (`package-lock.json` **or** `pnpm-lock.yaml`, not both)
-- [ ] Rename package from `my-v0-project` to `primelux-events`
+- [x] Add ESLint config so `npm run lint` is meaningful
+- [x] Standardize on one lockfile (`package-lock.json` **or** `pnpm-lock.yaml`, not both)
+- [x] Rename package from `my-v0-project` to `primelux-events`
 - [ ] Ensure `npm run build` succeeds cleanly in CI
 
 ---
@@ -209,8 +211,9 @@ Use the in-app launch readiness items (`readiness_items` on profiles) plus this 
 
 - [ ] Production product catalog complete (prices in cents, images in Storage, slugs unique)
 - [ ] Packages, modifiers, and inventory quantities verified
-- [ ] CMS pages: home, FAQ, rental agreement, contact — production copy (not placeholders)
-- [ ] Legal: Terms, Privacy Policy, rental agreement — reviewed by counsel as needed
+- [x] CMS pages: home, FAQ, rental agreement, contact — production copy (not placeholders) *(code fallbacks updated for Shelton rental house; confirm CMS overrides in prod)*
+- [x] Legal: Terms, Privacy Policy, rental agreement — *(Terms/Privacy pages shipped; counsel review still recommended)*
+- [x] Company settings defaults: `2 Research Dr, Shelton, CT 06484` · `(203) 633-4744` · `primeluxevents@gmail.com` · CT/RI/MA
 
 ### 4.2 Business configuration
 
@@ -240,15 +243,19 @@ Use the in-app launch readiness items (`readiness_items` on profiles) plus this 
 
 ---
 
-## Phase 5 — Go-live cutover
+## Phase 5 — Go-live cutover (ops owner checklist)
 
-1. **Freeze** non-critical merges to `main`.
-2. Confirm Production env vars (live Stripe + prod Supabase).
-3. Deploy latest `main` to Vercel Production.
-4. Run Phase 4.3 smoke tests against production (minimal live charge, then refund if policy allows).
-5. Submit sitemap in Search Console if SEO matters; confirm `robots.ts` / `sitemap` domain.
-6. Announce soft launch (limited traffic) → monitor errors/webhooks for 24–48 hours.
-7. Full launch marketing only after soft launch is clean.
+**Do these outside git before announcing launch:**
+
+1. [ ] **Rotate** any historically exposed Supabase/Stripe keys; set Vercel Production secrets.
+2. [ ] Apply all `supabase/migrations/` on production in order, including `20260827_production_rls_hardening.sql` and `20260829_database_data_safety.sql`.
+3. [ ] Seed production settings with Shelton address/phone/email; **do not** seed demo orders.
+4. [ ] Supabase Auth: Site URL `https://primeluxevents.com`; redirect allow-list (`/auth/callback`, `/login`, `/invite/*`); email confirmation on; no auto staff roles.
+5. [ ] Vercel Production = live Stripe + prod Supabase; Preview = test Stripe + staging DB when available.
+6. [ ] Stripe live webhook: `https://primeluxevents.com/api/stripe/webhook` (`payment_intent.succeeded`).
+7. [ ] DNS/TLS for apex + www → Vercel; confirm HSTS.
+8. [ ] Soft-launch smoke: catalog → checkout deposit → webhook → `/account` → admin RBAC.
+9. [ ] Confirm backups/PITR and rollback (previous Vercel deployment).
 
 **Rollback:** Instant previous deployment in Vercel. If a bad migration shipped, restore DB from backup on staging first; do not “fix forward” blindly on prod without a tested migration.
 

@@ -52,7 +52,7 @@ export function EditCustomerSheet({ customer, open, onOpenChange }: EditCustomer
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>
-            <SheetContent className="w-[400px] bg-[#1A1A1A] border-l border-white/10 text-white">
+            <SheetContent className="w-[400px] bg-[var(--dashboard-card)] border-l border-white/10 text-white">
                 <SheetHeader>
                     <SheetTitle className="font-serif text-2xl">Edit Customer</SheetTitle>
                     <SheetDescription className="text-gray-400">

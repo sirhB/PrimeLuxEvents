@@ -45,7 +45,7 @@ export function TestimonialsSection({
   items = testimonials,
 }: TestimonialsSectionProps) {
   return (
-    <section className="py-24 md:py-48 bg-[#1A1A1A] relative overflow-hidden">
+    <section className="py-24 md:py-48 bg-background relative overflow-hidden">
       <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
       {/* Background Orbs */}

@@ -66,7 +66,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--linen,#F7F4EF)] px-4 gap-8 dark:bg-gray-900">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--linen,var(--ink))] px-4 gap-8 dark:bg-gray-900">
       {isStandalone && (
         <div className="relative h-16 w-48">
           <Image

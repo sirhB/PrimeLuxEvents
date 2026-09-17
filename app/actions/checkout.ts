@@ -10,6 +10,7 @@ import {
 } from '@/lib/auth/partners'
 import { clampCheckoutAmount } from '@/lib/security/checkout-amounts'
 import { checkRateLimit, clientIpFromHeaders } from '@/lib/security/rate-limit'
+import { COMPANY } from '@/lib/company'
 import { headers } from 'next/headers'
 import { z } from 'zod'
 
@@ -89,7 +90,7 @@ export async function calculateDeliveryFee(deliveryAddress: string): Promise<num
             return 5000 // Default $50 if settings not available
         }
 
-        const warehouseAddress = settings.warehouse_address || '123 Main St, New York, NY 10001'
+        const warehouseAddress = settings.warehouse_address || COMPANY.warehouseAddress
         const baseFee = parseInt(settings.delivery_base_fee || '5000')
         const perMileRate = parseInt(settings.delivery_per_mile_rate || '150')
 
