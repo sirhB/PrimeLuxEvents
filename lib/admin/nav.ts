@@ -30,6 +30,7 @@ import {
   Plus,
   Handshake,
   Sparkles,
+  KeyRound,
 } from 'lucide-react'
 
 export type AdminNavItem = {
@@ -202,6 +203,13 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         label: 'Staff shifts',
         href: '/admin/team/shifts',
         keywords: ['schedule', 'shifts', 'roster'],
+      },
+      {
+        icon: KeyRound,
+        label: 'API keys',
+        href: '/admin/api-keys',
+        permission: 'settings.view',
+        keywords: ['api', 'developers', 'integrations', 'catalog', 'token'],
       },
       {
         icon: Settings,

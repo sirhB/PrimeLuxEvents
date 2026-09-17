@@ -10,7 +10,7 @@ Operational console for the luxury event rental business. Staff roles (`admin`, 
 | **Pipeline** | Orders, Leads, Appointments, Messages, Customers |
 | **Fulfillment** | Warehouse schedule, Scanner, Pack slips, Delivery, Bags, Inventory, Warehouse, Tasks, Logistics |
 | **Catalog** | Products, Categories, Packages, Portfolio, Site editor |
-| **Manage** | Preferred partners, Discounts, Staff, Staff shifts, Settings |
+| **Manage** | Preferred partners, Discounts, Staff, Staff shifts, API keys, Settings |
 
 Mobile bottom bar: **Orders / Week Prep / Scan / Inbox / Menu**. Desktop search is command-palette driven (`⌘K` / `Ctrl+K`). Nav items with a `permission` are filtered from the sidebar when the signed-in user lacks that permission (admins still see everything).
 
