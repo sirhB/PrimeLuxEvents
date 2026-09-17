@@ -172,8 +172,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
                 <div className="hero-parallax absolute inset-0 w-full h-full">
                     <Image
                         src={selectedCategory
-                            ? (categories.find(c => c.name === selectedCategory)?.image_url || "/images/mist-cedar-hero-vivid.png")
-                            : "/images/mist-cedar-hero-vivid.png"
+                            ? (categories.find(c => c.name === selectedCategory)?.image_url || "/images/mist-cedar-hero-vivid.jpg")
+                            : "/images/mist-cedar-hero-vivid.jpg"
                         }
                         alt="Catalog hero"
                         fill
