@@ -163,12 +163,12 @@ function VipPortalInner() {
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col lg:flex-row">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="relative min-h-[36vh] overflow-hidden border-b border-[var(--linen)]/10 bg-[#121110] lg:border-b-0 lg:border-r">
+        <div className="relative min-h-[36vh] overflow-hidden border-b border-[var(--linen)]/10 bg-[#000000] lg:border-b-0 lg:border-r">
           <div
             className="absolute inset-0 opacity-50"
             style={{
               background:
-                'radial-gradient(ellipse at 50% 0%, rgba(184,149,107,0.35), transparent 55%)',
+                'radial-gradient(ellipse at 50% 0%, rgba(240,167,62,0.35), transparent 55%)',
             }}
           />
           <div className="relative flex h-full min-h-[36vh] flex-col items-center justify-center px-6 py-12 text-center">

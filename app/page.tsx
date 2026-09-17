@@ -1,26 +1,35 @@
 import nextDynamic from "next/dynamic"
-import { getSiteContent } from "@/lib/content"
 import Link from "next/link"
+import { getSiteContent } from "@/lib/content"
 import { Skeleton } from "@/components/ui/skeleton"
-import { FeaturedCollection } from "@/components/featured-collection"
+import { HomePackagesSection } from "@/components/home-packages-section"
+import { ArrowRight } from "lucide-react"
 
 const sectionFallback = (
-  <div className="container mx-auto px-4 py-16 md:px-6">
+  <div className="mx-auto max-w-6xl px-6 py-16 md:px-10">
     <Skeleton className="mb-4 h-4 w-32" />
     <Skeleton className="mb-8 h-12 w-64" />
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <Skeleton key={i} className="aspect-[4/5] rounded-2xl" />
+        <Skeleton key={i} className="aspect-[4/5]" />
       ))}
     </div>
   </div>
 )
 
-const HeroSection = nextDynamic(() => import("@/components/hero-section").then(m => m.HeroSection))
-const FeaturedCategories = nextDynamic(() => import("@/components/featured-categories").then(m => m.FeaturedCategories), { loading: () => sectionFallback })
-const InteractiveProcess = nextDynamic(() => import("@/components/interactive-process").then(m => m.InteractiveProcess), { loading: () => sectionFallback })
-const BrandValuesSection = nextDynamic(() => import("@/components/brand-values-section").then(m => m.BrandValuesSection), { loading: () => sectionFallback })
-const TestimonialsSection = nextDynamic(() => import("@/components/testimonials-section").then(m => m.TestimonialsSection), { loading: () => sectionFallback })
+const HeroSection = nextDynamic(() =>
+  import("@/components/hero-section").then((m) => m.HeroSection),
+)
+const FeaturedCategories = nextDynamic(
+  () =>
+    import("@/components/featured-categories").then((m) => m.FeaturedCategories),
+  { loading: () => sectionFallback },
+)
+const InteractiveProcess = nextDynamic(
+  () =>
+    import("@/components/interactive-process").then((m) => m.InteractiveProcess),
+  { loading: () => sectionFallback },
+)
 
 export const revalidate = 60
 
@@ -30,50 +39,35 @@ export default async function Home() {
   return (
     <main className="flex min-h-screen flex-col">
       <HeroSection
-        title={content['home.hero.title']}
-        subtitle={content['home.hero.subtitle']}
-        ctaPrimary={content['home.hero.cta_primary']}
-        ctaSecondary={content['home.hero.cta_secondary']}
+        title={content["home.hero.title"]}
+        subtitle={content["home.hero.subtitle"]}
+        ctaPrimary={content["home.hero.cta_primary"]}
+        ctaSecondary={content["home.hero.cta_secondary"]}
       />
-      <BrandValuesSection
-        title={content['home.values.title']}
-        description={content['home.values.description']}
-        items={content['home.values.items']}
-      />
-      <FeaturedCategories />
       <InteractiveProcess />
-      <FeaturedCollection />
-      <TestimonialsSection
-        title={content['home.testimonials.title']}
-        description={content['home.testimonials.description']}
-        items={content['home.testimonials.items']}
-      />
+      <FeaturedCategories />
+      <HomePackagesSection />
 
-      {/* CTA Section */}
-      <section className="py-24 md:py-40 bg-background text-white text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="max-w-3xl mx-auto">
-            <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-6 block">Start Your Journey</span>
-            <h2 className="text-4xl md:text-6xl font-serif font-light mb-8 tracking-tight">Ready to plan your next celebration?</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto mb-12 text-lg font-light leading-relaxed">
-              Browse our full catalog, check availability, and secure your rentals instantly online. Our team is here to help you every step of the way.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-6">
-              <Link
-                href="/catalog"
-                className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-full bg-gold px-12 text-[11px] font-bold uppercase tracking-[0.2em] text-black transition-all duration-500 hover:scale-105 active:scale-95"
-              >
-                <span className="relative z-10">Start Your Quote</span>
-                <div className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
-              </Link>
-              <Link
-                href="/contact"
-                className="group inline-flex h-16 items-center justify-center rounded-full border border-white/20 bg-transparent px-12 text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all duration-500 hover:bg-white/10 hover:border-white hover:scale-105 active:scale-95"
-              >
-                Contact Support
-              </Link>
-            </div>
+      <section className="relative overflow-hidden bg-[var(--surface)] py-24 text-center md:py-36">
+        <div className="pointer-events-none absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[40rem] -translate-x-1/2 bg-[var(--champagne)]/10 blur-[120px]" />
+
+        <div className="relative z-10 mx-auto max-w-3xl px-6 md:px-10">
+          <p className="lux-label mb-6">Inquire</p>
+          <h2 className="font-serif text-4xl font-light tracking-tight text-[var(--signal)] md:text-6xl">
+            Ready to plan your celebration?
+          </h2>
+          <p className="mx-auto mt-6 max-w-xl text-base font-light leading-relaxed text-[var(--linen)]/65 md:text-lg">
+            Tell us about your date and venue, or start a quote from the catalog.
+          </p>
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
+            <Link href="/contact" className="lux-cta group">
+              Inquire
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+            <Link href="/catalog" className="lux-cta-ghost group">
+              Browse catalog
+            </Link>
           </div>
         </div>
       </section>

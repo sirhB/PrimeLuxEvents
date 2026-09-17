@@ -51,7 +51,7 @@ export function PartnerPaymentMethodsForm({ initial }: Props) {
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-lg space-y-6">
       <div className="space-y-2">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#B8956B)]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#f0a73e)]">
           Client payments
         </p>
         <h2 className="font-serif text-3xl font-light tracking-tight">How clients pay you</h2>

@@ -105,7 +105,7 @@ export default async function ProductsPage({
                 title="Products"
                 description="Manage your rental catalog."
                 actions={
-                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90">
+                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#000000] hover:bg-[var(--dashboard-accent-gold)]/90">
                         <Link href="/admin/products/new">
                             <Plus className="mr-2 h-4 w-4" />
                             Add Product

@@ -5,16 +5,16 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Dark Luxury — canonical public theme (Venue Floor, night) */
-  --ink: #0c0b0a;
-  --surface: #141312;
-  --surface-elevated: #1a1917;
-  --surface-muted: #22201d;
-  --linen: #f3efe8;
-  --champagne: #c4a574;
+  /* Slate Night + Soft Brass — black / navy / brass / silver / white */
+  --ink: #000000;
+  --surface: #0c1324;
+  --surface-elevated: #17213c;
+  --surface-muted: #243356;
+  --linen: #e5e5e5;
+  --champagne: #f0a73e;
   --champagne-soft: color-mix(in srgb, var(--champagne) 18%, transparent);
-  --sage: #8a9a8b;
-  --signal: #f7f4ef;
+  --sage: #8a96b0;
+  --signal: #ffffff;
 
   --background: var(--ink);
   --foreground: var(--signal);
@@ -26,7 +26,7 @@
   --popover-foreground: var(--signal);
 
   --primary: var(--champagne);
-  --primary-foreground: #121110;
+  --primary-foreground: #000000;
 
   --safe-area-inset-top: env(safe-area-inset-top);
   --safe-area-inset-bottom: env(safe-area-inset-bottom);
@@ -37,16 +37,16 @@
   --secondary-foreground: var(--signal);
 
   --muted: var(--surface-muted);
-  --muted-foreground: #a39e96;
+  --muted-foreground: #a3a3a3;
 
   --accent: var(--champagne);
-  --accent-foreground: #121110;
+  --accent-foreground: #000000;
 
   --destructive: #d4655a;
   --destructive-foreground: var(--signal);
 
-  --border: rgba(243, 239, 232, 0.1);
-  --input: rgba(243, 239, 232, 0.12);
+  --border: rgba(229, 229, 229, 0.12);
+  --input: rgba(229, 229, 229, 0.14);
   --ring: var(--champagne);
 
   /* Refined editorial corners — not pill, not razor */
@@ -62,20 +62,20 @@
   --sidebar: var(--surface);
   --sidebar-foreground: var(--signal);
   --sidebar-primary: var(--champagne);
-  --sidebar-primary-foreground: #121110;
+  --sidebar-primary-foreground: #000000;
   --sidebar-accent: var(--surface-muted);
   --sidebar-accent-foreground: var(--signal);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--champagne);
 
-  /* Admin — graphite ops, brass aligned to public champagne */
-  --dashboard-background: #0f1215;
-  --dashboard-surface: #13171c;
-  --dashboard-card: #181d24;
-  --dashboard-card-hover: #1f262f;
-  --dashboard-text: #eef0f2;
-  --dashboard-text-muted: #8a929c;
-  --dashboard-border: rgba(255, 255, 255, 0.07);
+  /* Admin — slate night ops, brass aligned to public champagne */
+  --dashboard-background: #000000;
+  --dashboard-surface: #0c1324;
+  --dashboard-card: #17213c;
+  --dashboard-card-hover: #243356;
+  --dashboard-text: #ffffff;
+  --dashboard-text-muted: #a3a3a3;
+  --dashboard-border: rgba(255, 255, 255, 0.08);
   --dashboard-accent-gold: var(--champagne);
   --dashboard-accent-green: #3d9a78;
   --dashboard-accent-orange: #d4924a;
@@ -84,7 +84,7 @@
   --dashboard-accent-purple: #8b7bb8;
   --dashboard-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 24px -12px rgba(0, 0, 0, 0.55);
   --dashboard-shadow-lg: 0 16px 40px -16px rgba(0, 0, 0, 0.65);
-  --dashboard-glass-bg: rgba(19, 23, 28, 0.92);
+  --dashboard-glass-bg: rgba(12, 19, 36, 0.92);
   --dashboard-glass-border: rgba(255, 255, 255, 0.06);
   --dashboard-radius: 0.375rem;
   --dashboard-rail: 2px;
@@ -100,11 +100,11 @@
   --muted: var(--dashboard-card-hover);
   --muted-foreground: var(--dashboard-text-muted);
   --primary: var(--dashboard-accent-gold);
-  --primary-foreground: #121110;
+  --primary-foreground: #000000;
   --secondary: var(--dashboard-card-hover);
   --secondary-foreground: var(--dashboard-text);
   --accent: var(--dashboard-accent-gold);
-  --accent-foreground: #121110;
+  --accent-foreground: #000000;
   --border: var(--dashboard-border);
   --input: var(--dashboard-border);
   --ring: var(--dashboard-accent-gold);
@@ -407,7 +407,7 @@
     padding-inline: 2rem;
     border-radius: var(--radius-cta);
     background: var(--champagne);
-    color: #121110;
+    color: #000000;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.18em;
@@ -431,7 +431,7 @@
     min-height: 3.25rem;
     padding-inline: 2rem;
     border-radius: var(--radius-cta);
-    border: 1px solid rgba(243, 239, 232, 0.22);
+    border: 1px solid rgba(229, 229, 229, 0.22);
     background: transparent;
     color: var(--signal);
     font-size: 11px;
@@ -503,7 +503,7 @@
   textarea,
   select,
   [role="button"] {
-    @apply outline-none focus-visible:ring-2 focus-visible:ring-[var(--champagne,#B8956B)] focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-[var(--champagne,#f0a73e)] focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
   /* Allow text selection in inputs */

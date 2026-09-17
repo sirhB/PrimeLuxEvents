@@ -32,8 +32,8 @@ ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, type = EXCLUDED.type;
 
 -- Home Page Content
 INSERT INTO content (key, value, type) VALUES
-('home.hero.title', 'Beautiful event rentals for celebrations across Connecticut', 'text'),
-('home.hero.subtitle', 'Furniture, lighting, tents, and décor you can browse and book online. We deliver throughout CT, RI, and MA.', 'text'),
+('home.hero.title', 'Event rentals, ready to book', 'text'),
+('home.hero.subtitle', 'Furniture, lighting, tents, and décor for celebrations across CT, RI, and MA.', 'text'),
 ('home.hero.cta_primary', 'Browse Catalog', 'text'),
 ('home.hero.cta_secondary', 'How It Works', 'text'),
 ('home.values.title', 'Why planners and couples choose PrimeLux', 'text'),
