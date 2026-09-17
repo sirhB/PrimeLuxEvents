@@ -573,10 +573,10 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                 Complete Your Vision
                             </span>
                             <h2 className="text-4xl md:text-6xl font-serif font-light mb-8 text-white tracking-tight">
-                                Related items
+                                Pieces that pair well
                             </h2>
                             <p className="text-lg text-gray-500 max-w-2xl mx-auto font-light leading-relaxed">
-                                Other pieces that often get rented with this one.
+                                Other rentals that often go with this one.
                             </p>
                         </div>
                         <RelatedProducts

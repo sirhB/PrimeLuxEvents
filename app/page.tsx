@@ -55,7 +55,7 @@ export default async function Home() {
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="max-w-3xl mx-auto">
             <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-6 block">Start Your Journey</span>
-            <h2 className="text-4xl md:text-6xl font-serif font-light mb-8 tracking-tight">Ready to plan your next event?</h2>
+            <h2 className="text-4xl md:text-6xl font-serif font-light mb-8 tracking-tight">Ready to plan your next celebration?</h2>
             <p className="text-gray-400 max-w-2xl mx-auto mb-12 text-lg font-light leading-relaxed">
               Browse our full catalog, check availability, and secure your rentals instantly online. Our team is here to help you every step of the way.
             </p>

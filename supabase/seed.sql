@@ -44,38 +44,38 @@ END $$;
 
 -- Seed Content (kept in sync with content_seed.sql tone)
 INSERT INTO content (key, value, type) VALUES
-('home.hero.title', 'Event rentals for weddings and parties in Connecticut', 'text'),
-('home.hero.subtitle', 'Furniture, lighting, tents, and decor you can browse and book online. We deliver to CT, RI, and MA.', 'text'),
+('home.hero.title', 'Beautiful event rentals for celebrations across Connecticut', 'text'),
+('home.hero.subtitle', 'Furniture, lighting, tents, and décor you can browse and book online. We deliver throughout CT, RI, and MA.', 'text'),
 ('home.hero.cta_primary', 'Browse Catalog', 'text'),
 ('home.hero.cta_secondary', 'How It Works', 'text'),
 
-('home.values.title', 'Why people book with us', 'text'),
-('home.values.description', 'We rent the furniture and handle the logistics so planning your event feels more manageable.', 'text'),
+('home.values.title', 'Why planners and couples choose PrimeLux', 'text'),
+('home.values.description', 'We provide the furniture and handle the logistics so planning your event feels more manageable.', 'text'),
 ('home.values.items', '[
   {
     "title": "Thoughtful inventory",
-    "description": "Chairs, tables, lighting, linens, and more—chosen to mix well together and look good in photos."
+    "description": "Chairs, tables, lighting, linens, and more—chosen to work well together and look good in photos."
   },
   {
     "title": "Quality you can count on",
-    "description": "Every item is cleaned and checked before delivery so it arrives ready to use."
+    "description": "Every item is cleaned and checked before delivery so it arrives ready for your guests."
   },
   {
     "title": "Delivery and pickup",
-    "description": "We bring items to your venue and pick them up after. Setup help is available if you need it."
+    "description": "We bring everything to your venue and pick it up after. Setup help is available when you need it."
   },
   {
     "title": "Real human help",
-    "description": "Questions about sizing, quantities, or layout? Message us—we will walk you through it."
+    "description": "Questions about sizing, quantities, or layout? Reach out—we will walk you through it."
   }
 ]', 'json'),
 
-('home.services.title', 'What we offer', 'text'),
-('home.services.description', 'Rentals first—and support when you want a hand with design or setup.', 'text'),
+('home.services.title', 'How we can help', 'text'),
+('home.services.description', 'Rentals are the foundation. These extras are here when you want design advice or on-site support.', 'text'),
 ('home.services.items', '[
   {
     "title": "Event layout help",
-    "description": "We can help you map chairs, tables, and lounges so the room works for your guest count."
+    "description": "We can help map chairs, tables, and lounges so the room works for your guest count."
   },
   {
     "title": "Delivery and setup",
