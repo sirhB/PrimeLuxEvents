@@ -26,3 +26,7 @@ PrimeLux Events is a premium event rental platform designed to provide a seamles
 ## 5. Logistics & Support
 - **Delivery Coordination**: Automated tracking and scheduling for deliveries.
 - **Clear Policies**: Transparent information on rental periods, damage waivers, and cancellations.
+
+## 6. Public Catalog API
+- **API keys**: Staff issue keys from Admin → API keys (`catalog:read` scope).
+- **Endpoints**: Authenticated read access to rental products and categories at `/api/v1/catalog/*`.

@@ -47,13 +47,28 @@ function getCatalogClient() {
 
 export async function fetchCatalogProducts(options?: {
   limit?: number
+  offset?: number
   categorySlug?: string | null
   query?: string | null
   sort?: string | null
   includeInactive?: boolean
 }): Promise<AppProduct[]> {
+  const result = await fetchCatalogProductsPage(options)
+  return result.products
+}
+
+/** Paginated catalog products with total count for public API consumers. */
+export async function fetchCatalogProductsPage(options?: {
+  limit?: number
+  offset?: number
+  categorySlug?: string | null
+  query?: string | null
+  sort?: string | null
+  includeInactive?: boolean
+}): Promise<{ products: AppProduct[]; total: number }> {
   const supabase = getCatalogClient()
   const limit = options?.limit ?? 100
+  const offset = Math.max(0, options?.offset ?? 0)
 
   const { data: categoryRows } = await supabase
     .from('categories')
@@ -63,7 +78,9 @@ export async function fetchCatalogProducts(options?: {
   const categories = (categoryRows || []) as LiveCategory[]
   const categoryById = new Map(categories.map((c) => [c.id, c]))
 
-  let dbQuery = supabase.from('products').select(PRODUCT_LIST_SELECT)
+  let dbQuery = supabase
+    .from('products')
+    .select(PRODUCT_LIST_SELECT, { count: 'exact' })
 
   if (!options?.includeInactive) {
     dbQuery = dbQuery.eq('is_active', true)
@@ -99,12 +116,12 @@ export async function fetchCatalogProducts(options?: {
       dbQuery = dbQuery.order('name', { ascending: true })
   }
 
-  dbQuery = dbQuery.limit(limit)
+  dbQuery = dbQuery.range(offset, offset + limit - 1)
 
-  const { data, error } = await dbQuery
+  const { data, error, count } = await dbQuery
   if (error) {
     console.error('fetchCatalogProducts error:', error)
-    return []
+    return { products: [], total: 0 }
   }
 
   const withCats = ((data || []) as LiveProduct[]).map((p) => {
@@ -115,7 +132,10 @@ export async function fetchCatalogProducts(options?: {
     }
   })
 
-  return adaptProducts(withCats)
+  return {
+    products: adaptProducts(withCats),
+    total: typeof count === 'number' ? count : adaptProducts(withCats).length,
+  }
 }
 
 export async function fetchCatalogCategories(): Promise<AppCategory[]> {
