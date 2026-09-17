@@ -62,7 +62,7 @@ export function DealCard({ name, description, price, imageUrl, onViewDetails, de
                     </h3>
 
                     <p className="text-muted-foreground text-[10px] md:text-sm mb-4 md:mb-8 line-clamp-2 flex-grow font-light leading-relaxed">
-                        {description || "A limited-time price on this rental."}
+                        {description || "A limited-time price on this rental — available while it lasts."}
                     </p>
 
                     <div className="flex items-end justify-between mt-auto pt-6 border-t border-border/10">

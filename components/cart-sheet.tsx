@@ -96,7 +96,7 @@ export function CartSheet() {
                 <div className="space-y-3">
                   <p className="font-serif text-xl font-light text-foreground">Your collection is empty</p>
                   <p className="text-sm text-muted-foreground font-light max-w-[240px] mx-auto leading-relaxed">
-                    Browse the catalog to find rentals for your next event.
+                    Browse the catalog to find rentals for your next celebration.
                   </p>
                 </div>
                 <Button
