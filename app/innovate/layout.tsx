@@ -35,13 +35,13 @@ export default async function InnovateLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-[var(--linen)] text-[var(--ink)]">
+    <div className="flex min-h-screen bg-[var(--ink)] text-[var(--linen)]">
       <InnovateSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <InnovateMobileHeader />
         <div className="flex-1">{children}</div>
       </div>
-      <Toaster richColors position="top-right" />
+      <Toaster richColors theme="dark" position="top-right" />
     </div>
   )
 }

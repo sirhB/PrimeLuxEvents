@@ -5,6 +5,7 @@ import {
   getPartnerBaseDiscountPercent,
   getPartnerTierSettings,
 } from '@/lib/auth/partners'
+import { getPartnerPerks } from '@/lib/partners/perks'
 import { createClient } from '@/lib/supabase/server'
 import { formatCentsWithCommas } from '@/lib/format-money'
 
@@ -14,6 +15,7 @@ export default async function PartnerRatesPage() {
 
   const basePercent = await getPartnerBaseDiscountPercent(partner)
   const tier = await getPartnerTierSettings(partner.tier)
+  const perks = getPartnerPerks(partner.tier, tier.hold_hours, basePercent)
   const supabase = await createClient()
   const { data: discounts } = await supabase
     .from('tiered_discounts')
@@ -47,7 +49,7 @@ export default async function PartnerRatesPage() {
             <span>Base {tier.label} trade</span>
             <span className="font-medium">{basePercent}% off</span>
           </li>
-          {(discounts || []).map((d: any) => (
+          {(discounts || []).map((d: { id: string; min_cart_total: number; name: string; discount_type: string; discount_value: number }) => (
             <li key={d.id} className="flex items-center justify-between py-3 text-sm">
               <span>
                 Cart from {formatCentsWithCommas(d.min_cart_total)} · {d.name}
@@ -57,6 +59,21 @@ export default async function PartnerRatesPage() {
                   ? `${d.discount_value}% off`
                   : formatCentsWithCommas(d.discount_value)}
               </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="space-y-4 border-t border-[var(--champagne,#B8956B)]/20 pt-8">
+        <h3 className="font-serif text-xl font-light">{tier.label} perks</h3>
+        <p className="text-sm text-muted-foreground">
+          Included with your tier — hold window is {tier.hold_hours} hours.
+        </p>
+        <ul className="divide-y divide-border/60">
+          {perks.map((perk) => (
+            <li key={perk.id} className="py-3">
+              <p className="text-sm font-medium">{perk.label}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{perk.detail}</p>
             </li>
           ))}
         </ul>

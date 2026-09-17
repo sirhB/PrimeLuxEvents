@@ -43,6 +43,20 @@ export function latestDraftForStudio(studio: InnovateStudioId): InnovateDraft | 
   return loadDrafts().find((d) => d.studio === studio) ?? null
 }
 
+export function getDraft(id: string): InnovateDraft | null {
+  if (!id) return null
+  return loadDrafts().find((d) => d.id === id) ?? null
+}
+
+/** Studio route for a draft, including reopen query. */
+export function draftStudioHref(draft: Pick<InnovateDraft, 'id' | 'studio'>): string {
+  const base =
+    draft.studio === 'vip'
+      ? '/innovate/vip'
+      : (`/innovate/${draft.studio}` as const)
+  return `${base}?draft=${encodeURIComponent(draft.id)}`
+}
+
 const VIP_GUESTS_KEY = 'primelux-innovate-vip-guests'
 const VIP_EVENT_KEY = 'primelux-innovate-vip-event'
 

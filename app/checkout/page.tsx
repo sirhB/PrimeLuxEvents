@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
-import { Loader2, Check, AlertCircle, CalendarIcon, Clock, ArrowRight, ArrowLeft, ShoppingBag, Plus, Minus, Package, X, MapPin, Truck } from 'lucide-react'
-import { createOrder, calculateOrderTotal, type CheckoutFormData, type CartItem } from '@/app/actions/checkout'
+import { Loader2, Check, AlertCircle, CalendarIcon, Clock, ArrowRight, ArrowLeft, ShoppingBag, Plus, Minus, Package, X, MapPin, Truck, Warehouse } from 'lucide-react'
+import { createOrder, calculateOrderTotal, type CheckoutFormData, type CartItem, type FulfillmentMethod } from '@/app/actions/checkout'
 import { uploadSignatureImage } from '@/app/actions/upload-signature'
 import { formatCurrency } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/client'
@@ -24,7 +24,7 @@ import { toast } from 'sonner'
 import Link from 'next/link'
 import { stripePromise } from '@/components/providers/stripe-provider'
 import { StripePaymentForm } from '@/components/checkout/stripe-payment-form'
-import { createPaymentIntent } from '@/app/actions/create-payment-intent'
+import { createCheckoutPaymentIntents } from '@/app/actions/create-payment-intent'
 import { Elements } from '@stripe/react-stripe-js'
 import {
     Dialog,
@@ -59,9 +59,13 @@ export default function CheckoutPage() {
     const [agreesToRentalAgreement, setAgreesToRentalAgreement] = useState(false)
     const [signatureData, setSignatureData] = useState<string | null>(null)
     const [clientSecret, setClientSecret] = useState<string | null>(null)
+    const [depositClientSecret, setDepositClientSecret] = useState<string | null>(null)
+    const [depositPaymentIntentId, setDepositPaymentIntentId] = useState<string | null>(null)
+    const [depositAmount, setDepositAmount] = useState(0)
     const [paymentChoice, setPaymentChoice] = useState<'full' | 'deposit'>('full')
     const [customAmount, setCustomAmount] = useState<string>('')
     const [paidAmount, setPaidAmount] = useState<number>(0)
+    const [fulfillmentMethod, setFulfillmentMethod] = useState<FulfillmentMethod>('delivery')
 
 
     // Form Data — empty defaults; never ship test identity into checkout
@@ -80,6 +84,9 @@ export default function CheckoutPage() {
         pickupTime: '10:00',
         pickupNotes: '',
         sameDayPickup: false,
+        fulfillmentMethod: 'delivery',
+        returnDate: '',
+        returnTime: '10:00',
     })
 
     // Additional Event Details State (not directly in CheckoutFormData but needed for UI/Logic)
@@ -91,11 +98,13 @@ export default function CheckoutPage() {
     const [hasStairs, setHasStairs] = useState(eventDetails?.logistics?.hasStairs || false)
     const [hasLoadingDock, setHasLoadingDock] = useState(eventDetails?.logistics?.hasLoadingDock || false)
 
-    // Pickup Details State
+    // Pickup Details State (vendor return pickup for delivery; customer warehouse window uses deliveryDate/Time)
     const [pickupDate, setPickupDate] = useState<Date | undefined>(undefined)
     const [pickupTime, setPickupTime] = useState("10:00")
     const [sameDayPickup, setSameDayPickup] = useState(false)
     const [pickupNotes, setPickupNotes] = useState("")
+    const [returnDate, setReturnDate] = useState<Date | undefined>(undefined)
+    const [returnTime, setReturnTime] = useState("10:00")
     const [addonsChecked, setAddonsChecked] = useState(false)
 
     // Redirect if cart is empty (only if loaded and not successful)
@@ -234,7 +243,9 @@ export default function CheckoutPage() {
                     modifiers: item.modifiers
                 }))
 
-                const calculated = await calculateOrderTotal(cartItems, addressToUse)
+                const calculated = await calculateOrderTotal(cartItems, addressToUse, {
+                    fulfillmentMethod,
+                })
 
                 setTotals(calculated)
             } catch (err) {
@@ -249,7 +260,7 @@ export default function CheckoutPage() {
         }, 500)
 
         return () => clearTimeout(debounce)
-    }, [formData.deliveryAddress, formData.venueAddress, items])
+    }, [formData.deliveryAddress, formData.venueAddress, items, fulfillmentMethod])
 
     // Sync local state to formData
     useEffect(() => {
@@ -287,6 +298,13 @@ export default function CheckoutPage() {
                 if (parsed.pickupTime) setPickupTime(parsed.pickupTime)
                 if (parsed.sameDayPickup !== undefined) setSameDayPickup(parsed.sameDayPickup)
                 if (parsed.pickupNotes) setPickupNotes(parsed.pickupNotes)
+                if (parsed.fulfillmentMethod === 'customer_pickup' || parsed.fulfillmentMethod === 'delivery') {
+                    setFulfillmentMethod(parsed.fulfillmentMethod)
+                }
+                if (parsed.returnDate) setReturnDate(new Date(parsed.returnDate))
+                if (parsed.returnTime) setReturnTime(parsed.returnTime)
+                if (typeof parsed.depositAmount === 'number') setDepositAmount(parsed.depositAmount)
+                if (parsed.depositPaymentIntentId) setDepositPaymentIntentId(parsed.depositPaymentIntentId)
 
             } catch (e) {
                 console.error("Failed to load saved checkout data", e)
@@ -312,11 +330,17 @@ export default function CheckoutPage() {
             pickupDate: pickupDate ? pickupDate.toISOString() : null,
             pickupTime,
             sameDayPickup,
-            pickupNotes
+            pickupNotes,
+            fulfillmentMethod,
+            returnDate: returnDate ? returnDate.toISOString() : null,
+            returnTime,
+            depositPaymentIntentId,
+            depositAmount,
+            depositClientSecret,
         }
 
         localStorage.setItem('checkout_form_data', JSON.stringify(dataToSave))
-    }, [formData, date, startTime, endTime, venueType, hasElevator, hasStairs, hasLoadingDock, pickupDate, pickupTime, sameDayPickup, pickupNotes])
+    }, [formData, date, startTime, endTime, venueType, hasElevator, hasStairs, hasLoadingDock, pickupDate, pickupTime, sameDayPickup, pickupNotes, fulfillmentMethod, returnDate, returnTime, depositPaymentIntentId, depositAmount, depositClientSecret])
 
     const handleNextStep = async () => {
         if (currentStep === 2) {
@@ -326,7 +350,12 @@ export default function CheckoutPage() {
                 return
             }
 
-            if (!sameDayPickup && !pickupDate) {
+            if (fulfillmentMethod === 'customer_pickup') {
+                if (!returnDate) {
+                    setError("Please select a return date for warehouse pickup.")
+                    return
+                }
+            } else if (!sameDayPickup && !pickupDate) {
                 setError("Please select a pickup date.")
                 return
             }
@@ -366,7 +395,10 @@ export default function CheckoutPage() {
                     modifiers: item.modifiers
                 }))
 
-                const addressToUse = formData.deliveryAddress || formData.venueAddress
+                const addressToUse =
+                    fulfillmentMethod === 'customer_pickup'
+                        ? (totals?.warehouseAddress || formData.venueAddress)
+                        : (formData.deliveryAddress || formData.venueAddress)
 
                 let initialPaidAmount = totals?.totalAmount || 0
                 if (paymentChoice === 'deposit') {
@@ -376,10 +408,18 @@ export default function CheckoutPage() {
                 }
                 setPaidAmount(initialPaidAmount)
 
-                const result = await createPaymentIntent(cartItems, addressToUse, initialPaidAmount)
+                const result = await createCheckoutPaymentIntents(
+                    cartItems,
+                    addressToUse,
+                    initialPaidAmount,
+                    fulfillmentMethod,
+                )
 
                 if (result.clientSecret) {
                     setClientSecret(result.clientSecret)
+                    setDepositClientSecret(result.depositClientSecret || null)
+                    setDepositPaymentIntentId(result.depositPaymentIntentId || null)
+                    setDepositAmount(result.depositAmount || 0)
                     setCurrentStep(3)
                     window.scrollTo(0, 0)
                 } else {
@@ -404,7 +444,10 @@ export default function CheckoutPage() {
         window.scrollTo(0, 0)
     }
 
-    const handlePaymentSuccess = async (paymentIntentId: string) => {
+    const handlePaymentSuccess = async (
+        paymentIntentId: string,
+        depositPiId?: string | null,
+    ) => {
         setIsLoading(true)
         setError(null)
 
@@ -418,8 +461,14 @@ export default function CheckoutPage() {
                 modifiers: item.modifiers
             }))
 
-            const finalFormData = {
+            const warehouseAddress = totals?.warehouseAddress || formData.deliveryAddress || formData.venueAddress
+
+            const finalFormData: CheckoutFormData = {
                 ...formData,
+                deliveryAddress:
+                    fulfillmentMethod === 'customer_pickup'
+                        ? warehouseAddress
+                        : (formData.deliveryAddress || formData.venueAddress),
                 deliveryDate: date ? format(date, 'yyyy-MM-dd') : formData.deliveryDate,
                 eventDate: date ? format(date, 'yyyy-MM-dd') : formData.eventDate,
                 deliveryTime: formData.deliveryTime || startTime,
@@ -427,6 +476,9 @@ export default function CheckoutPage() {
                 pickupTime,
                 pickupNotes,
                 sameDayPickup,
+                fulfillmentMethod,
+                returnDate: returnDate ? format(returnDate, 'yyyy-MM-dd') : '',
+                returnTime,
             }
 
             let signatureUrl = ''
@@ -440,7 +492,15 @@ export default function CheckoutPage() {
                 }
             }
 
-            const result = await createOrder(finalFormData, cartItems, paymentIntentId, signatureUrl, paidAmount)
+            const depositId = depositPiId || depositPaymentIntentId || undefined
+            const result = await createOrder(
+                finalFormData,
+                cartItems,
+                paymentIntentId,
+                signatureUrl,
+                paidAmount,
+                depositId,
+            )
 
             if (result.success) {
                 setIsSuccess(true)
@@ -772,6 +832,68 @@ export default function CheckoutPage() {
                                 </div>
                             </section>
 
+                            {/* Fulfillment */}
+                            <section className="space-y-5">
+                                <div className="flex items-center gap-3">
+                                    <h2 className={sectionTitleClass}>Fulfillment</h2>
+                                    <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent" />
+                                </div>
+                                <div className="grid sm:grid-cols-2 gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setFulfillmentMethod('delivery')
+                                            setFormData((prev) => ({ ...prev, fulfillmentMethod: 'delivery' }))
+                                            setClientSecret(null)
+                                        }}
+                                        className={cn(
+                                            "flex items-start gap-3 p-4 rounded-2xl border text-left transition-all",
+                                            fulfillmentMethod === 'delivery' ? "bg-gold/5 border-gold" : "bg-[var(--surface)] border-border hover:border-gold/30"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "h-10 w-10 rounded-[var(--radius-cta)] flex items-center justify-center shrink-0",
+                                            fulfillmentMethod === 'delivery' ? "bg-gold text-black" : "bg-gray-50 text-muted-foreground"
+                                        )}>
+                                            <Truck className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-base font-serif font-bold text-foreground">Delivery</h4>
+                                            <p className="text-xs text-muted-foreground mt-0.5">We deliver to your venue and pick up after</p>
+                                        </div>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setFulfillmentMethod('customer_pickup')
+                                            setFormData((prev) => ({ ...prev, fulfillmentMethod: 'customer_pickup' }))
+                                            setClientSecret(null)
+                                        }}
+                                        className={cn(
+                                            "flex items-start gap-3 p-4 rounded-2xl border text-left transition-all",
+                                            fulfillmentMethod === 'customer_pickup' ? "bg-gold/5 border-gold" : "bg-[var(--surface)] border-border hover:border-gold/30"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "h-10 w-10 rounded-[var(--radius-cta)] flex items-center justify-center shrink-0",
+                                            fulfillmentMethod === 'customer_pickup' ? "bg-gold text-black" : "bg-gray-50 text-muted-foreground"
+                                        )}>
+                                            <Warehouse className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-base font-serif font-bold text-foreground">Warehouse pickup</h4>
+                                            <p className="text-xs text-muted-foreground mt-0.5">You pick up &amp; return · no delivery fee</p>
+                                        </div>
+                                    </button>
+                                </div>
+                                {fulfillmentMethod === 'customer_pickup' && totals?.warehouseAddress && (
+                                    <p className="text-xs text-muted-foreground flex items-start gap-2">
+                                        <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-gold" />
+                                        <span>Pickup location: {totals.warehouseAddress}</span>
+                                    </p>
+                                )}
+                            </section>
+
                             {/* Event Details */}
                             <section className="space-y-5">
                                 <div className="flex items-center gap-3">
@@ -900,13 +1022,81 @@ export default function CheckoutPage() {
                                 </div>
                             </section>
 
-                            {/* Pickup Information */}
+                            {/* Pickup / Return schedule */}
                             <section className="space-y-5">
                                 <div className="flex items-center gap-3">
-                                    <h2 className={sectionTitleClass}>Pickup</h2>
+                                    <h2 className={sectionTitleClass}>
+                                        {fulfillmentMethod === 'customer_pickup' ? 'Pickup & return' : 'Pickup'}
+                                    </h2>
                                     <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent" />
                                 </div>
                                 <div className="space-y-5">
+                                    {fulfillmentMethod === 'customer_pickup' ? (
+                                        <>
+                                            <p className="text-sm text-muted-foreground font-light">
+                                                Choose when you&apos;ll collect items at our warehouse and when you&apos;ll return them. A manager will confirm or adjust these times.
+                                            </p>
+                                            <div className="grid sm:grid-cols-2 gap-5 sm:gap-6">
+                                                <div className="space-y-1.5">
+                                                    <Label className={labelClass}>Warehouse pickup time *</Label>
+                                                    <Input
+                                                        type="time"
+                                                        value={formData.deliveryTime || startTime}
+                                                        onChange={(e) => setFormData({ ...formData, deliveryTime: e.target.value })}
+                                                        className={fieldClass}
+                                                    />
+                                                    <p className="text-[11px] text-muted-foreground">On your event date ({date ? format(date, 'MMM d') : 'select event date'})</p>
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <Label className={labelClass}>Return date *</Label>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <Button
+                                                                variant={"outline"}
+                                                                className={cn(
+                                                                    fieldClass,
+                                                                    "justify-start text-left hover:bg-transparent hover:border-gold w-full",
+                                                                    !returnDate && "text-muted-foreground/70"
+                                                                )}
+                                                            >
+                                                                <CalendarIcon className="mr-2 h-4 w-4 text-gold shrink-0" />
+                                                                {returnDate ? format(returnDate, "MMM d, yyyy") : <span>Select date</span>}
+                                                            </Button>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-auto p-0 border-border shadow-2xl bg-[var(--surface-elevated)]">
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={returnDate}
+                                                                onSelect={setReturnDate}
+                                                                initialFocus
+                                                                disabled={(d) => d < new Date()}
+                                                                className="p-3"
+                                                            />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <Label className={labelClass}>Return time *</Label>
+                                                    <Input
+                                                        type="time"
+                                                        value={returnTime}
+                                                        onChange={(e) => setReturnTime(e.target.value)}
+                                                        className={fieldClass}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-1.5">
+                                                <Label className={labelClass}>Pickup notes</Label>
+                                                <Textarea
+                                                    placeholder="Vehicle size, loading help needed…"
+                                                    value={pickupNotes}
+                                                    onChange={(e) => setPickupNotes(e.target.value)}
+                                                    className="min-h-[72px] bg-transparent border-0 border-b border-white/15 rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-muted-foreground/70 font-light text-base resize-none"
+                                                />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
                                     <button
                                         type="button"
                                         className={cn(
@@ -998,6 +1188,8 @@ export default function CheckoutPage() {
                                             className="min-h-[72px] bg-transparent border-0 border-b border-white/15 rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-muted-foreground/70 font-light text-base resize-none"
                                         />
                                     </div>
+                                        </>
+                                    )}
                                 </div>
                             </section>
                         </div>
@@ -1443,6 +1635,8 @@ export default function CheckoutPage() {
                                         <Elements stripe={stripePromise} options={{ clientSecret }}>
                                             <StripePaymentForm
                                                 amount={paidAmount || totals?.totalAmount || 0}
+                                                depositAmount={depositAmount || totals?.securityDepositCents || 0}
+                                                depositClientSecret={depositClientSecret}
                                                 onSuccess={handlePaymentSuccess}
                                                 disabled={!agreesToRentalAgreement || !signatureData || (paymentChoice === 'deposit' && paidAmount < Math.ceil((totals?.totalAmount || 0) * 0.5))}
                                             />
@@ -1504,13 +1698,40 @@ export default function CheckoutPage() {
                                                 <span className="font-medium text-foreground">{formatCurrency(totals.taxAmount)}</span>
                                             </div>
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-muted-foreground">Delivery</span>
-                                                <span className="font-medium text-foreground">{isCalculating ? '…' : formatCurrency(totals.deliveryFee)}</span>
+                                                <span className="text-muted-foreground">
+                                                    {fulfillmentMethod === 'customer_pickup' ? 'Delivery' : 'Delivery'}
+                                                </span>
+                                                <span className="font-medium text-foreground">
+                                                    {isCalculating
+                                                        ? '…'
+                                                        : fulfillmentMethod === 'customer_pickup'
+                                                            ? 'Warehouse pickup'
+                                                            : formatCurrency(totals.deliveryFee)}
+                                                </span>
                                             </div>
+                                            {(depositAmount > 0 || (totals.securityDepositCents || 0) > 0) && (
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-muted-foreground">Security deposit (refundable)</span>
+                                                    <span className="font-medium text-foreground">
+                                                        {formatCurrency(depositAmount || totals.securityDepositCents || 0)}
+                                                    </span>
+                                                </div>
+                                            )}
                                             <div className="pt-3 border-t border-gold/10 flex justify-between items-baseline">
-                                                <span className="text-base font-serif font-bold text-foreground">Total</span>
+                                                <span className="text-base font-serif font-bold text-foreground">Order total</span>
                                                 <span className="font-bold text-2xl text-gold">{formatCurrency(totals.totalAmount)}</span>
                                             </div>
+                                            {(depositAmount > 0 || (totals.securityDepositCents || 0) > 0) && (
+                                                <div className="flex justify-between items-baseline text-sm">
+                                                    <span className="text-muted-foreground">Due now (order + deposit)</span>
+                                                    <span className="font-semibold text-foreground">
+                                                        {formatCurrency(
+                                                            (paidAmount || totals.totalAmount) +
+                                                                (depositAmount || totals.securityDepositCents || 0),
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     ) : (
                                         <div className="flex justify-center py-8">

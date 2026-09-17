@@ -2,12 +2,13 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { createOrder, type CartItem } from '@/app/actions/checkout'
+import { createOrder, type CartItem, type CheckoutFormData } from '@/app/actions/checkout'
 import { useCart } from '@/components/providers/cart-provider'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { stripePromise } from '@/components/providers/stripe-provider'
 
 function CheckoutReturnContent() {
     const router = useRouter()
@@ -38,17 +39,41 @@ function CheckoutReturnContent() {
         const handleReturn = async () => {
             if (redirectStatus === 'succeeded') {
                 try {
-                    // Retrieve stored form data
                     const savedData = localStorage.getItem('checkout_form_data')
                     if (!savedData) {
                         throw new Error('Could not find order details. Please contact support.')
                     }
 
                     const parsedData = JSON.parse(savedData)
-                    const formData = parsedData.formData
+                    const formData = parsedData.formData as CheckoutFormData
+                    const fulfillmentMethod =
+                        parsedData.fulfillmentMethod || formData.fulfillmentMethod || 'delivery'
 
-                    // Reconstruct final form data similar to checkout page
-                    const finalFormData = {
+                    let depositPaymentIntentId: string | undefined =
+                        parsedData.depositPaymentIntentId || undefined
+
+                    // If order PI redirect completed but deposit still needs confirming
+                    const depositClientSecret = parsedData.depositClientSecret as string | undefined
+                    if (depositClientSecret && !depositPaymentIntentId) {
+                        const stripe = await stripePromise
+                        if (stripe) {
+                            const { paymentIntent: depositPi, error } = await stripe.confirmPayment({
+                                clientSecret: depositClientSecret,
+                                redirect: 'if_required',
+                            })
+                            if (error) {
+                                throw new Error(
+                                    error.message ||
+                                        'Security deposit payment failed after order payment. Please contact support.',
+                                )
+                            }
+                            if (depositPi?.status === 'succeeded') {
+                                depositPaymentIntentId = depositPi.id
+                            }
+                        }
+                    }
+
+                    const finalFormData: CheckoutFormData = {
                         ...formData,
                         deliveryDate: formData.deliveryDate,
                         eventDate: formData.eventDate,
@@ -58,6 +83,11 @@ function CheckoutReturnContent() {
                         pickupTime: parsedData.pickupTime,
                         pickupNotes: parsedData.pickupNotes,
                         sameDayPickup: parsedData.sameDayPickup,
+                        fulfillmentMethod,
+                        returnDate: parsedData.returnDate
+                            ? new Date(parsedData.returnDate).toISOString().split('T')[0]
+                            : formData.returnDate,
+                        returnTime: parsedData.returnTime || formData.returnTime,
                     }
 
                     const cartItems: CartItem[] = items.map((item) => ({
@@ -69,8 +99,14 @@ function CheckoutReturnContent() {
                         modifiers: item.modifiers
                     }))
 
-                    // Create the order
-                    const result = await createOrder(finalFormData, cartItems, paymentIntentId)
+                    const result = await createOrder(
+                        finalFormData,
+                        cartItems,
+                        paymentIntentId,
+                        undefined,
+                        undefined,
+                        depositPaymentIntentId,
+                    )
 
                     if (result.success) {
                         setStatus('success')

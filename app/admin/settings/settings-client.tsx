@@ -29,6 +29,9 @@ export default function SettingsClient() {
         company_address: '',
         company_email: '',
         company_phone: '',
+        security_deposit_type: 'percent',
+        security_deposit_flat_cents: '100',
+        security_deposit_percent: '20',
     })
 
     const [testAddress, setTestAddress] = useState('')
@@ -51,6 +54,11 @@ export default function SettingsClient() {
                     company_address: settingsMap.company_address || COMPANY.address,
                     company_email: settingsMap.company_email || COMPANY.email,
                     company_phone: settingsMap.company_phone || COMPANY.phone,
+                    security_deposit_type: settingsMap.security_deposit_type === 'flat' ? 'flat' : 'percent',
+                    security_deposit_flat_cents: (
+                        parseInt(settingsMap.security_deposit_flat_cents || '10000', 10) / 100
+                    ).toString(),
+                    security_deposit_percent: settingsMap.security_deposit_percent || '20',
                 })
             }
 
@@ -103,6 +111,21 @@ export default function SettingsClient() {
                     key: 'company_phone',
                     value: settings.company_phone,
                     description: 'Publicly displayed company phone number',
+                },
+                {
+                    key: 'security_deposit_type',
+                    value: settings.security_deposit_type === 'flat' ? 'flat' : 'percent',
+                    description: 'flat or percent',
+                },
+                {
+                    key: 'security_deposit_flat_cents',
+                    value: Math.round(parseFloat(settings.security_deposit_flat_cents || '0') * 100).toString(),
+                    description: 'Flat security deposit in cents when type=flat',
+                },
+                {
+                    key: 'security_deposit_percent',
+                    value: parseFloat(settings.security_deposit_percent || '20').toString(),
+                    description: 'Percent of merchandise subtotal when type=percent',
                 },
             ]
 
@@ -316,6 +339,86 @@ export default function SettingsClient() {
                                 placeholder={COMPANY.address}
                                 rows={3}
                             />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Security Deposit */}
+                <Card className="border-none glass-card overflow-hidden">
+                    <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">
+                        <CardTitle className="font-serif text-2xl">Security Deposit</CardTitle>
+                        <CardDescription className="text-[var(--dashboard-text-muted)]">
+                            Refundable deposit charged as a separate Stripe payment at checkout (flat or % of cart)
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6 pt-6">
+                        <div className="space-y-3">
+                            <Label className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                Deposit type
+                            </Label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setSettings({ ...settings, security_deposit_type: 'percent' })}
+                                    className={`h-12 rounded-xl border text-sm font-medium transition-all ${
+                                        settings.security_deposit_type === 'percent'
+                                            ? 'border-[var(--dashboard-accent-gold)] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)]'
+                                            : 'border-[var(--dashboard-border)] text-[var(--dashboard-text-muted)]'
+                                    }`}
+                                >
+                                    Percent of cart
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setSettings({ ...settings, security_deposit_type: 'flat' })}
+                                    className={`h-12 rounded-xl border text-sm font-medium transition-all ${
+                                        settings.security_deposit_type === 'flat'
+                                            ? 'border-[var(--dashboard-accent-gold)] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)]'
+                                            : 'border-[var(--dashboard-border)] text-[var(--dashboard-text-muted)]'
+                                    }`}
+                                >
+                                    Flat rate
+                                </button>
+                            </div>
+                        </div>
+                        <div className="grid sm:grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                                <Label htmlFor="security_deposit_percent" className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                    Percent (%)
+                                </Label>
+                                <Input
+                                    id="security_deposit_percent"
+                                    type="number"
+                                    step="0.1"
+                                    min="0"
+                                    max="100"
+                                    value={settings.security_deposit_percent}
+                                    onChange={(e) =>
+                                        setSettings({ ...settings, security_deposit_percent: e.target.value })
+                                    }
+                                    disabled={settings.security_deposit_type !== 'percent'}
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                    placeholder="20"
+                                />
+                            </div>
+                            <div className="space-y-3">
+                                <Label htmlFor="security_deposit_flat" className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">
+                                    Flat amount ($)
+                                </Label>
+                                <Input
+                                    id="security_deposit_flat"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={settings.security_deposit_flat_cents}
+                                    onChange={(e) =>
+                                        setSettings({ ...settings, security_deposit_flat_cents: e.target.value })
+                                    }
+                                    disabled={settings.security_deposit_type !== 'flat'}
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                    placeholder="100.00"
+                                />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

@@ -1,8 +1,13 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ArrowRight, Share2, Percent } from 'lucide-react'
-import { getPartnerProfileForUser, getPartnerBaseDiscountPercent, getPartnerTierSettings } from '@/lib/auth/partners'
-import { listPartnerSharedCarts } from '@/app/actions/partners'
+import { ArrowRight, CalendarDays, Gem, Share2, Percent, TrendingUp } from 'lucide-react'
+import {
+  getPartnerProfileForUser,
+  getPartnerBaseDiscountPercent,
+  getPartnerTierSettings,
+} from '@/lib/auth/partners'
+import { getPartnerReportingStats, listPartnerSharedCarts } from '@/app/actions/partners'
+import { getPartnerPerks } from '@/lib/partners/perks'
 import { Button } from '@/components/ui/button'
 import { formatCentsWithCommas } from '@/lib/format-money'
 
@@ -14,8 +19,14 @@ export default async function PartnerHomePage() {
   const basePercent = await getPartnerBaseDiscountPercent(partner)
   const tier = await getPartnerTierSettings(partner.tier)
   const { carts } = await listPartnerSharedCarts()
-  const openCarts = (carts || []).filter((c: any) => ['shared', 'accepted'].includes(c.status))
-  const nextCart = openCarts[0]
+  const stats = await getPartnerReportingStats()
+  const perks = getPartnerPerks(partner.tier, tier.hold_hours, basePercent)
+  const openCarts = (carts || []).filter((c: { status: string }) =>
+    ['shared', 'accepted'].includes(c.status),
+  )
+  const nextCart = openCarts[0] as
+    | { client_name: string; retail_total: number; trade_total: number }
+    | undefined
 
   return (
     <div className="space-y-12">
@@ -69,6 +80,47 @@ export default async function PartnerHomePage() {
         </div>
       </section>
 
+      <section className="space-y-4 border-t border-[var(--champagne,#B8956B)]/20 pt-10">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#B8956B)]">
+          Your reporting
+        </p>
+        <h3 className="font-serif text-2xl font-light tracking-tight">Activity at a glance</h3>
+        <div className="grid gap-8 sm:grid-cols-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-[var(--champagne,#B8956B)]">
+              <CalendarDays className="h-4 w-4" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Events</span>
+            </div>
+            <p className="font-serif text-3xl font-light tabular-nums">{stats.eventsCount}</p>
+            <p className="text-xs text-muted-foreground">
+              Client carts in your pipeline ({stats.openCarts} open)
+            </p>
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-[var(--champagne,#B8956B)]">
+              <TrendingUp className="h-4 w-4" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em]">GMV</span>
+            </div>
+            <p className="font-serif text-3xl font-light tabular-nums">
+              {formatCentsWithCommas(stats.gmvCents)}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {stats.settledOrders} attributed order{stats.settledOrders === 1 ? '' : 's'}
+            </p>
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-[var(--champagne,#B8956B)]">
+              <Percent className="h-4 w-4" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Trade savings</span>
+            </div>
+            <p className="font-serif text-3xl font-light tabular-nums">
+              {formatCentsWithCommas(stats.tradeSavingsCents)}
+            </p>
+            <p className="text-xs text-muted-foreground">Retail vs trade on settled carts</p>
+          </div>
+        </div>
+      </section>
+
       <section className="grid gap-8 md:grid-cols-2">
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-[var(--champagne,#B8956B)]">
@@ -100,6 +152,28 @@ export default async function PartnerHomePage() {
             <Link href="/account/partner/carts">Manage shared carts →</Link>
           </Button>
         </div>
+      </section>
+
+      <section className="space-y-4 border-t border-[var(--champagne,#B8956B)]/20 pt-10">
+        <div className="flex items-center gap-2 text-[var(--champagne,#B8956B)]">
+          <Gem className="h-4 w-4" />
+          <h3 className="font-serif text-xl font-light">{tier.label} perks</h3>
+        </div>
+        <p className="max-w-xl text-sm text-muted-foreground">
+          Benefits included with your {tier.label} membership. Hold windows and rates scale with
+          tier.
+        </p>
+        <ul className="divide-y divide-border/60">
+          {perks.map((perk) => (
+            <li key={perk.id} className="py-4">
+              <p className="text-sm font-medium">{perk.label}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{perk.detail}</p>
+            </li>
+          ))}
+        </ul>
+        <Button asChild variant="link" className="h-auto px-0 text-[var(--champagne,#B8956B)]">
+          <Link href="/account/partner/rates">See full rate card →</Link>
+        </Button>
       </section>
     </div>
   )

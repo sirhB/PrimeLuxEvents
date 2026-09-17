@@ -32,7 +32,64 @@ export async function POST(req: Request) {
     switch (event.type) {
         case 'payment_intent.succeeded': {
             const paymentIntent = event.data.object
+            const paymentType = paymentIntent.metadata?.paymentType
 
+            // --- Security deposit: separate charge; never apply to balance_paid ---
+            if (paymentType === 'security_deposit') {
+                let { data: depositOrder } = await supabase
+                    .from('orders')
+                    .select('id, security_deposit_status')
+                    .eq('security_deposit_payment_intent_id', paymentIntent.id)
+                    .maybeSingle()
+
+                if (!depositOrder && paymentIntent.metadata?.orderId) {
+                    const { data: byMeta } = await supabase
+                        .from('orders')
+                        .select('id, security_deposit_status')
+                        .eq('id', paymentIntent.metadata.orderId)
+                        .maybeSingle()
+                    depositOrder = byMeta
+                }
+
+                if (!depositOrder) {
+                    // Order may not exist yet (PI succeeded before createOrder) — ack and retry later via createOrder verify
+                    console.warn('Security deposit PI succeeded before order row existed:', paymentIntent.id)
+                    return NextResponse.json({ received: true, pendingOrder: true })
+                }
+
+                const { data: existingPayment } = await supabase
+                    .from('payments')
+                    .select('id')
+                    .eq('stripe_payment_intent_id', paymentIntent.id)
+                    .maybeSingle()
+
+                if (existingPayment) {
+                    return NextResponse.json({ received: true, duplicate: true })
+                }
+
+                const amountReceived = paymentIntent.amount_received || paymentIntent.amount || 0
+
+                await supabase
+                    .from('orders')
+                    .update({
+                        security_deposit_status: 'held',
+                        security_deposit_amount: amountReceived,
+                        security_deposit_payment_intent_id: paymentIntent.id,
+                    })
+                    .eq('id', depositOrder.id)
+
+                await supabase.from('payments').insert({
+                    order_id: depositOrder.id,
+                    amount: amountReceived,
+                    payment_method: 'security_deposit',
+                    payment_status: 'succeeded',
+                    stripe_payment_intent_id: paymentIntent.id,
+                })
+
+                break
+            }
+
+            // --- Order / balance payments ---
             let { data: order, error: fetchError } = await supabase
                 .from('orders')
                 .select('id, total_amount, balance_paid')
@@ -52,6 +109,20 @@ export async function POST(req: Request) {
                         order = orderMeta
                         fetchError = null
                     }
+                }
+            }
+
+            // Guard: never treat a deposit PI as an order payment via mistaken lookup
+            if (order) {
+                const { data: asDeposit } = await supabase
+                    .from('orders')
+                    .select('id')
+                    .eq('id', order.id)
+                    .eq('security_deposit_payment_intent_id', paymentIntent.id)
+                    .maybeSingle()
+                if (asDeposit) {
+                    console.warn('Skipping balance update for security deposit PI', paymentIntent.id)
+                    return NextResponse.json({ received: true })
                 }
             }
 
@@ -112,6 +183,15 @@ export async function POST(req: Request) {
 
         case 'payment_intent.payment_failed': {
             const failedIntent = event.data.object
+            const failedType = failedIntent.metadata?.paymentType
+
+            if (failedType === 'security_deposit') {
+                await supabase
+                    .from('orders')
+                    .update({ security_deposit_status: 'none' })
+                    .eq('security_deposit_payment_intent_id', failedIntent.id)
+                break
+            }
 
             await supabase
                 .from('orders')
