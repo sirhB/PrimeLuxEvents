@@ -37,7 +37,7 @@ export function HeroSection({
         <div className="hero-enter relative space-y-7 md:space-y-9">
           <div
             aria-hidden
-            className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[140%] w-[130%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--linen)]/75 blur-2xl"
+            className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[110%] w-[95%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--linen)]/55 blur-3xl"
           />
           <p className="font-serif text-5xl font-light tracking-tight text-[var(--ink)] md:text-7xl lg:text-8xl">
             PrimeLux<span className="text-[var(--champagne)]">.</span>
