@@ -69,9 +69,9 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { icon: Activity, label: 'Activity', href: '/admin/activity', keywords: ['feed', 'audit'] },
       {
         icon: TrendingUp,
-        label: 'Analytics',
+        label: 'Ops Intelligence',
         href: '/admin/analytics',
-        keywords: ['reports', 'revenue'],
+        keywords: ['reports', 'revenue', 'analytics', 'gmv', 'intelligence', 'funnel'],
       },
       {
         icon: Sparkles,

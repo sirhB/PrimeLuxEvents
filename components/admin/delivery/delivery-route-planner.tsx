@@ -179,34 +179,61 @@ export function DeliveryRoutePlanner({ initialTasks }: DeliveryRoutePlannerProps
     }
 
     async function optimizeRoute() {
+        if (tasks.length < 2) {
+            toast.info('Add at least two stops to optimize')
+            return
+        }
+
         setOptimizing(true)
         toast.info('Optimizing route...')
 
-        // Simple optimization: Sort by distance from a reference point (e.g., warehouse)
-        // For a real implementation, we'd use OSRM or Google Distance Matrix API
-        // Here we'll simulate it by geocoding addresses if missing and sorting
-
         try {
-            // 1. Geocode missing addresses (client-side using Nominatim)
-            const updatedTasks = [...tasks]
-
-            // This is a simplified example. In production, use a proper geocoding service/cache.
-            // We'll skip actual geocoding calls here to avoid rate limits/complexity in this demo
-            // and just assume we sort by existing lat/long or just shuffle for demo if no coords.
-
-            // Let's just sort by delivery time for now as a basic "optimization"
-            // or if we had lat/long, we'd use nearest neighbor.
-
-            updatedTasks.sort((a, b) => {
-                // Prioritize time if available
-                if (a.orders?.delivery_time && b.orders?.delivery_time) {
-                    return a.orders.delivery_time.localeCompare(b.orders.delivery_time)
-                }
-                return 0
+            const res = await fetch('/api/delivery/optimize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    stops: tasks.map((task) => ({
+                        id: task.id,
+                        lat: task.orders?.latitude ?? null,
+                        lng: task.orders?.longitude ?? null,
+                        address: task.orders?.delivery_address ?? null,
+                        delivery_time: task.orders?.delivery_time ?? null,
+                    })),
+                }),
             })
 
-            setTasks(updatedTasks)
-            toast.success('Route optimized by delivery time')
+            const data = await res.json().catch(() => null)
+            if (!res.ok) {
+                throw new Error(data?.error || 'Optimize request failed')
+            }
+
+            const orderedIds: string[] = Array.isArray(data?.orderedIds) ? data.orderedIds : []
+            if (orderedIds.length === 0) {
+                throw new Error('No route returned')
+            }
+
+            const byId = new Map(tasks.map((t) => [t.id, t]))
+            const reordered = orderedIds
+                .map((id) => byId.get(id))
+                .filter((t): t is Task => Boolean(t))
+            // Append any stops the API omitted (should not happen)
+            for (const t of tasks) {
+                if (!orderedIds.includes(t.id)) reordered.push(t)
+            }
+
+            setTasks(reordered)
+
+            const methodLabel =
+                data.method === 'google_distance_matrix'
+                    ? 'Google Distance Matrix'
+                    : data.method === 'nearest_neighbor'
+                      ? 'nearest-neighbor'
+                      : 'delivery time'
+            const miles =
+                typeof data.totalDistanceMiles === 'number'
+                    ? ` · ~${data.totalDistanceMiles} mi`
+                    : ''
+            toast.success(`Route optimized (${methodLabel}${miles})`)
         } catch (error) {
             console.error('Error optimizing route:', error)
             toast.error('Failed to optimize route')

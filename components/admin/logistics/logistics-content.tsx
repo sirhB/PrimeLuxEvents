@@ -4,21 +4,23 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Truck, MapPin, Calendar, Search, Filter, Map as MapIcon, List, Package } from 'lucide-react'
+import { Truck, MapPin, Calendar, Search, Map as MapIcon, List, Package, Wand2 } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { AdminPageHeader } from '@/components/admin/page-shell'
+import { toast } from 'sonner'
 
 export function LogisticsContent() {
     const [orders, setOrders] = useState<any[]>([])
     const [selectedDate, setSelectedDate] = useState(new Date())
     const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
+    const [optimizing, setOptimizing] = useState(false)
     const supabase = createClient()
 
     useEffect(() => {
         async function fetchLogistics() {
             const dateStr = format(selectedDate, 'yyyy-MM-dd')
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('orders')
                 .select('*')
                 .eq('delivery_date', dateStr)
@@ -29,6 +31,55 @@ export function LogisticsContent() {
         fetchLogistics()
     }, [selectedDate])
 
+    async function optimizeDayRoute() {
+        if (orders.length < 2) {
+            toast.info('Need at least two deliveries to optimize')
+            return
+        }
+        setOptimizing(true)
+        try {
+            const res = await fetch('/api/delivery/optimize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    stops: orders.map((order) => ({
+                        id: order.id,
+                        lat: order.latitude ?? null,
+                        lng: order.longitude ?? null,
+                        address: order.delivery_address ?? null,
+                        delivery_time: order.delivery_time ?? null,
+                    })),
+                }),
+            })
+            const data = await res.json().catch(() => null)
+            if (!res.ok) throw new Error(data?.error || 'Optimize failed')
+
+            const orderedIds: string[] = Array.isArray(data?.orderedIds) ? data.orderedIds : []
+            const byId = new Map(orders.map((o) => [o.id, o]))
+            const reordered = orderedIds
+                .map((id) => byId.get(id))
+                .filter(Boolean)
+            for (const o of orders) {
+                if (!orderedIds.includes(o.id)) reordered.push(o)
+            }
+            setOrders(reordered)
+            setViewMode('list')
+
+            const methodLabel =
+                data.method === 'google_distance_matrix'
+                    ? 'Google Distance Matrix'
+                    : data.method === 'nearest_neighbor'
+                      ? 'nearest-neighbor'
+                      : 'delivery time'
+            toast.success(`Day route optimized (${methodLabel})`)
+        } catch (err) {
+            console.error(err)
+            toast.error('Failed to optimize route')
+        } finally {
+            setOptimizing(false)
+        }
+    }
+
     return (
         <div className="flex flex-col gap-6">
             <AdminPageHeader
@@ -36,25 +87,37 @@ export function LogisticsContent() {
                 title="Logistics Hub"
                 description="Route optimization and deployment."
                 actions={
-                    <div className="flex bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] p-1 rounded-md">
+                    <div className="flex flex-wrap items-center gap-2">
                         <Button
-                            variant={viewMode === 'map' ? 'secondary' : 'ghost'}
+                            variant="outline"
                             size="sm"
-                            onClick={() => setViewMode('map')}
-                            className="rounded-md px-4"
+                            onClick={optimizeDayRoute}
+                            disabled={optimizing || orders.length < 2}
+                            className="rounded-md"
                         >
-                            <MapIcon className="h-4 w-4 mr-2" />
-                            Map
+                            <Wand2 className="h-4 w-4 mr-2" />
+                            {optimizing ? 'Optimizing…' : 'Optimize route'}
                         </Button>
-                        <Button
-                            variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                            size="sm"
-                            onClick={() => setViewMode('list')}
-                            className="rounded-md px-4"
-                        >
-                            <List className="h-4 w-4 mr-2" />
-                            Schedule
-                        </Button>
+                        <div className="flex bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] p-1 rounded-md">
+                            <Button
+                                variant={viewMode === 'map' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('map')}
+                                className="rounded-md px-4"
+                            >
+                                <MapIcon className="h-4 w-4 mr-2" />
+                                Map
+                            </Button>
+                            <Button
+                                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('list')}
+                                className="rounded-md px-4"
+                            >
+                                <List className="h-4 w-4 mr-2" />
+                                Schedule
+                            </Button>
+                        </div>
                     </div>
                 }
             />
@@ -92,11 +155,15 @@ export function LogisticsContent() {
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-[var(--dashboard-text-muted)]">Completed</span>
-                                <span className="font-bold text-[var(--dashboard-accent-green)]">0</span>
+                                <span className="font-bold text-[var(--dashboard-accent-green)]">
+                                    {orders.filter((o) => o.status === 'completed' || o.status === 'delivered').length}
+                                </span>
                             </div>
                             <div className="flex justify-between items-center text-sm">
-                                <span className="text-[var(--dashboard-text-muted)]">In Progress</span>
-                                <span className="font-bold text-blue-500">0</span>
+                                <span className="text-[var(--dashboard-text-muted)]">Pending</span>
+                                <span className="font-bold text-blue-500">
+                                    {orders.filter((o) => o.status === 'pending' || o.status === 'confirmed').length}
+                                </span>
                             </div>
                         </CardContent>
                     </Card>
@@ -133,6 +200,12 @@ export function LogisticsContent() {
                                     Warehouse Bags
                                 </Link>
                             </Button>
+                            <Button asChild variant="ghost" className="w-full justify-start gap-3 rounded-xl hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]">
+                                <Link href="/admin/analytics">
+                                    <Wand2 className="h-4 w-4" />
+                                    Ops Intelligence
+                                </Link>
+                            </Button>
                         </CardContent>
                     </Card>
                 </div>
@@ -146,14 +219,16 @@ export function LogisticsContent() {
                                 </div>
                                 <h3 className="text-2xl font-serif mb-2 text-[var(--dashboard-text)]">Interactive Logistics Map</h3>
                                 <p className="text-[var(--dashboard-text-muted)] max-w-sm mx-auto">
-                                    Visualizing {orders.length} deliveries. Add a Google Maps API key to activate real-time route optimization.
+                                    Visualizing {orders.length} deliveries. Use Optimize route for nearest-neighbor ordering, or Google Distance Matrix when GOOGLE_MAPS_API_KEY is set.
                                 </p>
 
                                 <div className="mt-12 grid sm:grid-cols-2 gap-4 w-full max-w-xl">
-                                    {orders.map((order) => (
+                                    {orders.map((order, index) => (
                                         <div key={order.id} className="glass-card-bright p-4 rounded-2xl border border-[var(--dashboard-border)] text-left shadow-sm hover:shadow-md transition-all">
                                             <div className="flex items-center justify-between mb-2">
-                                                <span className="text-[10px] font-bold text-[var(--dashboard-accent-gold)] uppercase tracking-widest">{order.delivery_time || 'TBD'}</span>
+                                                <span className="text-[10px] font-bold text-[var(--dashboard-accent-gold)] uppercase tracking-widest">
+                                                    #{index + 1} · {order.delivery_time || 'TBD'}
+                                                </span>
                                                 <div className="h-2 w-2 rounded-full bg-blue-500" />
                                             </div>
                                             <p className="text-sm font-bold truncate text-[var(--dashboard-text)]">{order.customer_name}</p>
@@ -173,12 +248,12 @@ export function LogisticsContent() {
                                     {orders.length === 0 ? (
                                         <div className="p-12 text-center text-[var(--dashboard-text-muted)]">No deliveries scheduled for this date.</div>
                                     ) : (
-                                        orders.map((order) => (
+                                        orders.map((order, index) => (
                                             <div key={order.id} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-[var(--dashboard-card-hover)] transition-colors">
                                                 <div className="flex items-center gap-6">
                                                     <div className="h-14 w-14 rounded-2xl bg-black/20 flex flex-col items-center justify-center text-[var(--dashboard-text-muted)] border border-[var(--dashboard-border)]">
-                                                        <span className="text-[10px] font-bold uppercase">{order.delivery_time?.split(' ')[1] || 'HR'}</span>
-                                                        <span className="text-xl font-serif text-[var(--dashboard-text)]">{order.delivery_time?.split(' ')[0] || '--'}</span>
+                                                        <span className="text-[10px] font-bold uppercase">Stop</span>
+                                                        <span className="text-xl font-serif text-[var(--dashboard-text)]">{index + 1}</span>
                                                     </div>
                                                     <div>
                                                         <Link href={`/admin/orders/${order.id}`} className="font-bold text-lg text-[var(--dashboard-text)] hover:text-[var(--dashboard-accent-gold)] transition-colors">
@@ -200,8 +275,8 @@ export function LogisticsContent() {
                                                     </Button>
                                                 </div>
                                             </div>
-                                        )
-                                        ))}
+                                        ))
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>

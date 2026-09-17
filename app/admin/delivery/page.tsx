@@ -24,7 +24,9 @@ export default async function DeliveryPage({
                 customer_name,
                 delivery_address,
                 delivery_time,
-                delivery_date
+                delivery_date,
+                latitude,
+                longitude
             )
         `)
         .eq('task_type', 'delivery')
