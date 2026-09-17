@@ -73,7 +73,7 @@ export default async function ProductVerificationPage() {
                     <p className="text-[var(--dashboard-text-muted)] max-w-sm text-center mb-8 text-sm">
                         Great job! There are no pending products waiting for verification at this time.
                     </p>
-                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90">
+                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#000000] hover:bg-[var(--dashboard-accent-gold)]/90">
                         <Link href="/admin/products">Return to Inventory</Link>
                     </Button>
                 </div>

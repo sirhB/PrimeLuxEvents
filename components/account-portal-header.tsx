@@ -30,35 +30,35 @@ export function AccountPortalHeader({
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border/60 bg-[var(--linen,#F7F4EF)]/90 px-4 py-4 backdrop-blur-md md:px-10 pt-[max(1rem,env(safe-area-inset-top))]">
+    <header className="sticky top-0 z-20 border-b border-border/60 bg-[var(--linen,#e5e5e5)]/90 px-4 py-4 backdrop-blur-md md:px-10 pt-[max(1rem,env(safe-area-inset-top))]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
           <Button
             type="button"
             variant="outline"
             size="icon"
-            className="mt-0.5 shrink-0 rounded-xl border-[var(--champagne,#B8956B)]/30 md:hidden"
+            className="mt-0.5 shrink-0 rounded-xl border-[var(--champagne,#f0a73e)]/30 md:hidden"
             aria-label="Open menu"
             onClick={() => setIsMobileNavOpen(true)}
           >
             <Menu className="h-5 w-5" />
           </Button>
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--champagne,#B8956B)]">
+            <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--champagne,#f0a73e)]">
               Client portal
             </p>
-            <h1 className="font-serif text-2xl font-light tracking-tight text-[var(--ink,#121110)]">
+            <h1 className="font-serif text-2xl font-light tracking-tight text-[var(--ink,#000000)]">
               Hello, {firstName}
             </h1>
           </div>
         </div>
 
         {upcomingOrderDate ? (
-          <div className="rounded-2xl border border-[var(--champagne,#B8956B)]/30 bg-white/90 px-4 py-3 text-sm shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--ink,#121110)]/55">
+          <div className="rounded-2xl border border-[var(--champagne,#f0a73e)]/30 bg-white/90 px-4 py-3 text-sm shadow-sm">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--ink,#000000)]/55">
               Next delivery
             </p>
-            <p className="font-medium text-[var(--ink,#121110)]">
+            <p className="font-medium text-[var(--ink,#000000)]">
               {new Date(upcomingOrderDate).toLocaleDateString(undefined, {
                 month: 'long',
                 day: 'numeric',
@@ -66,11 +66,11 @@ export function AccountPortalHeader({
               })}
             </p>
             {upcomingOrderStatus && (
-              <p className="mt-1 text-xs capitalize text-[var(--sage,#8A9A8B)]">{upcomingOrderStatus}</p>
+              <p className="mt-1 text-xs capitalize text-[var(--sage,#8a96b0)]">{upcomingOrderStatus}</p>
             )}
           </div>
         ) : (
-          <Button asChild variant="outline" className="rounded-full border-[var(--champagne,#B8956B)]/30">
+          <Button asChild variant="outline" className="rounded-full border-[var(--champagne,#f0a73e)]/30">
             <Link href="/catalog" className="gap-2">
               Browse collection <ArrowRight className="h-4 w-4" />
             </Link>

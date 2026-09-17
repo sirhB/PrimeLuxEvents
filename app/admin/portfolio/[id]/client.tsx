@@ -92,7 +92,7 @@ export function CategoryImagesClient({ category, images }: CategoryImagesClientP
                     actions={
                         <Button
                             onClick={() => setUploadDialogOpen(true)}
-                            className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90"
+                            className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#000000] hover:bg-[var(--dashboard-accent-gold)]/90"
                         >
                             <Plus className="mr-2 h-4 w-4" />
                             Upload Images

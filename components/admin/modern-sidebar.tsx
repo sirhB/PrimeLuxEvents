@@ -264,7 +264,7 @@ export function ModernSidebar() {
             )}
             onClick={() => setIsMobileOpen(false)}
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[var(--dashboard-accent-gold)] text-sm font-bold text-[#121110]">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[var(--dashboard-accent-gold)] text-sm font-bold text-[#000000]">
               P
             </div>
             {(!isCollapsed || isMobileOpen) && (

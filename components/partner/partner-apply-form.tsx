@@ -36,7 +36,7 @@ export function PartnerApplyForm({ mode, companyName }: Props) {
   if (mode === 'pending') {
     return (
       <div className="mx-auto max-w-lg space-y-4 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#B8956B)]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#f0a73e)]">
           Preferred vendor
         </p>
         <h2 className="font-serif text-3xl font-light">Application under review</h2>
@@ -88,7 +88,7 @@ export function PartnerApplyForm({ mode, companyName }: Props) {
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-lg space-y-6">
       <div className="space-y-2 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#B8956B)]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#f0a73e)]">
           Preferred vendor program
         </p>
         <h2 className="font-serif text-3xl font-light">Partner with PrimeLux</h2>
