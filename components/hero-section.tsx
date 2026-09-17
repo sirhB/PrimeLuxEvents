@@ -28,8 +28,8 @@ export function HeroSection({
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--linen)]/55 via-[var(--linen)]/25 to-[var(--linen)]" />
-        <div className="absolute inset-0 bg-[var(--ink)]/15" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--linen)]/35 via-transparent to-[var(--linen)]" />
+        <div className="absolute inset-0 bg-[var(--ink)]/[0.08]" />
       </div>
 
       <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center md:px-10">
