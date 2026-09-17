@@ -67,20 +67,24 @@ export function VipCheckInDesk() {
   const arrived = guests.filter((g) => g.checkedIn).length
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10 md:px-10">
+    <div className="mx-auto max-w-3xl px-6 py-10 text-[var(--linen)] md:px-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--champagne)]">
             Check-in desk
           </p>
-          <h1 className="mt-2 font-serif text-3xl text-[var(--ink)]">
+          <h1 className="mt-2 font-serif text-3xl text-[var(--linen)]">
             {eventName || 'VIP Check-In'}
           </h1>
-          <p className="mt-1 text-sm text-[var(--ink)]/55">
+          <p className="mt-1 text-sm text-[var(--linen)]/55">
             {arrived}/{guests.length} arrived
           </p>
         </div>
-        <Button asChild variant="outline">
+        <Button
+          asChild
+          variant="outline"
+          className="border-[var(--linen)]/20 bg-transparent text-[var(--linen)] hover:bg-[var(--linen)]/5"
+        >
           <Link href="/innovate/vip">Back to VIP portal</Link>
         </Button>
       </div>
@@ -89,20 +93,20 @@ export function VipCheckInDesk() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search name, email, or token"
-        className="mt-8 w-full border border-[var(--ink)]/15 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-[var(--champagne)]"
+        className="mt-8 w-full border border-[var(--linen)]/15 bg-transparent px-3 py-2.5 text-sm text-[var(--linen)] outline-none placeholder:text-[var(--linen)]/35 focus:border-[var(--champagne)]"
       />
 
       {guests.length === 0 ? (
-        <p className="mt-8 text-sm text-[var(--ink)]/50">
+        <p className="mt-8 text-sm text-[var(--linen)]/50">
           No guests loaded. Import a manifest in the VIP portal first (same browser).
         </p>
       ) : (
-        <ul className="mt-6 divide-y divide-[var(--ink)]/10 border-y border-[var(--ink)]/10">
+        <ul className="mt-6 divide-y divide-[var(--linen)]/10 border-y border-[var(--linen)]/10">
           {filtered.map((g) => (
             <li key={g.id} className="flex items-center justify-between gap-4 py-3">
               <div className="min-w-0">
-                <p className="font-medium text-[var(--ink)]">{g.name}</p>
-                <p className="text-xs uppercase tracking-wider text-[var(--ink)]/40">
+                <p className="font-medium text-[var(--linen)]">{g.name}</p>
+                <p className="text-xs uppercase tracking-wider text-[var(--linen)]/40">
                   {g.tier}
                   {g.email ? ` · ${g.email}` : ''}
                 </p>
@@ -111,7 +115,9 @@ export function VipCheckInDesk() {
                 <button
                   type="button"
                   onClick={() => undo(g.id)}
-                  className={cn('border border-emerald-700/40 px-3 py-1.5 text-xs text-emerald-800')}
+                  className={cn(
+                    'border border-[var(--sage)]/40 px-3 py-1.5 text-xs text-[var(--sage)]',
+                  )}
                 >
                   Arrived · Undo
                 </button>
@@ -119,7 +125,7 @@ export function VipCheckInDesk() {
                 <Button
                   type="button"
                   size="sm"
-                  className="bg-[var(--ink)] text-[var(--linen)]"
+                  className="bg-[var(--champagne)] text-[var(--ink)] hover:bg-[var(--signal)]"
                   onClick={() => checkIn(g.id)}
                 >
                   Check in
