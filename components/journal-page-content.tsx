@@ -25,7 +25,7 @@ export function JournalPageContent({ content, isEditing = false }: JournalPageCo
     const heroY = useTransform(scrollYProgress, [0, 1], [0, 100])
 
     return (
-        <div className="bg-background text-white selection:bg-gold selection:text-black">
+        <div className="bg-background text-foreground selection:bg-gold selection:text-black">
             {/* Hero Section */}
             <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">

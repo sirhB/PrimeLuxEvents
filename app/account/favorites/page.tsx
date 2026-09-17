@@ -45,7 +45,7 @@ export default async function FavoritesPage() {
             const price = resolvePriceCents(product)
             return (
               <Card key={fav.id} className="overflow-hidden border-border/60 bg-white/80">
-                <div className="relative aspect-[4/5] bg-[var(--linen,#e5e5e5)]">
+                <div className="relative aspect-[4/5] bg-[var(--linen,#f4f7f5)]">
                   {product.image_url ? (
                     <Image src={product.image_url} alt={product.name} fill className="object-contain p-6" />
                   ) : null}
@@ -58,7 +58,7 @@ export default async function FavoritesPage() {
                     <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                       {product.categories?.name || 'Collection'}
                     </p>
-                    <Link href={href} className="font-serif text-xl font-light hover:text-[var(--champagne,#f0a73e)]">
+                    <Link href={href} className="font-serif text-xl font-light hover:text-[var(--champagne,#2f6b57)]">
                       {product.name}
                     </Link>
                   </div>

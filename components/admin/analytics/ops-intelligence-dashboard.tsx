@@ -32,13 +32,13 @@ import type { OpsIntelligenceMetrics } from '@/lib/admin/ops-intelligence'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-const COLORS = ['#f0a73e', '#3d9a78', '#5b8def', '#d4924a', '#8a929c']
+const COLORS = ['#2f6b57', '#3d9a78', '#5b8def', '#d4924a', '#8a929c']
 
 const FUNNEL_COLORS: Record<string, string> = {
   pending: '#d4924a',
   confirmed: '#5b8def',
   delivered: '#3d9a78',
-  completed: '#f0a73e',
+  completed: '#2f6b57',
   cancelled: '#d4655a',
 }
 
@@ -182,8 +182,8 @@ export function OpsIntelligenceDashboard({ metrics }: Props) {
                   <AreaChart data={chartDaily}>
                     <defs>
                       <linearGradient id="colorGmv" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f0a73e" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#f0a73e" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#2f6b57" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#2f6b57" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
@@ -211,7 +211,7 @@ export function OpsIntelligenceDashboard({ metrics }: Props) {
                     <Area
                       type="monotone"
                       dataKey="gmv"
-                      stroke="#f0a73e"
+                      stroke="#2f6b57"
                       strokeWidth={3}
                       fillOpacity={1}
                       fill="url(#colorGmv)"
@@ -353,7 +353,7 @@ export function OpsIntelligenceDashboard({ metrics }: Props) {
                       }}
                       formatter={(value: number) => [`$${Number(value).toFixed(2)}`, 'GMV']}
                     />
-                    <Bar dataKey="gmv" fill="#f0a73e" radius={[4, 4, 0, 0]} barSize={36} />
+                    <Bar dataKey="gmv" fill="#2f6b57" radius={[4, 4, 0, 0]} barSize={36} />
                   </BarChart>
                 </ResponsiveContainer>
               )}

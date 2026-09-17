@@ -471,7 +471,7 @@ const brandingSchema = z.object({
   brand_logo_url: z.string().max(2000).optional().or(z.literal('')),
   brand_accent_color: z.union([
     z.literal(''),
-    z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, 'Use a hex color like #17213c'),
+    z.string().regex(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/, 'Use a hex color like #2f6b57'),
   ]),
   brand_tagline: z.string().max(200).optional().or(z.literal('')),
   business_email: z.union([z.literal(''), z.string().email()]),
@@ -498,7 +498,7 @@ export async function updatePartnerBranding(input: z.infer<typeof brandingSchema
     const updates: Record<string, string | null> = {
       brand_display_name: parsed.data.brand_display_name?.trim() || null,
       brand_logo_url: parsed.data.brand_logo_url?.trim() || null,
-      brand_accent_color: parsed.data.brand_accent_color?.trim() || '#17213c',
+      brand_accent_color: parsed.data.brand_accent_color?.trim() || '#2f6b57',
       brand_tagline: parsed.data.brand_tagline?.trim() || null,
       business_email: parsed.data.business_email?.trim() || null,
       business_address: parsed.data.business_address?.trim() || null,

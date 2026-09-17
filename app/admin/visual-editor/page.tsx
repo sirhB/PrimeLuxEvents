@@ -95,7 +95,7 @@ function EditorWorkspace({
                     <button
                         type="button"
                         onClick={() => void editor.loadPage(activePage)}
-                        className="mt-2 rounded-md bg-[var(--dashboard-accent-gold,#f0a73e)] px-4 py-2 text-xs font-semibold text-black"
+                        className="mt-2 rounded-md bg-[var(--dashboard-accent-gold,#2f6b57)] px-4 py-2 text-xs font-semibold text-black"
                     >
                         Try again
                     </button>

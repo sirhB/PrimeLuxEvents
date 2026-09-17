@@ -78,7 +78,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport = {
-  themeColor: "#000000",
+  themeColor: "#f4f7f5",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -90,7 +90,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
+    <html lang="en" style={{ colorScheme: 'light' }}>
       <body className={`font-sans antialiased bg-background text-foreground ${instrumentSerif.variable} ${ibmPlexSans.variable}`}>
         <PwaProvider>
           <NotificationsProvider>

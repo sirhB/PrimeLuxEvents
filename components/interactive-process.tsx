@@ -37,10 +37,8 @@ export function InteractiveProcess() {
     <section
       id="how-it-works"
       ref={containerRef}
-      className="relative overflow-hidden bg-background py-24 text-[var(--signal)] md:py-36"
+      className="relative overflow-hidden bg-background py-24 text-foreground md:py-36"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
-
       <div className="relative z-10 mx-auto max-w-6xl px-6 md:px-10">
         <div className="mb-16 max-w-2xl md:mb-24">
           <motion.p
@@ -65,14 +63,14 @@ export function InteractiveProcess() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="mt-5 text-base font-light leading-relaxed text-[var(--linen)]/65 md:text-lg"
+            className="mt-5 text-base font-light leading-relaxed text-muted-foreground md:text-lg"
           >
             Four clear steps to reserve rentals for your event date.
           </motion.p>
         </div>
 
         <div className="relative">
-          <div className="absolute left-0 top-0 hidden h-px w-full bg-[var(--linen)]/10 md:block" />
+          <div className="absolute left-0 top-0 hidden h-px w-full bg-border md:block" />
           <motion.div
             style={{ scaleX: scrollYProgress }}
             className="absolute left-0 top-0 hidden h-px w-full origin-left bg-[var(--champagne)] md:block"
@@ -82,7 +80,7 @@ export function InteractiveProcess() {
             {steps.map((step, index) => (
               <li
                 key={step.id}
-                className="border-t border-[var(--linen)]/10 py-8 md:border-t-0 md:border-l md:border-[var(--linen)]/10 md:px-6 md:pt-10 md:first:border-l-0 md:first:pl-0"
+                className="border-t border-border py-8 md:border-t-0 md:border-l md:border-border md:px-6 md:pt-10 md:first:border-l-0 md:first:pl-0"
               >
                 <motion.div
                   initial={{ opacity: 0, y: 24 }}
@@ -96,7 +94,7 @@ export function InteractiveProcess() {
                   <h3 className="mb-3 font-serif text-2xl font-light tracking-tight md:text-3xl">
                     {step.title}
                   </h3>
-                  <p className="max-w-xs text-sm font-light leading-relaxed text-[var(--linen)]/55">
+                  <p className="max-w-xs text-sm font-light leading-relaxed text-muted-foreground">
                     {step.description}
                   </p>
                 </motion.div>

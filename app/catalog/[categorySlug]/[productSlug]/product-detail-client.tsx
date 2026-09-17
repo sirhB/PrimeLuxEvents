@@ -195,7 +195,7 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
     }
 
     return (
-        <div className="min-h-screen bg-background text-white selection:bg-gold selection:text-black">
+        <div className="min-h-screen bg-background text-foreground selection:bg-gold selection:text-black">
             <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
             {/* Top Blur Effect */}

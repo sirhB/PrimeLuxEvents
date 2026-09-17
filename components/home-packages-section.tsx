@@ -13,9 +13,8 @@ export async function HomePackagesSection() {
     .limit(3)
 
   return (
-    <section className="relative overflow-hidden bg-background py-24 text-[var(--signal)] md:py-36">
-      <div className="pointer-events-none absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
-      <div className="pointer-events-none absolute -right-24 top-1/4 h-72 w-72 rounded-full bg-[var(--champagne)]/8 blur-[100px]" />
+    <section className="relative overflow-hidden bg-background py-24 text-foreground md:py-36">
+      <div className="pointer-events-none absolute -right-24 top-1/4 h-72 w-72 rounded-full bg-[var(--champagne)]/10 blur-[100px]" />
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 md:px-10">
         <div className="mb-12 flex flex-col gap-8 md:mb-16 md:flex-row md:items-end md:justify-between">
@@ -24,7 +23,7 @@ export async function HomePackagesSection() {
             <h2 className="font-serif text-4xl font-light tracking-tight md:text-6xl">
               Bundles that save planning time
             </h2>
-            <p className="mt-5 text-base font-light leading-relaxed text-[var(--linen)]/65 md:text-lg">
+            <p className="mt-5 text-base font-light leading-relaxed text-muted-foreground md:text-lg">
               Ready-made rental sets so you can move from idea to quote faster.
             </p>
           </div>
@@ -35,7 +34,7 @@ export async function HomePackagesSection() {
         </div>
 
         {packages && packages.length > 0 ? (
-          <ul className="divide-y divide-[var(--linen)]/10 border-y border-[var(--linen)]/10">
+          <ul className="divide-y divide-border border-y border-border">
             {packages.map((pkg) => (
               <li key={pkg.id}>
                 <Link
@@ -54,17 +53,17 @@ export async function HomePackagesSection() {
                       ) : null}
                     </div>
                     {pkg.description ? (
-                      <p className="mt-2 max-w-xl text-sm font-light leading-relaxed text-[var(--linen)]/55 line-clamp-2">
+                      <p className="mt-2 max-w-xl text-sm font-light leading-relaxed text-muted-foreground line-clamp-2">
                         {pkg.description}
                       </p>
                     ) : null}
                   </div>
 
-                  <div className="flex items-center gap-6 shrink-0">
+                  <div className="flex shrink-0 items-center gap-6">
                     <div className="text-right">
                       {pkg.original_price != null &&
                       pkg.original_price > pkg.price ? (
-                        <p className="text-xs font-light text-[var(--linen)]/35 line-through">
+                        <p className="text-xs font-light text-muted-foreground/60 line-through">
                           {formatCurrency(pkg.original_price)}
                         </p>
                       ) : null}
@@ -72,16 +71,16 @@ export async function HomePackagesSection() {
                         {formatCurrency(pkg.price)}
                       </p>
                     </div>
-                    <ArrowRight className="h-5 w-5 text-[var(--linen)]/40 transition-transform group-hover:translate-x-1 group-hover:text-[var(--champagne)]" />
+                    <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-[var(--champagne)]" />
                   </div>
                 </Link>
               </li>
             ))}
           </ul>
         ) : (
-          <div className="border-y border-[var(--linen)]/10 py-16 text-center">
+          <div className="border-y border-border py-16 text-center">
             <p className="font-serif text-2xl font-light">Packages coming soon</p>
-            <p className="mt-3 text-sm font-light text-[var(--linen)]/50">
+            <p className="mt-3 text-sm font-light text-muted-foreground">
               Browse the full catalog while we finish bundling popular sets.
             </p>
             <Link href="/catalog" className="lux-cta mt-8 inline-flex">

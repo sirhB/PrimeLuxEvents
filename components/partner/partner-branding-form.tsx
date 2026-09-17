@@ -36,7 +36,7 @@ export function PartnerBrandingForm({ initial }: Props) {
     company_name: initial.company_name || '',
     brand_display_name: initial.brand_display_name || '',
     brand_logo_url: initial.brand_logo_url || '',
-    brand_accent_color: initial.brand_accent_color || '#17213c',
+    brand_accent_color: initial.brand_accent_color || '#2f6b57',
     brand_tagline: initial.brand_tagline || '',
     business_email: initial.business_email || '',
     business_address: initial.business_address || '',
@@ -67,7 +67,7 @@ export function PartnerBrandingForm({ initial }: Props) {
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-2xl space-y-8">
       <div className="space-y-2">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#f0a73e)]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#2f6b57)]">
           White-label invoices
         </p>
         <h2 className="font-serif text-3xl font-light tracking-tight">Your brand on client invoices</h2>
@@ -123,13 +123,13 @@ export function PartnerBrandingForm({ initial }: Props) {
                 id="brand_accent_color"
                 type="color"
                 className="h-10 w-14 cursor-pointer p-1"
-                value={form.brand_accent_color || '#17213c'}
+                value={form.brand_accent_color || '#2f6b57'}
                 onChange={(e) => set('brand_accent_color', e.target.value)}
               />
               <Input
                 value={form.brand_accent_color}
                 onChange={(e) => set('brand_accent_color', e.target.value)}
-                placeholder="#17213c"
+                placeholder="#2f6b57"
               />
             </div>
           </div>

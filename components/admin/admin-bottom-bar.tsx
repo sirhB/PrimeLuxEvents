@@ -60,7 +60,7 @@ export function AdminBottomBar() {
             className="-mt-4 flex flex-col items-center gap-0.5 text-[10px] font-medium text-[var(--dashboard-text-muted)]"
             aria-label="Open scanner"
           >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--dashboard-accent-gold)]/40 bg-[var(--dashboard-accent-gold)] text-[#000000] shadow-[0_8px_20px_-8px_rgba(240,167,62,0.7)]">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--dashboard-accent-gold)]/40 bg-[var(--dashboard-accent-gold)] text-[#000000] shadow-[0_8px_20px_-8px_rgba(47,107,87,0.7)]">
               <QrCode className="h-5 w-5" />
             </span>
             Scan

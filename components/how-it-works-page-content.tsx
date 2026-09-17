@@ -66,7 +66,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
     })
 
     return (
-        <div ref={containerRef} className="bg-background text-white selection:bg-gold selection:text-black">
+        <div ref={containerRef} className="bg-background text-foreground selection:bg-gold selection:text-black">
             {/* Hero Section */}
             <section className="relative h-screen flex items-center justify-center overflow-hidden">
                 {/* Background Elements */}

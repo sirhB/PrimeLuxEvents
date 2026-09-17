@@ -102,7 +102,7 @@ export function PartnerCartDetailClient({ cart }: { cart: Cart }) {
   return (
     <div className="mx-auto max-w-2xl space-y-10">
       <div className="space-y-3">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#f0a73e)]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#2f6b57)]">
           Shared cart
         </p>
         <h2 className="font-serif text-3xl font-light tracking-tight">
@@ -131,7 +131,7 @@ export function PartnerCartDetailClient({ cart }: { cart: Cart }) {
         )}
       </div>
 
-      <div className="grid gap-6 rounded-2xl border border-[var(--champagne,#f0a73e)]/25 bg-card p-6 sm:grid-cols-2">
+      <div className="grid gap-6 rounded-2xl border border-[var(--champagne,#2f6b57)]/25 bg-card p-6 sm:grid-cols-2">
         <div className="space-y-2">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
             Client pays you (retail)
@@ -148,7 +148,7 @@ export function PartnerCartDetailClient({ cart }: { cart: Cart }) {
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
             You pay PrimeLux (trade)
           </p>
-          <p className="font-serif text-3xl font-light text-[var(--champagne,#f0a73e)]">
+          <p className="font-serif text-3xl font-light text-[var(--champagne,#2f6b57)]">
             {formatCentsWithCommas(cart.trade_total)}
           </p>
           <p className="text-xs text-muted-foreground">
