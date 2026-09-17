@@ -28,6 +28,7 @@ import {
     type WarehouseTask,
     type WarehouseCategory,
 } from '@/lib/warehouse/types'
+import { assertOnline } from '@/components/admin/needs-connection'
 
 interface WarehouseTaskDetailProps {
     task: WarehouseTask
@@ -42,6 +43,15 @@ export function WarehouseTaskDetail({ task, onUpdate }: WarehouseTaskDetailProps
     const isComplete = task.status === 'completed'
 
     async function handleChecklistToggle(itemId: string, completed: boolean) {
+        if (
+            !assertOnline(() =>
+                toast.error('Needs connection', {
+                    description: 'Reconnect to update the checklist.',
+                }),
+            )
+        ) {
+            return
+        }
         setLoading(itemId)
         const result = await updateChecklistItem(task.id, itemId, completed)
         setLoading(null)
@@ -53,6 +63,15 @@ export function WarehouseTaskDetail({ task, onUpdate }: WarehouseTaskDetailProps
     }
 
     async function handleComplete() {
+        if (
+            !assertOnline(() =>
+                toast.error('Needs connection', {
+                    description: 'Reconnect to complete this task.',
+                }),
+            )
+        ) {
+            return
+        }
         setLoading('complete')
         const result = await completeWarehouseTask(task.id, notes || undefined)
         setLoading(null)
@@ -65,6 +84,15 @@ export function WarehouseTaskDetail({ task, onUpdate }: WarehouseTaskDetailProps
     }
 
     async function handleStart() {
+        if (
+            !assertOnline(() =>
+                toast.error('Needs connection', {
+                    description: 'Reconnect to start this task.',
+                }),
+            )
+        ) {
+            return
+        }
         setLoading('start')
         const result = await updateWarehouseTaskStatus(task.id, 'in_progress')
         setLoading(null)

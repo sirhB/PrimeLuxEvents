@@ -62,8 +62,8 @@ export function CartSheet() {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative group">
-          <ShoppingBag className="h-5 w-5 transition-transform group-hover:scale-110" />
+        <Button variant="ghost" size="icon" className="relative group" aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : 'Cart'}>
+          <ShoppingBag className="h-5 w-5 transition-transform group-hover:scale-110" aria-hidden />
           {cartCount > 0 && (
             <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-gold text-[10px] font-bold flex items-center justify-center text-black shadow-sm">
               {cartCount}

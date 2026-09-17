@@ -1,19 +1,28 @@
 'use client'
 
+import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Clock, User, Package, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Clock, User, Package, ChevronRight, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 import {
     WAREHOUSE_CATEGORY_LABELS,
     type WarehouseTask,
     type WarehouseCategory,
 } from '@/lib/warehouse/types'
+import {
+    completeWarehouseTask,
+    updateWarehouseTaskStatus,
+} from '@/app/admin/warehouse/actions'
+import { assertOnline } from '@/components/admin/needs-connection'
 
 interface WarehouseTaskCardProps {
     task: WarehouseTask
     selected?: boolean
     onClick?: () => void
+    onUpdated?: () => void
     compact?: boolean
 }
 
@@ -35,19 +44,76 @@ const statusColors: Record<string, string> = {
     cancelled: 'text-red-400',
 }
 
-export function WarehouseTaskCard({ task, selected, onClick, compact }: WarehouseTaskCardProps) {
+export function WarehouseTaskCard({
+    task,
+    selected,
+    onClick,
+    onUpdated,
+    compact,
+}: WarehouseTaskCardProps) {
+    const [busy, setBusy] = useState(false)
     const category = (task.warehouse_category || 'general') as WarehouseCategory
     const checklist = Array.isArray(task.checklist) ? task.checklist : []
     const completedCount = checklist.filter((i) => i.completed).length
     const progress = checklist.length > 0 ? Math.round((completedCount / checklist.length) * 100) : null
 
+    const primaryLabel =
+        task.status === 'pending' ? 'Start' : task.status === 'in_progress' ? 'Complete' : null
+
+    const onPrimary = async (e: React.MouseEvent) => {
+        e.stopPropagation()
+        if (
+            !assertOnline(() =>
+                toast.error('Needs connection', {
+                    description: 'Reconnect to update warehouse tasks.',
+                }),
+            )
+        ) {
+            return
+        }
+        if (!primaryLabel) return
+        setBusy(true)
+        try {
+            if (task.status === 'pending') {
+                const result = await updateWarehouseTaskStatus(task.id, 'in_progress')
+                if (!result.success) throw new Error(result.error || 'Failed to start')
+                toast.success('Task started')
+            } else {
+                const result = await completeWarehouseTask(task.id)
+                if (!result.success) throw new Error(result.error || 'Failed to complete')
+                toast.success('Task completed')
+            }
+            onUpdated?.()
+        } catch (err: any) {
+            toast.error(err?.message || 'Could not update task')
+        } finally {
+            setBusy(false)
+        }
+    }
+
     return (
         <Card
+            role={onClick ? 'button' : undefined}
+            tabIndex={onClick ? 0 : undefined}
+            onKeyDown={
+                onClick
+                    ? (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              onClick()
+                          }
+                      }
+                    : undefined
+            }
+            aria-pressed={onClick ? selected : undefined}
+            aria-label={onClick ? `Select task: ${task.title}` : undefined}
             className={cn(
-                'glass-card border-[var(--dashboard-border)] cursor-pointer transition-all hover:border-[var(--dashboard-accent-gold)]/30',
-                selected && 'border-[var(--dashboard-accent-gold)]/50 ring-1 ring-[var(--dashboard-accent-gold)]/20'
+                'glass-card border-[var(--dashboard-border)] transition-all min-h-[4.5rem]',
+                onClick && 'cursor-pointer hover:border-[var(--dashboard-accent-gold)]/30',
+                selected && 'border-[var(--dashboard-accent-gold)]/50 ring-1 ring-[var(--dashboard-accent-gold)]/20',
             )}
             onClick={onClick}
+            animate={false}
         >
             <CardContent className={cn('p-4', compact && 'p-3')}>
                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -62,7 +128,12 @@ export function WarehouseTaskCard({ task, selected, onClick, compact }: Warehous
                     </span>
                 </div>
 
-                <h4 className={cn('font-medium text-[var(--dashboard-text)] mb-1', compact ? 'text-sm line-clamp-1' : 'line-clamp-2')}>
+                <h4
+                    className={cn(
+                        'font-medium text-[var(--dashboard-text)] mb-1',
+                        compact ? 'text-sm line-clamp-1' : 'line-clamp-2',
+                    )}
+                >
                     {task.title}
                 </h4>
 
@@ -77,22 +148,24 @@ export function WarehouseTaskCard({ task, selected, onClick, compact }: Warehous
                     <div className="flex items-center gap-3 text-[10px] text-[var(--dashboard-text-muted)]">
                         {task.scheduled_start && typeof task.scheduled_start === 'string' && (
                             <span className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
+                                <Clock className="h-3 w-3" aria-hidden />
                                 {task.scheduled_start.slice(0, 5)}
                             </span>
                         )}
                         <span className="flex items-center gap-1">
-                            <User className="h-3 w-3" />
+                            <User className="h-3 w-3" aria-hidden />
                             {task.assigned_to_text || 'Warehouse team'}
                         </span>
                     </div>
                     {progress !== null && (
                         <span className="flex items-center gap-1 text-[10px] text-[var(--dashboard-text-muted)]">
-                            <Package className="h-3 w-3" />
+                            <Package className="h-3 w-3" aria-hidden />
                             {completedCount}/{checklist.length}
                         </span>
                     )}
-                    {!compact && <ChevronRight className="h-4 w-4 text-[var(--dashboard-text-muted)]" />}
+                    {!compact && !primaryLabel && (
+                        <ChevronRight className="h-4 w-4 text-[var(--dashboard-text-muted)]" aria-hidden />
+                    )}
                 </div>
 
                 {progress !== null && !compact && (
@@ -102,6 +175,17 @@ export function WarehouseTaskCard({ task, selected, onClick, compact }: Warehous
                             style={{ width: `${progress}%` }}
                         />
                     </div>
+                )}
+
+                {primaryLabel && (
+                    <Button
+                        type="button"
+                        disabled={busy}
+                        onClick={onPrimary}
+                        className="mt-3 w-full h-12 text-sm font-semibold bg-[var(--dashboard-accent-gold)] text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90"
+                    >
+                        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : primaryLabel}
+                    </Button>
                 )}
             </CardContent>
         </Card>

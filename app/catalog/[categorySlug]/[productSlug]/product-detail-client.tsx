@@ -101,8 +101,6 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
     )
     const isInCart = !!cartItem
 
-    const isProductInCart = (productId: string) => items.some((item) => item.productId === productId)
-
     const maxQuantity = 100
 
     const basePrice = resolvePriceCents(product)
@@ -580,8 +578,6 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                         <RelatedProducts
                             currentProduct={product}
                             allProducts={allProducts}
-                            onAddToCart={toggleCart}
-                            isInCart={isProductInCart}
                             maxItems={4}
                         />
                     </div>

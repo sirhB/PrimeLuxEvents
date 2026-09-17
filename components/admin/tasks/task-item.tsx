@@ -199,8 +199,8 @@ export function TaskItem({ task }: TaskItemProps) {
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-card-hover)] rounded-xl transition-all">
-                                <MoreHorizontal className="h-5 w-5" />
+                            <Button variant="ghost" size="icon" aria-label="Task actions" className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-card-hover)] rounded-xl transition-all">
+                                <MoreHorizontal className="h-5 w-5" aria-hidden />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="glass-card border-[var(--dashboard-border)] text-[var(--dashboard-text)]">

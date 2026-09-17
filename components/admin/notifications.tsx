@@ -32,8 +32,8 @@ export function AdminNotifications() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-xl hover:bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] border border-transparent hover:border-[var(--dashboard-accent-gold)]/20 transition-all">
-                    <Bell className="h-5 w-5" />
+                <Button variant="ghost" size="icon" aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'} className="relative h-10 w-10 rounded-xl hover:bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] border border-transparent hover:border-[var(--dashboard-accent-gold)]/20 transition-all">
+                    <Bell className="h-5 w-5" aria-hidden />
                     {unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--dashboard-accent-gold)] text-[10px] font-bold text-black ring-2 ring-[var(--dashboard-background)]">
                             {unreadCount > 9 ? '9+' : unreadCount}

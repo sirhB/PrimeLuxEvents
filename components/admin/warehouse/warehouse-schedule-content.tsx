@@ -318,6 +318,7 @@ export function WarehouseScheduleContent({
                                                     task={task}
                                                     selected={selectedTask?.id === task.id}
                                                     onClick={() => setSelectedTask(task)}
+                                                    onUpdated={refresh}
                                                     compact
                                                 />
                                             ))}
@@ -349,6 +350,7 @@ export function WarehouseScheduleContent({
                                         task={task}
                                         selected={selectedTask?.id === task.id}
                                         onClick={() => setSelectedTask(task)}
+                                        onUpdated={refresh}
                                     />
                                 ))
                             )}
