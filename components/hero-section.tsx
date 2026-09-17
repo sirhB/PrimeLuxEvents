@@ -24,11 +24,11 @@ export function HeroSection({
           src="/images/luxury-event-hero.png"
           alt="Event setup with rental furniture and lighting"
           fill
-          className="object-cover opacity-50 contrast-125"
+          className="object-cover opacity-40 contrast-125"
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/45 to-[var(--ink)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/55 to-[var(--ink)]" />
       </div>
 
       <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center md:px-10">
