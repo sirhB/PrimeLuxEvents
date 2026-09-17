@@ -18,7 +18,7 @@ export function HeroSection({
   ctaSecondary = "How It Works",
 }: HeroSectionProps) {
   return (
-    <section className="spotlight-frame relative h-[100svh] w-full overflow-hidden bg-[var(--ink)]">
+    <section className="relative h-[100svh] w-full overflow-hidden bg-[var(--ink)]">
       <div className="hero-parallax absolute inset-0">
         <Image
           src="/images/mist-cedar-hero-vivid.jpg"
