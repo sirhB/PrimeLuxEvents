@@ -1,17 +1,22 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { ATELIER_VIBES } from '@/lib/innovate/catalog'
 import {
   defaultAtelierHardware,
   priceAtelier,
   type AtelierConfig,
 } from '@/lib/innovate/pricing'
+import { useInnovateDraft } from '@/lib/innovate/use-draft'
 import type { InnovateQuote } from '@/lib/innovate/types'
 import { QuotePanel } from '@/components/innovate/quote-panel'
 import { cn } from '@/lib/utils'
 
-export function AtelierPlanner() {
+function AtelierPlannerInner() {
+  const { draftId, initialDraft, ready, onDraftSaved } = useInnovateDraft('atelier')
+  const hydrated = useRef(false)
+  const prevVibe = useRef<(typeof ATELIER_VIBES)[number]['id']>('winter-solstice')
+
   const [vibeId, setVibeId] =
     useState<(typeof ATELIER_VIBES)[number]['id']>('winter-solstice')
   const [hardwareQty, setHardwareQty] = useState<Record<string, number>>(() =>
@@ -21,6 +26,22 @@ export function AtelierPlanner() {
   const [pulse, setPulse] = useState(false)
 
   useEffect(() => {
+    if (!ready || hydrated.current || !initialDraft) return
+    hydrated.current = true
+    const cfg = initialDraft.config as Partial<AtelierConfig>
+    if (cfg.vibeId) {
+      prevVibe.current = cfg.vibeId
+      setVibeId(cfg.vibeId)
+    }
+    if (cfg.hardwareQty && typeof cfg.hardwareQty === 'object') {
+      setHardwareQty(cfg.hardwareQty)
+    }
+    if (initialDraft.clientLabel) setClientLabel(initialDraft.clientLabel)
+  }, [ready, initialDraft])
+
+  useEffect(() => {
+    if (prevVibe.current === vibeId) return
+    prevVibe.current = vibeId
     setHardwareQty(defaultAtelierHardware(vibeId))
     setPulse(true)
     const t = setTimeout(() => setPulse(false), 500)
@@ -48,12 +69,15 @@ export function AtelierPlanner() {
     setHardwareQty((prev) => ({ ...prev, [sku]: Math.max(0, qty) }))
   }
 
+  const fieldClass =
+    'w-full border border-[var(--linen)]/15 bg-transparent px-3 py-2 text-sm text-[var(--linen)] outline-none focus:border-[var(--champagne)] placeholder:text-[var(--linen)]/35'
+
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col lg:flex-row">
       <div className="flex min-w-0 flex-1 flex-col">
         <div
           className={cn(
-            'relative min-h-[42vh] flex-1 overflow-hidden border-b border-[var(--ink)]/10 transition-all duration-700 lg:min-h-0 lg:border-b-0 lg:border-r',
+            'relative min-h-[42vh] flex-1 overflow-hidden border-b border-[var(--linen)]/10 transition-all duration-700 lg:min-h-0 lg:border-b-0 lg:border-r',
             pulse && 'scale-[1.01]',
           )}
           style={{
@@ -82,21 +106,21 @@ export function AtelierPlanner() {
           </div>
         </div>
 
-        <div className="space-y-8 bg-[var(--linen)] p-6 lg:p-8">
+        <div className="space-y-8 bg-[var(--surface)] p-6 text-[var(--linen)] lg:p-8">
           <label className="block max-w-md">
-            <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+            <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
               Client label
             </span>
             <input
               value={clientLabel}
               onChange={(e) => setClientLabel(e.target.value)}
-              className="w-full border border-[var(--ink)]/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-[var(--champagne)]"
+              className={fieldClass}
               placeholder="e.g. New Year Lounge"
             />
           </label>
 
           <div>
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
               Vibe selector
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -108,15 +132,15 @@ export function AtelierPlanner() {
                   className={cn(
                     'border px-4 py-4 text-left transition-all duration-300',
                     vibeId === v.id
-                      ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--linen)]'
-                      : 'border-[var(--ink)]/15 hover:border-[var(--ink)]/35',
+                      ? 'border-[var(--champagne)] bg-[var(--champagne)] text-[var(--ink)]'
+                      : 'border-[var(--linen)]/15 hover:border-[var(--linen)]/35',
                   )}
                 >
                   <span className="block font-serif text-lg">{v.label}</span>
                   <span
                     className={cn(
                       'mt-1 block text-xs',
-                      vibeId === v.id ? 'text-[var(--linen)]/65' : 'text-[var(--ink)]/50',
+                      vibeId === v.id ? 'text-[var(--ink)]/65' : 'text-[var(--linen)]/50',
                     )}
                   >
                     {v.tagline}
@@ -127,20 +151,20 @@ export function AtelierPlanner() {
           </div>
 
           <div>
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
               Hardware bundle
             </p>
-            <ul className="divide-y divide-[var(--ink)]/10 border border-[var(--ink)]/10">
+            <ul className="divide-y divide-[var(--linen)]/10 border border-[var(--linen)]/10">
               {vibe.hardware.map((hw) => (
                 <li key={hw.sku} className="flex items-center justify-between gap-4 px-4 py-3">
                   <div className="min-w-0">
-                    <p className="text-sm text-[var(--ink)]">{hw.label}</p>
-                    <p className="text-[11px] text-[var(--ink)]/40">{hw.sku}</p>
+                    <p className="text-sm text-[var(--linen)]">{hw.label}</p>
+                    <p className="text-[11px] text-[var(--linen)]/40">{hw.sku}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      className="h-8 w-8 border border-[var(--ink)]/15 text-sm"
+                      className="h-8 w-8 border border-[var(--linen)]/15 text-sm text-[var(--linen)]"
                       onClick={() => setQty(hw.sku, (hardwareQty[hw.sku] ?? 0) - 1)}
                     >
                       −
@@ -150,7 +174,7 @@ export function AtelierPlanner() {
                     </span>
                     <button
                       type="button"
-                      className="h-8 w-8 border border-[var(--ink)]/15 text-sm"
+                      className="h-8 w-8 border border-[var(--linen)]/15 text-sm text-[var(--linen)]"
                       onClick={() => setQty(hw.sku, (hardwareQty[hw.sku] ?? 0) + 1)}
                     >
                       +
@@ -165,8 +189,18 @@ export function AtelierPlanner() {
 
       <QuotePanel
         quote={quote}
+        draftId={draftId}
+        onDraftSaved={onDraftSaved}
         className="w-full shrink-0 lg:sticky lg:top-0 lg:h-screen lg:w-80 xl:w-96"
       />
     </div>
+  )
+}
+
+export function AtelierPlanner() {
+  return (
+    <Suspense fallback={<div className="min-h-[50vh] bg-[var(--ink)]" />}>
+      <AtelierPlannerInner />
+    </Suspense>
   )
 }

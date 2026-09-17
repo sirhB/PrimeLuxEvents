@@ -1,12 +1,13 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import {
   AMBIENCE_PRESETS,
   BACKDROP_FRAMES,
   FLOOR_MATERIALS,
 } from '@/lib/innovate/catalog'
 import { priceBackdrop, type BackdropConfig } from '@/lib/innovate/pricing'
+import { useInnovateDraft } from '@/lib/innovate/use-draft'
 import type { InnovateQuote } from '@/lib/innovate/types'
 import { QuotePanel } from '@/components/innovate/quote-panel'
 import { cn } from '@/lib/utils'
@@ -27,8 +28,8 @@ function Chip({
       className={cn(
         'border px-3 py-1.5 text-xs transition-colors',
         active
-          ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--linen)]'
-          : 'border-[var(--ink)]/15 text-[var(--ink)]/70 hover:border-[var(--ink)]/40',
+          ? 'border-[var(--champagne)] bg-[var(--champagne)] text-[var(--ink)]'
+          : 'border-[var(--linen)]/15 text-[var(--linen)]/70 hover:border-[var(--linen)]/40',
       )}
     >
       {children}
@@ -39,7 +40,7 @@ function Chip({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+      <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
         {label}
       </span>
       {children}
@@ -47,7 +48,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   )
 }
 
-export function BackdropStudio() {
+function BackdropStudioInner() {
+  const { draftId, initialDraft, ready, onDraftSaved } = useInnovateDraft('backdrop')
+  const hydrated = useRef(false)
+
   const [frameId, setFrameId] =
     useState<(typeof BACKDROP_FRAMES)[number]['id']>('arch-wall')
   const [materialId, setMaterialId] =
@@ -60,6 +64,20 @@ export function BackdropStudio() {
     useState<(typeof AMBIENCE_PRESETS)[number]['id']>('warm-dusk')
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [clientLabel, setClientLabel] = useState('')
+
+  useEffect(() => {
+    if (!ready || hydrated.current || !initialDraft) return
+    hydrated.current = true
+    const cfg = initialDraft.config as Partial<BackdropConfig>
+    if (cfg.frameId) setFrameId(cfg.frameId as (typeof BACKDROP_FRAMES)[number]['id'])
+    if (cfg.materialId) setMaterialId(cfg.materialId as (typeof FLOOR_MATERIALS)[number]['id'])
+    if (typeof cfg.widthFt === 'number') setWidthFt(cfg.widthFt)
+    if (typeof cfg.lengthFt === 'number') setLengthFt(cfg.lengthFt)
+    if (typeof cfg.neonText === 'string') setNeonText(cfg.neonText)
+    if (typeof cfg.includeLogo === 'boolean') setIncludeLogo(cfg.includeLogo)
+    if (cfg.ambienceId) setAmbienceId(cfg.ambienceId as (typeof AMBIENCE_PRESETS)[number]['id'])
+    if (initialDraft.clientLabel) setClientLabel(initialDraft.clientLabel)
+  }, [ready, initialDraft])
 
   const config: BackdropConfig = {
     frameId,
@@ -106,10 +124,13 @@ export function BackdropStudio() {
     setIncludeLogo(true)
   }
 
+  const fieldClass =
+    'w-full border border-[var(--linen)]/15 bg-transparent px-3 py-2 text-sm text-[var(--linen)] outline-none focus:border-[var(--champagne)] placeholder:text-[var(--linen)]/35'
+
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col lg:flex-row">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="relative min-h-[42vh] flex-1 overflow-hidden border-b border-[var(--ink)]/10 lg:min-h-0 lg:border-b-0 lg:border-r">
+        <div className="relative min-h-[42vh] flex-1 overflow-hidden border-b border-[var(--linen)]/10 lg:min-h-0 lg:border-b-0 lg:border-r">
           <div
             className="absolute inset-0 transition-colors duration-700"
             style={{
@@ -181,12 +202,12 @@ export function BackdropStudio() {
           </div>
         </div>
 
-        <div className="grid gap-6 border-t border-[var(--ink)]/10 bg-[var(--linen)] p-6 md:grid-cols-2 lg:p-8">
+        <div className="grid gap-6 border-t border-[var(--linen)]/10 bg-[var(--surface)] p-6 md:grid-cols-2 lg:p-8">
           <Field label="Client label (optional)">
             <input
               value={clientLabel}
               onChange={(e) => setClientLabel(e.target.value)}
-              className="w-full border border-[var(--ink)]/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-[var(--champagne)]"
+              className={fieldClass}
               placeholder="e.g. Winter Gala — Acme"
             />
           </Field>
@@ -247,7 +268,7 @@ export function BackdropStudio() {
             <input
               value={neonText}
               onChange={(e) => setNeonText(e.target.value.slice(0, 40))}
-              className="w-full border border-[var(--ink)]/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-[var(--champagne)]"
+              className={fieldClass}
               placeholder="Event name"
             />
           </Field>
@@ -258,9 +279,9 @@ export function BackdropStudio() {
                 type="file"
                 accept="image/*,.svg"
                 onChange={(e) => onLogo(e.target.files?.[0] ?? null)}
-                className="text-sm file:mr-3 file:border-0 file:bg-[var(--ink)] file:px-3 file:py-1.5 file:text-xs file:text-[var(--linen)]"
+                className="text-sm text-[var(--linen)]/70 file:mr-3 file:border-0 file:bg-[var(--champagne)] file:px-3 file:py-1.5 file:text-xs file:text-[var(--ink)]"
               />
-              <label className="flex items-center gap-2 text-sm text-[var(--ink)]/70">
+              <label className="flex items-center gap-2 text-sm text-[var(--linen)]/70">
                 <input
                   type="checkbox"
                   checked={includeLogo}
@@ -275,8 +296,18 @@ export function BackdropStudio() {
 
       <QuotePanel
         quote={quote}
+        draftId={draftId}
+        onDraftSaved={onDraftSaved}
         className="w-full shrink-0 lg:sticky lg:top-0 lg:h-screen lg:w-80 xl:w-96"
       />
     </div>
+  )
+}
+
+export function BackdropStudio() {
+  return (
+    <Suspense fallback={<div className="min-h-[50vh] bg-[var(--ink)]" />}>
+      <BackdropStudioInner />
+    </Suspense>
   )
 }

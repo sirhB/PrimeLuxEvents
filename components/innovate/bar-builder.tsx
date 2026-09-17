@@ -1,19 +1,34 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { BAR_ADDONS, BAR_BASES, BAR_WRAP_OPTIONS } from '@/lib/innovate/catalog'
 import { priceBar, type BarConfig } from '@/lib/innovate/pricing'
+import { useInnovateDraft } from '@/lib/innovate/use-draft'
 import type { InnovateQuote } from '@/lib/innovate/types'
 import { QuotePanel } from '@/components/innovate/quote-panel'
 import { cn } from '@/lib/utils'
 
-export function BarBuilder() {
+function BarBuilderInner() {
+  const { draftId, initialDraft, ready, onDraftSaved } = useInnovateDraft('bar')
+  const hydrated = useRef(false)
+
   const [baseId, setBaseId] = useState<(typeof BAR_BASES)[number]['id']>('marble-top')
   const [addonIds, setAddonIds] = useState<string[]>(['ice-well'])
   const [wrapId, setWrapId] =
     useState<(typeof BAR_WRAP_OPTIONS)[number]['id']>('vinyl-wrap')
   const [brandText, setBrandText] = useState('HOUSE')
   const [clientLabel, setClientLabel] = useState('')
+
+  useEffect(() => {
+    if (!ready || hydrated.current || !initialDraft) return
+    hydrated.current = true
+    const cfg = initialDraft.config as Partial<BarConfig>
+    if (cfg.baseId) setBaseId(cfg.baseId as (typeof BAR_BASES)[number]['id'])
+    if (Array.isArray(cfg.addonIds)) setAddonIds(cfg.addonIds)
+    if (cfg.wrapId) setWrapId(cfg.wrapId as (typeof BAR_WRAP_OPTIONS)[number]['id'])
+    if (typeof cfg.brandText === 'string') setBrandText(cfg.brandText)
+    if (initialDraft.clientLabel) setClientLabel(initialDraft.clientLabel)
+  }, [ready, initialDraft])
 
   const config: BarConfig = { baseId, addonIds, wrapId, brandText }
   const lines = useMemo(
@@ -37,10 +52,13 @@ export function BarBuilder() {
     setAddonIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }
 
+  const fieldClass =
+    'w-full border border-[var(--linen)]/15 bg-transparent px-3 py-2 text-sm text-[var(--linen)] outline-none focus:border-[var(--champagne)] disabled:opacity-40 placeholder:text-[var(--linen)]/35'
+
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col lg:flex-row">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="relative min-h-[42vh] flex-1 overflow-hidden border-b border-[var(--ink)]/10 bg-[#1a1714] lg:min-h-0 lg:border-b-0 lg:border-r">
+        <div className="relative min-h-[42vh] flex-1 overflow-hidden border-b border-[var(--linen)]/10 bg-[#1a1714] lg:min-h-0 lg:border-b-0 lg:border-r">
           <div
             className="absolute inset-0 opacity-40"
             style={{
@@ -84,20 +102,20 @@ export function BarBuilder() {
           </div>
         </div>
 
-        <div className="space-y-8 bg-[var(--linen)] p-6 lg:p-8">
+        <div className="space-y-8 bg-[var(--surface)] p-6 text-[var(--linen)] lg:p-8">
           <label className="block max-w-md">
-            <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+            <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
               Client label
             </span>
             <input
               value={clientLabel}
               onChange={(e) => setClientLabel(e.target.value)}
-              className="w-full border border-[var(--ink)]/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-[var(--champagne)]"
+              className={fieldClass}
             />
           </label>
 
           <div>
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
               Base structure
             </p>
             <div className="grid gap-3 sm:grid-cols-3">
@@ -109,15 +127,15 @@ export function BarBuilder() {
                   className={cn(
                     'border px-4 py-4 text-left transition-colors',
                     baseId === b.id
-                      ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--linen)]'
-                      : 'border-[var(--ink)]/15 hover:border-[var(--ink)]/35',
+                      ? 'border-[var(--champagne)] bg-[var(--champagne)] text-[var(--ink)]'
+                      : 'border-[var(--linen)]/15 hover:border-[var(--linen)]/35',
                   )}
                 >
                   <span className="block font-serif text-lg">{b.label}</span>
                   <span
                     className={cn(
                       'mt-1 block text-xs',
-                      baseId === b.id ? 'text-[var(--linen)]/65' : 'text-[var(--ink)]/50',
+                      baseId === b.id ? 'text-[var(--ink)]/65' : 'text-[var(--linen)]/50',
                     )}
                   >
                     {b.description}
@@ -128,7 +146,7 @@ export function BarBuilder() {
           </div>
 
           <div>
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
               Add-ons
             </p>
             <div className="flex flex-wrap gap-2">
@@ -140,8 +158,8 @@ export function BarBuilder() {
                   className={cn(
                     'border px-3 py-1.5 text-xs transition-colors',
                     addonIds.includes(a.id)
-                      ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--linen)]'
-                      : 'border-[var(--ink)]/15 text-[var(--ink)]/70',
+                      ? 'border-[var(--champagne)] bg-[var(--champagne)] text-[var(--ink)]'
+                      : 'border-[var(--linen)]/15 text-[var(--linen)]/70',
                   )}
                 >
                   {a.label}
@@ -152,7 +170,7 @@ export function BarBuilder() {
 
           <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
                 Branded panel
               </p>
               <div className="flex flex-wrap gap-2">
@@ -164,8 +182,8 @@ export function BarBuilder() {
                     className={cn(
                       'border px-3 py-1.5 text-xs transition-colors',
                       wrapId === w.id
-                        ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--linen)]'
-                        : 'border-[var(--ink)]/15 text-[var(--ink)]/70',
+                        ? 'border-[var(--champagne)] bg-[var(--champagne)] text-[var(--ink)]'
+                        : 'border-[var(--linen)]/15 text-[var(--linen)]/70',
                     )}
                   >
                     {w.label}
@@ -174,14 +192,14 @@ export function BarBuilder() {
               </div>
             </div>
             <label className="block">
-              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
                 Brand text
               </span>
               <input
                 value={brandText}
                 onChange={(e) => setBrandText(e.target.value.slice(0, 24))}
                 disabled={wrapId === 'none'}
-                className="w-full border border-[var(--ink)]/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-[var(--champagne)] disabled:opacity-40"
+                className={fieldClass}
               />
             </label>
           </div>
@@ -190,8 +208,18 @@ export function BarBuilder() {
 
       <QuotePanel
         quote={quote}
+        draftId={draftId}
+        onDraftSaved={onDraftSaved}
         className="w-full shrink-0 lg:sticky lg:top-0 lg:h-screen lg:w-80 xl:w-96"
       />
     </div>
+  )
+}
+
+export function BarBuilder() {
+  return (
+    <Suspense fallback={<div className="min-h-[50vh] bg-[var(--ink)]" />}>
+      <BarBuilderInner />
+    </Suspense>
   )
 }

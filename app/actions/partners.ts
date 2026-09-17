@@ -601,3 +601,87 @@ export async function adminUpdatePartnerStatus(input: {
   revalidatePath('/admin/partners')
   return { success: true }
 }
+
+export type PartnerReportingStats = {
+  eventsCount: number
+  gmvCents: number
+  settledOrders: number
+  openCarts: number
+  tradeSavingsCents: number
+}
+
+/**
+ * Partner-facing Phase 2 reporting: client events (shared carts),
+ * GMV from attributed orders (or settled cart retail as fallback).
+ */
+export async function getPartnerReportingStats(): Promise<
+  PartnerReportingStats & { error?: string }
+> {
+  try {
+    const partner = await requireActivePartner()
+    const supabase = await createClient()
+    const admin = createServiceClient()
+
+    const { data: carts, error: cartsError } = await supabase
+      .from('partner_shared_carts')
+      .select('id, status, retail_total, trade_total, event_date, client_name')
+      .eq('partner_id', partner.id)
+
+    if (cartsError) {
+      return {
+        error: cartsError.message,
+        eventsCount: 0,
+        gmvCents: 0,
+        settledOrders: 0,
+        openCarts: 0,
+        tradeSavingsCents: 0,
+      }
+    }
+
+    const list = carts || []
+    const activeCarts = list.filter((c) => c.status !== 'cancelled')
+    // Count client events: distinct non-cancelled carts (each cart = one client event workflow)
+    const eventsCount = activeCarts.length
+    const openCarts = list.filter((c) =>
+      ['draft', 'shared', 'accepted'].includes(c.status),
+    ).length
+
+    const settled = list.filter((c) => c.status === 'settled')
+    const cartGmv = settled.reduce((sum, c) => sum + (c.retail_total || 0), 0)
+    const tradeSavingsCents = settled.reduce(
+      (sum, c) => sum + Math.max(0, (c.retail_total || 0) - (c.trade_total || 0)),
+      0,
+    )
+
+    // Prefer attributed order totals when readable (service role; partner-scoped)
+    let gmvCents = cartGmv
+    let settledOrders = settled.length
+    const { data: orders } = await admin
+      .from('orders')
+      .select('id, total_amount, status')
+      .eq('partner_id', partner.id)
+      .neq('status', 'cancelled')
+
+    if (orders && orders.length > 0) {
+      gmvCents = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0)
+      settledOrders = orders.length
+    }
+
+    return {
+      eventsCount,
+      gmvCents,
+      settledOrders,
+      openCarts,
+      tradeSavingsCents,
+    }
+  } catch (e) {
+    return {
+      error: e instanceof Error ? e.message : 'Failed',
+      eventsCount: 0,
+      gmvCents: 0,
+      settledOrders: 0,
+      openCarts: 0,
+      tradeSavingsCents: 0,
+    }
+  }
+}

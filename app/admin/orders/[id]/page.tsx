@@ -37,6 +37,7 @@ import { formatCents, formatCentsWithCommas } from '@/lib/format-money'
 import { AdminQRCode } from '@/components/admin/qr-code'
 import { Truck, Search, ShoppingBag } from 'lucide-react'
 import { BagAssignmentManager } from '@/components/admin/bag-assignment-manager'
+import { OrderPickupDepositPanel } from '@/components/admin/orders/order-pickup-deposit-panel'
 
 export default async function OrderDetailsPage({
     params,
@@ -112,6 +113,14 @@ export default async function OrderDetailsPage({
                                     </p>
                                     <p className="text-[var(--dashboard-text)]">{new Date(order.created_at).toLocaleString()}</p>
                                 </div>
+                                <div>
+                                    <p className="text-xs font-bold uppercase tracking-wider text-[var(--dashboard-text-muted)] mb-1">
+                                        Fulfillment
+                                    </p>
+                                    <p className="text-[var(--dashboard-text)] capitalize">
+                                        {(order.fulfillment_method || 'delivery').replace('_', ' ')}
+                                    </p>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -145,6 +154,33 @@ export default async function OrderDetailsPage({
                         </CardContent>
                     </Card>
                 </div>
+
+                {/* Pickup schedule + security deposit */}
+                <Card className="glass-card border-none">
+                    <CardHeader>
+                        <CardTitle className="text-[var(--dashboard-text)] text-base font-semibold">
+                            Schedule &amp; security deposit
+                        </CardTitle>
+                        <CardDescription className="text-[var(--dashboard-text-muted)]">
+                            Confirm pickup/return windows and refund the separate security deposit charge
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <OrderPickupDepositPanel
+                            orderId={order.id}
+                            fulfillmentMethod={order.fulfillment_method}
+                            deliveryDate={order.delivery_date}
+                            deliveryTime={order.delivery_time}
+                            returnDate={order.return_date}
+                            returnTime={order.return_time}
+                            pickupDate={order.pickup_date}
+                            pickupTime={order.pickup_time}
+                            pickupConfirmed={!!order.pickup_confirmed}
+                            securityDepositAmount={order.security_deposit_amount || 0}
+                            securityDepositStatus={order.security_deposit_status}
+                        />
+                    </CardContent>
+                </Card>
 
 
 

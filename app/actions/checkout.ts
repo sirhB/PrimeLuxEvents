@@ -11,6 +11,10 @@ import {
 import { clampCheckoutAmount } from '@/lib/security/checkout-amounts'
 import { checkRateLimit, clientIpFromHeaders } from '@/lib/security/rate-limit'
 import { COMPANY } from '@/lib/company'
+import {
+    computeSecurityDepositCents,
+    parseSecurityDepositSettings,
+} from '@/lib/security-deposit'
 import { headers } from 'next/headers'
 import { z } from 'zod'
 
@@ -29,7 +33,12 @@ const checkoutFormSchema = z.object({
     pickupTime: z.string().max(40).optional(),
     pickupNotes: z.string().max(2000).optional(),
     sameDayPickup: z.boolean().optional(),
+    fulfillmentMethod: z.enum(['delivery', 'customer_pickup']).optional().default('delivery'),
+    returnDate: z.string().max(40).optional(),
+    returnTime: z.string().max(40).optional(),
 })
+
+export type FulfillmentMethod = 'delivery' | 'customer_pickup'
 
 export interface CheckoutFormData {
     customerName: string
@@ -46,6 +55,11 @@ export interface CheckoutFormData {
     pickupTime?: string
     pickupNotes?: string
     sameDayPickup?: boolean
+    /** delivery = we deliver; customer_pickup = customer picks up at warehouse */
+    fulfillmentMethod?: FulfillmentMethod
+    /** Scheduled return / drop-off for customer_pickup rentals */
+    returnDate?: string
+    returnTime?: string
 }
 
 export interface CartItem {
@@ -112,11 +126,21 @@ export async function calculateDeliveryFee(deliveryAddress: string): Promise<num
     }
 }
 
+export type CalculateOrderTotalOptions = {
+    fulfillmentMethod?: FulfillmentMethod
+}
+
 /**
  * Calculate order totals
  */
-export async function calculateOrderTotal(items: CartItem[], deliveryAddress: string) {
+export async function calculateOrderTotal(
+    items: CartItem[],
+    deliveryAddress: string,
+    options?: CalculateOrderTotalOptions,
+) {
     const supabase = await createClient()
+    const fulfillmentMethod: FulfillmentMethod =
+        options?.fulfillmentMethod === 'customer_pickup' ? 'customer_pickup' : 'delivery'
 
     // Fetch products for standard items
     const productIds = items
@@ -198,12 +222,14 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
         }
     })
 
-    // Get settings for tax rate
+    // Get settings for tax rate + security deposit
     const settings = await getSettings()
     const taxRate = parseFloat(settings?.tax_rate || '0.08875')
+    const depositConfig = parseSecurityDepositSettings(settings || {})
 
-    // Calculate delivery fee
-    const deliveryFee = await calculateDeliveryFee(deliveryAddress)
+    // Customer warehouse pickup: no delivery fee
+    const deliveryFee =
+        fulfillmentMethod === 'customer_pickup' ? 0 : await calculateDeliveryFee(deliveryAddress)
 
     // Calculate tax (on subtotal + setup fee, not delivery)
     const taxableAmount = subtotal + setupFee
@@ -259,6 +285,8 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
     const adjustedTaxAmount = Math.round(adjustedTaxableAmount * taxRate)
 
     const totalAmount = discountedSubtotal + setupFee + adjustedTaxAmount + deliveryFee
+    // Refundable security deposit is separate from order total (charged as its own PaymentIntent)
+    const securityDepositCents = computeSecurityDepositCents(discountedSubtotal, depositConfig)
 
     return {
         subtotal,
@@ -269,6 +297,10 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
         taxAmount: adjustedTaxAmount,
         deliveryFee,
         totalAmount,
+        securityDepositCents,
+        securityDepositConfig: depositConfig,
+        fulfillmentMethod,
+        warehouseAddress: settings?.warehouse_address || COMPANY.warehouseAddress,
         products,
         packagePriceById: Object.fromEntries(packagePriceById),
     }
@@ -277,7 +309,14 @@ export async function calculateOrderTotal(items: CartItem[], deliveryAddress: st
 /**
  * Create a new order
  */
-export async function createOrder(formData: CheckoutFormData, items: CartItem[], paymentIntentId?: string, signatureUrl?: string, paidAmount?: number) {
+export async function createOrder(
+    formData: CheckoutFormData,
+    items: CartItem[],
+    paymentIntentId?: string,
+    signatureUrl?: string,
+    paidAmount?: number,
+    securityDepositPaymentIntentId?: string,
+) {
     try {
         const hdrs = await headers()
         const ip = clientIpFromHeaders(hdrs)
@@ -297,13 +336,27 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
             return { success: false, error: 'Invalid cart' }
         }
 
+        const fulfillmentMethod: FulfillmentMethod =
+            formData.fulfillmentMethod === 'customer_pickup' ? 'customer_pickup' : 'delivery'
+
+        if (fulfillmentMethod === 'customer_pickup') {
+            if (!formData.returnDate || !formData.returnTime) {
+                return { success: false, error: 'Return date and time are required for warehouse pickup' }
+            }
+        }
+
         // Session client for identity; service role for writes after server-side validation
         // (RLS no longer allows open public inserts on orders / items / reservations).
         const supabase = await createClient()
         const admin = createServiceClient()
 
         // Calculate totals (package/product prices from DB — ignore client prices)
-        const totals = await calculateOrderTotal(items, formData.deliveryAddress)
+        const totals = await calculateOrderTotal(items, formData.deliveryAddress, { fulfillmentMethod })
+
+        // For customer pickup, pin delivery address to warehouse
+        if (fulfillmentMethod === 'customer_pickup') {
+            formData.deliveryAddress = totals.warehouseAddress
+        }
 
         // Validate that all STANDARD items exist
         const foundProductIds = totals.products.map(p => p.id)
@@ -379,6 +432,9 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         if (finalPaymentIntentId) {
             if (stripe) {
                 const paymentIntent = await stripe.paymentIntents.retrieve(finalPaymentIntentId)
+                if (paymentIntent.metadata?.paymentType === 'security_deposit') {
+                    throw new Error('Invalid payment intent for order total')
+                }
                 const piAmount = paymentIntent.amount
                 const minDeposit = Math.ceil(totals.totalAmount * 0.5)
                 if (piAmount > totals.totalAmount || piAmount < minDeposit) {
@@ -405,6 +461,9 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                     automatic_payment_methods: {
                         enabled: true,
                     },
+                    metadata: {
+                        paymentType: 'order',
+                    },
                 })
                 finalPaymentIntentId = paymentIntent.id
                 paymentStatus = 'unpaid'
@@ -414,6 +473,48 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 paymentStatus = 'unpaid'
             } else {
                 throw new Error('Stripe is not configured. Payments cannot be processed.')
+            }
+        }
+
+        // Separate refundable security deposit PaymentIntent (must not mix with order balance)
+        const expectedDepositCents = totals.securityDepositCents
+        let finalDepositPaymentIntentId: string | null = securityDepositPaymentIntentId || null
+        let securityDepositStatus: 'none' | 'held' | 'refunded' | 'partially_refunded' | 'forfeited' =
+            expectedDepositCents > 0 ? 'none' : 'none'
+        let securityDepositAmount = 0
+
+        if (expectedDepositCents > 0) {
+            if (finalDepositPaymentIntentId) {
+                if (stripe) {
+                    const depositPi = await stripe.paymentIntents.retrieve(finalDepositPaymentIntentId)
+                    if (depositPi.metadata?.paymentType !== 'security_deposit') {
+                        throw new Error('Invalid security deposit payment intent')
+                    }
+                    if (depositPi.amount !== expectedDepositCents) {
+                        throw new Error('Security deposit amount does not match configured deposit')
+                    }
+                    securityDepositAmount = expectedDepositCents
+                    if (depositPi.status === 'succeeded') {
+                        securityDepositStatus = 'held'
+                    }
+                } else if (allowMockPayments()) {
+                    securityDepositAmount = expectedDepositCents
+                    securityDepositStatus = 'held'
+                } else {
+                    throw new Error('Stripe is not configured. Payments cannot be processed.')
+                }
+            } else if (paymentIntentId) {
+                // Public checkout supplied an order PaymentIntent — deposit charge is required
+                throw new Error('Security deposit payment is required to complete this booking')
+            } else if (allowMockPayments() && !stripe) {
+                const mock = await createMockPaymentIntent(expectedDepositCents)
+                finalDepositPaymentIntentId = mock.id
+                securityDepositAmount = expectedDepositCents
+                securityDepositStatus = 'held'
+            } else {
+                // Admin / partner paths: record expected deposit for later collection
+                securityDepositAmount = expectedDepositCents
+                securityDepositStatus = 'none'
             }
         }
 
@@ -530,6 +631,13 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
                 signature_url: signatureUrl,
                 signed_at: signatureUrl ? new Date().toISOString() : null,
                 balance_paid: verifiedPaidCents,
+                fulfillment_method: fulfillmentMethod,
+                return_date: fulfillmentMethod === 'customer_pickup' ? (formData.returnDate || null) : null,
+                return_time: fulfillmentMethod === 'customer_pickup' ? (formData.returnTime || null) : null,
+                pickup_confirmed: false,
+                security_deposit_amount: securityDepositAmount,
+                security_deposit_payment_intent_id: finalDepositPaymentIntentId,
+                security_deposit_status: securityDepositStatus,
             })
             .select()
             .single()
@@ -537,6 +645,36 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
         if (orderError) {
             console.error('Error creating order:', orderError)
             throw new Error('Failed to create order')
+        }
+
+        // Link both PaymentIntents to this order for webhook reconciliation
+        if (stripe && finalPaymentIntentId && !finalPaymentIntentId.startsWith('pi_mock_')) {
+            try {
+                await stripe.paymentIntents.update(finalPaymentIntentId, {
+                    metadata: {
+                        orderId: order.id,
+                        paymentType: 'order',
+                    },
+                })
+            } catch (metaErr) {
+                console.error('Failed to attach orderId to order PaymentIntent:', metaErr)
+            }
+        }
+        if (
+            stripe &&
+            finalDepositPaymentIntentId &&
+            !finalDepositPaymentIntentId.startsWith('pi_mock_')
+        ) {
+            try {
+                await stripe.paymentIntents.update(finalDepositPaymentIntentId, {
+                    metadata: {
+                        orderId: order.id,
+                        paymentType: 'security_deposit',
+                    },
+                })
+            } catch (metaErr) {
+                console.error('Failed to attach orderId to deposit PaymentIntent:', metaErr)
+            }
         }
 
         // Create order items (Decomposition)
@@ -639,6 +777,7 @@ export async function createOrder(formData: CheckoutFormData, items: CartItem[],
             success: true,
             orderId: order.id,
             paymentIntentId: finalPaymentIntentId,
+            securityDepositPaymentIntentId: finalDepositPaymentIntentId,
         }
     } catch (error) {
         console.error('Error in createOrder:', error)

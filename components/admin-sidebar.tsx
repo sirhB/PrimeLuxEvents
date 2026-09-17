@@ -38,7 +38,7 @@ const sidebarSections: SidebarSection[] = [
                 icon: LayoutDashboard,
             },
             {
-                title: 'Analytics',
+                title: 'Ops Intelligence',
                 href: '/admin/analytics',
                 icon: BarChart3,
             },

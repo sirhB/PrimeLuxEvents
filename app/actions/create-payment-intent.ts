@@ -1,7 +1,11 @@
 'use server'
 
-import { stripe } from '@/lib/stripe'
-import { calculateOrderTotal, type CartItem } from './checkout'
+import { stripe, allowMockPayments, createMockPaymentIntent } from '@/lib/stripe'
+import {
+    calculateOrderTotal,
+    type CartItem,
+    type FulfillmentMethod,
+} from './checkout'
 import { createClient } from '@/lib/supabase/server'
 import { userOwnsOrder } from '@/lib/orders/ownership'
 import { isStaffUser } from '@/lib/auth/roles'
@@ -9,12 +13,27 @@ import { clampCheckoutAmount } from '@/lib/security/checkout-amounts'
 import { checkRateLimit, clientIpFromHeaders } from '@/lib/security/rate-limit'
 import { headers } from 'next/headers'
 
-export async function createPaymentIntent(items: CartItem[], deliveryAddress: string, customAmount?: number) {
-    try {
-        if (!stripe) {
-            throw new Error('Stripe is not configured')
-        }
+export type CreateCheckoutPaymentIntentsResult = {
+    clientSecret?: string | null
+    paymentIntentId?: string
+    amount?: number
+    depositClientSecret?: string | null
+    depositPaymentIntentId?: string | null
+    depositAmount?: number
+    error?: string
+}
 
+/**
+ * Create two separate PaymentIntents: order total (or ≥50% deposit) + refundable security deposit.
+ * Keeping them separate makes deposit refunds independent of the rental charge.
+ */
+export async function createCheckoutPaymentIntents(
+    items: CartItem[],
+    deliveryAddress: string,
+    customAmount?: number,
+    fulfillmentMethod: FulfillmentMethod = 'delivery',
+): Promise<CreateCheckoutPaymentIntentsResult> {
+    try {
         if (!Array.isArray(items) || items.length === 0 || items.length > 100) {
             return { error: 'Invalid cart' }
         }
@@ -29,15 +48,40 @@ export async function createPaymentIntent(items: CartItem[], deliveryAddress: st
             return { error: 'Too many payment attempts. Please try again shortly.' }
         }
 
-        // Server-computed total from DB prices — ignore client package prices
-        const totals = await calculateOrderTotal(items, deliveryAddress)
+        const method: FulfillmentMethod =
+            fulfillmentMethod === 'customer_pickup' ? 'customer_pickup' : 'delivery'
+
+        const totals = await calculateOrderTotal(items, deliveryAddress, {
+            fulfillmentMethod: method,
+        })
         if (totals.totalAmount <= 0) {
             return { error: 'Cart total is invalid' }
         }
 
-        const { amount: finalAmount, isPartial } = clampCheckoutAmount(customAmount, totals.totalAmount)
+        const { amount: finalAmount, isPartial } = clampCheckoutAmount(
+            customAmount,
+            totals.totalAmount,
+        )
+        const depositAmount = Math.max(0, totals.securityDepositCents || 0)
 
-        const paymentIntent = await stripe.paymentIntents.create({
+        if (!stripe) {
+            if (!allowMockPayments()) {
+                return { error: 'Stripe is not configured' }
+            }
+            const orderMock = await createMockPaymentIntent(finalAmount)
+            const depositMock =
+                depositAmount > 0 ? await createMockPaymentIntent(depositAmount) : null
+            return {
+                clientSecret: orderMock.client_secret,
+                paymentIntentId: orderMock.id,
+                amount: finalAmount,
+                depositClientSecret: depositMock?.client_secret ?? null,
+                depositPaymentIntentId: depositMock?.id ?? null,
+                depositAmount,
+            }
+        }
+
+        const orderIntent = await stripe.paymentIntents.create({
             amount: finalAmount,
             currency: 'usd',
             automatic_payment_methods: {
@@ -47,18 +91,64 @@ export async function createPaymentIntent(items: CartItem[], deliveryAddress: st
                 itemCount: items.length.toString(),
                 isPartial: isPartial ? 'true' : 'false',
                 totalAmount: totals.totalAmount.toString(),
+                paymentType: 'order',
+                fulfillmentMethod: method,
             },
         })
 
+        let depositClientSecret: string | null = null
+        let depositPaymentIntentId: string | null = null
+
+        if (depositAmount > 0) {
+            const depositIntent = await stripe.paymentIntents.create({
+                amount: depositAmount,
+                currency: 'usd',
+                automatic_payment_methods: {
+                    enabled: true,
+                },
+                metadata: {
+                    paymentType: 'security_deposit',
+                    depositAmount: depositAmount.toString(),
+                    orderTotalAmount: totals.totalAmount.toString(),
+                    fulfillmentMethod: method,
+                },
+            })
+            depositClientSecret = depositIntent.client_secret
+            depositPaymentIntentId = depositIntent.id
+        }
+
         return {
-            clientSecret: paymentIntent.client_secret,
+            clientSecret: orderIntent.client_secret,
+            paymentIntentId: orderIntent.id,
             amount: finalAmount,
+            depositClientSecret,
+            depositPaymentIntentId,
+            depositAmount,
         }
     } catch (error) {
-        console.error('Error creating payment intent:', error)
+        console.error('Error creating checkout payment intents:', error)
         return {
             error: error instanceof Error ? error.message : 'Failed to create payment intent',
         }
+    }
+}
+
+/** @deprecated Prefer createCheckoutPaymentIntents — kept for callers that only need the order PI */
+export async function createPaymentIntent(
+    items: CartItem[],
+    deliveryAddress: string,
+    customAmount?: number,
+) {
+    const result = await createCheckoutPaymentIntents(items, deliveryAddress, customAmount, 'delivery')
+    if (result.error) {
+        return { error: result.error }
+    }
+    return {
+        clientSecret: result.clientSecret,
+        amount: result.amount,
+        depositClientSecret: result.depositClientSecret,
+        depositPaymentIntentId: result.depositPaymentIntentId,
+        depositAmount: result.depositAmount,
     }
 }
 

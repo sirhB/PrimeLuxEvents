@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { VIP_HARDWARE } from '@/lib/innovate/catalog'
@@ -13,6 +13,7 @@ import {
   saveVipGuests,
   type VipGuest,
 } from '@/lib/innovate/drafts'
+import { useInnovateDraft } from '@/lib/innovate/use-draft'
 import type { InnovateQuote } from '@/lib/innovate/types'
 import { generateQRCode } from '@/lib/qr'
 import { QuotePanel } from '@/components/innovate/quote-panel'
@@ -35,7 +36,10 @@ function parseManifest(raw: string): Omit<VipGuest, 'id' | 'checkedIn' | 'token'
     })
 }
 
-export function VipPortal() {
+function VipPortalInner() {
+  const { draftId, initialDraft, ready, onDraftSaved } = useInnovateDraft('vip')
+  const hydrated = useRef(false)
+
   const [eventName, setEventName] = useState('')
   const [eventDate, setEventDate] = useState('')
   const [venue, setVenue] = useState('')
@@ -47,6 +51,7 @@ export function VipPortal() {
   const [includeService, setIncludeService] = useState(true)
   const [qrMap, setQrMap] = useState<Record<string, string>>({})
   const [welcomeName, setWelcomeName] = useState('Welcome')
+  const [metaReady, setMetaReady] = useState(false)
 
   useEffect(() => {
     const meta = loadVipEvent()
@@ -54,15 +59,36 @@ export function VipPortal() {
     setEventDate(meta.date)
     setVenue(meta.venue)
     setGuests(loadVipGuests())
+    if (meta.name) setWelcomeName(`Welcome to ${meta.name}`)
+    setMetaReady(true)
   }, [])
 
   useEffect(() => {
-    saveVipEvent({ name: eventName, date: eventDate, venue })
-  }, [eventName, eventDate, venue])
+    if (!ready || !metaReady || hydrated.current || !initialDraft) return
+    hydrated.current = true
+    const cfg = initialDraft.config as Record<string, unknown>
+    if (typeof cfg.eventName === 'string' && cfg.eventName) {
+      setEventName(cfg.eventName)
+      setWelcomeName(`Welcome to ${cfg.eventName}`)
+    } else if (initialDraft.clientLabel) {
+      setEventName(initialDraft.clientLabel)
+      setWelcomeName(`Welcome to ${initialDraft.clientLabel}`)
+    }
+    if (typeof cfg.eventDate === 'string') setEventDate(cfg.eventDate)
+    if (typeof cfg.venue === 'string') setVenue(cfg.venue)
+    if (Array.isArray(cfg.hardwareSkus)) setHardwareSkus(cfg.hardwareSkus as string[])
+    if (typeof cfg.includeService === 'boolean') setIncludeService(cfg.includeService)
+  }, [ready, metaReady, initialDraft])
 
   useEffect(() => {
+    if (!metaReady) return
+    saveVipEvent({ name: eventName, date: eventDate, venue })
+  }, [eventName, eventDate, venue, metaReady])
+
+  useEffect(() => {
+    if (!metaReady) return
     saveVipGuests(guests)
-  }, [guests])
+  }, [guests, metaReady])
 
   const lines = useMemo(
     () =>
@@ -131,11 +157,13 @@ export function VipPortal() {
   }
 
   const checkedIn = guests.filter((g) => g.checkedIn).length
+  const fieldClass =
+    'w-full border border-[var(--linen)]/15 bg-transparent px-3 py-2 text-sm text-[var(--linen)] outline-none focus:border-[var(--champagne)]'
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col lg:flex-row">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="relative min-h-[36vh] overflow-hidden border-b border-[var(--ink)]/10 bg-[#121110] lg:border-b-0 lg:border-r">
+        <div className="relative min-h-[36vh] overflow-hidden border-b border-[var(--linen)]/10 bg-[#121110] lg:border-b-0 lg:border-r">
           <div
             className="absolute inset-0 opacity-50"
             style={{
@@ -161,10 +189,10 @@ export function VipPortal() {
           </div>
         </div>
 
-        <div className="space-y-8 bg-[var(--linen)] p-6 lg:p-8">
+        <div className="space-y-8 bg-[var(--surface)] p-6 text-[var(--linen)] lg:p-8">
           <div className="grid gap-4 md:grid-cols-3">
             <label className="block">
-              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
                 Event name
               </span>
               <input
@@ -173,50 +201,63 @@ export function VipPortal() {
                   setEventName(e.target.value)
                   if (e.target.value) setWelcomeName(`Welcome to ${e.target.value}`)
                 }}
-                className="w-full border border-[var(--ink)]/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-[var(--champagne)]"
+                className={fieldClass}
               />
             </label>
             <label className="block">
-              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
                 Date
               </span>
               <input
                 type="date"
                 value={eventDate}
                 onChange={(e) => setEventDate(e.target.value)}
-                className="w-full border border-[var(--ink)]/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-[var(--champagne)]"
+                className={fieldClass}
               />
             </label>
             <label className="block">
-              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
                 Venue
               </span>
               <input
                 value={venue}
                 onChange={(e) => setVenue(e.target.value)}
-                className="w-full border border-[var(--ink)]/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-[var(--champagne)]"
+                className={fieldClass}
               />
             </label>
           </div>
 
           <div>
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
               Guest manifest (CSV: name, email, tier)
             </p>
             <textarea
               value={manifest}
               onChange={(e) => setManifest(e.target.value)}
               rows={5}
-              className="w-full border border-[var(--ink)]/15 bg-transparent px-3 py-2 font-mono text-xs outline-none focus:border-[var(--champagne)]"
+              className="w-full border border-[var(--linen)]/15 bg-transparent px-3 py-2 font-mono text-xs text-[var(--linen)] outline-none focus:border-[var(--champagne)]"
             />
             <div className="mt-3 flex flex-wrap gap-2">
-              <Button type="button" onClick={importGuests} className="bg-[var(--ink)] text-[var(--linen)]">
+              <Button
+                type="button"
+                onClick={importGuests}
+                className="bg-[var(--champagne)] text-[var(--ink)] hover:bg-[var(--signal)]"
+              >
                 Import guests
               </Button>
-              <Button type="button" variant="outline" onClick={generatePasses}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={generatePasses}
+                className="border-[var(--linen)]/20 bg-transparent text-[var(--linen)] hover:bg-[var(--linen)]/5"
+              >
                 Generate QR passes
               </Button>
-              <Button asChild variant="outline">
+              <Button
+                asChild
+                variant="outline"
+                className="border-[var(--linen)]/20 bg-transparent text-[var(--linen)] hover:bg-[var(--linen)]/5"
+              >
                 <Link href="/innovate/vip/check-in">Open check-in desk</Link>
               </Button>
             </div>
@@ -224,15 +265,15 @@ export function VipPortal() {
 
           {guests.length > 0 && (
             <div>
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
                 Guests ({guests.length})
               </p>
-              <ul className="max-h-64 divide-y divide-[var(--ink)]/10 overflow-auto border border-[var(--ink)]/10">
+              <ul className="max-h-64 divide-y divide-[var(--linen)]/10 overflow-auto border border-[var(--linen)]/10">
                 {guests.map((g) => (
                   <li key={g.id} className="flex items-center gap-4 px-3 py-2 text-sm">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{g.name}</p>
-                      <p className="truncate text-xs text-[var(--ink)]/45">
+                      <p className="truncate font-medium text-[var(--linen)]">{g.name}</p>
+                      <p className="truncate text-xs text-[var(--linen)]/45">
                         {g.email || '—'} · {g.tier}
                         {g.checkedIn ? ' · checked in' : ''}
                       </p>
@@ -241,7 +282,7 @@ export function VipPortal() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={qrMap[g.token]} alt={`QR for ${g.name}`} className="h-14 w-14 bg-white p-0.5" />
                     ) : (
-                      <span className="text-[10px] uppercase tracking-wider text-[var(--ink)]/35">
+                      <span className="text-[10px] uppercase tracking-wider text-[var(--linen)]/35">
                         No QR
                       </span>
                     )}
@@ -252,7 +293,7 @@ export function VipPortal() {
           )}
 
           <div>
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]/45">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--linen)]/45">
               Entry hardware
             </p>
             <div className="flex flex-wrap gap-2">
@@ -264,15 +305,15 @@ export function VipPortal() {
                   className={cn(
                     'border px-3 py-1.5 text-xs transition-colors',
                     hardwareSkus.includes(hw.sku)
-                      ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--linen)]'
-                      : 'border-[var(--ink)]/15 text-[var(--ink)]/70',
+                      ? 'border-[var(--champagne)] bg-[var(--champagne)] text-[var(--ink)]'
+                      : 'border-[var(--linen)]/15 text-[var(--linen)]/70',
                   )}
                 >
                   {hw.label}
                 </button>
               ))}
             </div>
-            <label className="mt-4 flex items-center gap-2 text-sm text-[var(--ink)]/70">
+            <label className="mt-4 flex items-center gap-2 text-sm text-[var(--linen)]/70">
               <input
                 type="checkbox"
                 checked={includeService}
@@ -286,8 +327,18 @@ export function VipPortal() {
 
       <QuotePanel
         quote={quote}
+        draftId={draftId}
+        onDraftSaved={onDraftSaved}
         className="w-full shrink-0 lg:sticky lg:top-0 lg:h-screen lg:w-80 xl:w-96"
       />
     </div>
+  )
+}
+
+export function VipPortal() {
+  return (
+    <Suspense fallback={<div className="min-h-[50vh] bg-[var(--ink)]" />}>
+      <VipPortalInner />
+    </Suspense>
   )
 }
