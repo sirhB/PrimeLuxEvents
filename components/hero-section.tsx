@@ -28,8 +28,7 @@ export function HeroSection({
           priority
           sizes="100vw"
         />
-        {/* Edge only — keeps header/footer transition clean without a center wash */}
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[var(--ink)]/35 to-transparent" />
+        <div className="absolute inset-0 bg-black/45" />
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[var(--linen)] to-transparent" />
       </div>
 
