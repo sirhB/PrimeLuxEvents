@@ -24,12 +24,13 @@ export function HeroSection({
           src="/images/mist-cedar-hero.png"
           alt="Sunlit outdoor event tables with linen and greenery"
           fill
-          className="object-cover object-center"
+          className="object-cover object-center contrast-[1.05] saturate-[1.2]"
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--linen)]/35 via-transparent to-[var(--linen)]" />
-        <div className="absolute inset-0 bg-[var(--ink)]/[0.08]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--linen)]/20 via-transparent to-[var(--linen)]" />
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[var(--linen)]/50 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[var(--linen)] to-transparent" />
       </div>
 
       <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center md:px-10">
