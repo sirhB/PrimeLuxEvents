@@ -1,118 +1,110 @@
 "use client"
 
-import { motion, useScroll, useTransform } from "framer-motion"
+import { motion, useScroll } from "framer-motion"
 import { useRef } from "react"
-import { Search, MousePointerClick, CalendarCheck, PartyPopper, Sparkles, ShoppingBag, Send, GlassWater } from "lucide-react"
 
 const steps = [
-    {
-        id: 1,
-        title: "Browse Collection",
-        description: "Explore our curated gallery of premium furniture, decor, and lighting.",
-        icon: ShoppingBag,
-    },
-    {
-        id: 2,
-        title: "Select Favorites",
-        description: "Add items to your quote cart and customize quantities for your event.",
-        icon: MousePointerClick,
-    },
-    {
-        id: 3,
-        title: "Secure Your Date",
-        description: "Submit your request. We'll confirm availability and send a custom proposal.",
-        icon: Send,
-    },
-    {
-        id: 4,
-        title: "Celebrate in Style",
-        description: "We handle delivery and setup so you can focus on enjoying your event.",
-        icon: GlassWater,
-    },
+  {
+    id: 1,
+    title: "Browse",
+    description: "Explore furniture, lighting, tents, and décor in the online catalog.",
+  },
+  {
+    id: 2,
+    title: "Select",
+    description: "Add pieces to your quote and set quantities for your guest count.",
+  },
+  {
+    id: 3,
+    title: "Reserve",
+    description: "Submit your date. We confirm availability and send a clear proposal.",
+  },
+  {
+    id: 4,
+    title: "We deliver",
+    description: "Delivery and setup are handled so you can focus on the celebration.",
+  },
 ]
 
 export function InteractiveProcess() {
-    const containerRef = useRef<HTMLDivElement>(null)
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start center", "end center"],
-    })
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start center", "end center"],
+  })
 
-    return (
-        <section ref={containerRef} className="py-24 md:py-40 bg-background text-white relative overflow-hidden">
-            {/* Decorative background element */}
-            <div className="absolute top-0 right-0 w-full h-full bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
+  return (
+    <section
+      id="how-it-works"
+      ref={containerRef}
+      className="relative overflow-hidden bg-background py-24 text-[var(--signal)] md:py-36"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
 
-            <div className="container mx-auto px-4 md:px-6 relative z-10">
-                <div className="text-center max-w-3xl mx-auto mb-24">
-                    <motion.span
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-4 block"
-                    >
-                        The Process
-                    </motion.span>
-                    <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
-                        className="text-4xl md:text-6xl font-serif font-light mb-8 tracking-tight"
-                    >
-                        Seamless Luxury Experience
-                    </motion.h2>
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
-                        className="text-lg text-gray-400 font-light leading-relaxed"
-                    >
-                        From inspiration to celebration, we make the rental process effortless.
-                    </motion.p>
-                </div>
-
-                <div className="relative">
-                    {/* Connecting Line (Desktop) */}
-                    <div className="hidden md:block absolute top-1/2 left-0 w-full h-px bg-white/10 -translate-y-1/2 z-0" />
-                    <motion.div
-                        style={{ scaleX: scrollYProgress }}
-                        className="hidden md:block absolute top-1/2 left-0 w-full h-px bg-gold -translate-y-1/2 z-0 origin-left"
-                    />
-
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative z-10">
-                        {steps.map((step, index) => (
-                            <ProcessStep key={step.id} step={step} index={index} />
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </section>
-    )
-}
-
-function ProcessStep({ step, index }: { step: typeof steps[0]; index: number }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 50 }}
+      <div className="relative z-10 mx-auto max-w-6xl px-6 md:px-10">
+        <div className="mb-16 max-w-2xl md:mb-24">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: index * 0.2 }}
-            className="flex flex-col items-center text-center group"
-        >
-            <div className="relative mb-10">
-                <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-500 group-hover:bg-gold group-hover:border-gold group-hover:scale-110">
-                    <step.icon className="w-8 h-8 text-gold group-hover:text-black transition-colors duration-500 stroke-[1.5]" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-background border border-white/10 flex items-center justify-center text-[10px] font-bold text-gold">
+            className="lux-label mb-4"
+          >
+            How it works
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.05 }}
+            className="font-serif text-4xl font-light tracking-tight md:text-6xl"
+          >
+            From browse to delivery
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="mt-5 text-base font-light leading-relaxed text-[var(--linen)]/65 md:text-lg"
+          >
+            Four clear steps to reserve rentals for your event date.
+          </motion.p>
+        </div>
+
+        <div className="relative">
+          <div className="absolute left-0 top-0 hidden h-px w-full bg-[var(--linen)]/10 md:block" />
+          <motion.div
+            style={{ scaleX: scrollYProgress }}
+            className="absolute left-0 top-0 hidden h-px w-full origin-left bg-[var(--champagne)] md:block"
+          />
+
+          <ol className="grid grid-cols-1 gap-0 md:grid-cols-4 md:gap-0">
+            {steps.map((step, index) => (
+              <li
+                key={step.id}
+                className="border-t border-[var(--linen)]/10 py-8 md:border-t-0 md:border-l md:border-[var(--linen)]/10 md:px-6 md:pt-10 md:first:border-l-0 md:first:pl-0"
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.08 }}
+                >
+                  <p className="mb-6 font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-[var(--champagne)]">
                     0{step.id}
-                </div>
-            </div>
-            <h3 className="text-2xl font-serif font-light mb-5 tracking-tight group-hover:text-gold transition-all duration-500">{step.title}</h3>
-            <p className="text-gray-500 text-sm font-light leading-relaxed max-w-[240px]">
-                {step.description}
-            </p>
-        </motion.div>
-    )
+                  </p>
+                  <h3 className="mb-3 font-serif text-2xl font-light tracking-tight md:text-3xl">
+                    {step.title}
+                  </h3>
+                  <p className="max-w-xs text-sm font-light leading-relaxed text-[var(--linen)]/55">
+                    {step.description}
+                  </p>
+                </motion.div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+  )
 }
