@@ -34,7 +34,11 @@ export function HeroSection({
       </div>
 
       <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center md:px-10">
-        <div className="hero-enter space-y-7 md:space-y-9">
+        <div className="hero-enter relative space-y-7 md:space-y-9">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[140%] w-[130%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--linen)]/75 blur-2xl"
+          />
           <p className="font-serif text-5xl font-light tracking-tight text-[var(--ink)] md:text-7xl lg:text-8xl">
             PrimeLux<span className="text-[var(--champagne)]">.</span>
           </p>
@@ -43,7 +47,7 @@ export function HeroSection({
             {title}
           </h1>
 
-          <p className="mx-auto max-w-xl text-base font-light leading-relaxed text-[var(--ink)]/70 md:text-lg">
+          <p className="mx-auto max-w-xl text-base font-light leading-relaxed text-[var(--ink)]/75 md:text-lg">
             {subtitle}
           </p>
 
@@ -52,7 +56,7 @@ export function HeroSection({
               {ctaPrimary}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link href="#how-it-works" className="lux-cta-ghost group">
+            <Link href="#how-it-works" className="lux-cta-ghost group bg-[var(--linen)]/70">
               {ctaSecondary}
             </Link>
           </div>
