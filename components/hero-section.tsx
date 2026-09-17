@@ -21,7 +21,7 @@ export function HeroSection({
     <section className="spotlight-frame relative h-[100svh] w-full overflow-hidden bg-[var(--linen)]">
       <div className="hero-parallax absolute inset-0">
         <Image
-          src="/images/mist-cedar-hero.png"
+          src="/images/mist-cedar-hero-vivid.png"
           alt="Sunlit outdoor event tables with linen and greenery"
           fill
           className="object-cover object-center contrast-[1.05] saturate-[1.2]"

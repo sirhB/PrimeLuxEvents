@@ -54,7 +54,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
     const processImages = [
         "/images/luxury_furniture_collection_1767781427931.png",
         "/images/luxury_selection_interface_1767781469895.png",
-        "/images/mist-cedar-hero.png",
+        "/images/mist-cedar-hero-vivid.png",
         "/images/service-logistics.png",
         "/images/luxury_event_setup_celebration_1767781442112.png"
     ]
