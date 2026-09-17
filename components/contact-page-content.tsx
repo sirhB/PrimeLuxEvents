@@ -7,6 +7,7 @@ import Link from "next/link"
 import { EditableContent } from "@/components/admin/editable-content"
 import { NonEditableOverlay } from "@/components/admin/non-editable-overlay"
 import { cn } from "@/lib/utils"
+import { COMPANY } from "@/lib/company"
 
 interface ContactPageContentProps {
     content: any
@@ -16,9 +17,9 @@ interface ContactPageContentProps {
 
 export function ContactPageContent({ content, settings = {}, isEditing = false }: ContactPageContentProps) {
     // Map settings to content if settings exist, otherwise use content table values
-    const addressValue = settings.company_address || content['contact.info.address.value']
-    const emailValue = settings.company_email || content['contact.info.email.value']
-    const phoneValue = settings.company_phone || content['contact.info.phone.value']
+    const addressValue = settings.company_address || content['contact.info.address.value'] || COMPANY.address
+    const emailValue = settings.company_email || content['contact.info.email.value'] || COMPANY.email
+    const phoneValue = settings.company_phone || content['contact.info.phone.value'] || COMPANY.phone
     return (
         <section className="pt-32 pb-24 md:pt-48 md:pb-40 bg-[#1A1A1A] min-h-screen relative overflow-hidden">
             {/* Decorative background elements */}
@@ -127,13 +128,15 @@ export function ContactPageContent({ content, settings = {}, isEditing = false }
                         {/* Social Links or additional info */}
                         <div className="mt-12 flex justify-between items-center px-4">
                             <div className="flex gap-8">
-                                {['Instagram', 'Pinterest', 'LinkedIn'].map((social) => (
-                                    <Link key={social} href="#" className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 hover:text-gold transition-colors">
-                                        {social}
-                                    </Link>
-                                ))}
+                                <a
+                                    href={COMPANY.instagramUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 hover:text-gold transition-colors"
+                                >
+                                    Instagram
+                                </a>
                             </div>
-                            <div className="w-px h-8 bg-white/5" />
                         </div>
                     </motion.div>
                 </div>

@@ -324,8 +324,8 @@ export function CartSheet() {
                 }
 
                 return (
-                  <p className="text-[10px] text-gray-500 font-light leading-relaxed uppercase tracking-[0.2em] text-center">
-                    Final pricing will be calculated at checkout.
+                  <p className="text-[10px] text-gray-500 font-light leading-relaxed uppercase tracking-[0.15em] text-center">
+                    Next: optional add-ons → event details → secure pay
                   </p>
                 )
               })()}
@@ -382,7 +382,7 @@ export function CartSheet() {
                 return acc
               }, 0) < 15000}
             >
-              Secure Checkout <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              Continue to checkout <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
             </div>
           </div>

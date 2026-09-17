@@ -10,6 +10,7 @@ import { useRef } from "react"
 import { EditableContent } from "@/components/admin/editable-content"
 import { EditableList } from "@/components/admin/editable-list"
 import { cn } from "@/lib/utils"
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion"
 
 interface HowItWorksPageContentProps {
     content: any
@@ -17,7 +18,36 @@ interface HowItWorksPageContentProps {
 }
 
 export function HowItWorksPageContent({ content, isEditing = false }: HowItWorksPageContentProps) {
-    const steps = content['howitworks.steps.list'] || []
+    const reduceMotion = usePrefersReducedMotion()
+    const defaultSteps = [
+        {
+            title: 'Browse the collection',
+            description: 'Explore furniture, décor, lighting, and packages from our Shelton showroom. Filter by category and check what fits your event.',
+            details: ['Real-time catalog', 'Packages & à la carte', 'CT · RI · MA delivery'],
+        },
+        {
+            title: 'Build your cart',
+            description: 'Add pieces with quantities for your guest count. Optional add-ons appear at checkout so you can finish the look in one flow.',
+            details: ['Instant line totals', 'Event date in cart', 'Easy edits'],
+        },
+        {
+            title: 'Event & delivery details',
+            description: 'Tell us venue address, delivery window, and pickup. We calculate delivery from our Shelton warehouse.',
+            details: ['Venue logistics', 'Pickup scheduling', 'Transparent fees'],
+        },
+        {
+            title: 'Sign & reserve',
+            description: 'Review the rental agreement, sign digitally, and pay a deposit or full balance securely with Stripe.',
+            details: ['Digital signature', 'Deposit or pay in full', 'Confirmation email'],
+        },
+        {
+            title: 'We deliver — you celebrate',
+            description: 'Our team delivers and picks up on schedule. Need the event hall or a showroom visit? Contact us anytime.',
+            details: ['On-time logistics', 'Showroom at 2 Research Dr', 'Dedicated support'],
+        },
+    ]
+
+    const steps = (content['howitworks.steps.list']?.length ? content['howitworks.steps.list'] : defaultSteps)
     const faqs = content['howitworks.faq.list'] || []
 
     // Hardcoded images for a premium feel as per the new design
@@ -60,9 +90,9 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
 
                 <div className="container mx-auto relative z-10 px-4 md:px-6 text-center">
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={reduceMotion ? false : { opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, ease: "easeOut" }}
+                        transition={{ duration: reduceMotion ? 0 : 1, ease: "easeOut" }}
                         className="max-w-5xl mx-auto"
                     >
                         <motion.div

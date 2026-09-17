@@ -64,18 +64,18 @@ export default function CheckoutPage() {
     const [paidAmount, setPaidAmount] = useState<number>(0)
 
 
-    // Form Data
+    // Form Data — empty defaults; never ship test identity into checkout
     const [formData, setFormData] = useState<CheckoutFormData>({
-        customerName: 'Test User',
-        customerEmail: 'test@example.com',
-        customerPhone: '(555) 123-4567',
-        deliveryAddress: eventDetails?.venueAddress || '123 Test Avenue, New York, NY',
+        customerName: '',
+        customerEmail: '',
+        customerPhone: '',
+        deliveryAddress: eventDetails?.venueAddress || '',
         deliveryDate: eventDetails?.date ? new Date(eventDetails.date).toISOString().split('T')[0] : '',
         deliveryTime: eventDetails?.startTime || '09:00',
-        deliveryNotes: eventDetails?.logistics?.notes || 'Gate code: 1234',
+        deliveryNotes: eventDetails?.logistics?.notes || '',
         eventDate: eventDetails?.date ? new Date(eventDetails.date).toISOString().split('T')[0] : '',
-        eventType: eventDetails?.eventType || 'Test Event',
-        venueAddress: eventDetails?.venueAddress || '123 Test Avenue, New York, NY',
+        eventType: eventDetails?.eventType || '',
+        venueAddress: eventDetails?.venueAddress || '',
         pickupDate: '',
         pickupTime: '10:00',
         pickupNotes: '',
@@ -83,7 +83,7 @@ export default function CheckoutPage() {
     })
 
     // Additional Event Details State (not directly in CheckoutFormData but needed for UI/Logic)
-    const [date, setDate] = useState<Date | undefined>(eventDetails?.date || new Date(new Date().setDate(new Date().getDate() + 7)))
+    const [date, setDate] = useState<Date | undefined>(eventDetails?.date)
     const [startTime, setStartTime] = useState(eventDetails?.startTime || "14:00")
     const [endTime, setEndTime] = useState(eventDetails?.endTime || "18:00")
     const [venueType, setVenueType] = useState(eventDetails?.venueType || "private_residence")
@@ -92,10 +92,11 @@ export default function CheckoutPage() {
     const [hasLoadingDock, setHasLoadingDock] = useState(eventDetails?.logistics?.hasLoadingDock || false)
 
     // Pickup Details State
-    const [pickupDate, setPickupDate] = useState<Date | undefined>(new Date(new Date().setDate(new Date().getDate() + 8)))
+    const [pickupDate, setPickupDate] = useState<Date | undefined>(undefined)
     const [pickupTime, setPickupTime] = useState("10:00")
     const [sameDayPickup, setSameDayPickup] = useState(false)
     const [pickupNotes, setPickupNotes] = useState("")
+    const [addonsChecked, setAddonsChecked] = useState(false)
 
     // Redirect if cart is empty (only if loaded and not successful)
     useEffect(() => {
@@ -104,41 +105,53 @@ export default function CheckoutPage() {
         }
     }, [items, isLoaded, router, isSuccess])
 
-    // Fetch Supplemental Products
+    // Fetch Supplemental Products — skip add-ons step when none are available
     useEffect(() => {
         async function fetchSupplemental() {
+            setIsLoadingSupplemental(true)
             const supabase = createClient()
-            // Fetch some products and filter client side to be safe
             const cartIds = items.map(i => i.productId)
 
             const { data } = await supabase.from('products').select('*').limit(20)
 
+            let shuffled: NonNullable<ReturnType<typeof adaptProduct>>[] = []
             if (data) {
-                // Filter out items already in cart; normalize plux price_cents → price
                 const available = data
                     .map((row) => adaptProduct(row))
                     .filter((p): p is NonNullable<ReturnType<typeof adaptProduct>> => p != null && p.is_active)
                     .filter((p) => !cartIds.includes(p.id))
-                // Shuffle and take 8
-                const shuffled = available.sort(() => 0.5 - Math.random()).slice(0, 8)
+                shuffled = available.sort(() => 0.5 - Math.random()).slice(0, 8)
                 setSupplementalProducts(shuffled)
 
-                // Initialize quantities to 1 for each product
                 const initialQuantities: Record<string, number> = {}
                 shuffled.forEach(p => {
                     initialQuantities[p.id] = 1
                 })
                 setSupplementalQuantities(initialQuantities)
+            } else {
+                setSupplementalProducts([])
             }
             setIsLoadingSupplemental(false)
+            setAddonsChecked(true)
+
+            // Auto-advance past empty add-ons so checkout starts on event details
+            if (currentStep === 1 && shuffled.length === 0) {
+                setCurrentStep(2)
+            }
         }
 
-        if (currentStep === 1) {
+        if (currentStep === 1 && !addonsChecked) {
             fetchSupplemental()
         }
-    }, [currentStep, items])
+    }, [currentStep, items, addonsChecked])
 
-    // Helper function to update supplemental product quantity
+    const goToStep = (step: number) => {
+        if (step < currentStep || (step === 1 && addonsChecked)) {
+            setCurrentStep(step)
+            setError(null)
+            window.scrollTo(0, 0)
+        }
+    }
     const updateSupplementalQuantity = (productId: string, quantity: number) => {
         setSupplementalQuantities(prev => ({
             ...prev,
@@ -305,7 +318,7 @@ export default function CheckoutPage() {
         localStorage.setItem('checkout_form_data', JSON.stringify(dataToSave))
     }, [formData, date, startTime, endTime, venueType, hasElevator, hasStairs, hasLoadingDock, pickupDate, pickupTime, sameDayPickup, pickupNotes])
 
-    const handleNextStep = () => {
+    const handleNextStep = async () => {
         if (currentStep === 2) {
             // Validate Step 2
             if (!formData.customerName || !formData.customerEmail || !formData.customerPhone || !date || !startTime || !endTime || !formData.venueAddress) {
@@ -340,50 +353,46 @@ export default function CheckoutPage() {
             }
 
             setError(null)
-        }
 
-        if (currentStep === 2) {
-            // Prepare for payment by creating a payment intent
-            const preparePayment = async () => {
-                setIsLoading(true)
-                try {
-                    const cartItems: CartItem[] = items.map((item) => ({
-                        productId: item.productId,
-                        packageId: item.packageId,
-                        packageData: item.packageData,
-                        packageSelections: item.packageSelections,
-                        quantity: item.quantity,
-                        modifiers: item.modifiers
-                    }))
+            // Prepare payment before advancing — do not enter Pay step without a client secret
+            setIsLoading(true)
+            try {
+                const cartItems: CartItem[] = items.map((item) => ({
+                    productId: item.productId,
+                    packageId: item.packageId,
+                    packageData: item.packageData,
+                    packageSelections: item.packageSelections,
+                    quantity: item.quantity,
+                    modifiers: item.modifiers
+                }))
 
-                    const addressToUse = formData.deliveryAddress || formData.venueAddress
+                const addressToUse = formData.deliveryAddress || formData.venueAddress
 
-                    // Default paidAmount is total totalAmount
-                    let initialPaidAmount = totals?.totalAmount || 0
-                    if (paymentChoice === 'deposit') {
-                        const minDeposit = Math.ceil(initialPaidAmount * 0.5)
-                        const enteredAmount = customAmount ? parseInt(customAmount.replace(/[^0-9]/g, '')) * 100 : 0
-                        initialPaidAmount = Math.max(minDeposit, enteredAmount)
-                    }
-                    setPaidAmount(initialPaidAmount)
-
-                    const result = await createPaymentIntent(cartItems, addressToUse, initialPaidAmount)
-
-                    if (result.clientSecret) {
-                        setClientSecret(result.clientSecret)
-                    } else if (result.error) {
-                        setError(result.error)
-                    }
-                } catch (err) {
-                    console.error('Error preparing payment:', err)
-                    setError('Failed to initialize payment. Please try again.')
-                } finally {
-                    setIsLoading(false)
+                let initialPaidAmount = totals?.totalAmount || 0
+                if (paymentChoice === 'deposit') {
+                    const minDeposit = Math.ceil(initialPaidAmount * 0.5)
+                    const enteredAmount = customAmount ? parseInt(customAmount.replace(/[^0-9]/g, '')) * 100 : 0
+                    initialPaidAmount = Math.max(minDeposit, enteredAmount)
                 }
-            }
-            preparePayment()
-        }
+                setPaidAmount(initialPaidAmount)
 
+                const result = await createPaymentIntent(cartItems, addressToUse, initialPaidAmount)
+
+                if (result.clientSecret) {
+                    setClientSecret(result.clientSecret)
+                    setCurrentStep(3)
+                    window.scrollTo(0, 0)
+                } else {
+                    setError(result.error || 'Failed to initialize payment. Please try again.')
+                }
+            } catch (err) {
+                console.error('Error preparing payment:', err)
+                setError('Failed to initialize payment. Please try again.')
+            } finally {
+                setIsLoading(false)
+            }
+            return
+        }
 
         setCurrentStep(prev => prev + 1)
         window.scrollTo(0, 0)
@@ -391,7 +400,7 @@ export default function CheckoutPage() {
 
 
     const handlePrevStep = () => {
-        setCurrentStep(prev => prev - 1)
+        setCurrentStep(prev => Math.max(1, prev - 1))
         window.scrollTo(0, 0)
     }
 
@@ -466,9 +475,9 @@ export default function CheckoutPage() {
             return
         }
 
-        // Mock payment for development if no clientSecret
         if (!clientSecret) {
-            await handlePaymentSuccess('mock_pi_' + Math.random().toString(36).substring(7))
+            setError("Payment is not ready. Go back to event details and continue again to initialize checkout.")
+            return
         }
     }
 
@@ -532,7 +541,8 @@ export default function CheckoutPage() {
             <div className="container max-w-6xl mx-auto px-4 relative z-10">
                 {/* Compact sticky progress */}
                 <motion.div
-                    className="sticky top-16 z-30 -mx-4 px-4 py-3 mb-6 sm:mb-10 bg-[#FDFBF7]/90 backdrop-blur-md border-b border-border/5 sm:static sm:bg-transparent sm:backdrop-blur-none sm:border-0 sm:mx-0 sm:px-0 sm:py-0"
+                    className="sticky z-30 -mx-4 px-4 py-3 mb-6 sm:mb-10 bg-[#FDFBF7]/90 backdrop-blur-md border-b border-border/5 sm:static sm:bg-transparent sm:backdrop-blur-none sm:border-0 sm:mx-0 sm:px-0 sm:py-0"
+                    style={{ top: 'var(--header-height, 4rem)' }}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35 }}
@@ -553,19 +563,34 @@ export default function CheckoutPage() {
                                 { num: 1, label: "Add-ons" },
                                 { num: 2, label: "Details" },
                                 { num: 3, label: "Pay" }
-                            ].map((step) => (
-                                <div key={step.num} className="flex flex-col items-center gap-1.5 relative z-10 min-w-[4.5rem]">
+                            ].map((step) => {
+                                const isComplete = step.num < currentStep
+                                const isActive = step.num === currentStep
+                                const canNavigate = isComplete || (step.num === 1 && currentStep > 1)
+                                return (
+                                <button
+                                    key={step.num}
+                                    type="button"
+                                    onClick={() => canNavigate && goToStep(step.num)}
+                                    disabled={!canNavigate}
+                                    className={cn(
+                                        "flex flex-col items-center gap-1.5 relative z-10 min-w-[4.5rem]",
+                                        canNavigate ? "cursor-pointer" : "cursor-default"
+                                    )}
+                                    aria-current={isActive ? "step" : undefined}
+                                    aria-label={`${step.label}${isComplete ? " (completed)" : isActive ? " (current)" : ""}`}
+                                >
                                     <div
                                         className={cn(
                                             "h-6 w-6 rounded-full flex items-center justify-center font-bold text-[10px] transition-all duration-300 border",
-                                            step.num < currentStep
+                                            isComplete
                                                 ? "bg-gold border-gold text-black"
-                                                : step.num === currentStep
+                                                : isActive
                                                     ? "bg-white border-gold text-gold ring-4 ring-gold/10"
                                                     : "bg-white border-border/20 text-gray-300"
                                         )}
                                     >
-                                        {step.num < currentStep ? (
+                                        {isComplete ? (
                                             <Check className="h-3 w-3 stroke-[3]" />
                                         ) : (
                                             <span>{step.num}</span>
@@ -573,12 +598,13 @@ export default function CheckoutPage() {
                                     </div>
                                     <p className={cn(
                                         "text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.14em] transition-colors",
-                                        step.num === currentStep ? "text-gray-900" : "text-gray-400"
+                                        isActive ? "text-gray-900" : "text-gray-400"
                                     )}>
                                         {step.label}
                                     </p>
-                                </div>
-                            ))}
+                                </button>
+                                )
+                            })}
                         </div>
                     </div>
                 </motion.div>
@@ -596,9 +622,9 @@ export default function CheckoutPage() {
                         {currentStep === 3 && <>Review & <span className="italic text-gold">Pay</span></>}
                     </h1>
                     <p className="mt-1.5 text-sm text-gray-500 font-light">
-                        {currentStep === 1 && "Optional extras — skip anytime."}
-                        {currentStep === 2 && "Tell us where and when."}
-                        {currentStep === 3 && "Confirm items, sign, and pay."}
+                        {currentStep === 1 && "Optional extras — skip anytime to continue."}
+                        {currentStep === 2 && "Tell us where and when. We’ll prepare secure payment next."}
+                        {currentStep === 3 && "Confirm items, sign the agreement, and pay your deposit or balance."}
                     </p>
                 </motion.div>
 
@@ -804,7 +830,7 @@ export default function CheckoutPage() {
                                     <div className="grid gap-1.5">
                                         <Label className={labelClass}>Venue Address *</Label>
                                         <Input
-                                            placeholder="123 Fifth Avenue, New York, NY"
+                                            placeholder="123 Main St, Bridgeport, CT"
                                             value={formData.venueAddress}
                                             onChange={(e) => setFormData({ ...formData, venueAddress: e.target.value, deliveryAddress: e.target.value })}
                                             required
@@ -1542,20 +1568,19 @@ export default function CheckoutPage() {
                                     </div>
 
                                     {!clientSecret && (
-                                        <Button
-                                            className="w-full h-12 bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full text-[11px] font-bold uppercase tracking-[0.16em]"
-                                            onClick={handleSubmit}
-                                            disabled={isLoading || isCalculating || !totals || !agreesToRentalAgreement || !signatureData}
-                                        >
-                                            {isLoading ? (
-                                                <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    Processing…
-                                                </>
-                                            ) : (
-                                                <>Place order <ArrowRight className="ml-2 h-4 w-4" /></>
-                                            )}
-                                        </Button>
+                                        <div className="space-y-3">
+                                            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                                                Secure payment is not ready yet. Go back to event details and continue to initialize Stripe checkout.
+                                            </div>
+                                            <Button
+                                                className="w-full h-12 bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full text-[11px] font-bold uppercase tracking-[0.16em]"
+                                                onClick={() => goToStep(2)}
+                                                disabled={isLoading}
+                                            >
+                                                <ArrowLeft className="mr-2 h-4 w-4" />
+                                                Back to event details
+                                            </Button>
+                                        </div>
                                     )}
 
                                     <button

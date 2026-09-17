@@ -5,11 +5,17 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { getSiteContentClient } from "@/lib/content-client"
 import { motion } from "framer-motion"
 import { HelpCircle, MessageCircle, Clock, Sparkles, ArrowRight } from "lucide-react"
+import { COMPANY } from "@/lib/company"
 import Link from "next/link"
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion"
 
 export default function FAQPage() {
   const [content, setContent] = useState<any>({})
   const [faqs, setFaqs] = useState<any[]>([])
+  const reduceMotion = usePrefersReducedMotion()
+  const motionProps = reduceMotion
+    ? { initial: false as const, animate: { opacity: 1, y: 0 } }
+    : { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 } }
 
   useEffect(() => {
     const loadContent = async () => {
@@ -18,19 +24,23 @@ export default function FAQPage() {
       setFaqs(siteContent['faq.list'] || [
         {
           question: "How far in advance should I book?",
-          answer: "For larger weddings and corporate galas, we recommend booking 12-18 months in advance. For social gatherings and smaller events, 6-9 months is typically sufficient. However, we always welcome last-minute inquiries and will do our best to accommodate your schedule."
+          answer: "For peak wedding and holiday weekends, book 4–8 weeks ahead so popular pieces stay available. We can often accommodate shorter lead times — call us at " + COMPANY.phone + " and we’ll check inventory for your date."
         },
         {
-          question: "Do you offer full-service planning?",
-          answer: "Yes, we specialize in comprehensive, end-to-end planning. This includes venue selection, vendor management, design concept development, logistics, and on-site coordination. We also offer partial planning for clients who have already secured some elements."
+          question: "Where do you deliver?",
+          answer: "We deliver and pick up throughout " + COMPANY.serviceAreaLong + " from our showroom at " + COMPANY.address + ". Delivery fees are calculated from our Shelton warehouse based on distance."
         },
         {
-          question: "What is your typical budget range?",
-          answer: "As a luxury event firm, our clients typically invest between $50,000 and $500,000+ per event. We work closely with you to maximize your investment and ensure every dollar contributes to an extraordinary guest experience."
+          question: "How do deposits and payment work?",
+          answer: "Reserve online with a deposit (typically 50%) or pay in full at checkout. Payment is processed securely through Stripe. The remaining balance is due before delivery unless you paid in full."
         },
         {
-          question: "Can you help with destination events?",
-          answer: "Absolutely. Our team has extensive experience coordinating luxury events globally. Whether it's a private villa in Tuscany or a beachside celebration in St. Barts, we handle all travel logistics, local vendor vetting, and cultural considerations."
+          question: "What about damage, rain, or changes?",
+          answer: "Please review our rental agreement at checkout. Report damage promptly; normal wear is expected. Need to add items? Contact us at least 72 hours before your delivery date. Cancellations and weather policies are covered in the agreement."
+        },
+        {
+          question: "Do you have an event hall?",
+          answer: "Yes — Prime Lux Event Hall at " + COMPANY.address + " hosts birthdays, showers, weddings, anniversaries, and more. Inquire via our contact form or call " + COMPANY.phone + " for availability."
         }
       ])
     }
@@ -49,14 +59,13 @@ export default function FAQPage() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            {...motionProps}
+            transition={{ duration: reduceMotion ? 0 : 0.8 }}
             className="text-center mb-24 md:mb-32 space-y-8"
           >
             <div className="flex items-center justify-center gap-3">
               <span className="w-12 h-px bg-gold/30" />
-              <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Curated Intelligence</span>
+              <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Rental FAQ</span>
               <span className="w-12 h-px bg-gold/30" />
             </div>
 
@@ -66,15 +75,14 @@ export default function FAQPage() {
             </h1>
 
             <p className="text-xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
-              {content['faq.hero.description'] || 'Discover the finer details of our bespoke event orchestration and concierge services.'}
+              {content['faq.hero.description'] || 'Booking, delivery, deposits, and our Shelton showroom — answers for planning your rental.'}
             </p>
           </motion.div>
 
           {/* FAQ Items */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            {...motionProps}
+            transition={{ duration: reduceMotion ? 0 : 0.8, delay: reduceMotion ? 0 : 0.2 }}
             className="space-y-6"
           >
             <Accordion type="single" collapsible className="w-full space-y-6">

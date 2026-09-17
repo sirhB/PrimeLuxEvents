@@ -221,7 +221,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                         <div className="relative flex-1 max-w-md w-full">
                             <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gold/40" />
                             <Input
-                                placeholder="Search markers..."
+                                placeholder="Search the collection…"
                                 value={inputValue}
                                 onChange={(e) => handleSearchChange(e.target.value)}
                                 className="pl-14 pr-6 h-14 border-white/5 focus:border-gold/30 rounded-full bg-white/5 transition-all duration-300 focus:bg-white/10 text-white placeholder:text-gray-600 font-light shadow-2xl"

@@ -27,9 +27,9 @@ const READINESS_ITEMS = [
     {
         key: 'stripe_verified' as const,
         label: 'Verify Stripe Integration',
-        description: 'Ensure payment processing is configured',
+        description: 'Confirm live keys and webhooks in Settings, then Stripe Dashboard',
         icon: CreditCard,
-        href: '/admin/settings#payments'
+        href: '/admin/settings'
     },
     {
         key: 'products_verified' as const,
