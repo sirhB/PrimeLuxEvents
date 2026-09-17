@@ -30,3 +30,6 @@ Paste `plux-full-db-for-new-supabase.sql` into **SQL Editor**. If the editor rej
 1. Confirm Vercel Production points at the **new** project URL + anon + service_role keys.
 2. Hard-refresh `https://prime-lux-events-beige.vercel.app/catalog`.
 3. Auth users are **not** included (they live in `auth.*`). Re-invite staff or migrate Auth separately if needed.
+
+## Auth note
+`user_profiles.id → auth.users(id)` is commented out in the dump so restore works on a fresh project with no Auth users. After you create/invite real users, re-add that FK if desired. Staff login requires creating users in Supabase Auth (not only `public.users`).

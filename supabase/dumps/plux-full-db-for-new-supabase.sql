@@ -5099,8 +5099,10 @@ ALTER TABLE ONLY public.user_preferences
 -- Name: user_profiles user_profiles_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.user_profiles
-    ADD CONSTRAINT user_profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE;
+-- Skipped on empty Auth projects: user_profiles.id → auth.users(id)
+-- Re-add after migrating/creating matching auth users:
+-- ALTER TABLE ONLY public.user_profiles
+--     ADD CONSTRAINT user_profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE;
 
 
 --
