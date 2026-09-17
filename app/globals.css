@@ -447,6 +447,16 @@
     background: color-mix(in srgb, var(--champagne) 8%, transparent);
   }
 
+  .lux-cta-ghost.on-media {
+    border-color: rgba(255, 255, 255, 0.45);
+    color: #ffffff;
+  }
+
+  .lux-cta-ghost.on-media:hover {
+    border-color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
   .lux-field {
     @apply bg-transparent border-0 border-b border-foreground/15 rounded-none px-0 h-12 text-foreground
       focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-muted-foreground font-light;

@@ -52,7 +52,7 @@ export function HeroSection({
             </Link>
             <Link
               href="#how-it-works"
-              className="lux-cta-ghost group border-white/40 text-white hover:border-white hover:bg-white/10"
+              className="lux-cta-ghost on-media group"
             >
               {ctaSecondary}
             </Link>
