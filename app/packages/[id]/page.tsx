@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import PackageConfigurator from '@/components/packages/PackageConfigurator'
+import { PackageGuestGuidance } from '@/components/packages/package-guest-guidance'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
 import { ArrowLeft } from 'lucide-react'
@@ -157,8 +158,16 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
             </div>
 
             {/* Included Items Section (Static) */}
-            {pkg.package_items && pkg.package_items.length > 0 && (
-                <div className="container mx-auto px-4 md:px-6 py-12 -mt-10 relative z-30 mb-8">
+            <div className="container mx-auto px-4 md:px-6 py-12 -mt-10 relative z-30 mb-8 space-y-6">
+                <PackageGuestGuidance
+                    packageName={pkg.name}
+                    staticItems={(pkg.package_items || []).map((item: any) => ({
+                        quantity: item.quantity,
+                        product: productMap.get(item.product_id) || null,
+                    }))}
+                />
+
+                {pkg.package_items && pkg.package_items.length > 0 && (
                     <div className="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100">
                         <h2 className="text-2xl font-serif font-light mb-6 flex items-center gap-3">
                             <span className="w-8 h-px bg-gold"></span>
@@ -192,8 +201,8 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
                             })}
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
 
             {/* Configurator Section */}
             <div className="container mx-auto px-4 md:px-6 pb-24 relative z-30">

@@ -224,6 +224,29 @@ function ScanPageContent() {
                 }
             />
 
+            {initialOrderId && (
+                <div className="mb-4 rounded-md border border-[var(--dashboard-accent-gold)]/30 bg-[var(--dashboard-accent-gold)]/10 px-4 py-3">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--dashboard-accent-gold)]">
+                        Week Prep context
+                    </p>
+                    <p className="mt-1 text-sm text-[var(--dashboard-text)]">
+                        Picking for order{' '}
+                        <span className="font-semibold tabular-nums">
+                            {selectedOrder?.customer_name || initialOrderId.slice(0, 8).toUpperCase()}
+                        </span>
+                        {selectedOrder?.id ? ` · #${selectedOrder.id.slice(0, 8).toUpperCase()}` : ''}
+                        . Stay in picking mode until the list is clear.
+                    </p>
+                    <Button
+                        asChild
+                        variant="link"
+                        className="h-auto px-0 pt-1 text-[var(--dashboard-accent-gold)]"
+                    >
+                        <Link href="/admin/week-prep">Back to Week Prep</Link>
+                    </Button>
+                </div>
+            )}
+
             <Tabs
                 value={mode}
                 onValueChange={(v) => {

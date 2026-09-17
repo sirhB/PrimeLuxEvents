@@ -39,6 +39,9 @@ import {
 } from "@/components/ui/dialog"
 import { toast } from 'sonner'
 import { SignaturePad } from '@/components/signature-pad'
+import { OrderTimeline } from '@/components/account/order-timeline'
+import { OrderSupportCta } from '@/components/account/order-support-cta'
+import { StatusChip } from '@/components/shared/status-chip'
 
 function OrderDetailContent() {
     const params = useParams()
@@ -246,11 +249,14 @@ function OrderDetailContent() {
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-8">
-                    {/* Left Column: Order Items */}
+                    {/* Left Column: Timeline + Order Items */}
                     <div className="lg:col-span-2 space-y-8">
+                        <OrderTimeline order={order} />
+
                         <Card className="border-gold/10 shadow-sm overflow-hidden bg-white">
-                            <CardHeader className="bg-gray-50/50 border-b border-gold/10">
+                            <CardHeader className="bg-gray-50/50 border-b border-gold/10 flex flex-row items-center justify-between">
                                 <CardTitle className="text-lg font-serif">Rental Items</CardTitle>
+                                <StatusChip status={order.payment_status === 'succeeded' ? 'paid' : order.payment_status} />
                             </CardHeader>
                             <CardContent className="p-0">
                                 <div className="divide-y divide-gray-100">
@@ -368,8 +374,37 @@ function OrderDetailContent() {
                         </Card>
                     </div>
 
-                    {/* Right Column: Order Details & Logistics */}
+                    {/* Right Column: Docs, logistics, support */}
                     <div className="space-y-8">
+                        <div className="surface-panel rounded-md border border-gold/10 p-5 space-y-3">
+                            <h2 className="font-serif text-lg font-bold">Documents</h2>
+                            <p className="text-sm text-muted-foreground font-light">
+                                Download your invoice and rental agreement anytime.
+                            </p>
+                            <div className="flex flex-col gap-2">
+                                <Button
+                                    variant="outline"
+                                    className="rounded-[var(--radius-cta)] border-gold/20 hover:bg-gold/5 justify-start gap-2"
+                                    asChild
+                                >
+                                    <a href={`/api/orders/${order.id}/invoice?type=invoice`} download>
+                                        <Download className="h-4 w-4" />
+                                        Invoice PDF
+                                    </a>
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="rounded-[var(--radius-cta)] border-gold/20 hover:bg-gold/5 justify-start gap-2"
+                                    asChild
+                                >
+                                    <a href={`/api/orders/${order.id}/invoice?type=agreement`} download>
+                                        <Download className="h-4 w-4" />
+                                        Rental agreement PDF
+                                    </a>
+                                </Button>
+                            </div>
+                        </div>
+
                         {/* Event Details */}
                         <Card className="border-gold/10 shadow-sm bg-white overflow-hidden">
                             <CardHeader className="border-b border-gold/10 bg-gray-50/30">
@@ -462,6 +497,8 @@ function OrderDetailContent() {
                                 </CardContent>
                             </Card>
                         )}
+
+                        <OrderSupportCta orderId={order.id} />
                     </div>
                 </div>
 

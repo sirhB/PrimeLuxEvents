@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog"
 import { SignatureCanvas } from '@/components/checkout/signature-canvas'
 import { CheckoutLogisticsHelp } from '@/components/checkout/checkout-logistics-help'
+import { CheckoutOrderSummary } from '@/components/checkout/checkout-order-summary'
 import { RentalInfoBanner } from '@/components/customer/rental-info-banner'
 
 
@@ -620,99 +621,108 @@ export default function CheckoutPage() {
                 {/* Step 1: Supplemental Items */}
                 {currentStep === 1 && (
                     <motion.div
-                        className="space-y-4 sm:space-y-8"
+                        className="grid lg:grid-cols-5 gap-6 lg:gap-10"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
                     >
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-                            {isLoadingSupplemental ? (
-                                Array(4).fill(0).map((_, i) => (
-                                    <div key={i} className="animate-pulse space-y-2">
-                                        <div className="aspect-[4/5] bg-white rounded-2xl" />
-                                        <div className="h-3 bg-white rounded w-3/4" />
-                                    </div>
-                                ))
-                            ) : supplementalProducts.length === 0 ? (
-                                <div className="col-span-2 lg:col-span-4 text-center py-10 text-sm text-muted-foreground">
-                                    No add-ons available right now — continue to details.
-                                </div>
-                            ) : (
-                                supplementalProducts.map((product, index) => (
-                                    <motion.div
-                                        key={product.id}
-                                        initial={{ opacity: 0, y: 12 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
-                                        className="group"
-                                    >
-                                        <div className="bg-white rounded-2xl overflow-hidden border border-border shadow-[0_6px_20px_rgba(0,0,0,0.03)] flex flex-col h-full">
-                                            <div className="aspect-[4/5] relative overflow-hidden bg-gray-50">
-                                                <img
-                                                    src={product.image_url || '/placeholder.svg'}
-                                                    alt={product.name}
-                                                    className="object-cover w-full h-full"
-                                                />
-                                            </div>
-                                            <div className="p-3 sm:p-4 flex flex-col flex-1 gap-2.5">
-                                                <div>
-                                                    <h3 className="font-serif text-sm sm:text-base font-bold text-foreground line-clamp-2 leading-snug">{product.name}</h3>
-                                                    <p className="text-gold font-bold text-xs sm:text-sm mt-1">{formatCurrency(resolvePriceCents(product))}</p>
-                                                </div>
-                                                <div className="mt-auto flex items-center justify-between gap-2">
-                                                    <div className="flex items-center gap-2.5 bg-gray-50 rounded-[var(--radius-cta)] px-2.5 py-1 border border-border">
-                                                        <button
-                                                            type="button"
-                                                            aria-label="Decrease quantity"
-                                                            className="text-muted-foreground hover:text-gold transition-colors p-0.5"
-                                                            onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) - 1)}
-                                                            disabled={(supplementalQuantities[product.id] || 1) <= 1}
-                                                        >
-                                                            <Minus className="h-3 w-3" />
-                                                        </button>
-                                                        <span className="text-xs font-bold w-4 text-center">
-                                                            {supplementalQuantities[product.id] || 1}
-                                                        </span>
-                                                        <button
-                                                            type="button"
-                                                            aria-label="Increase quantity"
-                                                            className="text-muted-foreground hover:text-gold transition-colors p-0.5"
-                                                            onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) + 1)}
-                                                        >
-                                                            <Plus className="h-3 w-3" />
-                                                        </button>
-                                                    </div>
-                                                    <Button
-                                                        size="sm"
-                                                        className="h-8 px-3 bg-gold text-primary-foreground hover:bg-[var(--signal)] hover:text-primary-foreground rounded-[var(--radius-cta)] text-[10px] font-bold uppercase tracking-wider"
-                                                        onClick={() => handleAddSupplementalItem(product)}
-                                                    >
-                                                        Add
-                                                    </Button>
-                                                </div>
-                                            </div>
+                        <div className="lg:col-span-3 space-y-4 sm:space-y-8 pb-24 sm:pb-0">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-5">
+                                {isLoadingSupplemental ? (
+                                    Array(4).fill(0).map((_, i) => (
+                                        <div key={i} className="animate-pulse space-y-2">
+                                            <div className="aspect-[4/5] bg-white rounded-2xl" />
+                                            <div className="h-3 bg-white rounded w-3/4" />
                                         </div>
-                                    </motion.div>
-                                ))
-                            )}
-                        </div>
-
-                        <div className={stickyBarClass}>
-                            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-4 max-w-6xl mx-auto">
-                                <Button
-                                    variant="ghost"
-                                    onClick={handleNextStep}
-                                    className="h-11 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground hover:text-gold"
-                                >
-                                    Skip add-ons
-                                </Button>
-                                <Button
-                                    onClick={handleNextStep}
-                                    className="bg-gold text-primary-foreground hover:bg-[var(--signal)] hover:text-primary-foreground rounded-[var(--radius-cta)] px-8 h-12 text-[11px] font-bold uppercase tracking-[0.16em] w-full sm:w-auto"
-                                >
-                                    Continue <ArrowRight className="ml-2 h-4 w-4" />
-                                </Button>
+                                    ))
+                                ) : supplementalProducts.length === 0 ? (
+                                    <div className="col-span-2 text-center py-10 text-sm text-muted-foreground">
+                                        No add-ons available right now — continue to details.
+                                    </div>
+                                ) : (
+                                    supplementalProducts.map((product, index) => (
+                                        <motion.div
+                                            key={product.id}
+                                            initial={{ opacity: 0, y: 12 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
+                                            className="group"
+                                        >
+                                            <div className="bg-white rounded-2xl overflow-hidden border border-border shadow-[0_6px_20px_rgba(0,0,0,0.03)] flex flex-col h-full">
+                                                <div className="aspect-[4/5] relative overflow-hidden bg-gray-50">
+                                                    <img
+                                                        src={product.image_url || '/placeholder.svg'}
+                                                        alt={product.name}
+                                                        className="object-cover w-full h-full"
+                                                    />
+                                                </div>
+                                                <div className="p-3 sm:p-4 flex flex-col flex-1 gap-2.5">
+                                                    <div>
+                                                        <h3 className="font-serif text-sm sm:text-base font-bold text-foreground line-clamp-2 leading-snug">{product.name}</h3>
+                                                        <p className="text-gold font-bold text-xs sm:text-sm mt-1">{formatCurrency(resolvePriceCents(product))}</p>
+                                                    </div>
+                                                    <div className="mt-auto flex items-center justify-between gap-2">
+                                                        <div className="flex items-center gap-2.5 bg-gray-50 rounded-[var(--radius-cta)] px-2.5 py-1 border border-border">
+                                                            <button
+                                                                type="button"
+                                                                aria-label="Decrease quantity"
+                                                                className="text-muted-foreground hover:text-gold transition-colors p-0.5"
+                                                                onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) - 1)}
+                                                                disabled={(supplementalQuantities[product.id] || 1) <= 1}
+                                                            >
+                                                                <Minus className="h-3 w-3" />
+                                                            </button>
+                                                            <span className="text-xs font-bold w-4 text-center">
+                                                                {supplementalQuantities[product.id] || 1}
+                                                            </span>
+                                                            <button
+                                                                type="button"
+                                                                aria-label="Increase quantity"
+                                                                className="text-muted-foreground hover:text-gold transition-colors p-0.5"
+                                                                onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) + 1)}
+                                                            >
+                                                                <Plus className="h-3 w-3" />
+                                                            </button>
+                                                        </div>
+                                                        <Button
+                                                            size="sm"
+                                                            className="h-8 px-3 bg-gold text-primary-foreground hover:bg-[var(--signal)] hover:text-primary-foreground rounded-[var(--radius-cta)] text-[10px] font-bold uppercase tracking-wider"
+                                                            onClick={() => handleAddSupplementalItem(product)}
+                                                        >
+                                                            Add
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ))
+                                )}
                             </div>
+
+                            <div className={stickyBarClass}>
+                                <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-4">
+                                    <Button
+                                        variant="ghost"
+                                        onClick={handleNextStep}
+                                        className="h-11 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground hover:text-gold"
+                                    >
+                                        Skip add-ons
+                                    </Button>
+                                    <Button
+                                        onClick={handleNextStep}
+                                        className="bg-gold text-primary-foreground hover:bg-[var(--signal)] hover:text-primary-foreground rounded-[var(--radius-cta)] px-8 h-12 text-[11px] font-bold uppercase tracking-[0.16em] w-full sm:w-auto"
+                                    >
+                                        Continue <ArrowRight className="ml-2 h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="lg:col-span-2 hidden lg:block">
+                            <CheckoutOrderSummary
+                                totals={totals}
+                                isCalculating={isCalculating}
+                                itemCount={items.length}
+                            />
                         </div>
                     </motion.div>
                 )}
@@ -720,11 +730,12 @@ export default function CheckoutPage() {
                 {/* Step 2: Event & Delivery Details */}
                 {currentStep === 2 && (
                     <motion.div
-                        className="space-y-8 max-w-3xl mx-auto"
+                        className="grid lg:grid-cols-5 gap-6 lg:gap-10"
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
                     >
+                        <div className="lg:col-span-3 space-y-8 pb-24 sm:pb-0">
                         <CheckoutLogisticsHelp />
                         {error && (
                             <motion.div
@@ -1011,7 +1022,7 @@ export default function CheckoutPage() {
                         </div>
 
                         <div className={stickyBarClass}>
-                            <div className="flex items-center justify-between gap-3 max-w-3xl mx-auto">
+                            <div className="flex items-center justify-between gap-3">
                                 <button
                                     type="button"
                                     onClick={handlePrevStep}
@@ -1035,6 +1046,14 @@ export default function CheckoutPage() {
                                     )}
                                 </Button>
                             </div>
+                        </div>
+                        </div>
+                        <div className="lg:col-span-2 hidden lg:block">
+                            <CheckoutOrderSummary
+                                totals={totals}
+                                isCalculating={isCalculating}
+                                itemCount={items.length}
+                            />
                         </div>
                     </motion.div>
                 )}
@@ -1484,79 +1503,14 @@ export default function CheckoutPage() {
                         </div>
 
                         <div className="lg:col-span-2">
-                            <div className="lg:sticky lg:top-24 surface-panel rounded-md overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.06)] border border-gold/10">
-                                <div className="bg-[var(--surface-muted)] text-foreground border-b border-border py-5 px-5 sm:px-6">
-                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-center">Order summary</h3>
-                                </div>
-                                <div className="p-5 sm:p-6 space-y-5">
-                                    {totals ? (
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-muted-foreground">Subtotal</span>
-                                                <span className="font-medium text-foreground">{formatCurrency(totals.subtotal)}</span>
-                                            </div>
-                                            {totals.discountAmount > 0 && (
-                                                <div className="flex justify-between text-sm text-green-600">
-                                                    <span className="font-medium">{totals.discountName || 'Discount'}</span>
-                                                    <span className="font-medium">-{formatCurrency(totals.discountAmount)}</span>
-                                                </div>
-                                            )}
-                                            {totals.setupFee > 0 && (
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="text-muted-foreground">Setup fee</span>
-                                                    <span className="font-medium text-foreground">{formatCurrency(totals.setupFee)}</span>
-                                                </div>
-                                            )}
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-muted-foreground">Tax ({(totals.taxRate * 100).toFixed(2)}%)</span>
-                                                <span className="font-medium text-foreground">{formatCurrency(totals.taxAmount)}</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-muted-foreground">Delivery</span>
-                                                <span className="font-medium text-foreground">{isCalculating ? '…' : formatCurrency(totals.deliveryFee)}</span>
-                                            </div>
-                                            <div className="pt-3 border-t border-gold/10 flex justify-between items-baseline">
-                                                <span className="text-base font-serif font-bold text-foreground">Total</span>
-                                                <span className="font-bold text-2xl text-gold">{formatCurrency(totals.totalAmount)}</span>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="flex justify-center py-8">
-                                            <Loader2 className="h-8 w-8 animate-spin text-gold" />
-                                        </div>
-                                    )}
-
-                                    <div className="p-4 bg-gold/5 rounded-2xl border border-gold/10">
-                                        <div className="flex items-start gap-3">
-                                            <button
-                                                type="button"
-                                                onClick={() => setAgreesToRentalAgreement(!agreesToRentalAgreement)}
-                                                className={cn(
-                                                    "mt-0.5 h-5 w-5 rounded-[var(--radius-cta)] border-2 flex items-center justify-center shrink-0 transition-all",
-                                                    agreesToRentalAgreement ? "bg-gold border-gold" : "border-gold/30 hover:border-gold"
-                                                )}
-                                                aria-pressed={agreesToRentalAgreement}
-                                                aria-label="Agree to rental agreement"
-                                            >
-                                                {agreesToRentalAgreement && <Check className="h-2.5 w-2.5 text-black stroke-[3]" />}
-                                            </button>
-                                            <label
-                                                className="text-xs sm:text-sm font-medium cursor-pointer leading-relaxed text-foreground"
-                                                onClick={() => setAgreesToRentalAgreement(!agreesToRentalAgreement)}
-                                            >
-                                                I agree to the{' '}
-                                                <Link
-                                                    href="/rental-agreement"
-                                                    target="_blank"
-                                                    className="text-gold underline underline-offset-2 font-bold"
-                                                    onClick={(e) => e.stopPropagation()}
-                                                >
-                                                    rental agreement
-                                                </Link>
-                                            </label>
-                                        </div>
-                                    </div>
-
+                            <CheckoutOrderSummary
+                                totals={totals}
+                                isCalculating={isCalculating}
+                                itemCount={items.length}
+                                showAgreement
+                                agreesToRentalAgreement={agreesToRentalAgreement}
+                                onToggleAgreement={() => setAgreesToRentalAgreement(!agreesToRentalAgreement)}
+                            >
                                     {!clientSecret && (
                                         <div className="space-y-3">
                                             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -1580,8 +1534,7 @@ export default function CheckoutPage() {
                                     >
                                         <ArrowLeft className="h-4 w-4" /> Back
                                     </button>
-                                </div>
-                            </div>
+                            </CheckoutOrderSummary>
                         </div>
                     </motion.div>
                 )}

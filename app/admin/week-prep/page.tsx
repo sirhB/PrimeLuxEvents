@@ -21,7 +21,7 @@ export default async function WeekPrepPage({
       <AdminPageHeader
         eyebrow="Fulfillment"
         title="Week Prep"
-        description="Prepare weekday pick and pack work for upcoming weekend deliveries."
+        description="Primary manager canvas — Fri–Sun deliveries across Pick, Pack, Bags, and Load. Generate missing tasks, then drill into schedule or scanner."
         actions={
           <Button
             asChild

@@ -91,37 +91,37 @@ flowchart TB
 ### Phase B — Customer store & checkout (PRIORITY BUILD)
 - [x] Catalog first screen = filters + grid (short hero); featured secondary
 - [ ] PDP: availability for event date, delivery notes, specs; one primary “Add to rental”
-- [ ] Packages: what’s included + guest-count guidance
+- [x] Packages: what’s included + guest-count guidance
 - [x] First-class `/cart` page (keep sheet as shortcut)
 - [x] Checkout inline help: lead time, CT/RI/MA service area, deposit meaning
-- [ ] Split checkout into step components; sticky order summary
+- [x] Split checkout into step components; sticky order summary
 - [x] Account home = next upcoming order + pay / message actions
-- [ ] Order detail = status timeline + invoice/agreement + support CTA
-- [ ] Favorites → “Build rental from favorites”
+- [x] Order detail = status timeline + invoice/agreement + support CTA
+- [x] Favorites → “Build rental from favorites”
 
 ### Phase C — Partner portal
-- [ ] Partner home: one metric + one primary CTA
-- [ ] Public `/partners/apply`
-- [ ] Event/cart-centric list UX
-- [ ] “Trade rate applied” chip at checkout
+- [x] Partner home: one metric + one primary CTA
+- [x] Public `/partners/apply`
+- [x] Event/cart-centric list UX
+- [x] “Trade rate applied” chip at checkout
 - [ ] Admin partner approve → tier → attributed orders queue
 
 ### Phase D — Manager console
-- [ ] Ops Today = exceptions-only attention queue + weekend readiness strip
-- [ ] Week Prep = primary manager canvas (Fri–Sun × Pick/Pack/Bags/Load)
+- [x] Ops Today = exceptions-only attention queue + weekend readiness strip
+- [x] Week Prep = primary manager canvas (Fri–Sun × Pick/Pack/Bags/Load)
 - [ ] Nav collapse: Today | Pipeline | Fulfillment | Catalog | Manage
 - [ ] CRM deep links: lead → customer → order
 - [ ] Settings = business profile + Stripe status
 
 ### Phase E — Staff field
 - [x] Staff default condensed nav + mobile Tasks / Scan / Loads / More
-- [ ] Staff default landing: warehouse schedule or tasks
+- [x] Staff default landing: warehouse schedule or tasks
 - [ ] Task cards: large targets, one primary action
-- [ ] Scanner order-context banner from Week Prep `?orderId=`
+- [x] Scanner order-context banner from Week Prep `?orderId=`
 - [ ] Clear “needs connection” on offline mutations
 
 ### Phase F — Cross-cutting
-- [ ] Shared status vocabulary/chips across customer / partner / admin / staff
+- [x] Shared status vocabulary/chips across customer / partner / admin / staff
 - [ ] Microcopy audit (rental logistics, not planning-firm voice)
 - [ ] Motion budget + `prefers-reduced-motion`
 - [ ] A11y pass on lux CTAs and icon buttons

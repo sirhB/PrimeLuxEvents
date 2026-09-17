@@ -1,18 +1,35 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DashboardContent } from '@/components/admin/dashboard/dashboard-content'
 import { AdminPage, AdminPageHeader } from '@/components/admin/page-shell'
+import { createClient } from '@/lib/supabase/server'
+import { getUserStaffRoles } from '@/lib/auth/roles'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminDashboardPage() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (user) {
+    const roles = await getUserStaffRoles(user.id)
+    const isStaffOnly =
+      roles.includes('staff') && !roles.includes('admin') && !roles.includes('manager')
+    if (isStaffOnly) {
+      redirect('/admin/warehouse/schedule')
+    }
+  }
+
   return (
     <AdminPage>
       <AdminPageHeader
         eyebrow="Today"
         title="Ops Today"
-        description="What needs attention now, weekend readiness, and today’s warehouse work."
+        description="Exceptions that need a decision, plus weekend readiness. Deep work lives in Week Prep."
         actions={
           <div className="flex flex-wrap gap-2">
             <Button asChild variant="outline" className="h-10 border-[var(--dashboard-border)] bg-transparent">

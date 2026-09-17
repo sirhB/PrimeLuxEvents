@@ -255,7 +255,7 @@ export function DashboardContent() {
 
         <div className="grid gap-5 xl:grid-cols-3">
           <AdminPanel className="xl:col-span-1">
-            <AdminPanelHeader title="Needs attention" description="Queues that block today’s flow." />
+            <AdminPanelHeader title="Needs attention" description="Exceptions only — empty means stay in Week Prep." />
             {attention.length === 0 && !loading ? (
               <AdminEmptyState
                 title="You're clear"

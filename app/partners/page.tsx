@@ -29,7 +29,7 @@ export default function PartnersMarketingPage() {
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
             <Button asChild className="rounded-full bg-[var(--champagne,#B8956B)] text-black hover:bg-white">
-              <Link href="/signup?next=/account/partner/apply" className="gap-2">
+              <Link href="/partners/apply" className="gap-2">
                 Apply to partner <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
