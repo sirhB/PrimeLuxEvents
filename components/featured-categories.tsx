@@ -43,10 +43,10 @@ const categories = [
 
 export function FeaturedCategories() {
     return (
-        <section className="py-24 md:py-48 bg-[#1A1A1A] relative overflow-hidden">
+        <section className="py-24 md:py-48 bg-background relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
-            <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[150px] -translate-y-1/2 pointer-events-none" />
+            <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-gold/5 rounded-[var(--radius-cta)] blur-[150px] -translate-y-1/2 pointer-events-none" />
 
             <div className="container mx-auto px-4 md:px-6 relative z-10">
                 <motion.div
@@ -65,12 +65,10 @@ export function FeaturedCategories() {
                     </div>
                     <Link
                         href="/catalog"
-                        className="group relative inline-flex h-16 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-transparent px-12 text-[10px] font-bold uppercase tracking-[0.3em] text-white transition-all duration-500 hover:border-gold"
+                        className="lux-cta-ghost group"
                     >
-                        <div className="absolute inset-0 translate-y-full bg-gold transition-transform duration-500 group-hover:translate-y-0" />
-                        <span className="relative z-10 group-hover:text-black transition-colors duration-500 flex items-center gap-3">
-                            Check Availability <ArrowRight className="h-4 w-4" />
-                        </span>
+                        Check availability
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                 </motion.div>
 
@@ -92,7 +90,7 @@ export function FeaturedCategories() {
                                     fill
                                     className="object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110 opacity-80 group-hover:opacity-100"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-700" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)] via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-700" />
 
                                 <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-end">
                                     <div className="space-y-4 md:space-y-6">
@@ -118,7 +116,7 @@ export function FeaturedCategories() {
                                     </div>
                                 </div>
 
-                                <div className="absolute top-8 left-8 p-4 rounded-full border border-white/10 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-700 hidden md:block">
+                                <div className="absolute top-8 left-8 p-4 rounded-[var(--radius-cta)] border border-white/10 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-700 hidden md:block">
                                     <ArrowRight className="w-5 h-5 text-gold -rotate-45" />
                                 </div>
                             </Link>

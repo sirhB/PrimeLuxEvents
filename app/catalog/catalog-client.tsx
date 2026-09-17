@@ -163,7 +163,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
     }, [searchParams])
 
     return (
-        <main className="min-h-screen bg-[#1A1A1A] text-white selection:bg-gold selection:text-black">
+        <main className="min-h-screen bg-background text-foreground selection:bg-gold selection:text-black">
             {/* Background Texture Overlays */}
             <div className="fixed inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none z-0" />
 
@@ -181,7 +181,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                         priority
                         sizes="100vw"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[#1A1A1A]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[var(--ink)]" />
                 </div>
 
                 <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 z-10">
@@ -192,7 +192,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             <span className="w-12 h-px bg-gold/30" />
                         </div>
 
-                        <h1 className="text-6xl md:text-9xl font-serif font-light tracking-tighter leading-[0.85] text-white">
+                        <h1 className="text-6xl md:text-9xl font-serif font-light tracking-tighter leading-[0.85] text-foreground">
                             {selectedCategory
                                 ? selectedCategory
                                 : searchQuery
@@ -201,7 +201,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             }
                         </h1>
 
-                        <p className="text-xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto leading-relaxed">
                             {selectedCategory
                                 ? `Curated selection of premium ${selectedCategory.toLowerCase()} for your extraordinary events.`
                                 : searchQuery
@@ -214,7 +214,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
             </div>
 
             {/* Sticky Search & Filter Bar */}
-            <div className="sticky top-[72px] z-40 bg-[#1A1A1A]/80 backdrop-blur-xl border-y border-white/5 transition-all duration-300" style={{ top: 'var(--header-height, 72px)' }}>
+            <div className="sticky top-[72px] z-40 bg-background/80 backdrop-blur-xl border-y border-border transition-all duration-300" style={{ top: 'var(--header-height, 72px)' }}>
                 <div className="container mx-auto px-4 md:px-6 py-6 transition-all duration-300">
                     <div className="flex flex-col lg:flex-row gap-6 items-center">
                         {/* Search Input */}
@@ -224,11 +224,11 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 placeholder="Search the collection…"
                                 value={inputValue}
                                 onChange={(e) => handleSearchChange(e.target.value)}
-                                className="pl-14 pr-6 h-14 border-white/5 focus:border-gold/30 rounded-full bg-white/5 transition-all duration-300 focus:bg-white/10 text-white placeholder:text-gray-600 font-light shadow-2xl"
+                                className="pl-14 pr-6 h-14 border-border focus:border-gold/30 rounded-[var(--radius-cta)] bg-white/5 transition-all duration-300 focus:bg-white/10 text-foreground placeholder:text-gray-600 font-light shadow-2xl"
                             />
                             {isPending && (
                                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                                    <div className="w-4 h-4 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+                                    <div className="w-4 h-4 border-2 border-gold/30 border-t-gold rounded-[var(--radius-cta)] animate-spin" />
                                 </div>
                             )}
                         </div>
@@ -239,7 +239,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 <Button
                                     variant="ghost"
                                     onClick={handleBackToCatalog}
-                                    className="flex gap-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-gold transition-colors font-bold uppercase tracking-widest text-[10px]"
+                                    className="flex gap-2 rounded-[var(--radius-cta)] hover:bg-white/5 text-muted-foreground hover:text-gold transition-colors font-bold uppercase tracking-widest text-[10px]"
                                 >
                                     <ArrowLeft className="h-4 w-4" />
                                     All Collections
@@ -247,10 +247,10 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             )}
 
                             <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                                <SelectTrigger className="w-44 h-14 rounded-full border-white/5 bg-white/5 text-white font-light shadow-2xl">
+                                <SelectTrigger className="w-44 h-14 rounded-[var(--radius-cta)] border-border bg-white/5 text-foreground font-light shadow-2xl">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-[#1E1E1E] border-white/10 text-white">
+                                <SelectContent className="bg-[var(--surface-elevated)] border-border text-foreground">
                                     <SelectItem value="name">Name A-Z</SelectItem>
                                     <SelectItem value="price-low">Price: Low to High</SelectItem>
                                     <SelectItem value="price-high">Price: High to Low</SelectItem>
@@ -258,14 +258,14 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 </SelectContent>
                             </Select>
 
-                            <div className="flex items-center gap-1 bg-white/5 border border-white/5 rounded-full p-1 shadow-2xl">
+                            <div className="flex items-center gap-1 bg-white/5 border border-border rounded-[var(--radius-cta)] p-1 shadow-2xl">
                                 <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => setViewMode('grid')}
                                     className={cn(
-                                        "h-12 w-12 rounded-full transition-all duration-500",
-                                        viewMode === 'grid' ? "bg-gold text-black hover:bg-white shadow-xl" : "text-gray-400 hover:text-white"
+                                        "h-12 w-12 rounded-[var(--radius-cta)] transition-all duration-500",
+                                        viewMode === 'grid' ? "bg-gold text-black hover:bg-white shadow-xl" : "text-muted-foreground hover:text-foreground"
                                     )}
                                 >
                                     <Grid3X3 className="h-5 w-5" />
@@ -275,8 +275,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     size="icon"
                                     onClick={() => setViewMode('masonry')}
                                     className={cn(
-                                        "h-12 w-12 rounded-full transition-all duration-500",
-                                        viewMode === 'masonry' ? "bg-gold text-black hover:bg-white shadow-xl" : "text-gray-400 hover:text-white"
+                                        "h-12 w-12 rounded-[var(--radius-cta)] transition-all duration-500",
+                                        viewMode === 'masonry' ? "bg-gold text-black hover:bg-white shadow-xl" : "text-muted-foreground hover:text-foreground"
                                     )}
                                 >
                                     <Columns className="h-5 w-5" />
@@ -287,7 +287,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setIsSidebarOpen(true)}
-                                className="lg:hidden h-14 w-14 rounded-full border border-white/5 bg-white/5 shadow-2xl text-gold"
+                                className="lg:hidden h-14 w-14 rounded-[var(--radius-cta)] border border-border bg-white/5 shadow-2xl text-gold"
                             >
                                 <SlidersHorizontal className="h-5 w-5" />
                             </Button>
@@ -314,7 +314,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     <section>
                                         <div className="mb-16">
                                             <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Premium Selection</span>
-                                            <h2 className="text-4xl md:text-7xl font-serif font-light text-white tracking-tighter">Featured Collection</h2>
+                                            <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">Featured Collection</h2>
                                         </div>
                                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
                                             {featuredProducts.slice(0, 4).map((product, index) => (
@@ -336,7 +336,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     <section>
                                         <div className="mb-16">
                                             <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Complete Solutions</span>
-                                            <h2 className="text-4xl md:text-7xl font-serif font-light text-white tracking-tighter">Curated Packages</h2>
+                                            <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">Curated Packages</h2>
                                         </div>
                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-12">
                                             {featuredPackages.slice(0, 3).map((pkg, index) => (
@@ -368,7 +368,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                             <section>
                                 <div className="mb-16">
                                     <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">The Collections</span>
-                                    <h2 className="text-4xl md:text-7xl font-serif font-light text-white tracking-tighter">Browse Categories</h2>
+                                    <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">Browse Categories</h2>
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-8">
                                     {orderedCategories.map((category, index) => (
@@ -396,9 +396,9 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                 <div className="mb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
                                     <div>
                                         <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Inventory</span>
-                                        <h2 className="text-4xl md:text-7xl font-serif font-light text-white tracking-tighter">All Rentals</h2>
+                                        <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">All Rentals</h2>
                                     </div>
-                                    <p className="text-sm text-gray-500 font-light max-w-md">
+                                    <p className="text-sm text-muted-foreground font-light max-w-md">
                                         {searchResults.length} pieces available. Select a category above to refine.
                                     </p>
                                 </div>
@@ -432,7 +432,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                                         "w-full text-left px-4 py-3 rounded-xl transition-all duration-300 text-sm",
                                                         !selectedCategory
                                                             ? "bg-gold text-black font-bold tracking-widest uppercase text-[10px]"
-                                                            : "text-gray-400 hover:text-white hover:bg-white/5"
+                                                            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                                                     )}
                                                     onClick={handleBackToCatalog}
                                                 >
@@ -445,7 +445,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                                             "w-full text-left px-4 py-3 rounded-xl transition-all duration-300 text-sm",
                                                             selectedCategory === category.name
                                                                 ? "bg-gold text-black font-bold tracking-widest uppercase text-[10px]"
-                                                                : "text-gray-400 hover:text-white hover:bg-white/5"
+                                                                : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                                                         )}
                                                         onClick={() => handleCategoryClick(category.name)}
                                                     >
@@ -487,15 +487,15 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                             ))}
                                         </motion.div>
                                     ) : (
-                                        <div className="spotlight-frame rounded-[2.5rem] border border-white/5 bg-white/5 py-40 text-center">
+                                        <div className="spotlight-frame rounded-[2.5rem] border border-border bg-white/5 py-40 text-center">
                                             <Search className="mx-auto mb-8 h-16 w-16 text-[var(--champagne,#B8956B)]/30" />
-                                            <h3 className="mb-4 font-serif text-2xl text-white">No pieces match this search</h3>
-                                            <p className="mx-auto mb-12 max-w-md font-light text-gray-500">
+                                            <h3 className="mb-4 font-serif text-2xl text-foreground">No pieces match this search</h3>
+                                            <p className="mx-auto mb-12 max-w-md font-light text-muted-foreground">
                                                 Try another category or browse the full collection to find rentals for your event.
                                             </p>
                                             <Button
                                                 onClick={handleBackToCatalog}
-                                                className="rounded-full bg-[var(--champagne,#B8956B)] px-12 py-6 text-[10px] font-bold uppercase tracking-widest text-black transition-all duration-500 hover:bg-white"
+                                                className="rounded-[var(--radius-cta)] bg-[var(--champagne,#B8956B)] px-12 py-6 text-[10px] font-bold uppercase tracking-widest text-black transition-all duration-500 hover:bg-white"
                                             >
                                                 Browse the collection
                                             </Button>
@@ -510,9 +510,9 @@ export default function CatalogClient({ heroTitle, products, categories, package
 
             {/* Mobile Category Drawer */}
             <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-                <SheetContent side="left" className="w-80 p-0 bg-[#1A1A1A] border-r border-white/5 text-white">
-                    <div className="p-8 border-b border-white/5">
-                        <SheetTitle className="text-2xl font-serif font-light text-white">Collections</SheetTitle>
+                <SheetContent side="left" className="w-80 p-0 bg-background border-r border-border text-foreground">
+                    <div className="p-8 border-b border-border">
+                        <SheetTitle className="text-2xl font-serif font-light text-foreground">Collections</SheetTitle>
                     </div>
                     <div className="flex-1 overflow-y-auto px-6 py-8">
                         <nav className="flex flex-col gap-2">
@@ -521,7 +521,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     "w-full text-left px-6 py-5 rounded-2xl transition-all duration-300",
                                     !selectedCategory && !searchQuery
                                         ? "bg-gold text-black font-bold uppercase tracking-widest text-[10px]"
-                                        : "text-gray-400 hover:text-white"
+                                        : "text-muted-foreground hover:text-foreground"
                                 )}
                                 onClick={() => {
                                     handleBackToCatalog()
@@ -537,7 +537,7 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                         "w-full text-left px-6 py-5 rounded-2xl transition-all duration-300",
                                         selectedCategory === category.name
                                             ? "bg-gold text-black font-bold uppercase tracking-widest text-[10px]"
-                                            : "text-gray-400 hover:text-white"
+                                            : "text-muted-foreground hover:text-foreground"
                                     )}
                                     onClick={() => {
                                         handleCategoryClick(category.name)

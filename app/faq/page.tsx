@@ -49,7 +49,7 @@ export default function FAQPage() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-[#1A1A1A] text-white selection:bg-gold selection:text-black pt-32 pb-24 md:pt-48 md:pb-40 relative overflow-hidden">
+    <main className="min-h-screen bg-background text-white selection:bg-gold selection:text-black pt-32 pb-24 md:pt-48 md:pb-40 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gold/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-gold/5 blur-[100px] rounded-full translate-y-1/2 -translate-x-1/2" />
@@ -90,7 +90,7 @@ export default function FAQPage() {
                 <AccordionItem
                   key={index}
                   value={`item-${index}`}
-                  className="border border-white/5 rounded-2xl bg-[#1E1E1E]/50 backdrop-blur-sm overflow-hidden px-6 md:px-10 transition-all duration-300 hover:border-gold/20"
+                  className="border border-border rounded-2xl bg-[var(--surface-elevated)] backdrop-blur-sm overflow-hidden px-6 md:px-10 transition-all duration-300 hover:border-gold/20"
                 >
                   <AccordionTrigger className="py-8 text-left hover:no-underline group">
                     <div className="flex items-start gap-6">
@@ -124,7 +124,7 @@ export default function FAQPage() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="mt-32 p-12 rounded-[2rem] border border-white/5 bg-gradient-to-br from-[#1E1E1E] to-transparent text-center relative group overflow-hidden"
+            className="mt-32 p-12 rounded-[2rem] border border-border bg-gradient-to-br from-[#1E1E1E] to-transparent text-center relative group overflow-hidden"
           >
             <div className="absolute inset-0 bg-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             <HelpCircle className="w-12 h-12 text-gold mx-auto mb-8 stroke-[1]" />

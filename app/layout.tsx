@@ -90,8 +90,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`font-sans antialiased ${instrumentSerif.variable} ${ibmPlexSans.variable}`}>
+    <html lang="en" className="dark" style={{ colorScheme: 'dark' }}>
+      <body className={`font-sans antialiased bg-background text-foreground ${instrumentSerif.variable} ${ibmPlexSans.variable}`}>
         <PwaProvider>
           <NotificationsProvider>
             <CartProvider>

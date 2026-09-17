@@ -24,7 +24,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
     })
 
     return (
-        <div ref={containerRef} className="bg-[#1A1A1A] text-white selection:bg-gold selection:text-black">
+        <div ref={containerRef} className="bg-background text-white selection:bg-gold selection:text-black">
             {/* Hero Section */}
             <section className="relative h-screen flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
@@ -39,7 +39,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                         className="object-cover opacity-40 grayscale-[20%]"
                         priority
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#1A1A1A]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[var(--ink)]" />
                     <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-10 mix-blend-overlay" />
                 </div>
 
@@ -102,7 +102,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
             </section>
 
             {/* Our Story Section */}
-            <section className="relative py-24 md:py-48 overflow-hidden bg-[#151515]">
+            <section className="relative py-24 md:py-48 overflow-hidden bg-[var(--surface)]">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="grid lg:grid-cols-2 gap-24 items-center">
                         <motion.div
@@ -181,7 +181,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
             </section>
 
             {/* Values Section */}
-            <section className="py-24 md:py-48 bg-[#1A1A1A] relative overflow-hidden">
+            <section className="py-24 md:py-48 bg-background relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
                     <motion.div

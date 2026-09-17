@@ -66,11 +66,11 @@ export function GalleryPageContent({ content, isEditing = false }: GalleryPageCo
     }, [selectedImage])
 
     return (
-        <div className="bg-[#1A1A1A] text-white selection:bg-gold selection:text-black">
+        <div className="bg-background text-white selection:bg-gold selection:text-black">
             {/* Hero Section */}
             <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#1A1A1A]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[var(--ink)]" />
                     <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-10 mix-blend-overlay" />
                     <Image
                         src={images.length > 0 ? images[0].src : "/images/gallery-hero.png"}
@@ -135,7 +135,7 @@ export function GalleryPageContent({ content, isEditing = false }: GalleryPageCo
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                        className="bg-[#151515] border-y border-white/5 overflow-hidden"
+                        className="bg-[var(--surface)] border-y border-white/5 overflow-hidden"
                     >
                         <div className="container mx-auto px-4 md:px-6 py-12">
                             <div className="flex flex-wrap justify-center gap-6">
@@ -158,7 +158,7 @@ export function GalleryPageContent({ content, isEditing = false }: GalleryPageCo
             </AnimatePresence>
 
             {/* Gallery Grid */}
-            <section className="py-24 md:py-48 bg-[#1A1A1A]">
+            <section className="py-24 md:py-48 bg-background">
                 <div className="container mx-auto px-4 md:px-6">
                     <AnimatePresence mode="wait">
                         <motion.div
@@ -292,7 +292,7 @@ function GalleryImageCard({ image, index, onClick }: { image: GalleryImage, inde
             className="group relative cursor-pointer"
             onClick={onClick}
         >
-            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#1E1E1E] border border-white/5">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[var(--surface-elevated)] border border-white/5">
                 <Image
                     src={image.src}
                     alt={image.alt}

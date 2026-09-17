@@ -467,12 +467,12 @@ export default function CheckoutPage() {
     if (items.length === 0 && isLoaded) return null
 
     const fieldClass =
-        "bg-transparent border-0 border-b border-gray-200 rounded-none px-0 h-11 sm:h-12 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-base"
-    const labelClass = "text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400"
-    const sectionTitleClass = "text-xl sm:text-2xl font-serif font-bold text-gray-900 tracking-tight"
-    const cardClass = "bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-border/5"
+        "bg-transparent border-0 border-b border-white/15 rounded-none px-0 h-11 sm:h-12 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-muted-foreground/70 font-light text-base"
+    const labelClass = "text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground"
+    const sectionTitleClass = "text-xl sm:text-2xl font-serif font-bold text-foreground tracking-tight"
+    const cardClass = "surface-panel rounded-md overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-border"
     const stickyBarClass =
-        "fixed inset-x-0 bottom-0 z-40 border-t border-border/10 bg-[#FDFBF7]/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:static sm:border-0 sm:bg-transparent sm:backdrop-blur-none sm:p-0 sm:mt-8"
+        "fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-md px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:static sm:border-0 sm:bg-transparent sm:backdrop-blur-none sm:p-0 sm:mt-8"
 
     if (isSuccess) {
         return (
@@ -486,7 +486,7 @@ export default function CheckoutPage() {
                     <Card className="w-full border-gold/20 shadow-2xl shadow-gold/5">
                         <CardContent className="pt-8 pb-8 text-center space-y-5">
                             <motion.div
-                                className="h-14 w-14 rounded-full bg-gold/10 flex items-center justify-center text-gold mx-auto border border-gold/20"
+                                className="h-14 w-14 rounded-[var(--radius-cta)] bg-gold/10 flex items-center justify-center text-gold mx-auto border border-gold/20"
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
@@ -519,11 +519,11 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#FDFBF7] pt-20 pb-28 sm:pt-24 sm:pb-16 md:pt-28 relative">
+        <div className="min-h-screen bg-background pt-20 pb-28 sm:pt-24 sm:pb-16 md:pt-28 relative">
             <div className="container max-w-6xl mx-auto px-4 relative z-10">
                 {/* Compact sticky progress */}
                 <motion.div
-                    className="sticky z-30 -mx-4 px-4 py-3 mb-6 sm:mb-10 bg-[#FDFBF7]/90 backdrop-blur-md border-b border-border/5 sm:static sm:bg-transparent sm:backdrop-blur-none sm:border-0 sm:mx-0 sm:px-0 sm:py-0"
+                    className="sticky z-30 -mx-4 px-4 py-3 mb-6 sm:mb-10 bg-background/90 backdrop-blur-md border-b border-border sm:static sm:bg-transparent sm:backdrop-blur-none sm:border-0 sm:mx-0 sm:px-0 sm:py-0"
                     style={{ top: 'var(--header-height, 4rem)' }}
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -564,12 +564,12 @@ export default function CheckoutPage() {
                                 >
                                     <div
                                         className={cn(
-                                            "h-6 w-6 rounded-full flex items-center justify-center font-bold text-[10px] transition-all duration-300 border",
+                                            "h-6 w-6 rounded-[var(--radius-cta)] flex items-center justify-center font-bold text-[10px] transition-all duration-300 border",
                                             isComplete
                                                 ? "bg-gold border-gold text-black"
                                                 : isActive
-                                                    ? "bg-white border-gold text-gold ring-4 ring-gold/10"
-                                                    : "bg-white border-border/20 text-gray-300"
+                                                    ? "bg-[var(--surface)] border-gold text-gold ring-4 ring-gold/10"
+                                                    : "bg-[var(--surface)] border-border text-muted-foreground/70"
                                         )}
                                     >
                                         {isComplete ? (
@@ -580,7 +580,7 @@ export default function CheckoutPage() {
                                     </div>
                                     <p className={cn(
                                         "text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.14em] transition-colors",
-                                        isActive ? "text-gray-900" : "text-gray-400"
+                                        isActive ? "text-foreground" : "text-muted-foreground"
                                     )}>
                                         {step.label}
                                     </p>
@@ -598,12 +598,12 @@ export default function CheckoutPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35 }}
                 >
-                    <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif font-light tracking-tight text-gray-900 leading-snug">
+                    <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif font-light tracking-tight text-foreground leading-snug">
                         {currentStep === 1 && <>Complete Your <span className="italic text-gold">Look</span></>}
                         {currentStep === 2 && <>Event & <span className="italic text-gold">Delivery</span></>}
                         {currentStep === 3 && <>Review & <span className="italic text-gold">Pay</span></>}
                     </h1>
-                    <p className="mt-1.5 text-sm text-gray-500 font-light">
+                    <p className="mt-1.5 text-sm text-muted-foreground font-light">
                         {currentStep === 1 && "Optional extras — skip anytime to continue."}
                         {currentStep === 2 && "Tell us where and when. We’ll prepare secure payment next."}
                         {currentStep === 3 && "Confirm items, sign the agreement, and pay your deposit or balance."}
@@ -627,7 +627,7 @@ export default function CheckoutPage() {
                                     </div>
                                 ))
                             ) : supplementalProducts.length === 0 ? (
-                                <div className="col-span-2 lg:col-span-4 text-center py-10 text-sm text-gray-500">
+                                <div className="col-span-2 lg:col-span-4 text-center py-10 text-sm text-muted-foreground">
                                     No add-ons available right now — continue to details.
                                 </div>
                             ) : (
@@ -639,7 +639,7 @@ export default function CheckoutPage() {
                                         transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
                                         className="group"
                                     >
-                                        <div className="bg-white rounded-2xl overflow-hidden border border-border/5 shadow-[0_6px_20px_rgba(0,0,0,0.03)] flex flex-col h-full">
+                                        <div className="bg-white rounded-2xl overflow-hidden border border-border shadow-[0_6px_20px_rgba(0,0,0,0.03)] flex flex-col h-full">
                                             <div className="aspect-[4/5] relative overflow-hidden bg-gray-50">
                                                 <img
                                                     src={product.image_url || '/placeholder.svg'}
@@ -649,15 +649,15 @@ export default function CheckoutPage() {
                                             </div>
                                             <div className="p-3 sm:p-4 flex flex-col flex-1 gap-2.5">
                                                 <div>
-                                                    <h3 className="font-serif text-sm sm:text-base font-bold text-gray-900 line-clamp-2 leading-snug">{product.name}</h3>
+                                                    <h3 className="font-serif text-sm sm:text-base font-bold text-foreground line-clamp-2 leading-snug">{product.name}</h3>
                                                     <p className="text-gold font-bold text-xs sm:text-sm mt-1">{formatCurrency(resolvePriceCents(product))}</p>
                                                 </div>
                                                 <div className="mt-auto flex items-center justify-between gap-2">
-                                                    <div className="flex items-center gap-2.5 bg-gray-50 rounded-full px-2.5 py-1 border border-border/5">
+                                                    <div className="flex items-center gap-2.5 bg-gray-50 rounded-[var(--radius-cta)] px-2.5 py-1 border border-border">
                                                         <button
                                                             type="button"
                                                             aria-label="Decrease quantity"
-                                                            className="text-gray-400 hover:text-gold transition-colors p-0.5"
+                                                            className="text-muted-foreground hover:text-gold transition-colors p-0.5"
                                                             onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) - 1)}
                                                             disabled={(supplementalQuantities[product.id] || 1) <= 1}
                                                         >
@@ -669,7 +669,7 @@ export default function CheckoutPage() {
                                                         <button
                                                             type="button"
                                                             aria-label="Increase quantity"
-                                                            className="text-gray-400 hover:text-gold transition-colors p-0.5"
+                                                            className="text-muted-foreground hover:text-gold transition-colors p-0.5"
                                                             onClick={() => updateSupplementalQuantity(product.id, (supplementalQuantities[product.id] || 1) + 1)}
                                                         >
                                                             <Plus className="h-3 w-3" />
@@ -677,7 +677,7 @@ export default function CheckoutPage() {
                                                     </div>
                                                     <Button
                                                         size="sm"
-                                                        className="h-8 px-3 bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full text-[10px] font-bold uppercase tracking-wider"
+                                                        className="h-8 px-3 bg-gold text-primary-foreground hover:bg-[var(--signal)] hover:text-primary-foreground rounded-[var(--radius-cta)] text-[10px] font-bold uppercase tracking-wider"
                                                         onClick={() => handleAddSupplementalItem(product)}
                                                     >
                                                         Add
@@ -695,13 +695,13 @@ export default function CheckoutPage() {
                                 <Button
                                     variant="ghost"
                                     onClick={handleNextStep}
-                                    className="h-11 text-[10px] font-bold uppercase tracking-[0.16em] text-gray-500 hover:text-gold"
+                                    className="h-11 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground hover:text-gold"
                                 >
                                     Skip add-ons
                                 </Button>
                                 <Button
                                     onClick={handleNextStep}
-                                    className="bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full px-8 h-12 text-[11px] font-bold uppercase tracking-[0.16em] w-full sm:w-auto"
+                                    className="bg-gold text-primary-foreground hover:bg-[var(--signal)] hover:text-primary-foreground rounded-[var(--radius-cta)] px-8 h-12 text-[11px] font-bold uppercase tracking-[0.16em] w-full sm:w-auto"
                                 >
                                     Continue <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
@@ -786,13 +786,13 @@ export default function CheckoutPage() {
                                                 <PopoverTrigger asChild>
                                                     <Button
                                                         variant={"outline"}
-                                                        className={cn(fieldClass, "justify-start text-left hover:bg-transparent hover:border-gold", !date && "text-gray-300")}
+                                                        className={cn(fieldClass, "justify-start text-left hover:bg-transparent hover:border-gold", !date && "text-muted-foreground/70")}
                                                     >
                                                         <CalendarIcon className="mr-2 h-4 w-4 text-gold shrink-0" />
                                                         {date ? format(date, "MMM d, yyyy") : <span>Select date</span>}
                                                     </Button>
                                                 </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0 border-border/10 shadow-2xl bg-[#FDFBF7]">
+                                                <PopoverContent className="w-auto p-0 border-border shadow-2xl bg-[var(--surface-elevated)]">
                                                     <Calendar mode="single" selected={date} onSelect={setDate} initialFocus className="p-3" />
                                                 </PopoverContent>
                                             </Popover>
@@ -818,7 +818,7 @@ export default function CheckoutPage() {
                                             required
                                             className={fieldClass}
                                         />
-                                        <p className="text-[10px] font-medium tracking-wide text-gray-400">Used as delivery address</p>
+                                        <p className="text-[10px] font-medium tracking-wide text-muted-foreground">Used as delivery address</p>
                                     </div>
 
                                     <div className="grid sm:grid-cols-2 gap-5 sm:gap-6">
@@ -828,7 +828,7 @@ export default function CheckoutPage() {
                                                 <SelectTrigger className={cn(fieldClass, "focus:ring-0 focus:border-gold")}>
                                                     <SelectValue placeholder="Select type" />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-[#FDFBF7] border-border/10">
+                                                <SelectContent className="bg-[var(--surface-elevated)] border-border">
                                                     <SelectItem value="hotel">Hotel</SelectItem>
                                                     <SelectItem value="private_residence">Private Residence</SelectItem>
                                                     <SelectItem value="corporate_office">Corporate Office</SelectItem>
@@ -858,7 +858,7 @@ export default function CheckoutPage() {
                                     <div className="h-px flex-1 bg-gradient-to-r from-gold/30 to-transparent" />
                                 </div>
                                 <div className="space-y-4">
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 p-3 sm:p-4 bg-white rounded-2xl border border-border/5">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 p-3 sm:p-4 bg-white rounded-2xl border border-border">
                                         {[
                                             { id: "elevator", label: "Elevator", checked: hasElevator, onChange: setHasElevator },
                                             { id: "stairs", label: "Stairs", checked: hasStairs, onChange: setHasStairs },
@@ -874,14 +874,14 @@ export default function CheckoutPage() {
                                                 onClick={() => item.onChange(!item.checked)}
                                             >
                                                 <div className={cn(
-                                                    "h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all",
-                                                    item.checked ? "bg-gold border-gold" : "border-gray-200"
+                                                    "h-5 w-5 rounded-[var(--radius-cta)] border-2 flex items-center justify-center shrink-0 transition-all",
+                                                    item.checked ? "bg-gold border-gold" : "border-white/15"
                                                 )}>
                                                     {item.checked && <Check className="h-2.5 w-2.5 text-black stroke-[3]" />}
                                                 </div>
                                                 <span className={cn(
                                                     "text-[11px] font-bold uppercase tracking-wider",
-                                                    item.checked ? "text-gray-900" : "text-gray-400"
+                                                    item.checked ? "text-foreground" : "text-muted-foreground"
                                                 )}>
                                                     {item.label}
                                                 </span>
@@ -894,7 +894,7 @@ export default function CheckoutPage() {
                                             placeholder="Gate codes, parking, room names…"
                                             value={formData.deliveryNotes}
                                             onChange={(e) => setFormData({ ...formData, deliveryNotes: e.target.value })}
-                                            className="min-h-[72px] bg-transparent border-0 border-b border-gray-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-base resize-none"
+                                            className="min-h-[72px] bg-transparent border-0 border-b border-white/15 rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-muted-foreground/70 font-light text-base resize-none"
                                         />
                                     </div>
                                 </div>
@@ -911,23 +911,23 @@ export default function CheckoutPage() {
                                         type="button"
                                         className={cn(
                                             "w-full flex items-center gap-4 p-4 rounded-2xl border text-left transition-all",
-                                            sameDayPickup ? "bg-gold/5 border-gold" : "bg-white border-border/5 hover:border-gold/30"
+                                            sameDayPickup ? "bg-gold/5 border-gold" : "bg-[var(--surface)] border-border hover:border-gold/30"
                                         )}
                                         onClick={() => setSameDayPickup(!sameDayPickup)}
                                     >
                                         <div className={cn(
-                                            "h-10 w-10 rounded-full flex items-center justify-center shrink-0 transition-all",
-                                            sameDayPickup ? "bg-gold text-black" : "bg-gray-50 text-gray-400"
+                                            "h-10 w-10 rounded-[var(--radius-cta)] flex items-center justify-center shrink-0 transition-all",
+                                            sameDayPickup ? "bg-gold text-black" : "bg-gray-50 text-muted-foreground"
                                         )}>
                                             <Clock className="h-5 w-5" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="text-base font-serif font-bold text-gray-900">Same-day pickup</h4>
-                                            <p className="text-xs text-gray-500 mt-0.5">Return items the day of your event · fee applies</p>
+                                            <h4 className="text-base font-serif font-bold text-foreground">Same-day pickup</h4>
+                                            <p className="text-xs text-muted-foreground mt-0.5">Return items the day of your event · fee applies</p>
                                         </div>
                                         <div className={cn(
-                                            "h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0",
-                                            sameDayPickup ? "bg-gold border-gold" : "border-gray-200"
+                                            "h-6 w-6 rounded-[var(--radius-cta)] border-2 flex items-center justify-center shrink-0",
+                                            sameDayPickup ? "bg-gold border-gold" : "border-white/15"
                                         )}>
                                             {sameDayPickup && <Check className="h-3 w-3 text-black stroke-[3]" />}
                                         </div>
@@ -945,7 +945,7 @@ export default function CheckoutPage() {
                                                         className={cn(
                                                             fieldClass,
                                                             "justify-start text-left hover:bg-transparent hover:border-gold w-full",
-                                                            !pickupDate && !sameDayPickup && "text-gray-300",
+                                                            !pickupDate && !sameDayPickup && "text-muted-foreground/70",
                                                             sameDayPickup && "opacity-50 cursor-not-allowed"
                                                         )}
                                                         disabled={sameDayPickup}
@@ -958,7 +958,7 @@ export default function CheckoutPage() {
                                                     </Button>
                                                 </PopoverTrigger>
                                                 {!sameDayPickup && (
-                                                    <PopoverContent className="w-auto p-0 border-border/10 shadow-2xl bg-[#FDFBF7]">
+                                                    <PopoverContent className="w-auto p-0 border-border shadow-2xl bg-[var(--surface-elevated)]">
                                                         <Calendar
                                                             mode="single"
                                                             selected={pickupDate}
@@ -995,7 +995,7 @@ export default function CheckoutPage() {
                                             placeholder="Any special pickup instructions?"
                                             value={pickupNotes}
                                             onChange={(e) => setPickupNotes(e.target.value)}
-                                            className="min-h-[72px] bg-transparent border-0 border-b border-gray-200 rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-gray-300 font-light text-base resize-none"
+                                            className="min-h-[72px] bg-transparent border-0 border-b border-white/15 rounded-none px-0 focus-visible:ring-0 focus-visible:border-gold transition-colors placeholder:text-muted-foreground/70 font-light text-base resize-none"
                                         />
                                     </div>
                                 </div>
@@ -1007,7 +1007,7 @@ export default function CheckoutPage() {
                                 <button
                                     type="button"
                                     onClick={handlePrevStep}
-                                    className="text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 hover:text-gold transition-colors flex items-center gap-1.5 shrink-0 py-2"
+                                    className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground hover:text-gold transition-colors flex items-center gap-1.5 shrink-0 py-2"
                                 >
                                     <ArrowLeft className="h-4 w-4" />
                                     <span className="hidden xs:inline sm:inline">Back</span>
@@ -1015,7 +1015,7 @@ export default function CheckoutPage() {
                                 <Button
                                     onClick={handleNextStep}
                                     disabled={isLoading}
-                                    className="bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full px-6 sm:px-8 h-12 text-[11px] font-bold uppercase tracking-[0.16em] flex-1 sm:flex-none"
+                                    className="bg-gold text-primary-foreground hover:bg-[var(--signal)] hover:text-primary-foreground rounded-[var(--radius-cta)] px-6 sm:px-8 h-12 text-[11px] font-bold uppercase tracking-[0.16em] flex-1 sm:flex-none"
                                 >
                                     {isLoading ? (
                                         <>
@@ -1042,12 +1042,12 @@ export default function CheckoutPage() {
                         <div className="lg:col-span-3 space-y-5 sm:space-y-6">
                             {/* Review Order */}
                             <div className={cardClass}>
-                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border/5 flex items-center gap-3">
-                                    <div className="h-9 w-9 rounded-full bg-gold/10 flex items-center justify-center shrink-0">
+                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border flex items-center gap-3">
+                                    <div className="h-9 w-9 rounded-[var(--radius-cta)] bg-gold/10 flex items-center justify-center shrink-0">
                                         <ShoppingBag className="h-4 w-4 text-gold" />
                                     </div>
-                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-gray-900">Your order</h3>
-                                    <span className="ml-auto text-xs text-gray-400 font-medium">{items.length} item{items.length === 1 ? '' : 's'}</span>
+                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-foreground">Your order</h3>
+                                    <span className="ml-auto text-xs text-muted-foreground font-medium">{items.length} item{items.length === 1 ? '' : 's'}</span>
                                 </div>
                                 <div className="divide-y divide-border/5">
                                     {items.map((item, index) => {
@@ -1056,7 +1056,7 @@ export default function CheckoutPage() {
                                             const packagePrice = resolvePriceCents({ price })
                                             return (
                                                 <div key={item.id} className="flex gap-3 sm:gap-4 p-4 sm:p-5">
-                                                    <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl border border-border/5 bg-gray-50 overflow-hidden flex-shrink-0 relative">
+                                                    <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl border border-border bg-gray-50 overflow-hidden flex-shrink-0 relative">
                                                         {item.packageData.image_url ? (
                                                             <img src={item.packageData.image_url} alt={name} className="h-full w-full object-cover" />
                                                         ) : (
@@ -1068,11 +1068,11 @@ export default function CheckoutPage() {
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex justify-between gap-2 items-start">
                                                             <div className="min-w-0">
-                                                                <h4 className="font-serif text-base font-bold text-gray-900 truncate">{name}</h4>
+                                                                <h4 className="font-serif text-base font-bold text-foreground truncate">{name}</h4>
                                                                 <p className="text-gold font-bold text-sm mt-0.5">{formatCurrency(packagePrice * item.quantity)}</p>
                                                                 <p className="text-[10px] uppercase tracking-wider font-bold text-gold/50 mt-1">Package</p>
                                                             </div>
-                                                            <button type="button" onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 p-1 shrink-0" aria-label="Remove">
+                                                            <button type="button" onClick={() => removeItem(item.id)} className="text-muted-foreground/70 hover:text-red-500 p-1 shrink-0" aria-label="Remove">
                                                                 <X className="h-4 w-4" />
                                                             </button>
                                                         </div>
@@ -1080,7 +1080,7 @@ export default function CheckoutPage() {
                                                             <div className="mt-2 flex flex-wrap gap-1.5">
                                                                 {item.packageData.selectionsSummary.flatMap((group: any) =>
                                                                     group.items.map((selection: any, sIdx: number) => (
-                                                                        <span key={`${group.groupName}-${sIdx}`} className="text-[10px] text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">
+                                                                        <span key={`${group.groupName}-${sIdx}`} className="text-[10px] text-gray-600 bg-gray-100 px-2 py-0.5 rounded-[var(--radius-cta)]">
                                                                             {selection.name}{selection.quantity > 1 ? ` ×${selection.quantity}` : ''}
                                                                         </span>
                                                                     ))
@@ -1088,12 +1088,12 @@ export default function CheckoutPage() {
                                                             </div>
                                                         )}
                                                         <div className="flex items-center gap-3 mt-3">
-                                                            <div className="flex items-center gap-3 bg-gray-50 rounded-full px-3 py-1 border border-border/5">
-                                                                <button type="button" className="text-gray-400 hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity - 1); toast.info('Quantity updated') }} disabled={item.quantity <= 1} aria-label="Decrease">
+                                                            <div className="flex items-center gap-3 bg-gray-50 rounded-[var(--radius-cta)] px-3 py-1 border border-border">
+                                                                <button type="button" className="text-muted-foreground hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity - 1); toast.info('Quantity updated') }} disabled={item.quantity <= 1} aria-label="Decrease">
                                                                     <Minus className="h-3.5 w-3.5" />
                                                                 </button>
                                                                 <span className="text-xs font-bold w-5 text-center">{item.quantity}</span>
-                                                                <button type="button" className="text-gray-400 hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity + 1); toast.info('Quantity updated') }} aria-label="Increase">
+                                                                <button type="button" className="text-muted-foreground hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity + 1); toast.info('Quantity updated') }} aria-label="Increase">
                                                                     <Plus className="h-3.5 w-3.5" />
                                                                 </button>
                                                             </div>
@@ -1107,26 +1107,26 @@ export default function CheckoutPage() {
                                         if (!product) return null
                                         return (
                                             <div key={item.id} className="flex gap-3 sm:gap-4 p-4 sm:p-5">
-                                                <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl border border-border/5 bg-gray-50 overflow-hidden flex-shrink-0">
+                                                <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl border border-border bg-gray-50 overflow-hidden flex-shrink-0">
                                                     <img src={product.image_url || '/placeholder.svg'} alt={product.name} className="h-full w-full object-cover" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex justify-between gap-2 items-start">
                                                         <div className="min-w-0">
-                                                            <h4 className="font-serif text-base font-bold text-gray-900 truncate">{product.name}</h4>
+                                                            <h4 className="font-serif text-base font-bold text-foreground truncate">{product.name}</h4>
                                                             <p className="text-gold font-bold text-sm mt-0.5">{formatCurrency(resolvePriceCents(product) * item.quantity)}</p>
                                                         </div>
-                                                        <button type="button" onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-500 p-1 shrink-0" aria-label="Remove">
+                                                        <button type="button" onClick={() => removeItem(item.id)} className="text-muted-foreground/70 hover:text-red-500 p-1 shrink-0" aria-label="Remove">
                                                             <X className="h-4 w-4" />
                                                         </button>
                                                     </div>
                                                     <div className="flex items-center gap-3 mt-3">
-                                                        <div className="flex items-center gap-3 bg-gray-50 rounded-full px-3 py-1 border border-border/5">
-                                                            <button type="button" className="text-gray-400 hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity - 1); toast.info('Quantity updated') }} disabled={item.quantity <= 1} aria-label="Decrease">
+                                                        <div className="flex items-center gap-3 bg-gray-50 rounded-[var(--radius-cta)] px-3 py-1 border border-border">
+                                                            <button type="button" className="text-muted-foreground hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity - 1); toast.info('Quantity updated') }} disabled={item.quantity <= 1} aria-label="Decrease">
                                                                 <Minus className="h-3.5 w-3.5" />
                                                             </button>
                                                             <span className="text-xs font-bold w-5 text-center">{item.quantity}</span>
-                                                            <button type="button" className="text-gray-400 hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity + 1); toast.info('Quantity updated') }} aria-label="Increase">
+                                                            <button type="button" className="text-muted-foreground hover:text-gold" onClick={() => { updateQuantity(item.id, item.quantity + 1); toast.info('Quantity updated') }} aria-label="Increase">
                                                                 <Plus className="h-3.5 w-3.5" />
                                                             </button>
                                                         </div>
@@ -1139,14 +1139,14 @@ export default function CheckoutPage() {
                             </div>
 
                             {/* Event & Delivery Review */}
-                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
-                                <div className="p-10 border-b border-border/5">
+                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border">
+                                <div className="p-10 border-b border-border">
                                     <div className="flex items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
+                                            <div className="h-12 w-12 rounded-[var(--radius-cta)] bg-gold/10 flex items-center justify-center">
                                                 <CalendarIcon className="h-6 w-6 text-gold" />
                                             </div>
-                                            <h3 className="text-2xl font-serif font-bold text-gray-900">Event Information</h3>
+                                            <h3 className="text-2xl font-serif font-bold text-foreground">Event Information</h3>
                                         </div>
                                         <button
                                             type="button"
@@ -1160,19 +1160,19 @@ export default function CheckoutPage() {
                                 <div className="p-10 space-y-8">
                                     <div className="grid sm:grid-cols-2 gap-8">
                                         <div>
-                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Event Date</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Event Date</span>
                                             <div className="flex items-center gap-2 mt-2">
                                                 <CalendarIcon className="h-4 w-4 text-gold flex-shrink-0" />
-                                                <p className="font-medium text-gray-900">
+                                                <p className="font-medium text-foreground">
                                                     {date ? format(date, 'PPP') : 'Not set'}
                                                 </p>
                                             </div>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Event Time</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Event Time</span>
                                             <div className="flex items-center gap-2 mt-2">
                                                 <Clock className="h-4 w-4 text-gold flex-shrink-0" />
-                                                <p className="font-medium text-gray-900">
+                                                <p className="font-medium text-foreground">
                                                     {startTime || 'TBD'}{endTime ? ` – ${endTime}` : ''}
                                                 </p>
                                             </div>
@@ -1182,44 +1182,44 @@ export default function CheckoutPage() {
                                     <div className="grid sm:grid-cols-2 gap-8">
                                         {formData.eventType && (
                                             <div>
-                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Event Type</span>
-                                                <p className="mt-2 font-medium text-gray-900">{formData.eventType}</p>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Event Type</span>
+                                                <p className="mt-2 font-medium text-foreground">{formData.eventType}</p>
                                             </div>
                                         )}
                                         <div>
-                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Venue Type</span>
-                                            <p className="mt-2 font-medium text-gray-900 capitalize">
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Venue Type</span>
+                                            <p className="mt-2 font-medium text-foreground capitalize">
                                                 {venueType?.replace(/_/g, ' ') || 'Not set'}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="pt-6 border-t border-border/5">
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Venue / Delivery Address</span>
+                                    <div className="pt-6 border-t border-border">
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Venue / Delivery Address</span>
                                         <div className="flex items-start gap-2 mt-2">
                                             <MapPin className="h-4 w-4 text-gold mt-1 flex-shrink-0" />
-                                            <p className="font-medium text-gray-900 leading-relaxed">
+                                            <p className="font-medium text-foreground leading-relaxed">
                                                 {formData.venueAddress || formData.deliveryAddress || 'Not set'}
                                             </p>
                                         </div>
                                     </div>
 
                                     {(hasElevator || hasStairs || hasLoadingDock) && (
-                                        <div className="pt-6 border-t border-border/5">
-                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Access</span>
+                                        <div className="pt-6 border-t border-border">
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Access</span>
                                             <div className="flex flex-wrap gap-3 mt-3">
                                                 {hasElevator && (
-                                                    <span className="text-xs font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-border/5">
+                                                    <span className="text-xs font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-[var(--radius-cta)] border border-border">
                                                         Elevator Access
                                                     </span>
                                                 )}
                                                 {hasStairs && (
-                                                    <span className="text-xs font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-border/5">
+                                                    <span className="text-xs font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-[var(--radius-cta)] border border-border">
                                                         Stairs Required
                                                     </span>
                                                 )}
                                                 {hasLoadingDock && (
-                                                    <span className="text-xs font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-full border border-border/5">
+                                                    <span className="text-xs font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-[var(--radius-cta)] border border-border">
                                                         Loading Dock
                                                     </span>
                                                 )}
@@ -1228,9 +1228,9 @@ export default function CheckoutPage() {
                                     )}
 
                                     {formData.deliveryNotes && (
-                                        <div className="pt-6 border-t border-border/5">
-                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Logistics Notes</span>
-                                            <p className="mt-2 text-sm text-gray-500 italic font-light leading-relaxed">
+                                        <div className="pt-6 border-t border-border">
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Logistics Notes</span>
+                                            <p className="mt-2 text-sm text-muted-foreground italic font-light leading-relaxed">
                                                 &ldquo;{formData.deliveryNotes}&rdquo;
                                             </p>
                                         </div>
@@ -1239,14 +1239,14 @@ export default function CheckoutPage() {
                             </div>
 
                             {/* Delivery & Pickup Review */}
-                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border/5">
-                                <div className="p-10 border-b border-border/5">
+                            <div className="bg-white rounded-[3rem] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] border border-border">
+                                <div className="p-10 border-b border-border">
                                     <div className="flex items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="h-12 w-12 rounded-full bg-gold/10 flex items-center justify-center">
+                                            <div className="h-12 w-12 rounded-[var(--radius-cta)] bg-gold/10 flex items-center justify-center">
                                                 <Truck className="h-6 w-6 text-gold" />
                                             </div>
-                                            <h3 className="text-2xl font-serif font-bold text-gray-900">Delivery & Pickup</h3>
+                                            <h3 className="text-2xl font-serif font-bold text-foreground">Delivery & Pickup</h3>
                                         </div>
                                         <button
                                             type="button"
@@ -1262,50 +1262,50 @@ export default function CheckoutPage() {
                                         <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Delivery</h4>
                                         <div className="grid sm:grid-cols-2 gap-8">
                                             <div>
-                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Delivery Date</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Delivery Date</span>
                                                 <div className="flex items-center gap-2 mt-2">
                                                     <CalendarIcon className="h-4 w-4 text-gold flex-shrink-0" />
-                                                    <p className="font-medium text-gray-900">
+                                                    <p className="font-medium text-foreground">
                                                         {date ? format(date, 'PPP') : 'Not set'}
                                                     </p>
                                                 </div>
                                             </div>
                                             <div>
-                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Delivery Time</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Delivery Time</span>
                                                 <div className="flex items-center gap-2 mt-2">
                                                     <Clock className="h-4 w-4 text-gold flex-shrink-0" />
-                                                    <p className="font-medium text-gray-900">
+                                                    <p className="font-medium text-foreground">
                                                         {formData.deliveryTime || startTime || 'TBD'}
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Delivery Address</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Delivery Address</span>
                                             <div className="flex items-start gap-2 mt-2">
                                                 <MapPin className="h-4 w-4 text-gold mt-1 flex-shrink-0" />
-                                                <p className="font-medium text-gray-900 leading-relaxed">
+                                                <p className="font-medium text-foreground leading-relaxed">
                                                     {formData.deliveryAddress || formData.venueAddress || 'Not set'}
                                                 </p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="pt-8 border-t border-border/5 space-y-6">
+                                    <div className="pt-8 border-t border-border space-y-6">
                                         <div className="flex items-center gap-3">
                                             <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Pickup</h4>
                                             {sameDayPickup && (
-                                                <span className="text-[10px] font-bold uppercase tracking-widest text-black bg-gold px-3 py-1 rounded-full">
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-black bg-gold px-3 py-1 rounded-[var(--radius-cta)]">
                                                     Same-Day
                                                 </span>
                                             )}
                                         </div>
                                         <div className="grid sm:grid-cols-2 gap-8">
                                             <div>
-                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Pickup Date</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Pickup Date</span>
                                                 <div className="flex items-center gap-2 mt-2">
                                                     <CalendarIcon className="h-4 w-4 text-gold flex-shrink-0" />
-                                                    <p className="font-medium text-gray-900">
+                                                    <p className="font-medium text-foreground">
                                                         {sameDayPickup
                                                             ? (date ? format(date, 'PPP') : 'Same as event date')
                                                             : (pickupDate ? format(pickupDate, 'PPP') : 'Not set')}
@@ -1313,10 +1313,10 @@ export default function CheckoutPage() {
                                                 </div>
                                             </div>
                                             <div>
-                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Preferred Pickup Time</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Preferred Pickup Time</span>
                                                 <div className="flex items-center gap-2 mt-2">
                                                     <Clock className="h-4 w-4 text-gold flex-shrink-0" />
-                                                    <p className="font-medium text-gray-900">
+                                                    <p className="font-medium text-foreground">
                                                         {pickupTime || 'TBD'}
                                                     </p>
                                                 </div>
@@ -1324,8 +1324,8 @@ export default function CheckoutPage() {
                                         </div>
                                         {pickupNotes && (
                                             <div>
-                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Pickup Instructions</span>
-                                                <p className="mt-2 text-sm text-gray-500 italic font-light leading-relaxed">
+                                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Pickup Instructions</span>
+                                                <p className="mt-2 text-sm text-muted-foreground italic font-light leading-relaxed">
                                                     &ldquo;{pickupNotes}&rdquo;
                                                 </p>
                                             </div>
@@ -1336,8 +1336,8 @@ export default function CheckoutPage() {
 
                             {/* Payment Choice */}
                             <div className={cardClass}>
-                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border/5">
-                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-gray-900">Payment amount</h3>
+                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border">
+                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-foreground">Payment amount</h3>
                                 </div>
                                 <div className="p-4 sm:p-6 space-y-4">
                                     <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
@@ -1356,10 +1356,10 @@ export default function CheckoutPage() {
                                             )}
                                         >
                                             <div className="flex items-center justify-between gap-1">
-                                                <span className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Full</span>
+                                                <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Full</span>
                                                 {paymentChoice === 'full' && <Check className="h-3.5 w-3.5 text-gold shrink-0" />}
                                             </div>
-                                            <h4 className="text-sm sm:text-base font-serif font-bold text-gray-900">Pay in full</h4>
+                                            <h4 className="text-sm sm:text-base font-serif font-bold text-foreground">Pay in full</h4>
                                             <p className="text-sm sm:text-base font-bold text-gold">{totals ? formatCurrency(totals.totalAmount) : '…'}</p>
                                         </button>
 
@@ -1379,10 +1379,10 @@ export default function CheckoutPage() {
                                             )}
                                         >
                                             <div className="flex items-center justify-between gap-1">
-                                                <span className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Deposit</span>
+                                                <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Deposit</span>
                                                 {paymentChoice === 'deposit' && <Check className="h-3.5 w-3.5 text-gold shrink-0" />}
                                             </div>
-                                            <h4 className="text-sm sm:text-base font-serif font-bold text-gray-900">50% now</h4>
+                                            <h4 className="text-sm sm:text-base font-serif font-bold text-foreground">50% now</h4>
                                             <p className="text-sm sm:text-base font-bold text-gold">Min. {totals ? formatCurrency(Math.ceil(totals.totalAmount * 0.5)) : '…'}</p>
                                         </button>
                                     </div>
@@ -1391,11 +1391,11 @@ export default function CheckoutPage() {
                                         <motion.div
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: 'auto' }}
-                                            className="space-y-2 pt-3 border-t border-border/5"
+                                            className="space-y-2 pt-3 border-t border-border"
                                         >
                                             <Label htmlFor="custom-amount" className={labelClass}>Custom amount ($)</Label>
                                             <div className="relative">
-                                                <span className="absolute left-0 bottom-3 text-lg font-light text-gray-400">$</span>
+                                                <span className="absolute left-0 bottom-3 text-lg font-light text-muted-foreground">$</span>
                                                 <Input
                                                     id="custom-amount"
                                                     type="number"
@@ -1412,7 +1412,7 @@ export default function CheckoutPage() {
                                                         setCurrentStep(2)
                                                         setTimeout(() => handleNextStep(), 10)
                                                     }}
-                                                    className="bg-transparent border-0 border-b border-gray-200 rounded-none pl-5 h-11 focus-visible:ring-0 focus-visible:border-gold font-light text-xl"
+                                                    className="bg-transparent border-0 border-b border-white/15 rounded-none pl-5 h-11 focus-visible:ring-0 focus-visible:border-gold font-light text-xl"
                                                     placeholder={((totals?.totalAmount || 0) / 200).toString()}
                                                 />
                                             </div>
@@ -1424,7 +1424,7 @@ export default function CheckoutPage() {
                                         </motion.div>
                                     )}
 
-                                    <p className="text-[11px] text-gray-500 leading-relaxed">
+                                    <p className="text-[11px] text-muted-foreground leading-relaxed">
                                         Remaining balance follows the{' '}
                                         <Link href="/rental-agreement" target="_blank" className="text-gold font-semibold hover:underline">
                                             rental agreement
@@ -1435,8 +1435,8 @@ export default function CheckoutPage() {
 
                             {/* Payment Method */}
                             <div className={cardClass}>
-                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border/5">
-                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-gray-900">Payment details</h3>
+                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border">
+                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-foreground">Payment details</h3>
                                 </div>
                                 <div className="p-4 sm:p-6">
                                     {clientSecret ? (
@@ -1450,7 +1450,7 @@ export default function CheckoutPage() {
                                     ) : (
                                         <div className="flex flex-col items-center justify-center py-10 space-y-3">
                                             <Loader2 className="h-8 w-8 animate-spin text-gold" />
-                                            <p className="text-sm text-gray-500">Initializing secure payment…</p>
+                                            <p className="text-sm text-muted-foreground">Initializing secure payment…</p>
                                         </div>
                                     )}
                                 </div>
@@ -1458,8 +1458,8 @@ export default function CheckoutPage() {
 
                             {/* Signature */}
                             <div className={cardClass}>
-                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border/5">
-                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-gray-900">Sign agreement</h3>
+                                <div className="px-4 py-4 sm:px-6 sm:py-5 border-b border-border">
+                                    <h3 className="text-lg sm:text-xl font-serif font-bold text-foreground">Sign agreement</h3>
                                 </div>
                                 <div className="p-4 sm:p-6">
                                     <SignatureCanvas
@@ -1476,16 +1476,16 @@ export default function CheckoutPage() {
                         </div>
 
                         <div className="lg:col-span-2">
-                            <div className="lg:sticky lg:top-24 bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.06)] border border-gold/10">
-                                <div className="bg-gradient-to-br from-[#1A1A1A] to-black text-white py-5 px-5 sm:px-6">
+                            <div className="lg:sticky lg:top-24 surface-panel rounded-md overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.06)] border border-gold/10">
+                                <div className="bg-[var(--surface-muted)] text-foreground border-b border-border py-5 px-5 sm:px-6">
                                     <h3 className="text-lg sm:text-xl font-serif font-bold text-center">Order summary</h3>
                                 </div>
                                 <div className="p-5 sm:p-6 space-y-5">
                                     {totals ? (
                                         <div className="space-y-3">
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-gray-500">Subtotal</span>
-                                                <span className="font-medium text-gray-900">{formatCurrency(totals.subtotal)}</span>
+                                                <span className="text-muted-foreground">Subtotal</span>
+                                                <span className="font-medium text-foreground">{formatCurrency(totals.subtotal)}</span>
                                             </div>
                                             {totals.discountAmount > 0 && (
                                                 <div className="flex justify-between text-sm text-green-600">
@@ -1495,20 +1495,20 @@ export default function CheckoutPage() {
                                             )}
                                             {totals.setupFee > 0 && (
                                                 <div className="flex justify-between text-sm">
-                                                    <span className="text-gray-500">Setup fee</span>
-                                                    <span className="font-medium text-gray-900">{formatCurrency(totals.setupFee)}</span>
+                                                    <span className="text-muted-foreground">Setup fee</span>
+                                                    <span className="font-medium text-foreground">{formatCurrency(totals.setupFee)}</span>
                                                 </div>
                                             )}
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-gray-500">Tax ({(totals.taxRate * 100).toFixed(2)}%)</span>
-                                                <span className="font-medium text-gray-900">{formatCurrency(totals.taxAmount)}</span>
+                                                <span className="text-muted-foreground">Tax ({(totals.taxRate * 100).toFixed(2)}%)</span>
+                                                <span className="font-medium text-foreground">{formatCurrency(totals.taxAmount)}</span>
                                             </div>
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-gray-500">Delivery</span>
-                                                <span className="font-medium text-gray-900">{isCalculating ? '…' : formatCurrency(totals.deliveryFee)}</span>
+                                                <span className="text-muted-foreground">Delivery</span>
+                                                <span className="font-medium text-foreground">{isCalculating ? '…' : formatCurrency(totals.deliveryFee)}</span>
                                             </div>
                                             <div className="pt-3 border-t border-gold/10 flex justify-between items-baseline">
-                                                <span className="text-base font-serif font-bold text-gray-900">Total</span>
+                                                <span className="text-base font-serif font-bold text-foreground">Total</span>
                                                 <span className="font-bold text-2xl text-gold">{formatCurrency(totals.totalAmount)}</span>
                                             </div>
                                         </div>
@@ -1524,7 +1524,7 @@ export default function CheckoutPage() {
                                                 type="button"
                                                 onClick={() => setAgreesToRentalAgreement(!agreesToRentalAgreement)}
                                                 className={cn(
-                                                    "mt-0.5 h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all",
+                                                    "mt-0.5 h-5 w-5 rounded-[var(--radius-cta)] border-2 flex items-center justify-center shrink-0 transition-all",
                                                     agreesToRentalAgreement ? "bg-gold border-gold" : "border-gold/30 hover:border-gold"
                                                 )}
                                                 aria-pressed={agreesToRentalAgreement}
@@ -1533,7 +1533,7 @@ export default function CheckoutPage() {
                                                 {agreesToRentalAgreement && <Check className="h-2.5 w-2.5 text-black stroke-[3]" />}
                                             </button>
                                             <label
-                                                className="text-xs sm:text-sm font-medium cursor-pointer leading-relaxed text-gray-900"
+                                                className="text-xs sm:text-sm font-medium cursor-pointer leading-relaxed text-foreground"
                                                 onClick={() => setAgreesToRentalAgreement(!agreesToRentalAgreement)}
                                             >
                                                 I agree to the{' '}
@@ -1555,7 +1555,7 @@ export default function CheckoutPage() {
                                                 Secure payment is not ready yet. Go back to event details and continue to initialize Stripe checkout.
                                             </div>
                                             <Button
-                                                className="w-full h-12 bg-[#1A1A1A] text-white hover:bg-gold hover:text-black rounded-full text-[11px] font-bold uppercase tracking-[0.16em]"
+                                                className="w-full h-12 bg-gold text-primary-foreground hover:bg-[var(--signal)] hover:text-primary-foreground rounded-[var(--radius-cta)] text-[11px] font-bold uppercase tracking-[0.16em]"
                                                 onClick={() => goToStep(2)}
                                                 disabled={isLoading}
                                             >
@@ -1568,7 +1568,7 @@ export default function CheckoutPage() {
                                     <button
                                         type="button"
                                         onClick={handlePrevStep}
-                                        className="w-full text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400 hover:text-gold transition-colors flex items-center justify-center gap-1.5 py-2"
+                                        className="w-full text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground hover:text-gold transition-colors flex items-center justify-center gap-1.5 py-2"
                                     >
                                         <ArrowLeft className="h-4 w-4" /> Back
                                     </button>

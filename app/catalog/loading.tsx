@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function CatalogLoading() {
     return (
-        <main className="min-h-screen bg-[#1A1A1A]">
+        <main className="min-h-screen bg-background">
             {/* Hero Skeleton */}
             <div className="relative h-[60vh] md:h-[70vh] bg-black w-full overflow-hidden">
                 <div className="absolute inset-0 bg-white/5 animate-pulse" />
@@ -14,7 +14,7 @@ export default function CatalogLoading() {
             </div>
 
             {/* Sticky Bar Skeleton */}
-            <div className="sticky top-[72px] z-40 bg-[#1A1A1A]/80 backdrop-blur-xl border-y border-white/5 py-6">
+            <div className="sticky top-[72px] z-40 bg-background/80 backdrop-blur-xl border-y border-white/5 py-6">
                 <div className="container mx-auto px-4 flex flex-col lg:flex-row gap-6 items-center">
                     <Skeleton className="h-14 w-full flex-1 rounded-full bg-white/10" />
                     <div className="flex gap-4 w-full lg:w-auto">

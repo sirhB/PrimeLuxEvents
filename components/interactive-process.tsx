@@ -39,7 +39,7 @@ export function InteractiveProcess() {
     })
 
     return (
-        <section ref={containerRef} className="py-24 md:py-40 bg-[#1A1A1A] text-white relative overflow-hidden">
+        <section ref={containerRef} className="py-24 md:py-40 bg-background text-white relative overflow-hidden">
             {/* Decorative background element */}
             <div className="absolute top-0 right-0 w-full h-full bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
 
@@ -105,7 +105,7 @@ function ProcessStep({ step, index }: { step: typeof steps[0]; index: number }) 
                 <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-500 group-hover:bg-gold group-hover:border-gold group-hover:scale-110">
                     <step.icon className="w-8 h-8 text-gold group-hover:text-black transition-colors duration-500 stroke-[1.5]" />
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-[#1A1A1A] border border-white/10 flex items-center justify-center text-[10px] font-bold text-gold">
+                <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-background border border-white/10 flex items-center justify-center text-[10px] font-bold text-gold">
                     0{step.id}
                 </div>
             </div>

@@ -77,7 +77,7 @@ export function EditDiscountDialog({ discount }: { discount: Discount }) {
                     <Pencil className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-[#1A1A1A] border-white/10 text-white">
+            <DialogContent className="sm:max-w-[425px] bg-[var(--dashboard-card)] border-white/10 text-white">
                 <DialogHeader>
                     <DialogTitle className="font-serif text-2xl">Edit Discount Tier</DialogTitle>
                     <DialogDescription className="text-gray-400">
@@ -111,7 +111,7 @@ export function EditDiscountDialog({ discount }: { discount: Discount }) {
                                 <SelectTrigger className="bg-white/5 border-white/10 text-white">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-[#1A1A1A] border-white/10 text-white">
+                                <SelectContent className="bg-[var(--dashboard-card)] border-white/10 text-white">
                                     <SelectItem value="percentage">Percent (%)</SelectItem>
                                     <SelectItem value="fixed">Fixed ($)</SelectItem>
                                 </SelectContent>

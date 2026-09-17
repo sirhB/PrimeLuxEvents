@@ -195,14 +195,14 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
     }
 
     return (
-        <div className="min-h-screen bg-[#1A1A1A] text-white selection:bg-gold selection:text-black">
+        <div className="min-h-screen bg-background text-white selection:bg-gold selection:text-black">
             <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
 
             {/* Top Blur Effect */}
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[120px] pointer-events-none" />
 
             {/* Navigation Bar */}
-            <div className="sticky top-0 z-40 bg-[#1A1A1A]/80 backdrop-blur-xl border-b border-white/5">
+            <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-white/5">
                 <div className="container mx-auto px-4 md:px-6 py-4">
                     <motion.div
                         initial={{ opacity: 0, y: -10 }}
@@ -563,7 +563,7 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                    className="bg-[#1E1E1E]/50 border-t border-white/5 relative overflow-hidden"
+                    className="bg-[var(--surface-elevated)]/50 border-t border-white/5 relative overflow-hidden"
                 >
                     <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[100px] pointer-events-none" />
 

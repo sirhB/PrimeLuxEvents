@@ -32,11 +32,11 @@ export function GalleryLanding({ content, categories, isEditing = false }: Galle
     const heroY = useTransform(scrollYProgress, [0, 1], [0, 50])
 
     return (
-        <div className="bg-[#1A1A1A] text-white selection:bg-gold selection:text-black">
+        <div className="bg-background text-white selection:bg-gold selection:text-black">
             {/* Hero Section */}
             <section ref={heroRef} className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#1A1A1A]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[var(--ink)]" />
                     <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-10 mix-blend-overlay" />
                     <Image
                         src="/images/gallery-hero.png"
@@ -86,7 +86,7 @@ export function GalleryLanding({ content, categories, isEditing = false }: Galle
             </section>
 
             {/* Categories Grid */}
-            <section className="py-24 md:py-48 bg-[#1A1A1A]">
+            <section className="py-24 md:py-48 bg-background">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-16">
                         {categories.map((category, index) => (
@@ -121,7 +121,7 @@ function CategoryCard({ category, index }: { category: PortfolioCategory, index:
             className="group relative"
         >
             <Link href={`/gallery/${category.slug}`} className="block">
-                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#1E1E1E] border border-white/5 shadow-2xl">
+                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[var(--surface-elevated)] border border-white/5 shadow-2xl">
                     <Image
                         src={category.cover_image || "/images/gallery-hero.png"}
                         alt={category.name}

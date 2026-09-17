@@ -25,7 +25,7 @@ export function CategoryCard({ name, imageUrl, isSelected, onClick, productCount
             transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
         >
             {/* Image Container */}
-            <div className="relative aspect-[4/3] overflow-hidden bg-[#FDFBF7]">
+            <div className="relative aspect-[4/3] overflow-hidden bg-[var(--surface-elevated)]">
                 {imageUrl ? (
                     <Image
                         src={imageUrl}

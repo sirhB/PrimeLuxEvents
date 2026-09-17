@@ -36,26 +36,23 @@ export function SiteFooter() {
   }, [])
 
   return (
-    <footer className="bg-[#1A1A1A] text-white pt-24 pb-12 overflow-hidden relative">
-      {/* Decorative background element */}
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
-
+    <footer className="bg-[var(--ink)] text-foreground pt-20 pb-10 overflow-hidden relative border-t border-border">
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-16">
           {/* Brand Column */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             <Link href="/" className="font-serif text-3xl font-light tracking-tighter group">
-              PrimeLux<span className="text-gold group-hover:text-white transition-colors">.</span>
+              PrimeLux<span className="text-gold group-hover:text-foreground transition-colors">.</span>
             </Link>
-            <p className="text-gray-400 text-sm leading-relaxed max-w-xs font-light">
-              Elevating life's most celebrated moments with curated rentals and bespoke styling services. We believe every event deserves a touch of extraordinary.
+            <p className="text-muted-foreground text-sm leading-relaxed max-w-xs font-light">
+              Luxury party rentals and event styling from Shelton, CT — serving Connecticut, Rhode Island, and Massachusetts.
             </p>
             <div className="flex gap-6">
               <a
                 href={COMPANY.instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-gold transition-colors"
+                className="text-muted-foreground hover:text-gold transition-colors"
               >
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
@@ -66,33 +63,33 @@ export function SiteFooter() {
           {/* Quick Links */}
           <div>
             <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold mb-8">Navigation</h3>
-            <ul className="space-y-4 text-sm text-gray-400 font-light">
+            <ul className="space-y-4 text-sm text-muted-foreground font-light">
               <li>
-                <Link href="/catalog" className="hover:text-white transition-colors flex items-center group">
+                <Link href="/catalog" className="hover:text-foreground transition-colors flex items-center group">
                   <ArrowRight className="h-3 w-3 mr-2 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
                   Rental Catalog
                 </Link>
               </li>
               <li>
-                <Link href="/packages" className="hover:text-white transition-colors flex items-center group">
+                <Link href="/packages" className="hover:text-foreground transition-colors flex items-center group">
                   <ArrowRight className="h-3 w-3 mr-2 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
                   Event Packages
                 </Link>
               </li>
               <li>
-                <Link href="/gallery" className="hover:text-white transition-colors flex items-center group">
+                <Link href="/gallery" className="hover:text-foreground transition-colors flex items-center group">
                   <ArrowRight className="h-3 w-3 mr-2 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
                   Portfolio
                 </Link>
               </li>
               <li>
-                <Link href="/how-it-works" className="hover:text-white transition-colors flex items-center group">
+                <Link href="/how-it-works" className="hover:text-foreground transition-colors flex items-center group">
                   <ArrowRight className="h-3 w-3 mr-2 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
                   The Process
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-white transition-colors flex items-center group">
+                <Link href="/about" className="hover:text-foreground transition-colors flex items-center group">
                   <ArrowRight className="h-3 w-3 mr-2 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
                   Our Story
                 </Link>
@@ -103,21 +100,21 @@ export function SiteFooter() {
           {/* Support */}
           <div>
             <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold mb-8">Support</h3>
-            <ul className="space-y-4 text-sm text-gray-400 font-light">
+            <ul className="space-y-4 text-sm text-muted-foreground font-light">
               <li>
-                <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
+                <Link href="/faq" className="hover:text-foreground transition-colors">FAQ</Link>
               </li>
               <li>
-                <Link href="/rental-agreement" className="hover:text-white transition-colors">Rental Agreement</Link>
+                <Link href="/rental-agreement" className="hover:text-foreground transition-colors">Rental Agreement</Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+                <Link href="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                <Link href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-white transition-colors">Contact Support</Link>
+                <Link href="/contact" className="hover:text-foreground transition-colors">Contact Support</Link>
               </li>
             </ul>
           </div>
@@ -125,24 +122,24 @@ export function SiteFooter() {
           {/* Contact */}
           <div>
             <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold mb-8">Get in Touch</h3>
-            <ul className="space-y-6 text-sm text-gray-400 font-light">
+            <ul className="space-y-6 text-sm text-muted-foreground font-light">
               <li className="flex items-start gap-4">
                 <MapPin className="h-5 w-5 text-gold shrink-0" />
                 <span className="whitespace-pre-line">{settings.company_address}</span>
               </li>
               <li className="flex items-center gap-4">
                 <Phone className="h-5 w-5 text-gold shrink-0" />
-                <a href={`tel:${settings.company_phone.replace(/\D/g, '')}`} className="hover:text-white transition-colors">{settings.company_phone}</a>
+                <a href={`tel:${settings.company_phone.replace(/\D/g, '')}`} className="hover:text-foreground transition-colors">{settings.company_phone}</a>
               </li>
               <li className="flex items-center gap-4">
                 <Mail className="h-5 w-5 text-gold shrink-0" />
-                <a href={`mailto:${settings.company_email}`} className="hover:text-white transition-colors">{settings.company_email}</a>
+                <a href={`mailto:${settings.company_email}`} className="hover:text-foreground transition-colors">{settings.company_email}</a>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+        <div className="pt-12 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} PrimeLux Events. All rights reserved.</p>
           <div className="flex gap-8">
             <p>Shelton, Connecticut</p>

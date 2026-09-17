@@ -60,7 +60,7 @@ export function CreateLocationDialog({ onSuccess }: CreateLocationDialogProps) {
                     New Location
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-[#1A1A1A] border-white/10 text-white">
+            <DialogContent className="sm:max-w-[425px] bg-[var(--dashboard-card)] border-white/10 text-white">
                 <DialogHeader>
                     <DialogTitle className="font-serif text-2xl">Add Location</DialogTitle>
                     <DialogDescription className="text-gray-400">
@@ -84,7 +84,7 @@ export function CreateLocationDialog({ onSuccess }: CreateLocationDialogProps) {
                             <SelectTrigger className="bg-white/5 border-white/10 text-white">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-[#1A1A1A] border-white/10 text-white">
+                            <SelectContent className="bg-[var(--dashboard-card)] border-white/10 text-white">
                                 <SelectItem value="shelf">Shelf</SelectItem>
                                 <SelectItem value="bin">Bin</SelectItem>
                                 <SelectItem value="aisle">Aisle</SelectItem>

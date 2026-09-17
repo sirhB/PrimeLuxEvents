@@ -136,7 +136,7 @@ export function ContactForm() {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        className={`p-6 rounded-2xl flex items-center gap-4 ${submitMessage.type === 'success' ? 'bg-emerald-50 text-emerald-800 border border-emerald-100' : 'bg-red-50 text-red-800 border border-red-100'}`}
+                        className={`p-6 rounded-md flex items-center gap-4 ${submitMessage.type === 'success' ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20' : 'bg-red-500/10 text-red-300 border border-red-500/20'}`}
                     >
                         {submitMessage.type === 'success' ? <CheckCircle2 className="h-6 w-6 shrink-0" /> : <AlertCircle className="h-6 w-6 shrink-0" />}
                         <p className="text-sm font-medium">{submitMessage.text}</p>
@@ -150,7 +150,7 @@ export function ContactForm() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="p-6 rounded-2xl border border-red-100 bg-red-50 text-red-800 space-y-2"
+                        className="p-6 rounded-md border border-red-500/20 bg-red-500/10 text-red-300 space-y-2"
                     >
                         <div className="flex items-center gap-2 mb-2">
                             <AlertCircle className="h-4 w-4" />
@@ -302,7 +302,7 @@ export function ContactForm() {
 
             <Button
                 type="submit"
-                className="w-full h-16 bg-[var(--champagne,#B8956B)] text-black rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-white transition-all duration-500 group shadow-xl"
+                className="lux-cta w-full !h-14"
                 disabled={isSubmitting}
             >
                 {isSubmitting ? 'Sending Request...' : 'Send Consultation Request'}

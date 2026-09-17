@@ -168,7 +168,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
                             {pkg.package_items.map((item: any) => {
                                 const product = productMap.get(item.product_id)
                                 return (
-                                    <div key={item.id} className="flex items-center gap-4 bg-[#FDFBF7] p-4 rounded-xl">
+                                    <div key={item.id} className="flex items-center gap-4 bg-[var(--surface-elevated)] p-4 rounded-xl">
                                         <div className="relative w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 flex-shrink-0">
                                             {product?.image_url ? (
                                                 <Image
