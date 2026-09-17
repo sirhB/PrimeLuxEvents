@@ -24,12 +24,20 @@ export function HeroSection({
           src="/images/mist-cedar-hero-vivid.jpg"
           alt="Guests toasting with champagne at a sunlit celebration dinner"
           fill
+<<<<<<< HEAD
           className="object-cover object-[center_40%]"
           priority
           sizes="100vw"
         />
         <div className="absolute inset-0 bg-black/60" />
         <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[var(--linen)] to-transparent" />
+=======
+          className="object-cover opacity-40 contrast-125"
+          priority
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/55 to-[var(--ink)]" />
+>>>>>>> origin/main
       </div>
 
       <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center md:px-10">
