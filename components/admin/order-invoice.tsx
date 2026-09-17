@@ -1,6 +1,7 @@
 "use client"
 
 import { format } from "date-fns"
+import { COMPANY } from "@/lib/company"
 
 interface OrderItem {
     id: string
@@ -65,10 +66,10 @@ export function OrderInvoice({ order }: OrderInvoiceProps) {
                     <h1 className="text-4xl font-serif font-bold mb-2">PrimeLux Events</h1>
                     <p className="text-sm text-gray-600">Premium Event Rentals</p>
                     <div className="mt-4 text-sm">
-                        <p>123 Luxury Lane</p>
-                        <p>New York, NY 10001</p>
-                        <p>Phone: (555) 000-0000</p>
-                        <p>Email: info@primeluxevents.com</p>
+                        <p>{COMPANY.address.split(',')[0]}</p>
+                        <p>Shelton, CT 06484</p>
+                        <p>Phone: {COMPANY.phone}</p>
+                        <p>Email: {COMPANY.email}</p>
                     </div>
                 </div>
                 <div className="text-right">

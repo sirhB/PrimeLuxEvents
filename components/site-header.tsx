@@ -12,6 +12,7 @@ import { SearchModal } from "@/components/search-modal"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { PwaBackButton } from "@/components/pwa/pwa-back-button"
+import { COMPANY } from "@/lib/company"
 
 interface SiteHeaderProps {
   initialSettings?: {
@@ -22,8 +23,8 @@ interface SiteHeaderProps {
 
 export function SiteHeader({
   initialSettings = {
-    company_email: "info@primeluxevents.com",
-    company_phone: "(555) 123-4567",
+    company_email: COMPANY.email,
+    company_phone: COMPANY.phone,
   },
 }: SiteHeaderProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -86,7 +87,7 @@ export function SiteHeader({
       <div className="bg-[#1A1A1A] text-white py-2 px-4 text-[10px] font-bold uppercase tracking-[0.2em] relative z-50">
         <div className="container mx-auto flex justify-between items-center">
           <p className="hidden md:block opacity-70">
-            Serving the Tri-State Area & New England
+            Serving {COMPANY.serviceArea}
           </p>
             <div className="flex items-center gap-6 w-full md:w-auto justify-center md:justify-end">
             <a href={`tel:${settings.company_phone.replace(/\D/g, '')}`} className="hover:text-gold transition-colors flex items-center gap-2">
@@ -119,12 +120,14 @@ export function SiteHeader({
                 <Button
                   variant="ghost"
                   size="icon"
+                  aria-label="Open menu"
                   className={cn(
                     "hover:bg-gold/10 transition-colors",
                     headerTheme === 'dark' ? "text-white" : "text-black"
                   )}
                 >
                   <Menu className="h-6 w-6" />
+                  <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-full sm:w-[400px] bg-[#1A1A1A] border-r border-white/5 p-0 text-white">

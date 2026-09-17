@@ -28,8 +28,8 @@ export const metadata: Metadata = {
     default: 'PrimeLux Events | Luxury Event Rentals',
     template: '%s | PrimeLux Events',
   },
-  description: 'Premium event rentals for weddings, corporate events, and luxury gatherings. Elevate your event with our curated collection of furniture, decor, and lighting.',
-  keywords: ['luxury event rentals', 'wedding rentals', 'event design', 'party rentals', 'furniture rental'],
+  description: 'Premium event rentals from Shelton, CT — serving Connecticut, Rhode Island, and Massachusetts. Furniture, decor, lighting, and packages for weddings and celebrations.',
+  keywords: ['luxury event rentals', 'party rentals Shelton CT', 'wedding rentals Connecticut', 'event design', 'furniture rental CT'],
   manifest: '/manifest-store.webmanifest',
   openGraph: {
     type: 'website',
@@ -81,8 +81,6 @@ export const viewport = {
   themeColor: "#121110",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   viewportFit: "cover",
 }
 

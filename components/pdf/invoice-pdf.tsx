@@ -1,6 +1,6 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Image, Font } from '@react-pdf/renderer';
-
+import { COMPANY } from '@/lib/company';
 // Register fonts if needed
 // Font.register({ family: 'Inter', src: '...' });
 
@@ -158,9 +158,9 @@ export const InvoicePDF = ({ order, items, settings }: InvoiceProps) => {
                     </View>
                     <View style={styles.companyInfo}>
                         <Text>{settings.company_name || 'PrimeLux Events'}</Text>
-                        <Text>{settings.warehouse_address || '123 Luxury Lane, NY 10001'}</Text>
-                        <Text>{settings.company_phone}</Text>
-                        <Text>{settings.company_email}</Text>
+                        <Text>{settings.warehouse_address || COMPANY.address}</Text>
+                        <Text>{settings.company_phone || COMPANY.phone}</Text>
+                        <Text>{settings.company_email || COMPANY.email}</Text>
                     </View>
                 </View>
 

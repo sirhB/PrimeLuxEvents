@@ -13,8 +13,8 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({
-  title = "Curating Unforgettable Moments of Luxury",
-  subtitle = "Premier event rentals and styling for weddings, galas, and corporate gatherings. Browse our collection and book directly online.",
+  title = "PrimeLux Events",
+  subtitle = "Luxury party rentals and event styling from our Shelton, CT showroom — serving Connecticut, Rhode Island, and Massachusetts. Browse the collection and book online.",
   ctaPrimary = "Rent Online",
   ctaSecondary = "How It Works",
 }: HeroSectionProps) {
@@ -37,7 +37,7 @@ export function HeroSection({
           <div className="mb-4 flex items-center justify-center gap-3">
             <span className="h-px w-12 bg-[var(--champagne,#B8956B)]/50" />
             <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--champagne,#B8956B)] md:text-xs">
-              Bespoke event rentals
+              Shelton, Connecticut
             </span>
             <span className="h-px w-12 bg-[var(--champagne,#B8956B)]/50" />
           </div>

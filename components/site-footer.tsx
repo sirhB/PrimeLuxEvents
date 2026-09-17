@@ -1,15 +1,16 @@
 "use client"
 
 import Link from "next/link"
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, ArrowRight } from "lucide-react"
+import { Instagram, Mail, Phone, MapPin, ArrowRight } from "lucide-react"
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { COMPANY } from "@/lib/company"
 
 export function SiteFooter() {
   const [settings, setSettings] = useState({
-    company_address: "123 Luxury Lane, Suite 100\nBeverly Hills, CA 90210",
-    company_email: "info@primeluxevents.com",
-    company_phone: "(555) 123-4567"
+    company_address: COMPANY.addressMultiline,
+    company_email: COMPANY.email,
+    company_phone: COMPANY.phone,
   })
 
   useEffect(() => {
@@ -50,18 +51,15 @@ export function SiteFooter() {
               Elevating life's most celebrated moments with curated rentals and bespoke styling services. We believe every event deserves a touch of extraordinary.
             </p>
             <div className="flex gap-6">
-              <Link href="#" className="text-gray-400 hover:text-gold transition-colors">
+              <a
+                href={COMPANY.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-gold transition-colors"
+              >
                 <Instagram className="h-5 w-5" />
                 <span className="sr-only">Instagram</span>
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-gold transition-colors">
-                <Facebook className="h-5 w-5" />
-                <span className="sr-only">Facebook</span>
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-gold transition-colors">
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -113,10 +111,10 @@ export function SiteFooter() {
                 <Link href="/rental-agreement" className="hover:text-white transition-colors">Rental Agreement</Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
+                <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+                <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
               </li>
               <li>
                 <Link href="/contact" className="hover:text-white transition-colors">Contact Support</Link>
@@ -147,8 +145,7 @@ export function SiteFooter() {
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
           <p>&copy; {new Date().getFullYear()} PrimeLux Events. All rights reserved.</p>
           <div className="flex gap-8">
-            <Link href="/admin" className="hover:text-gold transition-colors">Admin Portal</Link>
-            <p>Designed with elegance</p>
+            <p>Shelton, Connecticut</p>
           </div>
         </div>
       </div>
