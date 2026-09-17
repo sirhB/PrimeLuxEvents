@@ -137,10 +137,14 @@
 @media (prefers-reduced-motion: reduce) {
   .admin-theme *,
   .admin-theme *::before,
-  .admin-theme *::after {
+  .admin-theme *::after,
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -423,6 +427,16 @@
     transform: scale(0.98);
   }
 
+  .lux-cta:focus-visible {
+    outline: 2px solid var(--champagne);
+    outline-offset: 3px;
+  }
+
+  .lux-cta:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
   .lux-cta-ghost {
     display: inline-flex;
     align-items: center;
@@ -444,6 +458,32 @@
   .lux-cta-ghost:hover {
     border-color: var(--champagne);
     background: color-mix(in srgb, var(--champagne) 8%, transparent);
+  }
+
+  .lux-cta-ghost:focus-visible {
+    outline: 2px solid var(--champagne);
+    outline-offset: 3px;
+  }
+
+  .lux-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    border-radius: var(--radius-cta);
+    color: var(--foreground);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .lux-icon-btn:hover {
+    background: color-mix(in srgb, var(--champagne) 12%, transparent);
+    color: var(--champagne);
+  }
+
+  .lux-icon-btn:focus-visible {
+    outline: 2px solid var(--champagne);
+    outline-offset: 2px;
   }
 
   .lux-field {

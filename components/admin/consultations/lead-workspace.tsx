@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useMemo, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { LeadRail } from '@/components/admin/consultations/lead-rail'
@@ -28,8 +29,20 @@ interface LeadWorkspaceProps {
 }
 
 export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
+    const searchParams = useSearchParams()
+    const initialSearch = searchParams.get('search') || ''
     const [leads, setLeads] = useState<Consultation[]>(initialLeads)
-    const [selectedLeadId, setSelectedLeadId] = useState<string | null>(initialLeads[0]?.id || null)
+    const [selectedLeadId, setSelectedLeadId] = useState<string | null>(() => {
+        if (initialSearch) {
+            const match = initialLeads.find(
+                (l) =>
+                    l.customer_email?.toLowerCase().includes(initialSearch.toLowerCase()) ||
+                    l.customer_name?.toLowerCase().includes(initialSearch.toLowerCase()),
+            )
+            if (match) return match.id
+        }
+        return initialLeads[0]?.id || null
+    })
     const [viewMode, setViewMode] = useState<'dossier' | 'pipeline'>('dossier')
     const supabase = createClient()
 
@@ -122,6 +135,7 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
                                 leads={leads}
                                 selectedId={selectedLeadId}
                                 onSelect={setSelectedLeadId}
+                                initialSearch={initialSearch}
                             />
                         </Card>
 

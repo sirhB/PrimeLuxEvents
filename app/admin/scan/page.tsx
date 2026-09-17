@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { ACTIVE_FULFILLMENT_ORDER_STATUSES } from '@/lib/orders/status'
 import type { ChecklistItem } from '@/lib/warehouse/types'
 import { AdminPage, AdminPageHeader } from '@/components/admin/page-shell'
+import { NeedsConnectionBanner } from '@/components/admin/needs-connection'
 
 type ScanMode = 'navigation' | 'inventory' | 'picking'
 
@@ -223,6 +224,8 @@ function ScanPageContent() {
                     </Button>
                 }
             />
+
+            <NeedsConnectionBanner className="mb-4" />
 
             {initialOrderId && (
                 <div className="mb-4 rounded-md border border-[var(--dashboard-accent-gold)]/30 bg-[var(--dashboard-accent-gold)]/10 px-4 py-3">

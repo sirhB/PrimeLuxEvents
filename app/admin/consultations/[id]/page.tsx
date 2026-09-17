@@ -101,6 +101,33 @@ export default async function ConsultationDetailPage({ params }: { params: Promi
                 {/* LEFT COLUMN - MAIN INFO */}
                 <div className="lg:col-span-2 space-y-6">
 
+                    {/* CRM trail: lead → customer → order */}
+                    <div className="flex flex-wrap gap-2">
+                        {consultation.customer_email && (
+                            <>
+                                <Button asChild variant="outline" size="sm" className="rounded-md">
+                                    <Link
+                                        href={`/admin/customers?search=${encodeURIComponent(consultation.customer_email)}`}
+                                    >
+                                        Customer record
+                                    </Link>
+                                </Button>
+                                <Button asChild variant="outline" size="sm" className="rounded-md">
+                                    <Link
+                                        href={`/admin/orders?search=${encodeURIComponent(consultation.customer_email)}`}
+                                    >
+                                        Related orders
+                                    </Link>
+                                </Button>
+                            </>
+                        )}
+                        <Button asChild size="sm" className="rounded-md bg-[var(--dashboard-accent-gold)] text-[#121110]">
+                            <Link href={`/admin/orders/new?leadId=${consultation.id}`}>
+                                Convert to order
+                            </Link>
+                        </Button>
+                    </div>
+
                     {/* Customer Information */}
                     <Card className="bg-[var(--dashboard-card-bg)] border shadow-sm">
                         <CardHeader className="pb-3 border-b">

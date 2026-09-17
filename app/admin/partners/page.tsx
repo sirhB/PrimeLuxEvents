@@ -24,7 +24,7 @@ export default async function AdminPartnersPage() {
         <AdminPageHeader
           title="Preferred partners"
           description="Approve planners and decorators for trade rates and client share carts."
-          eyebrow="CRM"
+          eyebrow="Pipeline"
           breadcrumbs={[
             { label: 'Admin', href: '/admin' },
             { label: 'Partners' },
@@ -44,5 +44,19 @@ export default async function AdminPartnersPage() {
     )
   }
 
-  return <PartnersAdminContent partners={(partners as any[]) || []} />
+  const { data: attributedOrders } = await admin
+    .from('orders')
+    .select(
+      'id, customer_name, status, total_amount, delivery_date, partner_id, billing_party, created_at',
+    )
+    .not('partner_id', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(40)
+
+  return (
+    <PartnersAdminContent
+      partners={(partners as any[]) || []}
+      attributedOrders={(attributedOrders as any[]) || []}
+    />
+  )
 }

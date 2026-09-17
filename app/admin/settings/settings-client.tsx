@@ -13,8 +13,9 @@ import Link from 'next/link'
 import { AdminPage } from '@/components/admin/page-shell'
 import { AdminPageHeader } from '@/components/admin/page-shell'
 import { COMPANY } from '@/lib/company'
+import type { ReactNode } from 'react'
 
-export default function SettingsClient() {
+export default function SettingsClient({ stripeStatus }: { stripeStatus?: ReactNode }) {
     const [isLoading, setIsLoading] = useState(true)
     const [isSaving, setIsSaving] = useState(false)
     const [isTesting, setIsTesting] = useState(false)
@@ -171,7 +172,7 @@ export default function SettingsClient() {
             <AdminPageHeader
                 eyebrow="Configuration"
                 title="Settings"
-                description="Configure global settings for your store, tax, and delivery."
+                description="Business profile, delivery fees, tax, and Stripe payment status."
                 actions={
                     <Button asChild variant="outline" className="rounded-md">
                         <Link href="/admin/visual-editor">
@@ -183,6 +184,8 @@ export default function SettingsClient() {
             />
 
             <div className="grid gap-6 max-w-4xl">
+                {stripeStatus}
+
                 {/* Branding & Appearance Shortcut */}
                 <Card className="border-none glass-card overflow-hidden border-gold/20 bg-gold/[0.02]">
                     <CardHeader className="border-b border-gold/10 pb-4 bg-gold/5">
@@ -278,8 +281,8 @@ export default function SettingsClient() {
                 {/* Company Information */}
                 <Card className="border-none glass-card overflow-hidden">
                     <CardHeader className="border-b border-[var(--dashboard-border)] pb-6">
-                        <CardTitle className="font-serif text-2xl">Company Information</CardTitle>
-                        <CardDescription className="text-[var(--dashboard-text-muted)]">Set public contact information for your business</CardDescription>
+                        <CardTitle className="font-serif text-2xl">Business profile</CardTitle>
+                        <CardDescription className="text-[var(--dashboard-text-muted)]">Public contact details shown on invoices and the storefront</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6 pt-6">
                         <div className="grid sm:grid-cols-2 gap-6">

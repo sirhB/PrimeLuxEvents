@@ -57,7 +57,7 @@ export default async function Home() {
             <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em] mb-6 block">Start Your Journey</span>
             <h2 className="text-4xl md:text-6xl font-serif font-light mb-8 tracking-tight">Ready to plan your next extraordinary event?</h2>
             <p className="text-gray-400 max-w-2xl mx-auto mb-12 text-lg font-light leading-relaxed">
-              Browse our full catalog, check availability, and secure your rentals instantly online. Our team is here to help you every step of the way.
+              Browse the catalog, check availability for your event date, and reserve online. Delivery across CT, RI &amp; MA from our Shelton warehouse.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-6">
               <Link

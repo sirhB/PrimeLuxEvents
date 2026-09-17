@@ -12,6 +12,7 @@ interface LeadRailProps {
     leads: Consultation[]
     selectedId: string | null
     onSelect: (id: string) => void
+    initialSearch?: string
 }
 
 const statusGlows: Record<ConsultationStatus, string> = {
@@ -35,9 +36,12 @@ const statusDots: Record<ConsultationStatus, string> = {
     completed: 'bg-slate-400 shadow-[0_0_8px_rgba(148,163,184,0.6)]',
 }
 
-export function LeadRail({ leads, selectedId, onSelect }: LeadRailProps) {
-    const [search, setSearch] = React.useState('')
+export function LeadRail({ leads, selectedId, onSelect, initialSearch = '' }: LeadRailProps) {
+    const [search, setSearch] = React.useState(initialSearch)
 
+    React.useEffect(() => {
+        setSearch(initialSearch)
+    }, [initialSearch])
     const getDisplayName = (lead: Consultation) => {
         if (lead.first_name || lead.last_name) {
             return [lead.first_name, lead.last_name].filter(Boolean).join(' ')

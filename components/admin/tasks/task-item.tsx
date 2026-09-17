@@ -100,6 +100,12 @@ export function TaskItem({ task }: TaskItemProps) {
     }
 
     const handleStatusChange = async (newStatus: string) => {
+        if (!navigator.onLine) {
+            toast.error('Needs connection', {
+                description: 'Reconnect before updating this task.',
+            })
+            return
+        }
         setIsUpdatingStatus(true)
         const toastId = toast.loading(`Updating status to ${newStatus.replace('_', ' ')}...`)
         try {

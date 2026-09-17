@@ -90,7 +90,7 @@ flowchart TB
 
 ### Phase B — Customer store & checkout (PRIORITY BUILD)
 - [x] Catalog first screen = filters + grid (short hero); featured secondary
-- [ ] PDP: availability for event date, delivery notes, specs; one primary “Add to rental”
+- [x] PDP: availability for event date, delivery notes, specs; one primary “Add to rental”
 - [x] Packages: what’s included + guest-count guidance
 - [x] First-class `/cart` page (keep sheet as shortcut)
 - [x] Checkout inline help: lead time, CT/RI/MA service area, deposit meaning
@@ -104,28 +104,28 @@ flowchart TB
 - [x] Public `/partners/apply`
 - [x] Event/cart-centric list UX
 - [x] “Trade rate applied” chip at checkout
-- [ ] Admin partner approve → tier → attributed orders queue
+- [x] Admin partner approve → tier → attributed orders queue
 
 ### Phase D — Manager console
 - [x] Ops Today = exceptions-only attention queue + weekend readiness strip
 - [x] Week Prep = primary manager canvas (Fri–Sun × Pick/Pack/Bags/Load)
-- [ ] Nav collapse: Today | Pipeline | Fulfillment | Catalog | Manage
-- [ ] CRM deep links: lead → customer → order
-- [ ] Settings = business profile + Stripe status
+- [x] Nav collapse: Today | Pipeline | Fulfillment | Catalog | Manage
+- [x] CRM deep links: lead → customer → order
+- [x] Settings = business profile + Stripe status
 
 ### Phase E — Staff field
 - [x] Staff default condensed nav + mobile Tasks / Scan / Loads / More
 - [x] Staff default landing: warehouse schedule or tasks
-- [ ] Task cards: large targets, one primary action
+- [x] Task cards: large targets, one primary action
 - [x] Scanner order-context banner from Week Prep `?orderId=`
-- [ ] Clear “needs connection” on offline mutations
+- [x] Clear “needs connection” on offline mutations
 
 ### Phase F — Cross-cutting
 - [x] Shared status vocabulary/chips across customer / partner / admin / staff
-- [ ] Microcopy audit (rental logistics, not planning-firm voice)
-- [ ] Motion budget + `prefers-reduced-motion`
-- [ ] A11y pass on lux CTAs and icon buttons
-- [ ] Checkout code-split / perf
+- [x] Microcopy audit (rental logistics, not planning-firm voice)
+- [x] Motion budget + `prefers-reduced-motion`
+- [x] A11y pass on lux CTAs and icon buttons
+- [x] Checkout code-split / perf
 
 ---
 

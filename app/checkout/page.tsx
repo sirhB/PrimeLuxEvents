@@ -16,14 +16,13 @@ import { createClient } from '@/lib/supabase/client'
 import { adaptProduct, resolvePriceCents } from '@/lib/catalog/adapters'
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { stripePromise } from '@/components/providers/stripe-provider'
-import { StripePaymentForm } from '@/components/checkout/stripe-payment-form'
 import { createPaymentIntent } from '@/app/actions/create-payment-intent'
 import { Elements } from '@stripe/react-stripe-js'
 import {
@@ -34,10 +33,22 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog"
-import { SignatureCanvas } from '@/components/checkout/signature-canvas'
 import { CheckoutLogisticsHelp } from '@/components/checkout/checkout-logistics-help'
 import { CheckoutOrderSummary } from '@/components/checkout/checkout-order-summary'
 import { RentalInfoBanner } from '@/components/customer/rental-info-banner'
+
+const StripePaymentForm = dynamic(
+    () => import('@/components/checkout/stripe-payment-form').then((m) => m.StripePaymentForm),
+    { ssr: false, loading: () => <Loader2 className="h-6 w-6 animate-spin text-gold mx-auto" /> },
+)
+const SignatureCanvas = dynamic(
+    () => import('@/components/checkout/signature-canvas').then((m) => m.SignatureCanvas),
+    { ssr: false, loading: () => <div className="h-40 animate-pulse rounded-md bg-white/5" /> },
+)
+const Calendar = dynamic(
+    () => import('@/components/ui/calendar').then((m) => m.Calendar),
+    { ssr: false },
+)
 
 
 

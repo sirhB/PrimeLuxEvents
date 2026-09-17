@@ -48,7 +48,7 @@ export type AdminNavGroup = {
   defaultCollapsed?: boolean
 }
 
-/** Canonical admin information architecture */
+/** Canonical admin information architecture — five shells */
 export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
     title: 'Today',
@@ -66,19 +66,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         keywords: ['weekend', 'prep', 'readiness', 'fulfillment'],
       },
       { icon: Calendar, label: 'Calendar', href: '/admin/calendar', keywords: ['schedule'] },
-      { icon: Activity, label: 'Activity', href: '/admin/activity', keywords: ['feed', 'audit'] },
-      {
-        icon: TrendingUp,
-        label: 'Analytics',
-        href: '/admin/analytics',
-        keywords: ['reports', 'revenue'],
-      },
-      {
-        icon: Sparkles,
-        label: 'Innovate',
-        href: '/innovate',
-        keywords: ['studio', 'visualizer', 'atelier', 'backdrop', 'vip', 'custom'],
-      },
     ],
   },
   {
@@ -115,6 +102,12 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         href: '/admin/customers',
         permission: 'customers.view',
         keywords: ['clients'],
+      },
+      {
+        icon: Handshake,
+        label: 'Preferred partners',
+        href: '/admin/partners',
+        keywords: ['planners', 'decorators', 'preferred', 'trade', 'partner', 'vendor'],
       },
     ],
   },
@@ -179,12 +172,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     defaultCollapsed: true,
     items: [
       {
-        icon: Handshake,
-        label: 'Preferred partners',
-        href: '/admin/partners',
-        keywords: ['planners', 'decorators', 'preferred', 'trade', 'partner', 'vendor'],
-      },
-      {
         icon: Tag,
         label: 'Discounts',
         href: '/admin/marketing/discounts',
@@ -203,12 +190,25 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         href: '/admin/team/shifts',
         keywords: ['schedule', 'shifts', 'roster'],
       },
+      { icon: Activity, label: 'Activity', href: '/admin/activity', keywords: ['feed', 'audit'] },
+      {
+        icon: TrendingUp,
+        label: 'Analytics',
+        href: '/admin/analytics',
+        keywords: ['reports', 'revenue'],
+      },
+      {
+        icon: Sparkles,
+        label: 'Innovate',
+        href: '/innovate',
+        keywords: ['studio', 'visualizer', 'atelier', 'backdrop', 'vip', 'custom'],
+      },
       {
         icon: Settings,
         label: 'Settings',
         href: '/admin/settings',
         permission: 'settings.view',
-        keywords: ['company', 'hours'],
+        keywords: ['company', 'hours', 'stripe', 'business'],
       },
     ],
   },

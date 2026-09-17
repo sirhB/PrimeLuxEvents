@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, Check, Plus, Minus, Star, ShieldCheck } from "lucide-react"
+import { ArrowLeft, Check, Plus, Minus } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useCart } from "@/components/providers/cart-provider"
 import { Button } from "@/components/ui/button"
@@ -11,9 +11,9 @@ import { toast } from "sonner"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { ProductGallery } from "@/components/product-gallery"
 import { RelatedProducts } from "@/components/related-products"
+import { PdpAvailabilityPanel } from "@/components/customer/pdp-availability"
 import { formatCurrency, cn } from "@/lib/utils"
 import { resolvePriceCents } from "@/lib/catalog/adapters"
 import {
@@ -436,8 +436,14 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                     <div className="h-px w-full bg-gradient-to-r from-white/10 via-white/5 to-transparent" />
                                 </motion.div>
 
+                                <motion.div variants={itemVariants}>
+                                    <PdpAvailabilityPanel
+                                        stock={product.quantity_available ?? product.stock ?? 0}
+                                    />
+                                </motion.div>
+
                                 {/* Pricing Summary */}
-                                <motion.div variants={itemVariants} className="space-y-10">
+                                <motion.div variants={itemVariants} className="space-y-6">
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-end">
                                             <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-500 mb-1">Subtotal</span>
@@ -447,9 +453,10 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                         </div>
                                     </div>
 
-                                    {/* Add to Cart Button */}
+                                    {/* Single primary CTA */}
                                     <Button
                                         onClick={toggleCart}
+                                        aria-label={isInCart ? 'Remove from rental cart' : 'Add to rental'}
                                         className={cn(
                                             "lux-cta w-full !h-14",
                                             isInCart && "!bg-[var(--signal)]"
@@ -457,45 +464,30 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                     >
                                         {isInCart ? (
                                             <>
-                                                <Check className="h-5 w-5" />
+                                                <Check className="h-5 w-5" aria-hidden />
                                                 In your rental
                                             </>
                                         ) : (
                                             <>
-                                                <Plus className="h-5 w-5" />
+                                                <Plus className="h-5 w-5" aria-hidden />
                                                 Add to rental
                                             </>
                                         )}
                                     </Button>
-                                    <p className="text-center text-xs text-muted-foreground font-light">
-                                        {(product.quantity_available ?? product.stock) > 0
-                                            ? `${product.quantity_available ?? product.stock} available · Delivered across CT, RI & MA`
-                                            : 'Ask us about availability for your event date'}
-                                    </p>
-
-                                    <div className="flex items-center justify-center gap-8 py-4 px-6 rounded-md bg-white/5 border border-border">
-                                        <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                                            <ShieldCheck className="h-3 w-3 text-gold" /> Secure reservation
-                                        </div>
-                                        <div className="w-1 h-1 rounded-full bg-white/10" />
-                                        <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                                            <Star className="h-3 w-3 text-gold" /> Showroom support
-                                        </div>
-                                    </div>
                                 </motion.div>
 
                                 {/* Additional Information */}
-                                <motion.div variants={itemVariants} className="pt-10">
+                                <motion.div variants={itemVariants} className="pt-6">
                                     <Accordion type="single" collapsible className="w-full space-y-4">
                                         <AccordionItem value="details" className="border border-white/5 rounded-2xl bg-white/5 backdrop-blur-sm overflow-hidden px-8 transition-all duration-500 hover:border-white/10">
                                             <AccordionTrigger className="text-lg font-serif font-light text-white hover:text-gold transition-all duration-500 py-6 border-none">
-                                                Specifications & Origin
+                                                Specs
                                             </AccordionTrigger>
                                             <AccordionContent className="space-y-5 text-base text-gray-400 pb-8 font-light">
                                                 <div className="h-px w-full bg-white/5 mb-6" />
                                                 {product.sku && (
                                                     <div className="flex justify-between py-2 border-b border-white/5 border-dashed">
-                                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Curated SKU</span>
+                                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">SKU</span>
                                                         <span className="text-gray-300">{product.sku}</span>
                                                     </div>
                                                 )}
@@ -505,19 +497,25 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                                         <span className="text-gray-300">{product.weight} lbs</span>
                                                     </div>
                                                 )}
-                                                <div className="flex justify-between py-2">
-                                                    <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Minimum Engagement</span>
+                                                <div className="flex justify-between py-2 border-b border-white/5 border-dashed">
+                                                    <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Min. rental</span>
                                                     <span className="text-gray-300">
                                                         {product.minimum_rental_days || 1} {(product.minimum_rental_days || 1) === 1 ? 'day' : 'days'}
                                                     </span>
                                                 </div>
+                                                {(product.setup_fee ?? 0) > 0 && (
+                                                    <div className="flex justify-between py-2">
+                                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Setup fee</span>
+                                                        <span className="text-gray-300">{formatCurrency(product.setup_fee || 0)}</span>
+                                                    </div>
+                                                )}
                                             </AccordionContent>
                                         </AccordionItem>
 
                                         {product.care_instructions && (
                                             <AccordionItem value="care" className="border border-white/5 rounded-2xl bg-white/5 backdrop-blur-sm overflow-hidden px-8 transition-all duration-500 hover:border-white/10">
                                                 <AccordionTrigger className="text-lg font-serif font-light text-white hover:text-gold transition-all duration-500 py-6 border-none">
-                                                    Maintenance & Care
+                                                    Care &amp; handling
                                                 </AccordionTrigger>
                                                 <AccordionContent className="text-base text-gray-400 leading-relaxed pb-8 font-light">
                                                     <div className="h-px w-full bg-white/5 mb-6" />
@@ -528,22 +526,22 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
 
                                         <AccordionItem value="rental" className="border border-white/5 rounded-2xl bg-white/5 backdrop-blur-sm overflow-hidden px-8 transition-all duration-500 hover:border-white/10">
                                             <AccordionTrigger className="text-lg font-serif font-light text-white hover:text-gold transition-all duration-500 py-6 border-none">
-                                                The Luxury Process
+                                                Delivery &amp; pickup
                                             </AccordionTrigger>
                                             <AccordionContent className="space-y-6 text-base text-gray-400 pb-8 font-light">
                                                 <div className="h-px w-full bg-white/5 mb-6" />
                                                 <div className="grid gap-5">
-                                                    <div className="flex gap-4 items-start group">
-                                                        <div className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform duration-500" />
-                                                        <p className="group-hover:text-gray-200 transition-colors">Standard rental period includes 24-hour of seamless use</p>
+                                                    <div className="flex gap-4 items-start">
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0" />
+                                                        <p>Standard rental includes use for your event day (extended days available at checkout).</p>
                                                     </div>
-                                                    <div className="flex gap-4 items-start group">
-                                                        <div className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform duration-500" />
-                                                        <p className="group-hover:text-gray-200 transition-colors">White-glove delivery occurs conveniently prior to your event</p>
+                                                    <div className="flex gap-4 items-start">
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0" />
+                                                        <p>We deliver before your event and pick up afterward — exact windows confirmed after booking.</p>
                                                     </div>
-                                                    <div className="flex gap-4 items-start group">
-                                                        <div className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform duration-500" />
-                                                        <p className="group-hover:text-gray-200 transition-colors">Discreet retrieval scheduled for the day following your event</p>
+                                                    <div className="flex gap-4 items-start">
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-gold mt-2.5 flex-shrink-0" />
+                                                        <p>Reserve with a deposit or pay in full; balance is due before delivery.</p>
                                                     </div>
                                                 </div>
                                             </AccordionContent>
@@ -569,14 +567,14 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
 
                     <div className="container mx-auto px-4 md:px-6 py-24 md:py-40 relative z-10">
                         <div className="mb-24 text-center">
-                            <span className="text-gold text-[10px] font-bold tracking-[0.4em] uppercase mb-4 block opacity-80 decoration-gold/30 underline underline-offset-8">
-                                Complete Your Vision
+                            <span className="text-gold text-[10px] font-bold tracking-[0.4em] uppercase mb-4 block opacity-80">
+                                Also rent with this
                             </span>
                             <h2 className="text-4xl md:text-6xl font-serif font-light mb-8 text-white tracking-tight">
-                                Curated Pairings
+                                Related pieces
                             </h2>
                             <p className="text-lg text-gray-500 max-w-2xl mx-auto font-light leading-relaxed">
-                                Discover complementary pieces selected by our stylists to create an cohesive and extraordinary atmosphere.
+                                Add complementary rentals that pair well with this piece for seating, tabletop, or décor.
                             </p>
                         </div>
                         <RelatedProducts

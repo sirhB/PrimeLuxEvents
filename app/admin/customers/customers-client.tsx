@@ -4,7 +4,7 @@ import { useState } from 'react'
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table'
-import { Users, MoreVertical, Eye, Mail, Phone, Edit, Trash } from 'lucide-react'
+import { Users, MoreVertical, Eye, Mail, Phone, Edit, Trash, ShoppingCart, FileText } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SearchInput } from '@/components/admin/search-input'
@@ -19,6 +19,7 @@ import { EditCustomerSheet } from '@/components/admin/customers/edit-customer-sh
 import { deleteCustomer } from '@/app/admin/customers/actions'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface Customer {
     email: string
@@ -155,6 +156,24 @@ export function CustomersClient({ customers, activeCustomers = [], totalCount, c
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="glass-card border-[var(--dashboard-border)] text-[var(--dashboard-text)]">
+                                                        <DropdownMenuItem asChild>
+                                                            <Link
+                                                                href={`/admin/orders?search=${encodeURIComponent(customer.email)}`}
+                                                                className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest cursor-pointer"
+                                                            >
+                                                                <ShoppingCart className="h-4 w-4" />
+                                                                Orders
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link
+                                                                href={`/admin/consultations?search=${encodeURIComponent(customer.email)}`}
+                                                                className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest cursor-pointer"
+                                                            >
+                                                                <FileText className="h-4 w-4" />
+                                                                Leads
+                                                            </Link>
+                                                        </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             onClick={() => handleEdit(customer)}
                                                             className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest cursor-pointer focus:bg-[var(--dashboard-accent-gold)] focus:text-black"

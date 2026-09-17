@@ -1,12 +1,18 @@
 'use client'
 
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CreateTaskDialog } from '@/components/admin/tasks/create-task-dialog'
-import { CheckCircle2, Clock, Flag, Briefcase, Truck, Home, Building, MapPin, Calendar, AlertCircle } from 'lucide-react'
+import { CheckCircle2, Clock, Flag, Briefcase, Truck, Home, Building, MapPin, Calendar, AlertCircle, Loader2 } from 'lucide-react'
 import { TaskItem } from '@/components/admin/tasks/task-item'
 import { cn } from '@/lib/utils'
 import { AdminPageHeader } from '@/components/admin/page-shell'
+import { Button } from '@/components/ui/button'
+import { createClient } from '@/lib/supabase/client'
+import { toast } from 'sonner'
+import { NeedsConnectionBanner } from '@/components/admin/needs-connection'
 
 interface TasksContentProps {
     tasks: any[] | null
@@ -36,44 +42,86 @@ function getPriorityColor(priority: string) {
 }
 
 function TaskBoardItem({ task }: { task: any }) {
+    const router = useRouter()
+    const [busy, setBusy] = useState(false)
+    const supabase = createClient()
+
+    const primaryLabel =
+        task.status === 'pending' ? 'Start' : task.status === 'in_progress' ? 'Complete' : 'Open'
+    const nextStatus =
+        task.status === 'pending' ? 'in_progress' : task.status === 'in_progress' ? 'completed' : null
+
+    const onPrimary = async (e: React.MouseEvent) => {
+        e.stopPropagation()
+        if (!navigator.onLine) {
+            toast.error('Needs connection', {
+                description: 'Reconnect to update this task.',
+            })
+            return
+        }
+        if (!nextStatus) {
+            router.push(`/admin/warehouse/schedule`)
+            return
+        }
+        setBusy(true)
+        try {
+            const { error } = await supabase
+                .from('tasks')
+                .update({ status: nextStatus, updated_at: new Date().toISOString() })
+                .eq('id', task.id)
+            if (error) throw error
+            toast.success(`Marked ${nextStatus.replace('_', ' ')}`)
+            router.refresh()
+        } catch {
+            toast.error('Could not update task')
+        } finally {
+            setBusy(false)
+        }
+    }
+
     return (
-        <Card className="glass-card border-[var(--dashboard-border)] hover:border-[var(--dashboard-accent-gold)]/30 transition-all cursor-pointer group">
-            <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-2">
+        <Card className="glass-card border-[var(--dashboard-border)] hover:border-[var(--dashboard-accent-gold)]/30 transition-all group min-h-[11rem]">
+            <CardContent className="p-5 flex flex-col h-full gap-3">
+                <div className="flex items-start justify-between">
                     <span className={cn(
                         "text-[10px] uppercase tracking-wider px-2 py-0.5 rounded border shadow-sm font-medium",
                         getPriorityColor(task.priority)
                     )}>
                         {task.priority}
                     </span>
-                    <div className="p-1.5 rounded-md bg-[var(--dashboard-card-hover)] text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-accent-gold)] transition-colors">
+                    <div className="p-2 rounded-md bg-[var(--dashboard-card-hover)] text-[var(--dashboard-text-muted)] group-hover:text-[var(--dashboard-accent-gold)] transition-colors">
                         {getTaskIcon(task.task_type)}
                     </div>
                 </div>
-                <h4 className="font-medium text-[var(--dashboard-text)] mb-1 line-clamp-2">{task.title}</h4>
-                <p className="text-xs text-[var(--dashboard-text-muted)] line-clamp-2 mb-4">{task.description}</p>
-                <div className="flex items-center justify-between mt-auto pt-3 border-t border-[var(--dashboard-border)]">
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-[var(--dashboard-accent-gold)]/10 flex items-center justify-center border border-[var(--dashboard-accent-gold)]/20 text-[var(--dashboard-accent-gold)]">
-                            <span className="text-[10px] font-bold">{(task.assigned_to_text || 'U')[0].toUpperCase()}</span>
-                        </div>
-                        <span className="text-[10px] text-[var(--dashboard-text-muted)]">{task.assigned_to_text || 'Unassigned'}</span>
+                <h4 className="font-medium text-base text-[var(--dashboard-text)] line-clamp-2">{task.title}</h4>
+                {task.description && (
+                    <p className="text-xs text-[var(--dashboard-text-muted)] line-clamp-2">{task.description}</p>
+                )}
+                <div className="mt-auto space-y-3 pt-2">
+                    <div className="flex items-center justify-between text-[10px] text-[var(--dashboard-text-muted)]">
+                        <span>{task.assigned_to_text || 'Unassigned'}</span>
+                        {task.due_date && (
+                            <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {new Date(task.due_date).toLocaleDateString()}
+                            </span>
+                        )}
                     </div>
-                    {task.due_date && (
-                        <div className={cn("flex items-center gap-1 text-[10px]",
-                            (new Date(task.due_date) < new Date(new Date().setHours(0, 0, 0, 0)) && task.status !== 'completed' && task.status !== 'cancelled')
-                                ? "text-red-400 font-medium"
-                                : "text-[var(--dashboard-text-muted)]"
-                        )}>
-                            <Clock className="w-3 h-3" />
-                            {new Date(task.due_date).toLocaleDateString()}
-                        </div>
-                    )}
+                    <Button
+                        type="button"
+                        disabled={busy}
+                        onClick={onPrimary}
+                        className="w-full h-12 text-sm font-semibold bg-[var(--dashboard-accent-gold)] text-[#121110] hover:bg-[var(--dashboard-accent-gold)]/90"
+                    >
+                        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : primaryLabel}
+                    </Button>
                 </div>
             </CardContent>
         </Card>
     )
 }
+
+import { NeedsConnectionBanner } from '@/components/admin/needs-connection'
 
 export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
     const now = new Date()
@@ -102,6 +150,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
                 description="Coordinate event execution and manage team responsibilities."
                 actions={<CreateTaskDialog />}
             />
+            <NeedsConnectionBanner />
 
             <div className="grid gap-6 md:grid-cols-4 animate-fade-in-up delay-100">
                 <Card className="glass-card border-none overflow-hidden relative group">
