@@ -35,6 +35,8 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog"
 import { SignatureCanvas } from '@/components/checkout/signature-canvas'
+import { CheckoutLogisticsHelp } from '@/components/checkout/checkout-logistics-help'
+import { RentalInfoBanner } from '@/components/customer/rental-info-banner'
 
 
 
@@ -608,6 +610,11 @@ export default function CheckoutPage() {
                         {currentStep === 2 && "Tell us where and when. We’ll prepare secure payment next."}
                         {currentStep === 3 && "Confirm items, sign the agreement, and pay your deposit or balance."}
                     </p>
+                    {currentStep === 1 && (
+                        <div className="mt-6">
+                            <RentalInfoBanner />
+                        </div>
+                    )}
                 </motion.div>
 
                 {/* Step 1: Supplemental Items */}
@@ -718,9 +725,10 @@ export default function CheckoutPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
                     >
+                        <CheckoutLogisticsHelp />
                         {error && (
                             <motion.div
-                                className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-start gap-3 text-red-800"
+                                className="bg-red-500/10 border border-red-500/20 rounded-md p-4 flex items-start gap-3 text-red-300"
                                 initial={{ opacity: 0, scale: 0.98 }}
                                 animate={{ opacity: 1, scale: 1 }}
                             >

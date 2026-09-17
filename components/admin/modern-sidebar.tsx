@@ -35,7 +35,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   ADMIN_NAV_GROUPS,
-  filterNavGroupsByPermission,
+  filterNavGroupsForStaff,
   isAdminRouteActive,
   type AdminNavItem,
 } from '@/lib/admin/nav'
@@ -199,7 +199,7 @@ export function ModernSidebar() {
   const supabase = createClient()
 
   const navGroups = useMemo(
-    () => filterNavGroupsByPermission(ADMIN_NAV_GROUPS, permissionNames, roleNames),
+    () => filterNavGroupsForStaff(ADMIN_NAV_GROUPS, permissionNames, roleNames),
     [permissionNames, roleNames],
   )
 

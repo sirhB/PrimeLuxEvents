@@ -17,6 +17,7 @@ import Link from 'next/link'
 import { cn, formatCurrency } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { RentalInfoBanner } from '@/components/customer/rental-info-banner'
 
 interface Product {
     id: string
@@ -167,9 +168,9 @@ export default function CatalogClient({ heroTitle, products, categories, package
             {/* Background Texture Overlays */}
             <div className="fixed inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none z-0" />
 
-            {/* Immersive Hero Section */}
-            <div className="relative h-[60vh] md:h-[70vh] overflow-hidden bg-black">
-                <div className="hero-parallax absolute inset-0 w-full h-full">
+            {/* Browse-first hero — short so filters + grid appear in first viewport */}
+            <div className="relative h-[32vh] md:h-[36vh] min-h-[220px] overflow-hidden bg-black">
+                <div className="absolute inset-0 w-full h-full">
                     <Image
                         src={selectedCategory
                             ? (categories.find(c => c.name === selectedCategory)?.image_url || "/images/luxury-event-hero.png")
@@ -177,22 +178,17 @@ export default function CatalogClient({ heroTitle, products, categories, package
                         }
                         alt="Catalog hero"
                         fill
-                        className="object-cover opacity-40 scale-105"
+                        className="object-cover opacity-35"
                         priority
                         sizes="100vw"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[var(--ink)]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-[var(--ink)]" />
                 </div>
 
-                <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 z-10">
-                    <div className="hero-enter max-w-4xl space-y-10">
-                        <div className="flex items-center justify-center gap-3">
-                            <span className="w-12 h-px bg-gold/30" />
-                            <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Curated Intelligence</span>
-                            <span className="w-12 h-px bg-gold/30" />
-                        </div>
-
-                        <h1 className="text-6xl md:text-9xl font-serif font-light tracking-tighter leading-[0.85] text-foreground">
+                <div className="relative container mx-auto h-full flex flex-col justify-end pb-8 md:pb-10 px-4 md:px-6 z-10">
+                    <div className="max-w-3xl space-y-3">
+                        <p className="lux-label">Rental collection</p>
+                        <h1 className="text-4xl md:text-6xl font-serif font-light tracking-tighter leading-[0.95] text-foreground">
                             {selectedCategory
                                 ? selectedCategory
                                 : searchQuery
@@ -200,17 +196,20 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                     : (heroTitle || "The Collection")
                             }
                         </h1>
-
-                        <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-base md:text-lg text-muted-foreground font-light max-w-xl leading-relaxed">
                             {selectedCategory
-                                ? `Curated selection of premium ${selectedCategory.toLowerCase()} for your extraordinary events.`
+                                ? `Browse ${selectedCategory.toLowerCase()} available for your event — add pieces to your rental cart.`
                                 : searchQuery
-                                    ? `Results for "${searchQuery}" in our luxury rental collection.`
-                                    : "Browse our exclusive categories of luxury event rentals, designed to transform any venue."
+                                    ? `Results for "${searchQuery}".`
+                                    : "Filter by category, check pieces, and build your rental online."
                             }
                         </p>
                     </div>
                 </div>
+            </div>
+
+            <div className="container mx-auto px-4 md:px-6 pt-6">
+                <RentalInfoBanner />
             </div>
 
             {/* Sticky Search & Filter Bar */}

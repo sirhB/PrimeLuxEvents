@@ -276,3 +276,48 @@ export function filterNavGroupsByPermission(
     }))
     .filter((group) => group.items.length > 0)
 }
+
+/** Staff field shell — fulfillment-focused; Catalog/Manage/Analytics behind command palette only conceptually by omission */
+const STAFF_ALLOWED_HREFS = new Set([
+  '/admin',
+  '/admin/week-prep',
+  '/admin/orders',
+  '/admin/calendar',
+  '/admin/messages',
+  '/admin/warehouse/schedule',
+  '/admin/warehouse/locations',
+  '/admin/scan',
+  '/admin/pack-slip',
+  '/admin/delivery',
+  '/admin/bags',
+  '/admin/inventory',
+  '/admin/tasks',
+  '/admin/logistics',
+])
+
+export function filterNavGroupsForStaff(
+  groups: AdminNavGroup[],
+  permissionNames: string[] | null | undefined,
+  roleNames: string[] | null | undefined = null,
+): AdminNavGroup[] {
+  const byPerm = filterNavGroupsByPermission(groups, permissionNames, roleNames)
+  const isStaffOnly =
+    roleNames?.includes('staff') &&
+    !roleNames?.includes('admin') &&
+    !roleNames?.includes('manager')
+
+  if (!isStaffOnly) return byPerm
+
+  return byPerm
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => STAFF_ALLOWED_HREFS.has(item.href)),
+    }))
+    .filter((group) => group.items.length > 0)
+}
+
+/** Mobile tabs for staff field shell (Scan stays the center chrome control) */
+export const STAFF_MOBILE_TABS: AdminNavItem[] = [
+  { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks' },
+  { icon: Truck, label: 'Loads', href: '/admin/warehouse/schedule' },
+]

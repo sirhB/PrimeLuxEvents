@@ -7,12 +7,17 @@ import { Menu, QrCode } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAdminSidebar } from '@/components/admin/sidebar-context'
 import { ScanModal } from '@/components/admin/scan-modal'
-import { ADMIN_MOBILE_TABS, isAdminRouteActive } from '@/lib/admin/nav'
+import { ADMIN_MOBILE_TABS, STAFF_MOBILE_TABS, isAdminRouteActive } from '@/lib/admin/nav'
 
 export function AdminBottomBar() {
   const pathname = usePathname()
-  const { counts, isMobileOpen, setIsMobileOpen } = useAdminSidebar()
+  const { counts, isMobileOpen, setIsMobileOpen, roleNames } = useAdminSidebar()
   const [isScanOpen, setIsScanOpen] = useState(false)
+
+  const isStaffOnly =
+    !!roleNames?.includes('staff') &&
+    !roleNames?.includes('admin') &&
+    !roleNames?.includes('manager')
 
   const badgeFor = (href: string) => {
     if (href === '/admin/orders') return counts.orders
@@ -21,8 +26,9 @@ export function AdminBottomBar() {
     return 0
   }
 
-  const left = ADMIN_MOBILE_TABS.slice(0, 2)
-  const right = ADMIN_MOBILE_TABS.slice(2)
+  const tabs = isStaffOnly ? STAFF_MOBILE_TABS : ADMIN_MOBILE_TABS
+  const left = isStaffOnly ? tabs.slice(0, 1) : tabs.slice(0, 2)
+  const right = isStaffOnly ? tabs.slice(1) : tabs.slice(2)
 
   return (
     <>

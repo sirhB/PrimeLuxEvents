@@ -451,35 +451,35 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                     <Button
                                         onClick={toggleCart}
                                         className={cn(
-                                            "w-full h-20 text-[11px] font-bold uppercase tracking-[0.3em] rounded-full transition-all duration-700 group relative overflow-hidden shadow-2xl",
-                                            isInCart
-                                                ? "bg-white text-black hover:bg-white/90"
-                                                : "bg-gold text-black hover:bg-white"
+                                            "lux-cta w-full !h-14",
+                                            isInCart && "!bg-[var(--signal)]"
                                         )}
                                     >
-                                        <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-700" />
-                                        <span className="relative z-10 flex items-center justify-center gap-4">
-                                            {isInCart ? (
-                                                <>
-                                                    <Check className="h-5 w-5" />
-                                                    Included in Selection
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Plus className="h-5 w-5 transition-transform group-hover:rotate-90 duration-500" />
-                                                    Add to Collection
-                                                </>
-                                            )}
-                                        </span>
+                                        {isInCart ? (
+                                            <>
+                                                <Check className="h-5 w-5" />
+                                                In your rental
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Plus className="h-5 w-5" />
+                                                Add to rental
+                                            </>
+                                        )}
                                     </Button>
+                                    <p className="text-center text-xs text-muted-foreground font-light">
+                                        {(product.quantity_available ?? product.stock) > 0
+                                            ? `${product.quantity_available ?? product.stock} available · Delivered across CT, RI & MA`
+                                            : 'Ask us about availability for your event date'}
+                                    </p>
 
-                                    <div className="flex items-center justify-center gap-8 py-4 px-6 rounded-2xl bg-white/5 border border-white/5">
-                                        <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                                            <ShieldCheck className="h-3 w-3 text-gold" /> Secure Reservation
+                                    <div className="flex items-center justify-center gap-8 py-4 px-6 rounded-md bg-white/5 border border-border">
+                                        <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                                            <ShieldCheck className="h-3 w-3 text-gold" /> Secure reservation
                                         </div>
                                         <div className="w-1 h-1 rounded-full bg-white/10" />
-                                        <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                                            <Star className="h-3 w-3 text-gold" /> Premium Support
+                                        <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                                            <Star className="h-3 w-3 text-gold" /> Showroom support
                                         </div>
                                     </div>
                                 </motion.div>

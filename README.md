@@ -5,6 +5,7 @@ A premium event rental platform built with Next.js and Supabase.
 ## Documentation
 - **[Features Guide](FEATURES.md)** - Overview of core platform functionality.
 - **[Admin Guide](ADMIN.md)** - Detailed look at administrative tools and management.
+- **[Self-Service UX Rehaul](SELF_SERVICE_UX_REHAUL.md)** - Customer-first design + UX plan and TODO checklist.
 - **[Production Launch Plan](PRODUCTION_LAUNCH_PLAN.md)** - Go-live checklist: database security, Stripe, Vercel, and ops.
 - **[Future Roadmap](FUTURE_ROADMAPPING.md)** - Suggestions for expansion and future features.
 

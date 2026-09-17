@@ -382,6 +382,13 @@ export function CartSheet() {
             >
               Continue to checkout <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
+            <Link
+              href="/cart"
+              onClick={() => setIsOpen(false)}
+              className="block text-center text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground hover:text-gold pt-1"
+            >
+              Open full cart
+            </Link>
             </div>
           </div>
         )}
