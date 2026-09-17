@@ -20,7 +20,7 @@ export default async function AdminDashboardPage() {
             </Button>
             <Button
               asChild
-              className="h-10 bg-[var(--dashboard-accent-gold)] text-[#0d1014] hover:bg-[var(--dashboard-accent-gold)]/90"
+              className="h-10 bg-[var(--dashboard-accent-gold)] text-[#000000] hover:bg-[var(--dashboard-accent-gold)]/90"
             >
               <Link href="/admin/orders/new">
                 <Plus className="mr-2 h-4 w-4" />

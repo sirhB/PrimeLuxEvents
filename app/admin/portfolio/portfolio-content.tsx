@@ -19,7 +19,7 @@ export function PortfolioContent({ categories }: PortfolioContentProps) {
                 title="Portfolio"
                 description="Manage your event galleries and portfolio categories."
                 actions={
-                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#0d1014] hover:bg-[var(--dashboard-accent-gold)]/90">
+                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#000000] hover:bg-[var(--dashboard-accent-gold)]/90">
                         <Link href="/admin/portfolio/new">
                             <Plus className="mr-2 h-4 w-4" />
                             Add Category

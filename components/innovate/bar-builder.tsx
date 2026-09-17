@@ -58,12 +58,12 @@ function BarBuilderInner() {
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col lg:flex-row">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="relative min-h-[42vh] flex-1 overflow-hidden border-b border-[var(--linen)]/10 bg-[#151a20] lg:min-h-0 lg:border-b-0 lg:border-r">
+        <div className="relative min-h-[42vh] flex-1 overflow-hidden border-b border-[var(--linen)]/10 bg-[#0c1324] lg:min-h-0 lg:border-b-0 lg:border-r">
           <div
             className="absolute inset-0 opacity-40"
             style={{
               background:
-                'radial-gradient(ellipse at 50% 30%, rgba(194,168,130,0.35), transparent 55%)',
+                'radial-gradient(ellipse at 50% 30%, rgba(240,167,62,0.35), transparent 55%)',
             }}
           />
           <div className="absolute bottom-[20%] left-1/2 w-[min(28rem,78%)] -translate-x-1/2">
@@ -73,7 +73,7 @@ function BarBuilderInner() {
                 base.id === 'marble-top' && 'bg-gradient-to-b from-[#e8e4dc] to-[#b8b0a4]',
                 base.id === 'tufted-velvet' && 'bg-gradient-to-b from-[#5a2a38] to-[#2a1218]',
                 base.id === 'led-underlit' &&
-                  'bg-gradient-to-b from-[#2a2e36] to-[#121418] shadow-[0_20px_40px_rgba(194,168,130,0.45)]',
+                  'bg-gradient-to-b from-[#2a2e36] to-[#121418] shadow-[0_20px_40px_rgba(240,167,62,0.45)]',
               )}
             >
               {base.id === 'tufted-velvet' && (
@@ -91,7 +91,7 @@ function BarBuilderInner() {
                 </div>
               )}
               {base.id === 'led-underlit' && (
-                <div className="absolute -bottom-1 left-2 right-2 h-1 bg-[var(--champagne)] shadow-[0_0_18px_rgba(194,168,130,0.9)]" />
+                <div className="absolute -bottom-1 left-2 right-2 h-1 bg-[var(--champagne)] shadow-[0_0_18px_rgba(240,167,62,0.9)]" />
               )}
             </div>
             <div className="mx-auto h-10 w-[92%] bg-black/50" />

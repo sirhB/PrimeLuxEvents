@@ -77,7 +77,7 @@ export default async function AccountPage() {
     return (
         <div className="space-y-8">
             <div className="flex flex-col gap-2">
-                <h2 className="font-serif text-2xl font-light tracking-tight text-[var(--ink,#0d1014)]">
+                <h2 className="font-serif text-2xl font-light tracking-tight text-[var(--ink,#000000)]">
                     Your dashboard
                 </h2>
                 <p className="text-muted-foreground">
@@ -86,7 +86,7 @@ export default async function AccountPage() {
             </div>
 
             {!partner && (
-                <div className="flex flex-col gap-3 rounded-2xl border border-[var(--champagne,#c2a882)]/30 bg-white/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-3 rounded-2xl border border-[var(--champagne,#f0a73e)]/30 bg-white/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p className="text-sm font-medium">Event planner or decorator?</p>
                         <p className="text-xs text-muted-foreground">
@@ -126,13 +126,13 @@ export default async function AccountPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="spotlight-frame border-[var(--champagne,#c2a882)]/25 bg-[color-mix(in_srgb,var(--champagne)_8%,white)]">
+                <Card className="spotlight-frame border-[var(--champagne,#f0a73e)]/25 bg-[color-mix(in_srgb,var(--champagne)_8%,white)]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-[var(--champagne,#c2a882)]">Countdown</CardTitle>
-                        <Clock className="h-4 w-4 text-[var(--champagne,#c2a882)]" />
+                        <CardTitle className="text-sm font-medium text-[var(--champagne,#f0a73e)]">Countdown</CardTitle>
+                        <Clock className="h-4 w-4 text-[var(--champagne,#f0a73e)]" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-[var(--ink,#0d1014)]">
+                        <div className="text-2xl font-bold text-[var(--ink,#000000)]">
                             {daysUntil !== null ? `${daysUntil} days` : '---'}
                         </div>
                         <p className="text-xs text-muted-foreground">Until your next delivery</p>
@@ -155,7 +155,7 @@ export default async function AccountPage() {
                                 return (
                                     <li key={step.label} className="relative rounded-2xl border border-border/50 p-4">
                                         <div className="mb-3 flex items-center gap-2">
-                                            <span className={`rounded-full p-2 ${step.done ? 'bg-[var(--champagne,#c2a882)]/15 text-[var(--champagne,#c2a882)]' : 'bg-muted text-muted-foreground'}`}>
+                                            <span className={`rounded-full p-2 ${step.done ? 'bg-[var(--champagne,#f0a73e)]/15 text-[var(--champagne,#f0a73e)]' : 'bg-muted text-muted-foreground'}`}>
                                                 <Icon className="h-4 w-4" />
                                             </span>
                                             <span className="text-sm font-medium">{step.label}</span>
@@ -183,7 +183,7 @@ export default async function AccountPage() {
                     {recentOrders.length > 0 ? (
                         recentOrders.map((order: any) => (
                             <Link key={order.id} href={`/account/orders/${order.id}`}>
-                                <Card className="spotlight-frame border-border/60 bg-white/80 transition-colors hover:border-[var(--champagne,#c2a882)]/30">
+                                <Card className="spotlight-frame border-border/60 bg-white/80 transition-colors hover:border-[var(--champagne,#f0a73e)]/30">
                                     <CardContent className="flex items-center justify-between py-4">
                                         <div className="space-y-1">
                                             <p className="font-medium">Order #{order.id.slice(0, 8).toUpperCase()}</p>
@@ -205,7 +205,7 @@ export default async function AccountPage() {
                                 <p className="text-muted-foreground">
                                     No orders yet. Browse the collection to start planning your event.
                                 </p>
-                                <Button asChild className="rounded-full bg-[var(--champagne,#c2a882)] text-black hover:bg-[var(--ink,#0d1014)] hover:text-white">
+                                <Button asChild className="rounded-full bg-[var(--champagne,#f0a73e)] text-black hover:bg-[var(--ink,#000000)] hover:text-white">
                                     <Link href="/catalog">Browse the collection</Link>
                                 </Button>
                             </CardContent>

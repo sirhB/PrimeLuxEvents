@@ -104,7 +104,7 @@ export default function BagsPage() {
                             Bulk Print QR
                         </Button>
                         <Button
-                            className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#0d1014] hover:bg-[var(--dashboard-accent-gold)]/90"
+                            className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#000000] hover:bg-[var(--dashboard-accent-gold)]/90"
                             onClick={openCreateDialog}
                         >
                             Add New Bag

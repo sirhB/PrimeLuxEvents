@@ -172,7 +172,7 @@ function BackdropStudioInner() {
                 frame.id === 'arch-wall' && 'rounded-t-[50%] rounded-b-sm',
                 frame.id === 'velvet-panels' && 'rounded-sm',
                 frame.id === 'greenery-grid' &&
-                  'rounded-sm [background-image:linear-gradient(rgba(111,143,138,0.35)_1px,transparent_1px),linear-gradient(90deg,rgba(111,143,138,0.35)_1px,transparent_1px)] [background-size:18%_22%]',
+                  'rounded-sm [background-image:linear-gradient(rgba(138,150,176,0.35)_1px,transparent_1px),linear-gradient(90deg,rgba(138,150,176,0.35)_1px,transparent_1px)] [background-size:18%_22%]',
                 frame.id === 'mirror-box' &&
                   'rounded-sm border-[var(--linen)]/60 shadow-[inset_0_0_40px_rgba(255,255,255,0.15)]',
               )}

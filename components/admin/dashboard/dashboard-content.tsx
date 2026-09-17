@@ -295,7 +295,7 @@ export function DashboardContent() {
               title="This weekend"
               description={weekendLabel || 'Upcoming Fri–Sun deliveries'}
               actions={
-                <Button asChild size="sm" className="bg-[var(--dashboard-accent-gold)] text-[#0d1014]">
+                <Button asChild size="sm" className="bg-[var(--dashboard-accent-gold)] text-[#000000]">
                   <Link href="/admin/week-prep">
                     Open Week Prep
                     <ArrowRight className="ml-1.5 h-3.5 w-3.5" />

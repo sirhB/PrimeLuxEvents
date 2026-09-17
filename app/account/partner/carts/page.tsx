@@ -24,7 +24,7 @@ export default async function PartnerCartsPage() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-2">
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#c2a882)]">
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#f0a73e)]">
             Shared carts
           </p>
           <h2 className="font-serif text-3xl font-light tracking-tight">Client selections</h2>
@@ -39,20 +39,20 @@ export default async function PartnerCartsPage() {
       </div>
 
       {!carts?.length ? (
-        <div className="rounded-2xl border border-dashed border-[var(--champagne,#c2a882)]/40 px-6 py-16 text-center">
+        <div className="rounded-2xl border border-dashed border-[var(--champagne,#f0a73e)]/40 px-6 py-16 text-center">
           <p className="font-serif text-xl font-light">No shared carts yet</p>
           <p className="mt-2 text-sm text-muted-foreground">
             Build a cart in the catalog, then choose &ldquo;Share with client&rdquo; from the bag.
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-border/70 border-t border-[var(--champagne,#c2a882)]/20">
+        <ul className="divide-y divide-border/70 border-t border-[var(--champagne,#f0a73e)]/20">
           {carts.map((cart: any) => (
             <li key={cart.id} className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 space-y-1">
                 <Link
                   href={`/account/partner/carts/${cart.id}`}
-                  className="font-serif text-lg font-light hover:text-[var(--champagne,#c2a882)]"
+                  className="font-serif text-lg font-light hover:text-[var(--champagne,#f0a73e)]"
                 >
                   {cart.title || cart.client_name}
                 </Link>
@@ -76,7 +76,7 @@ export default async function PartnerCartsPage() {
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
                     You owe
                   </p>
-                  <p className="font-medium text-[var(--champagne,#c2a882)]">
+                  <p className="font-medium text-[var(--champagne,#f0a73e)]">
                     {formatCentsWithCommas(cart.trade_total)}
                   </p>
                 </div>

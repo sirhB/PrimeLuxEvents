@@ -29,7 +29,7 @@ export default function InnovateHubPage() {
         className="pointer-events-none absolute inset-0 opacity-80"
         style={{
           background:
-            'radial-gradient(ellipse 80% 50% at 10% 0%, rgba(194,168,130,0.18), transparent 55%), radial-gradient(ellipse 60% 40% at 90% 20%, rgba(111,143,138,0.12), transparent 50%)',
+            'radial-gradient(ellipse 80% 50% at 10% 0%, rgba(240,167,62,0.18), transparent 55%), radial-gradient(ellipse 60% 40% at 90% 20%, rgba(138,150,176,0.12), transparent 50%)',
         }}
       />
 

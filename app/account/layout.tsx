@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport = {
-  themeColor: '#0d1014',
+  themeColor: '#000000',
 }
 
 export default async function AccountLayout({

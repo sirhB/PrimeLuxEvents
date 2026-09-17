@@ -4,20 +4,20 @@ import { ArrowRight } from 'lucide-react'
 
 export default function PartnersMarketingPage() {
   return (
-    <div className="bg-[var(--linen,#e8eef2)]">
-      <section className="relative min-h-[78vh] overflow-hidden bg-gradient-to-br from-[#0d1014] via-[#1c232b] to-[#242b34] px-6 py-24 text-[var(--linen,#e8eef2)] md:px-12">
+    <div className="bg-[var(--linen,#e5e5e5)]">
+      <section className="relative min-h-[78vh] overflow-hidden bg-gradient-to-br from-[#000000] via-[#17213c] to-[#243356] px-6 py-24 text-[var(--linen,#e5e5e5)] md:px-12">
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
           style={{
             backgroundImage:
-              'radial-gradient(ellipse at 15% 20%, rgba(194,168,130,0.45), transparent 50%), url(/open-planner.png)',
+              'radial-gradient(ellipse at 15% 20%, rgba(240,167,62,0.45), transparent 50%), url(/open-planner.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             mixBlendMode: 'overlay',
           }}
         />
         <div className="relative mx-auto flex max-w-3xl flex-col justify-end gap-6 pt-24">
-          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--champagne,#c2a882)]">
+          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--champagne,#f0a73e)]">
             Preferred vendor program
           </p>
           <h1 className="font-serif text-5xl font-light tracking-tight md:text-6xl">
@@ -28,7 +28,7 @@ export default function PartnersMarketingPage() {
             preferred rental house.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button asChild className="rounded-full bg-[var(--champagne,#c2a882)] text-black hover:bg-white">
+            <Button asChild className="rounded-full bg-[var(--champagne,#f0a73e)] text-black hover:bg-white">
               <Link href="/signup?next=/account/partner/apply" className="gap-2">
                 Apply to partner <ArrowRight className="h-4 w-4" />
               </Link>

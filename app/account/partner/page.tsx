@@ -30,16 +30,16 @@ export default async function PartnerHomePage() {
 
   return (
     <div className="space-y-12">
-      <section className="relative overflow-hidden rounded-[2rem] border border-[var(--champagne,#c2a882)]/25 bg-gradient-to-br from-[#0d1014] via-[#1c232b] to-[#242b34] px-8 py-14 text-[var(--linen,#e8eef2)] md:px-12">
+      <section className="relative overflow-hidden rounded-[2rem] border border-[var(--champagne,#f0a73e)]/25 bg-gradient-to-br from-[#000000] via-[#17213c] to-[#243356] px-8 py-14 text-[var(--linen,#e5e5e5)] md:px-12">
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
           style={{
             backgroundImage:
-              'radial-gradient(ellipse at 20% 20%, rgba(194,168,130,0.35), transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(111,143,138,0.2), transparent 45%)',
+              'radial-gradient(ellipse at 20% 20%, rgba(240,167,62,0.35), transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(138,150,176,0.2), transparent 45%)',
           }}
         />
         <div className="relative max-w-xl space-y-6">
-          <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--champagne,#c2a882)]">
+          <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--champagne,#f0a73e)]">
             PrimeLux Preferred Partner
           </p>
           <h2 className="font-serif text-4xl font-light tracking-tight md:text-5xl">
@@ -50,7 +50,7 @@ export default async function PartnerHomePage() {
             white-label invoice to your client, collect from them, then settle your portion with us.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
-            <Button asChild className="rounded-full bg-[var(--champagne,#c2a882)] text-black hover:bg-white">
+            <Button asChild className="rounded-full bg-[var(--champagne,#f0a73e)] text-black hover:bg-white">
               <Link href="/catalog" className="gap-2">
                 Build a cart <ArrowRight className="h-4 w-4" />
               </Link>
@@ -80,14 +80,14 @@ export default async function PartnerHomePage() {
         </div>
       </section>
 
-      <section className="space-y-4 border-t border-[var(--champagne,#c2a882)]/20 pt-10">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#c2a882)]">
+      <section className="space-y-4 border-t border-[var(--champagne,#f0a73e)]/20 pt-10">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#f0a73e)]">
           Your reporting
         </p>
         <h3 className="font-serif text-2xl font-light tracking-tight">Activity at a glance</h3>
         <div className="grid gap-8 sm:grid-cols-3">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-[var(--champagne,#c2a882)]">
+            <div className="flex items-center gap-2 text-[var(--champagne,#f0a73e)]">
               <CalendarDays className="h-4 w-4" />
               <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Events</span>
             </div>
@@ -97,7 +97,7 @@ export default async function PartnerHomePage() {
             </p>
           </div>
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-[var(--champagne,#c2a882)]">
+            <div className="flex items-center gap-2 text-[var(--champagne,#f0a73e)]">
               <TrendingUp className="h-4 w-4" />
               <span className="text-[10px] font-bold uppercase tracking-[0.2em]">GMV</span>
             </div>
@@ -109,7 +109,7 @@ export default async function PartnerHomePage() {
             </p>
           </div>
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-[var(--champagne,#c2a882)]">
+            <div className="flex items-center gap-2 text-[var(--champagne,#f0a73e)]">
               <Percent className="h-4 w-4" />
               <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Trade savings</span>
             </div>
@@ -123,7 +123,7 @@ export default async function PartnerHomePage() {
 
       <section className="grid gap-8 md:grid-cols-2">
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-[var(--champagne,#c2a882)]">
+          <div className="flex items-center gap-2 text-[var(--champagne,#f0a73e)]">
             <Percent className="h-4 w-4" />
             <h3 className="font-serif text-xl font-light">Your trade rate</h3>
           </div>
@@ -131,13 +131,13 @@ export default async function PartnerHomePage() {
             Base {basePercent}% off catalog merchandise, with volume tiers when you qualify.
             Delivery and setup are billed at standard rates.
           </p>
-          <Button asChild variant="link" className="h-auto px-0 text-[var(--champagne,#c2a882)]">
+          <Button asChild variant="link" className="h-auto px-0 text-[var(--champagne,#f0a73e)]">
             <Link href="/account/partner/rates">View rate card →</Link>
           </Button>
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-[var(--champagne,#c2a882)]">
+          <div className="flex items-center gap-2 text-[var(--champagne,#f0a73e)]">
             <Share2 className="h-4 w-4" />
             <h3 className="font-serif text-xl font-light">Client workflow</h3>
           </div>
@@ -148,14 +148,14 @@ export default async function PartnerHomePage() {
                 ? `Next up: ${nextCart.client_name} — retail ${formatCentsWithCommas(nextCart.retail_total)}, you owe ${formatCentsWithCommas(nextCart.trade_total)}.`
                 : null}
           </p>
-          <Button asChild variant="link" className="h-auto px-0 text-[var(--champagne,#c2a882)]">
+          <Button asChild variant="link" className="h-auto px-0 text-[var(--champagne,#f0a73e)]">
             <Link href="/account/partner/carts">Manage shared carts →</Link>
           </Button>
         </div>
       </section>
 
-      <section className="space-y-4 border-t border-[var(--champagne,#c2a882)]/20 pt-10">
-        <div className="flex items-center gap-2 text-[var(--champagne,#c2a882)]">
+      <section className="space-y-4 border-t border-[var(--champagne,#f0a73e)]/20 pt-10">
+        <div className="flex items-center gap-2 text-[var(--champagne,#f0a73e)]">
           <Gem className="h-4 w-4" />
           <h3 className="font-serif text-xl font-light">{tier.label} perks</h3>
         </div>
@@ -171,7 +171,7 @@ export default async function PartnerHomePage() {
             </li>
           ))}
         </ul>
-        <Button asChild variant="link" className="h-auto px-0 text-[var(--champagne,#c2a882)]">
+        <Button asChild variant="link" className="h-auto px-0 text-[var(--champagne,#f0a73e)]">
           <Link href="/account/partner/rates">See full rate card →</Link>
         </Button>
       </section>
