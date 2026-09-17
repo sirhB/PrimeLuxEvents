@@ -18,30 +18,31 @@ export function HeroSection({
   ctaSecondary = "How It Works",
 }: HeroSectionProps) {
   return (
-    <section className="spotlight-frame relative h-[100svh] w-full overflow-hidden bg-[var(--ink)]">
+    <section className="spotlight-frame relative h-[100svh] w-full overflow-hidden bg-[var(--linen)]">
       <div className="hero-parallax absolute inset-0">
         <Image
-          src="/images/luxury-event-hero.png"
-          alt="Event setup with rental furniture and lighting"
+          src="/images/mist-cedar-hero.png"
+          alt="Sunlit outdoor event tables with linen and greenery"
           fill
-          className="object-cover opacity-55 contrast-110"
+          className="object-cover object-center"
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--ink)]/70 via-[var(--ink)]/45 to-[var(--linen)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--linen)]/55 via-[var(--linen)]/25 to-[var(--linen)]" />
+        <div className="absolute inset-0 bg-[var(--ink)]/15" />
       </div>
 
       <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center md:px-10">
         <div className="hero-enter space-y-7 md:space-y-9">
-          <p className="font-serif text-5xl font-light tracking-tight text-white md:text-7xl lg:text-8xl">
+          <p className="font-serif text-5xl font-light tracking-tight text-[var(--ink)] md:text-7xl lg:text-8xl">
             PrimeLux<span className="text-[var(--champagne)]">.</span>
           </p>
 
-          <h1 className="mx-auto max-w-3xl font-serif text-2xl font-light leading-snug tracking-tight text-white md:text-4xl lg:text-5xl">
+          <h1 className="mx-auto max-w-3xl font-serif text-2xl font-light leading-snug tracking-tight text-[var(--ink)] md:text-4xl lg:text-5xl">
             {title}
           </h1>
 
-          <p className="mx-auto max-w-xl text-base font-light leading-relaxed text-white/80 md:text-lg">
+          <p className="mx-auto max-w-xl text-base font-light leading-relaxed text-[var(--ink)]/70 md:text-lg">
             {subtitle}
           </p>
 
@@ -50,10 +51,7 @@ export function HeroSection({
               {ctaPrimary}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link
-              href="#how-it-works"
-              className="lux-cta-ghost on-media group"
-            >
+            <Link href="#how-it-works" className="lux-cta-ghost group">
               {ctaSecondary}
             </Link>
           </div>
