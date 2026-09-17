@@ -49,15 +49,14 @@ export default async function Home() {
       <HomePackagesSection />
 
       <section className="relative overflow-hidden bg-[var(--surface)] py-24 text-center md:py-36">
-        <div className="pointer-events-none absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay" />
         <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[40rem] -translate-x-1/2 bg-[var(--champagne)]/10 blur-[120px]" />
 
         <div className="relative z-10 mx-auto max-w-3xl px-6 md:px-10">
           <p className="lux-label mb-6">Inquire</p>
-          <h2 className="font-serif text-4xl font-light tracking-tight text-[var(--signal)] md:text-6xl">
+          <h2 className="font-serif text-4xl font-light tracking-tight text-foreground md:text-6xl">
             Ready to plan your celebration?
           </h2>
-          <p className="mx-auto mt-6 max-w-xl text-base font-light leading-relaxed text-[var(--linen)]/65 md:text-lg">
+          <p className="mx-auto mt-6 max-w-xl text-base font-light leading-relaxed text-muted-foreground md:text-lg">
             Tell us about your date and venue, or start a quote from the catalog.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">

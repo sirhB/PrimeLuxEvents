@@ -26,7 +26,7 @@ export default async function PartnerRatesPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-10">
       <div className="space-y-3">
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#f0a73e)]">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--champagne,#2f6b57)]">
           Trade rates
         </p>
         <h2 className="font-serif text-3xl font-light tracking-tight">
@@ -38,7 +38,7 @@ export default async function PartnerRatesPage() {
         </p>
       </div>
 
-      <div className="space-y-4 border-t border-[var(--champagne,#f0a73e)]/20 pt-8">
+      <div className="space-y-4 border-t border-[var(--champagne,#2f6b57)]/20 pt-8">
         <h3 className="font-serif text-xl font-light">Volume ladder</h3>
         <p className="text-sm text-muted-foreground">
           You receive the greater of your base trade rate or the best volume tier you qualify for
@@ -64,7 +64,7 @@ export default async function PartnerRatesPage() {
         </ul>
       </div>
 
-      <div className="space-y-4 border-t border-[var(--champagne,#f0a73e)]/20 pt-8">
+      <div className="space-y-4 border-t border-[var(--champagne,#2f6b57)]/20 pt-8">
         <h3 className="font-serif text-xl font-light">{tier.label} perks</h3>
         <p className="text-sm text-muted-foreground">
           Included with your tier — hold window is {tier.hold_hours} hours.

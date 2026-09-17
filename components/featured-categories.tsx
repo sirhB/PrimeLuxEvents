@@ -48,10 +48,10 @@ export function FeaturedCategories() {
           className="mb-12 max-w-2xl md:mb-16"
         >
           <p className="lux-label mb-4">Collection</p>
-          <h2 className="font-serif text-4xl font-light tracking-tight text-[var(--signal)] md:text-6xl">
+          <h2 className="font-serif text-4xl font-light tracking-tight text-foreground md:text-6xl">
             Browse by category
           </h2>
-          <p className="mt-5 text-base font-light leading-relaxed text-[var(--linen)]/65 md:text-lg">
+          <p className="mt-5 text-base font-light leading-relaxed text-muted-foreground md:text-lg">
             Start with the pieces that shape the room, then build from there.
           </p>
         </motion.div>
@@ -65,7 +65,7 @@ export function FeaturedCategories() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: index * 0.06 }}
-            className="group relative min-h-[420px] overflow-hidden border-t border-[var(--linen)]/10 sm:border-l sm:first:border-l-0 lg:min-h-[520px]"
+            className="group relative min-h-[420px] overflow-hidden border-t border-border sm:border-l sm:first:border-l-0 lg:min-h-[520px]"
           >
             <Link
               href={`/catalog?category=${encodeURIComponent(category.name)}`}
@@ -75,19 +75,19 @@ export function FeaturedCategories() {
                 src={category.image}
                 alt={category.displayName}
                 fill
-                className="object-cover opacity-70 transition-transform duration-700 ease-out group-hover:scale-105 group-hover:opacity-90"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)] via-[var(--ink)]/35 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)]/85 via-[var(--ink)]/25 to-transparent" />
 
               <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-                <h3 className="font-serif text-3xl font-light tracking-tight text-[var(--signal)] transition-colors duration-300 group-hover:text-[var(--champagne)]">
+                <h3 className="font-serif text-3xl font-light tracking-tight text-white transition-colors duration-300 group-hover:text-[var(--champagne)]">
                   {category.displayName}
                 </h3>
-                <p className="mt-2 max-w-xs text-sm font-light leading-relaxed text-[var(--linen)]/65">
+                <p className="mt-2 max-w-xs text-sm font-light leading-relaxed text-white/75">
                   {category.description}
                 </p>
-                <span className="mt-5 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-[var(--champagne)]">
+                <span className="mt-5 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-white">
                   View selection
                   <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                 </span>

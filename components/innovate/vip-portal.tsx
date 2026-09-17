@@ -168,7 +168,7 @@ function VipPortalInner() {
             className="absolute inset-0 opacity-50"
             style={{
               background:
-                'radial-gradient(ellipse at 50% 0%, rgba(240,167,62,0.35), transparent 55%)',
+                'radial-gradient(ellipse at 50% 0%, rgba(47,107,87,0.35), transparent 55%)',
             }}
           />
           <div className="relative flex h-full min-h-[36vh] flex-col items-center justify-center px-6 py-12 text-center">

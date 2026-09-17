@@ -24,7 +24,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
     })
 
     return (
-        <div ref={containerRef} className="bg-background text-white selection:bg-gold selection:text-black">
+        <div ref={containerRef} className="bg-background text-foreground selection:bg-gold selection:text-black">
             {/* Hero Section */}
             <section className="relative h-screen flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">

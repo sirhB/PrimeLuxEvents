@@ -172,8 +172,8 @@ export default function CatalogClient({ heroTitle, products, categories, package
                 <div className="hero-parallax absolute inset-0 w-full h-full">
                     <Image
                         src={selectedCategory
-                            ? (categories.find(c => c.name === selectedCategory)?.image_url || "/images/luxury-event-hero.png")
-                            : "/images/luxury-event-hero.png"
+                            ? (categories.find(c => c.name === selectedCategory)?.image_url || "/images/mist-cedar-hero-vivid.jpg")
+                            : "/images/mist-cedar-hero-vivid.jpg"
                         }
                         alt="Catalog hero"
                         fill
@@ -488,14 +488,14 @@ export default function CatalogClient({ heroTitle, products, categories, package
                                         </motion.div>
                                     ) : (
                                         <div className="spotlight-frame rounded-[2.5rem] border border-border bg-white/5 py-40 text-center">
-                                            <Search className="mx-auto mb-8 h-16 w-16 text-[var(--champagne,#f0a73e)]/30" />
+                                            <Search className="mx-auto mb-8 h-16 w-16 text-[var(--champagne,#2f6b57)]/30" />
                                             <h3 className="mb-4 font-serif text-2xl text-foreground">No pieces match this search</h3>
                                             <p className="mx-auto mb-12 max-w-md font-light text-muted-foreground">
                                                 Try another category or browse the full collection to find rentals for your event.
                                             </p>
                                             <Button
                                                 onClick={handleBackToCatalog}
-                                                className="rounded-[var(--radius-cta)] bg-[var(--champagne,#f0a73e)] px-12 py-6 text-[10px] font-bold uppercase tracking-widest text-black transition-all duration-500 hover:bg-white"
+                                                className="rounded-[var(--radius-cta)] bg-[var(--champagne,#2f6b57)] px-12 py-6 text-[10px] font-bold uppercase tracking-widest text-black transition-all duration-500 hover:bg-white"
                                             >
                                                 Browse the collection
                                             </Button>

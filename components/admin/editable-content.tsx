@@ -23,10 +23,10 @@ interface EditableContentProps {
 
 /** Fixed chrome for edit controls — never inherit storefront text-white / huge type sizes */
 const EDIT_CONTROL_BASE =
-    "w-full rounded-md border-2 border-[var(--dashboard-accent-gold,#f0a73e)] " +
-    "bg-[#e5e5e5] text-[#000000] caret-[#000000] " +
-    "outline-none ring-2 ring-[var(--dashboard-accent-gold,#f0a73e)]/25 " +
-    "placeholder:text-[#000000]/40 selection:bg-[var(--dashboard-accent-gold,#f0a73e)]/30"
+    "w-full rounded-md border-2 border-[var(--dashboard-accent-gold,#2f6b57)] " +
+    "bg-[#e3ebe6] text-[#000000] caret-[#000000] " +
+    "outline-none ring-2 ring-[var(--dashboard-accent-gold,#2f6b57)]/25 " +
+    "placeholder:text-[#000000]/40 selection:bg-[var(--dashboard-accent-gold,#2f6b57)]/30"
 
 export function EditableContent({
     contentKey,
@@ -172,7 +172,7 @@ export function EditableContent({
                             className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="bg-[#e5e5e5] p-4 rounded-lg w-full max-w-md space-y-4">
+                            <div className="bg-[#e3ebe6] p-4 rounded-lg w-full max-w-md space-y-4">
                                 <h3 className="font-medium text-[#000000]">Edit image URL</h3>
                                 <input
                                     type="text"
@@ -205,16 +205,16 @@ export function EditableContent({
             onMouseLeave={() => setIsHovered(false)}
         >
             {editMode ? (
-                <div className="relative z-20 space-y-2 rounded-lg bg-[var(--dashboard-card)]/90 p-2 ring-1 ring-[var(--dashboard-accent-gold,#f0a73e)]/40 backdrop-blur-sm">
+                <div className="relative z-20 space-y-2 rounded-lg bg-[var(--dashboard-card)]/90 p-2 ring-1 ring-[var(--dashboard-accent-gold,#2f6b57)]/40 backdrop-blur-sm">
                     <div className="flex items-center justify-between gap-2 px-1">
-                        <span className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--dashboard-accent-gold,#f0a73e)]">
+                        <span className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--dashboard-accent-gold,#2f6b57)]">
                             {fieldLabel}
                         </span>
                         <div className="flex shrink-0 gap-1 rounded-md border border-white/10 bg-black/40 p-0.5">
                             <Button
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 text-[var(--dashboard-accent-gold,#f0a73e)] hover:bg-[var(--dashboard-accent-gold,#f0a73e)]/15"
+                                className="h-7 w-7 text-[var(--dashboard-accent-gold,#2f6b57)] hover:bg-[var(--dashboard-accent-gold,#2f6b57)]/15"
                                 onClick={handleSave}
                                 disabled={isSaving}
                                 aria-label="Save changes"
@@ -266,7 +266,7 @@ export function EditableContent({
                     onClick={() => setEditMode(true)}
                     className={cn(
                         "relative cursor-pointer rounded-sm transition-all duration-200",
-                        isHovered && "outline outline-2 outline-[var(--dashboard-accent-gold,#f0a73e)]/50 bg-[var(--dashboard-accent-gold,#f0a73e)]/5"
+                        isHovered && "outline outline-2 outline-[var(--dashboard-accent-gold,#2f6b57)]/50 bg-[var(--dashboard-accent-gold,#2f6b57)]/5"
                     )}
                 >
                     <Component className={className} {...props}>
@@ -274,7 +274,7 @@ export function EditableContent({
                     </Component>
 
                     {isHovered && (
-                        <div className="absolute -right-3 -top-3 bg-[var(--dashboard-accent-gold,#f0a73e)] text-black rounded-full p-1 shadow-md z-10">
+                        <div className="absolute -right-3 -top-3 bg-[var(--dashboard-accent-gold,#2f6b57)] text-black rounded-full p-1 shadow-md z-10">
                             <Pencil className="w-3 h-3" />
                         </div>
                     )}

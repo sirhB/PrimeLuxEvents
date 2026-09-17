@@ -66,7 +66,7 @@ export function GalleryPageContent({ content, isEditing = false }: GalleryPageCo
     }, [selectedImage])
 
     return (
-        <div className="bg-background text-white selection:bg-gold selection:text-black">
+        <div className="bg-background text-foreground selection:bg-gold selection:text-black">
             {/* Hero Section */}
             <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">

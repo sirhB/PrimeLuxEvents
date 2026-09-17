@@ -54,7 +54,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
     const processImages = [
         "/images/luxury_furniture_collection_1767781427931.png",
         "/images/luxury_selection_interface_1767781469895.png",
-        "/images/luxury-event-hero.png",
+        "/images/mist-cedar-hero-vivid.jpg",
         "/images/service-logistics.png",
         "/images/luxury_event_setup_celebration_1767781442112.png"
     ]
@@ -66,7 +66,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
     })
 
     return (
-        <div ref={containerRef} className="bg-background text-white selection:bg-gold selection:text-black">
+        <div ref={containerRef} className="bg-background text-foreground selection:bg-gold selection:text-black">
             {/* Hero Section */}
             <section className="relative h-screen flex items-center justify-center overflow-hidden">
                 {/* Background Elements */}

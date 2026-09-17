@@ -78,8 +78,8 @@ export function SiteHeader({
     { href: "/about", label: "About" },
   ]
 
-  const isDarkPage = true // All public pages are now dark themed luxury experience
-  const headerTheme = scrolled || isDarkPage ? 'dark' : 'light'
+  const isDarkPage = false
+  const headerTheme = scrolled ? 'light' : 'light'
 
   return (
     <>
@@ -105,7 +105,7 @@ export function SiteHeader({
       <header
         ref={headerRef}
         className={cn(
-          "sticky top-0 z-50 w-full transition-all duration-500 bg-[var(--ink)]/90 backdrop-blur-xl border-b border-border",
+          "sticky top-0 z-50 w-full transition-all duration-500 bg-[var(--linen)]/90 backdrop-blur-xl border-b border-border",
           scrolled ? "py-3" : "py-5"
         )}
       >
