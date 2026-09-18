@@ -65,6 +65,8 @@ interface Product {
     care_instructions?: string
     sku?: string
     weight?: number
+    height?: string | null
+    width?: string | null
     product_images?: ProductImage[]
     categories?: { name: string, slug?: string }
     slug?: string
@@ -497,6 +499,19 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                                     <div className="flex justify-between py-2 border-b border-white/5 border-dashed">
                                                         <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">SKU</span>
                                                         <span className="text-gray-300">{product.sku}</span>
+                                                    </div>
+                                                )}
+                                                {(product.width || product.height) && (
+                                                    <div className="flex justify-between py-2 border-b border-white/5 border-dashed">
+                                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Dimensions</span>
+                                                        <span className="text-gray-300">
+                                                            {[
+                                                                product.width ? `${product.width} W` : null,
+                                                                product.height ? `${product.height} H` : null,
+                                                            ]
+                                                                .filter(Boolean)
+                                                                .join(' × ')}
+                                                        </span>
                                                     </div>
                                                 )}
                                                 {product.weight && (
