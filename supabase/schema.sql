@@ -34,6 +34,8 @@ create table products (
   setup_fee integer default 0, -- stored in cents
   sku text,
   weight decimal(10, 2),
+  height text, -- display height (e.g. 6 ft, 52")
+  width text, -- display width (e.g. 8 ft, 48")
   features jsonb default '[]'::jsonb,
   care_instructions text,
   is_featured boolean default false,

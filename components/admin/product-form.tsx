@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog'
 import { SearchDialog } from '@/components/ui/search-dialog'
 import { cn } from '@/lib/utils'
+import { extractProductDimensions } from '@/lib/products/dimensions'
 
 
 interface Category {
@@ -64,6 +65,17 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
     const [galleryImages, setGalleryImages] = useState<string[]>(
         product?.images || product?.gallery_images || [],
     )
+
+    const initialDims = extractProductDimensions(product?.name, product?.description)
+    const initialHeight = product?.height || initialDims.height || ''
+    const initialWidth = product?.width || initialDims.width || ''
+    const initialDescription =
+        product?.height || product?.width
+            ? product?.description || ''
+            : initialDims.shouldStripDescription
+              ? initialDims.cleanedDescription || product?.description || ''
+              : product?.description || ''
+
     interface AssemblyItem {
         name: string
         quantity: number
@@ -309,16 +321,30 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
         const stock = parseInt(formData.get('stock') as string) || 1
         const slug = (formData.get('slug') as string) || ''
         const name = formData.get('name') as string
+        const rawDescription = (formData.get('description') as string) || ''
+        const heightInput = ((formData.get('height') as string) || '').trim()
+        const widthInput = ((formData.get('width') as string) || '').trim()
         const sku =
             (formData.get('sku') as string) ||
             product?.sku ||
             slug.toUpperCase().replace(/[^A-Z0-9]+/g, '-').slice(0, 40) ||
             `SKU-${Date.now().toString(36).toUpperCase()}`
 
+        // If height/width left blank, try to extract from name/description
+        const extracted = extractProductDimensions(name, rawDescription)
+        const height = heightInput || extracted.height || null
+        const width = widthInput || extracted.width || null
+        const description =
+            !heightInput && !widthInput && extracted.shouldStripDescription
+                ? extracted.cleanedDescription || ''
+                : rawDescription
+
         // plux schema: price_cents, gallery_images, specifications — drop legacy columns
         const data = {
             name,
-            description: formData.get('description') as string,
+            description,
+            height,
+            width,
             slug,
             sku,
             price_cents: priceInCents,
@@ -636,10 +662,31 @@ export function ProductForm({ product, categories, variants = [] }: ProductFormP
                         <Textarea
                             id="description"
                             name="description"
-                            defaultValue={product?.description}
+                            defaultValue={initialDescription}
                             placeholder="Describe the product..."
                             className="min-h-[120px]"
                         />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="height">Height</Label>
+                            <Input
+                                id="height"
+                                name="height"
+                                defaultValue={initialHeight}
+                                placeholder='e.g. 6 ft or 52"'
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="width">Width</Label>
+                            <Input
+                                id="width"
+                                name="width"
+                                defaultValue={initialWidth}
+                                placeholder='e.g. 8 ft or 48"'
+                            />
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

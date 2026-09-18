@@ -8,6 +8,7 @@ import { PaginationControls } from '@/components/admin/pagination-controls'
 import { ProductFilters } from '@/components/admin/product-filters'
 import { ProductsTable } from '@/components/admin/products-table'
 import { ProductStatsCards } from '@/components/admin/products/product-stats-cards'
+import { BackfillDimensionsButton } from '@/components/admin/products/backfill-dimensions-button'
 import { adaptProducts, type LiveProduct } from '@/lib/catalog/adapters'
 
 import { requirePermission } from '@/lib/auth/authorization'
@@ -30,7 +31,7 @@ export default async function ProductsPage({
 
     let query = supabase
         .from('products')
-        .select('id, name, slug, description, category_id, sku, price_cents, cost_cents, image_url, gallery_images, specifications, is_active, created_at', { count: 'exact' })
+        .select('id, name, slug, description, category_id, sku, price_cents, cost_cents, image_url, gallery_images, specifications, is_active, height, width, created_at', { count: 'exact' })
 
     if (category_id) query = query.eq('category_id', category_id)
     if (search) query = query.ilike('name', `%${search}%`)
@@ -105,12 +106,15 @@ export default async function ProductsPage({
                 title="Products"
                 description="Manage your rental catalog."
                 actions={
-                    <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#000000] hover:bg-[var(--dashboard-accent-gold)]/90">
-                        <Link href="/admin/products/new">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Product
-                        </Link>
-                    </Button>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <BackfillDimensionsButton />
+                        <Button asChild className="h-10 rounded-md bg-[var(--dashboard-accent-gold)] px-4 text-[#000000] hover:bg-[var(--dashboard-accent-gold)]/90">
+                            <Link href="/admin/products/new">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Product
+                            </Link>
+                        </Button>
+                    </div>
                 }
             />
 

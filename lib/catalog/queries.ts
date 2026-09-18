@@ -28,6 +28,8 @@ const PRODUCT_LIST_SELECT = `
   specifications,
   is_active,
   minimum_rental_period,
+  height,
+  width,
   created_at,
   updated_at
 `

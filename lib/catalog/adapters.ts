@@ -19,6 +19,8 @@ export type LiveProduct = {
   specifications?: Record<string, unknown> | null
   is_active?: boolean | null
   weight?: number | null
+  height?: string | null
+  width?: string | null
   minimum_rental_period?: number | null
   created_at?: string
   updated_at?: string
@@ -62,6 +64,8 @@ export type AppProduct = {
   is_featured: boolean
   is_active: boolean
   minimum_rental_days: number
+  height: string | null
+  width: string | null
   categories?: { name: string; slug?: string | null } | null
   specifications?: Record<string, unknown> | null
   modifiers: unknown[]
@@ -164,6 +168,8 @@ export function adaptProduct(row: LiveProduct | null | undefined): AppProduct | 
     is_featured: Boolean(row.is_featured),
     is_active: row.is_active !== false,
     minimum_rental_days: row.minimum_rental_period ?? 1,
+    height: typeof row.height === 'string' && row.height.trim() ? row.height.trim() : null,
+    width: typeof row.width === 'string' && row.width.trim() ? row.width.trim() : null,
     categories: row.categories ?? null,
     specifications: row.specifications ?? null,
     modifiers: [],
