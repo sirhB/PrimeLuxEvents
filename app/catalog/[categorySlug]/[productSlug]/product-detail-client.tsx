@@ -23,6 +23,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 import Image from "next/image"
+import { DimensionScaleCompare } from "@/components/catalog/dimension-scale-compare"
 
 interface ModifierOption {
     id: string
@@ -502,17 +503,23 @@ export function ProductDetailClient({ product, allProducts, colorVariants = [] }
                                                     </div>
                                                 )}
                                                 {(product.width || product.height) && (
-                                                    <div className="flex justify-between py-2 border-b border-white/5 border-dashed">
-                                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Dimensions</span>
-                                                        <span className="text-gray-300">
-                                                            {[
-                                                                product.width ? `${product.width} W` : null,
-                                                                product.height ? `${product.height} H` : null,
-                                                            ]
-                                                                .filter(Boolean)
-                                                                .join(' × ')}
-                                                        </span>
-                                                    </div>
+                                                    <>
+                                                        <div className="flex justify-between py-2 border-b border-white/5 border-dashed">
+                                                            <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Dimensions</span>
+                                                            <span className="text-gray-300">
+                                                                {[
+                                                                    product.width ? `${product.width} W` : null,
+                                                                    product.height ? `${product.height} H` : null,
+                                                                ]
+                                                                    .filter(Boolean)
+                                                                    .join(' × ')}
+                                                            </span>
+                                                        </div>
+                                                        <DimensionScaleCompare
+                                                            height={product.height}
+                                                            width={product.width}
+                                                        />
+                                                    </>
                                                 )}
                                                 {product.weight && (
                                                     <div className="flex justify-between py-2 border-b border-white/5 border-dashed">

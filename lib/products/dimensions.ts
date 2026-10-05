@@ -297,3 +297,45 @@ export function formatDimensionsLabel(dims: ProductDimensions): string | null {
   if (dims.height) return `${dims.height} H`
   return null
 }
+
+/** Reference person used for scale comparisons on the PDP. */
+export const REFERENCE_PERSON_HEIGHT_IN = 72 // 6 ft
+export const REFERENCE_PERSON_SHOULDER_IN = 24 // 2 ft
+
+/**
+ * Parse a display dimension string into inches.
+ * Examples: "6 ft" → 72, "52\"" → 52, "10 ft" → 120, "180 cm" → ~70.87
+ */
+export function parseDimensionToInches(
+  value: string | null | undefined,
+): number | null {
+  if (!value) return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+
+  const match = trimmed.match(
+    new RegExp(String.raw`^(${NUM})\s*(${UNIT})?\s*$`, 'i'),
+  )
+  if (!match) {
+    // Fallback: leading number + optional unit anywhere in the string
+    const loose = trimmed.match(
+      new RegExp(String.raw`(${NUM})\s*(${UNIT})?`, 'i'),
+    )
+    if (!loose) return null
+    return convertToInches(loose[1], loose[2] ?? null)
+  }
+  return convertToInches(match[1], match[2] ?? null)
+}
+
+function convertToInches(numRaw: string, unitRaw: string | null): number | null {
+  const n = Number(numRaw)
+  if (!Number.isFinite(n) || n <= 0) return null
+  const unit = unitRaw ? normalizeUnit(unitRaw) : null
+  if (!unit || unit === 'in') return n
+  if (unit === 'ft') return n * 12
+  if (unit === 'cm') return n / 2.54
+  if (unit === 'mm') return n / 25.4
+  // Bare number with no unit: treat as inches if large-ish, else feet for small values? Prefer inches.
+  return n
+}
+
