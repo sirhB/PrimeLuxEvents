@@ -647,17 +647,258 @@
   background-color: #f6f4ef;
 }
 
-/* Grand reveal — transform and opacity only, so the curtains stay on the compositor. */
-.reveal-curtain {
+/* Theatre drapes — transform and opacity only, so the gather stays on the compositor. */
+.theatre-curtains {
+  --fold-shadow: color-mix(in srgb, var(--theme-dark) 70%, black);
+  --fold-mid: color-mix(in srgb, var(--theme-dark) 52%, var(--theme-accent));
+  --fold-light: color-mix(in srgb, var(--theme-accent) 34%, var(--theme-dark));
+  --fold-sheen: color-mix(in srgb, var(--theme-accent) 58%, white);
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.theatre-drape {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56%;
+}
+
+.theatre-drape-left { left: 0; }
+.theatre-drape-right { right: 0; }
+
+.theatre-cloth {
+  position: absolute;
+  inset: 0;
+  transform-origin: left top;
   will-change: transform;
+  background-image:
+    linear-gradient(to bottom, color-mix(in srgb, white 14%, transparent), transparent 16%),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 3px,
+      color-mix(in srgb, black 16%, transparent) 3px 4px
+    ),
+    linear-gradient(
+      to right,
+      var(--fold-shadow) 0px,
+      var(--fold-mid) 16px,
+      var(--fold-light) 34px,
+      var(--fold-sheen) 44px,
+      var(--fold-light) 56px,
+      var(--fold-shadow) 78px,
+      var(--fold-mid) 96px,
+      var(--fold-light) 122px,
+      var(--fold-sheen) 136px,
+      var(--fold-mid) 156px,
+      var(--fold-shadow) 182px,
+      var(--fold-mid) 198px,
+      var(--fold-light) 220px,
+      var(--fold-sheen) 232px,
+      var(--fold-shadow) 258px,
+      var(--fold-mid) 278px,
+      var(--fold-sheen) 304px,
+      var(--fold-light) 326px,
+      var(--fold-shadow) 354px
+    );
+  background-size: auto, auto, 354px 100%;
+  mask-image: linear-gradient(to right, #000 0 94%, transparent 100%);
 }
 
-.reveal-curtain-left {
-  animation: reveal-curtain-left 1.45s cubic-bezier(0.77, 0, 0.18, 1) 0.15s forwards;
+.theatre-drape-right .theatre-cloth {
+  transform-origin: right top;
+  mask-image: linear-gradient(to left, #000 0 94%, transparent 100%);
+  background-image:
+    linear-gradient(to bottom, color-mix(in srgb, white 14%, transparent), transparent 16%),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 3px,
+      color-mix(in srgb, black 16%, transparent) 3px 4px
+    ),
+    linear-gradient(
+      to left,
+      var(--fold-shadow) 0px,
+      var(--fold-mid) 16px,
+      var(--fold-light) 34px,
+      var(--fold-sheen) 44px,
+      var(--fold-light) 56px,
+      var(--fold-shadow) 78px,
+      var(--fold-mid) 96px,
+      var(--fold-light) 122px,
+      var(--fold-sheen) 136px,
+      var(--fold-mid) 156px,
+      var(--fold-shadow) 182px,
+      var(--fold-mid) 198px,
+      var(--fold-light) 220px,
+      var(--fold-sheen) 232px,
+      var(--fold-shadow) 258px,
+      var(--fold-mid) 278px,
+      var(--fold-sheen) 304px,
+      var(--fold-light) 326px,
+      var(--fold-shadow) 354px
+    );
 }
 
-.reveal-curtain-right {
-  animation: reveal-curtain-right 1.45s cubic-bezier(0.77, 0, 0.18, 1) 0.15s forwards;
+.theatre-cloth-rear {
+  --fold-shadow: color-mix(in srgb, var(--theme-dark) 84%, black);
+  --fold-mid: color-mix(in srgb, var(--theme-dark) 74%, var(--theme-accent));
+  --fold-light: color-mix(in srgb, var(--theme-dark) 62%, var(--theme-accent));
+  --fold-sheen: color-mix(in srgb, var(--theme-accent) 22%, var(--theme-dark));
+  animation: theatre-rear-left 3.35s cubic-bezier(0.45, 0.02, 0.18, 1) 0.42s forwards;
+}
+
+.theatre-drape-right .theatre-cloth-rear {
+  animation-name: theatre-rear-right;
+}
+
+.theatre-cloth-front {
+  animation: theatre-front-left 3.15s cubic-bezier(0.5, 0.02, 0.16, 1) 0.22s forwards;
+  box-shadow: 26px 0 42px color-mix(in srgb, var(--theme-dark) 48%, transparent);
+}
+
+.theatre-drape-right .theatre-cloth-front {
+  animation-name: theatre-front-right;
+  box-shadow: -26px 0 42px color-mix(in srgb, var(--theme-dark) 48%, transparent);
+}
+
+.theatre-sheen,
+.theatre-hem,
+.theatre-lip {
+  position: absolute;
+  pointer-events: none;
+}
+
+.theatre-sheen {
+  inset: 0;
+  background: linear-gradient(
+    108deg,
+    transparent 28%,
+    color-mix(in srgb, white 24%, transparent) 44%,
+    transparent 58%
+  );
+  mix-blend-mode: soft-light;
+  transform: translate3d(-28%, 0, 0);
+  animation: theatre-sheen 2.4s ease-out 0.7s forwards;
+}
+
+.theatre-hem {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 14%;
+  background: linear-gradient(to top, color-mix(in srgb, black 42%, transparent), transparent);
+}
+
+.theatre-lip {
+  top: 0;
+  bottom: 0;
+  width: 22px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--theme-accent) 55%, white),
+    var(--fold-shadow)
+  );
+}
+
+.theatre-drape-left .theatre-lip { right: 0; }
+.theatre-drape-right .theatre-lip {
+  left: 0;
+  background: linear-gradient(
+    270deg,
+    transparent,
+    color-mix(in srgb, var(--theme-accent) 55%, white),
+    var(--fold-shadow)
+  );
+}
+
+.theatre-shade {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  animation: theatre-shade 3.1s ease 0.45s forwards;
+}
+
+.theatre-shade-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7.5rem;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--theme-dark) 62%, transparent), transparent);
+  opacity: 0.85;
+  animation: none;
+}
+
+.theatre-shade-left,
+.theatre-shade-right {
+  top: 0;
+  bottom: 0;
+  width: 24%;
+}
+
+.theatre-shade-left {
+  left: 0;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--theme-dark) 78%, transparent), transparent 82%);
+}
+
+.theatre-shade-right {
+  right: 0;
+  background: linear-gradient(270deg, color-mix(in srgb, var(--theme-dark) 78%, transparent), transparent 82%);
+}
+
+.theatre-valance {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 9.25rem;
+}
+
+.theatre-pelmet {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.15rem;
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--theme-accent) 78%, white) 0 2px,
+      var(--theme-accent) 2px 5px,
+      color-mix(in srgb, var(--theme-dark) 82%, black) 5px 100%
+    );
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--theme-dark) 42%, transparent);
+}
+
+.theatre-swag {
+  position: absolute;
+  top: 0.65rem;
+  left: 0;
+  width: 100%;
+  height: 6.1rem;
+}
+
+.theatre-tassels {
+  position: absolute;
+  top: 4.35rem;
+  left: 0;
+  right: 0;
+  height: 3rem;
+}
+
+.theatre-tassel {
+  position: absolute;
+  top: 0;
+  display: block;
+  margin-left: -8px;
+  transform-origin: 50% 0;
+  animation: theatre-tassel 3.15s cubic-bezier(0.22, 0.61, 0.24, 1) forwards;
 }
 
 .reveal-letter {
@@ -667,17 +908,59 @@
 }
 
 .reveal-cue {
-  animation: reveal-cue 1.8s ease-in-out 1.6s infinite;
+  animation: reveal-cue 1.8s ease-in-out 2.5s infinite;
 }
 
-@keyframes reveal-curtain-left {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-105%, 0, 0); }
+@keyframes theatre-front-left {
+  0% { transform: rotate(0deg) scaleX(1) translateY(0); }
+  10% { transform: rotate(0.18deg) scaleX(1.012) translateY(1.1%); }
+  36% { transform: rotate(0.55deg) scaleX(0.7) translateY(0.35%); }
+  64% { transform: rotate(-0.28deg) scaleX(0.26) translateY(0.15%); }
+  80% { transform: rotate(0.32deg) scaleX(0.17) translateY(0.7%); }
+  91% { transform: rotate(-0.1deg) scaleX(0.24) translateY(0.25%); }
+  100% { transform: rotate(0.06deg) scaleX(0.21) translateY(0.4%); }
 }
 
-@keyframes reveal-curtain-right {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(105%, 0, 0); }
+@keyframes theatre-front-right {
+  0% { transform: rotate(0deg) scaleX(1) translateY(0); }
+  10% { transform: rotate(-0.18deg) scaleX(1.012) translateY(1.1%); }
+  36% { transform: rotate(-0.55deg) scaleX(0.7) translateY(0.35%); }
+  64% { transform: rotate(0.28deg) scaleX(0.26) translateY(0.15%); }
+  80% { transform: rotate(-0.32deg) scaleX(0.17) translateY(0.7%); }
+  91% { transform: rotate(0.1deg) scaleX(0.24) translateY(0.25%); }
+  100% { transform: rotate(-0.06deg) scaleX(0.21) translateY(0.4%); }
+}
+
+@keyframes theatre-rear-left {
+  0% { transform: rotate(0deg) scaleX(1); }
+  40% { transform: rotate(0.25deg) scaleX(0.82); }
+  72% { transform: rotate(-0.12deg) scaleX(0.4); }
+  100% { transform: rotate(0.04deg) scaleX(0.36); }
+}
+
+@keyframes theatre-rear-right {
+  0% { transform: rotate(0deg) scaleX(1); }
+  40% { transform: rotate(-0.25deg) scaleX(0.82); }
+  72% { transform: rotate(0.12deg) scaleX(0.4); }
+  100% { transform: rotate(-0.04deg) scaleX(0.36); }
+}
+
+@keyframes theatre-sheen {
+  from { transform: translate3d(-30%, 0, 0); }
+  to { transform: translate3d(18%, 0, 0); opacity: 0.72; }
+}
+
+@keyframes theatre-shade {
+  0%, 28% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes theatre-tassel {
+  0%, 16% { transform: rotate(0deg); }
+  40% { transform: rotate(7deg); }
+  62% { transform: rotate(-4.5deg); }
+  80% { transform: rotate(2.2deg); }
+  100% { transform: rotate(0.4deg); }
 }
 
 @keyframes reveal-letter {
@@ -691,14 +974,23 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal-curtain-left,
-  .reveal-curtain-right,
+  .theatre-cloth-front,
+  .theatre-cloth-rear,
+  .theatre-sheen,
+  .theatre-shade-left,
+  .theatre-shade-right,
+  .theatre-tassel,
   .reveal-letter,
   .reveal-cue {
     animation: none !important;
   }
 
-  .reveal-curtain-left { transform: translate3d(-105%, 0, 0); }
-  .reveal-curtain-right { transform: translate3d(105%, 0, 0); }
+  .theatre-drape-left .theatre-cloth-front { transform: scaleX(0.21) translateY(0.4%); }
+  .theatre-drape-right .theatre-cloth-front { transform: scaleX(0.21) translateY(0.4%); }
+  .theatre-drape-left .theatre-cloth-rear,
+  .theatre-drape-right .theatre-cloth-rear { transform: scaleX(0.36); }
+  .theatre-sheen { opacity: 0.55; transform: none; }
+  .theatre-shade-left,
+  .theatre-shade-right { opacity: 1; }
   .reveal-letter { opacity: 1; transform: none; }
 }

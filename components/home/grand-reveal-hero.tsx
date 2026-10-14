@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { TheatreCurtains } from '@/components/home/theatre-curtains'
 
 interface GrandRevealHeroProps {
   subtitle?: string
@@ -9,22 +10,6 @@ interface GrandRevealHeroProps {
 }
 
 const HEADLINE = ['Moments,', 'Crowned.']
-
-function curtainStyle(side: 'left' | 'right') {
-  const edge = side === 'left' ? 'to left' : 'to right'
-  return {
-    backgroundImage: `
-      linear-gradient(${edge}, color-mix(in srgb, var(--theme-dark) 18%, transparent), var(--theme-dark) 92%),
-      repeating-linear-gradient(
-        90deg,
-        color-mix(in srgb, var(--theme-accent) 78%, var(--theme-dark)) 0px,
-        var(--theme-accent) 14px,
-        color-mix(in srgb, var(--theme-accent) 42%, black) 28px,
-        color-mix(in srgb, var(--theme-accent) 88%, white) 46px
-      )
-    `,
-  }
-}
 
 export function GrandRevealHero({
   subtitle = 'Furniture, lighting, tents, and décor for celebrations across Connecticut, Rhode Island, and Massachusetts.',
@@ -59,7 +44,7 @@ export function GrandRevealHero({
                   <span
                     key={`${lineIndex}-${index}`}
                     className="reveal-letter"
-                    style={{ animationDelay: `${0.72 + (previous + index) * 0.038}s` }}
+                    style={{ animationDelay: `${1.22 + (previous + index) * 0.042}s` }}
                   >
                     {character === ' ' ? '\u00A0' : character}
                   </span>
@@ -90,16 +75,7 @@ export function GrandRevealHero({
         <span className="reveal-cue block h-8 w-px bg-[var(--theme-accent-on-dark)]" aria-hidden />
       </a>
 
-      <div
-        aria-hidden
-        className="reveal-curtain reveal-curtain-left absolute inset-y-0 left-0 z-30 w-1/2 shadow-[12px_0_40px_rgba(0,0,0,0.28)]"
-        style={curtainStyle('left')}
-      />
-      <div
-        aria-hidden
-        className="reveal-curtain reveal-curtain-right absolute inset-y-0 right-0 z-30 w-1/2 shadow-[-12px_0_40px_rgba(0,0,0,0.28)]"
-        style={curtainStyle('right')}
-      />
+      <TheatreCurtains />
     </section>
   )
 }
