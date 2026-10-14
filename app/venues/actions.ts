@@ -39,7 +39,7 @@ export async function submitVenueInquiry(input: VenueInquiryInput): Promise<{ ok
       event_date: parsed.data.event_date,
       guest_count: parsed.data.guest_count,
       notes_preview: parsed.data.notes,
-      stage: 'new',
+      stage: 'inquiry',
       source: 'venue_page',
     })
     if (error) {

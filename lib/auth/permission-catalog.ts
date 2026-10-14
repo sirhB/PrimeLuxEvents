@@ -43,6 +43,7 @@ export const PERMISSION_AREAS: PermissionArea[] = [
   { resource: 'customers', label: 'Customers', description: 'Clients, messages, and partners', actions: ['view', 'create', 'update', 'delete', 'manage'] },
   { resource: 'consultations', label: 'Consultations', description: 'Leads and consultations', actions: ['view', 'create', 'update', 'delete', 'manage'] },
   { resource: 'venues', label: 'Venues', description: 'Venue listings and the venue desk', actions: ['view', 'create', 'update', 'delete', 'manage'] },
+  { resource: 'crm', label: 'Venue CRM', description: 'Contacts, pipeline, proposals, contracts, and reports', actions: ['view', 'create', 'update', 'delete', 'manage'] },
   { resource: 'content', label: 'Content', description: 'CMS content', actions: ['view', 'create', 'update', 'delete', 'manage'] },
   { resource: 'users', label: 'Team', description: 'Members, roles, and invitations', actions: ['view', 'create', 'update', 'delete', 'manage'] },
   { resource: 'reports', label: 'Reports', description: 'Analytics and reports', actions: ['view', 'create', 'manage'] },
@@ -99,6 +100,8 @@ const STAFF_GRANTS = [
   'customers.view', 'customers.create', 'customers.update',
   'consultations.view', 'consultations.create', 'consultations.update',
   'venues.view', 'venues.create', 'venues.update',
+  'crm.view', 'crm.create', 'crm.update',
+  'tasks.view', 'tasks.create', 'tasks.update',
   'appointments.view', 'appointments.create', 'appointments.update',
   'content.view', 'content.update',
   'reports.view',
@@ -113,11 +116,11 @@ const STAFF_GRANTS = [
 ]
 
 const VIEWER_RESOURCES = [
-  'events', 'orders', 'products', 'customers', 'consultations', 'venues',
-  'appointments', 'content', 'settings', 'users', 'reports',
+  'events', 'orders', 'products', 'customers', 'consultations', 'venues', 'crm',
+  'appointments', 'content', 'settings', 'users', 'reports', 'tasks',
 ]
 
-const COORDINATOR_RESOURCES = ['events', 'consultations', 'customers', 'orders', 'venues']
+const COORDINATOR_RESOURCES = ['events', 'consultations', 'customers', 'orders', 'venues', 'crm', 'tasks']
 
 function namesFor(resources: string[], actions: PermissionAction[]): string[] {
   const allowed = new Set(actions)

@@ -105,6 +105,27 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         permission: 'consultations.view',
         keywords: ['plan', 'inquiry', 'budget', 'guests'],
       },
+      {
+        icon: CheckSquare,
+        label: 'My tasks',
+        href: '/admin/my-tasks',
+        permission: 'tasks.view',
+        keywords: ['today', 'overdue', 'assigned', 'checklist'],
+      },
+      {
+        icon: ClipboardCheck,
+        label: 'Team tasks',
+        href: '/admin/staff-tasks',
+        permission: 'tasks.view',
+        keywords: ['board', 'workload', 'calendar', 'staff'],
+      },
+      {
+        icon: ClipboardList,
+        label: 'Task templates',
+        href: '/admin/task-templates',
+        permission: 'tasks.manage',
+        keywords: ['automation', 'stage', 'checklist'],
+      },
     ],
   },
   {

@@ -115,7 +115,7 @@ export async function submitEventPlan(input: EventPlanInput): Promise<{ ok: bool
         contact_phone: parsed.data.contact_phone,
         event_date: parsed.data.event_date,
         guest_count: parsed.data.guest_count,
-        stage: 'new',
+        stage: 'inquiry',
         source: 'event_plan',
         event_plan_id: data.id,
       })
