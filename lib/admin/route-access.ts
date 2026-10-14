@@ -1,7 +1,7 @@
 /**
  * Server-side route permissions. Longest prefix wins.
- * `null` means any active staff role (admin, manager, staff) may open the path.
- * A string is a permission name; admin and `resource.manage` satisfy it.
+ * `null` means any user who can open the staff portal may view the path.
+ * Permission names come from lib/auth/permission-catalog.ts.
  */
 export type AdminRouteRule = {
   prefix: string
@@ -14,13 +14,15 @@ export const ADMIN_ROUTE_RULES: AdminRouteRule[] = [
   { prefix: '/admin/products/new', permission: 'products.create' },
   { prefix: '/admin/products/verify', permission: 'products.update' },
   { prefix: '/admin/products', permission: 'products.view' },
-  { prefix: '/admin/categories', permission: 'products.view' },
-  { prefix: '/admin/packages', permission: 'products.view' },
+  { prefix: '/admin/categories/new', permission: 'catalog.create' },
+  { prefix: '/admin/categories', permission: 'catalog.view' },
+  { prefix: '/admin/packages/new', permission: 'catalog.create' },
+  { prefix: '/admin/packages', permission: 'catalog.view' },
   { prefix: '/admin/consultations', permission: 'consultations.view' },
   { prefix: '/admin/customers', permission: 'customers.view' },
   { prefix: '/admin/messages', permission: 'customers.view' },
   { prefix: '/admin/partners', permission: 'customers.view' },
-  { prefix: '/admin/team/shifts', permission: null },
+  { prefix: '/admin/team/shifts', permission: 'shifts.view' },
   { prefix: '/admin/team', permission: 'users.view' },
   { prefix: '/admin/settings', permission: 'settings.view' },
   { prefix: '/admin/api-keys', permission: 'settings.view' },
@@ -31,11 +33,17 @@ export const ADMIN_ROUTE_RULES: AdminRouteRule[] = [
   { prefix: '/admin/warehouse', permission: 'orders.view' },
   { prefix: '/admin/scan', permission: 'orders.view' },
   { prefix: '/admin/pack-slip', permission: 'orders.view' },
-  { prefix: '/admin/delivery', permission: 'orders.view' },
+  { prefix: '/admin/delivery', permission: 'delivery.view' },
   { prefix: '/admin/bags', permission: 'orders.view' },
   { prefix: '/admin/inventory', permission: 'orders.view' },
   { prefix: '/admin/tasks', permission: 'orders.view' },
   { prefix: '/admin/logistics', permission: 'orders.view' },
+  { prefix: '/admin/appointments', permission: 'appointments.view' },
+  { prefix: '/admin/portfolio/new', permission: 'portfolio.create' },
+  { prefix: '/admin/portfolio', permission: 'portfolio.view' },
+  { prefix: '/admin/visual-editor', permission: 'visual_editor.view' },
+  { prefix: '/admin/content', permission: 'content.view' },
+  { prefix: '/admin/marketing/discounts', permission: 'discounts.view' },
 ]
 
 export function permissionForAdminPath(pathname: string): string | null {

@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils"
 import { PwaBackButton } from "@/components/pwa/pwa-back-button"
 import { COMPANY } from "@/lib/company"
 import { ThemeSwitcher } from "@/components/theme-switcher"
-import { BrandLockup } from "@/components/brand/brand-logo"
+import { BrandMonogram } from "@/components/brand/brand-logo"
 
 interface SiteHeaderProps {
   initialSettings?: {
@@ -129,8 +129,8 @@ export function SiteHeader({
               <SheetContent side="left" className="w-full sm:w-[400px] bg-[var(--surface)] border-r border-border p-0 text-foreground">
                 <div className="flex flex-col h-full">
                   <div className="p-8 border-b border-border">
-                    <Link href="/" onClick={() => setIsOpen(false)} aria-label="Prime Lux Events" className="inline-flex">
-                      <BrandLockup className="text-[1.35rem]" />
+                    <Link href="/" onClick={() => setIsOpen(false)} aria-label="Prime Lux Events" className="brand-lockup inline-flex">
+                      <BrandMonogram className="h-14" />
                     </Link>
                   </div>
                   <nav className="flex-1 px-8 py-12 flex flex-col gap-8">
@@ -177,8 +177,8 @@ export function SiteHeader({
           </div>
 
           {/* Logo */}
-          <Link href="/" aria-label="Prime Lux Events" className="inline-flex items-center">
-            <BrandLockup className="text-[1.05rem] sm:text-[1.2rem]" />
+          <Link href="/" aria-label="Prime Lux Events" className="brand-lockup inline-flex items-center">
+            <BrandMonogram className="h-12 sm:h-14" />
           </Link>
 
           {/* Desktop Navigation */}

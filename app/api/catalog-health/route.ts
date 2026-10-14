@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic'
  * Launch diagnostics — staff only. Does not expose secret values.
  */
 export async function GET() {
-  const denied = await requireAnyApiPermission(['products.view', 'settings.view'])
+  const denied = await requireAnyApiPermission(['catalog.view', 'products.view', 'settings.view'])
   if (denied) return denied
 
   const url = getSupabaseUrl() || null

@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
+import { userHasPermission } from '@/lib/auth/permission-catalog'
 import {
   LayoutDashboard,
   ClipboardCheck,
@@ -80,6 +81,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: Sparkles,
         label: 'Innovate',
         href: '/innovate',
+        permission: 'innovate.view',
         keywords: ['studio', 'visualizer', 'atelier', 'backdrop', 'vip', 'custom'],
       },
     ],
@@ -105,6 +107,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: CalendarCheck,
         label: 'Appointments',
         href: '/admin/appointments',
+        permission: 'appointments.view',
         keywords: ['showroom', 'visits'],
       },
       {
@@ -141,7 +144,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         permission: 'orders.view',
         keywords: ['packing', 'warehouse slip'],
       },
-      { icon: Box, label: 'Delivery', href: '/admin/delivery', permission: 'orders.view', keywords: ['routes', 'dropoff'] },
+      { icon: Box, label: 'Delivery', href: '/admin/delivery', permission: 'delivery.view', keywords: ['routes', 'dropoff'] },
       { icon: Briefcase, label: 'Bags', href: '/admin/bags', permission: 'orders.view', keywords: ['kits', 'manifests'] },
       { icon: Archive, label: 'Inventory', href: '/admin/inventory', permission: 'orders.view', keywords: ['stock'] },
       {
@@ -166,18 +169,20 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         permission: 'products.view',
         keywords: ['items', 'rentals'],
       },
-      { icon: Layers, label: 'Categories', href: '/admin/categories', permission: 'products.view', keywords: ['taxonomy'] },
-      { icon: ClipboardList, label: 'Packages', href: '/admin/packages', permission: 'products.view', keywords: ['bundles'] },
+      { icon: Layers, label: 'Categories', href: '/admin/categories', permission: 'catalog.view', keywords: ['taxonomy'] },
+      { icon: ClipboardList, label: 'Packages', href: '/admin/packages', permission: 'catalog.view', keywords: ['bundles'] },
       {
         icon: ImageIcon,
         label: 'Portfolio',
         href: '/admin/portfolio',
+        permission: 'portfolio.view',
         keywords: ['gallery', 'events'],
       },
       {
         icon: PenLine,
         label: 'Site editor',
         href: '/admin/visual-editor',
+        permission: 'visual_editor.view',
         keywords: ['cms', 'content', 'visual'],
       },
     ],
@@ -197,6 +202,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: Tag,
         label: 'Discounts',
         href: '/admin/marketing/discounts',
+        permission: 'discounts.view',
         keywords: ['coupons', 'promo', 'marketing'],
       },
       {
@@ -210,6 +216,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: CalendarDays,
         label: 'Staff shifts',
         href: '/admin/team/shifts',
+        permission: 'shifts.view',
         keywords: ['schedule', 'shifts', 'roster'],
       },
       {
@@ -240,7 +247,7 @@ export const ADMIN_QUICK_ACTIONS: AdminNavItem[] = [
     keywords: ['weekend', 'prep', 'ready'],
   },
   { icon: Plus, label: 'New product', href: '/admin/products/new', permission: 'products.create', keywords: ['add', 'create'] },
-  { icon: Plus, label: 'New package', href: '/admin/packages/new', permission: 'products.view', keywords: ['add', 'create'] },
+  { icon: Plus, label: 'New package', href: '/admin/packages/new', permission: 'catalog.create', keywords: ['add', 'create'] },
   {
     icon: Handshake,
     label: 'Review partners',
@@ -266,31 +273,36 @@ export function flattenAdminNav(): AdminNavItem[] {
   return ADMIN_NAV_GROUPS.flatMap((group) => group.items)
 }
 
-/** Client-side permission check mirroring server manage.* inheritance + admin role */
+/** Client-side permission check. super_admin bypasses; resource.manage covers that resource. */
 export function canAccessNavItem(
   permissionNames: string[] | null | undefined,
   roleNames: string[] | null | undefined,
   item: AdminNavItem,
+  bridge = false,
 ): boolean {
   if (!item.permission) return true
-  // Until permissions load, show all items to avoid empty nav flash
-  if (permissionNames == null) return true
-  if (roleNames?.includes('admin')) return true
-  if (permissionNames.includes(item.permission)) return true
-  const [resource] = item.permission.split('.')
-  if (resource && permissionNames.includes(`${resource}.manage`)) return true
-  return false
+  // Until permissions load, show all items to avoid an empty nav flash
+  if (permissionNames == null || roleNames == null) return true
+  return userHasPermission(
+    {
+      roles: roleNames.map((name) => ({ name })),
+      permissions: permissionNames.map((name) => ({ name })),
+    },
+    item.permission,
+    { bridge },
+  )
 }
 
 export function filterNavGroupsByPermission(
   groups: AdminNavGroup[],
   permissionNames: string[] | null | undefined,
   roleNames: string[] | null | undefined = null,
+  bridge = false,
 ): AdminNavGroup[] {
   return groups
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => canAccessNavItem(permissionNames, roleNames, item)),
+      items: group.items.filter((item) => canAccessNavItem(permissionNames, roleNames, item, bridge)),
     }))
     .filter((group) => group.items.length > 0)
 }

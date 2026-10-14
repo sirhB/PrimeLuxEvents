@@ -1,7 +1,9 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { requirePermission } from '@/lib/auth/authorization'
+import { getCurrentUser, requirePermission } from '@/lib/auth/authorization'
+import { SUPER_ADMIN_ROLE, isSuperAdmin } from '@/lib/auth/permission-catalog'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import { revalidatePath } from 'next/cache'
 import { buildIlikeOrFilter, sanitizePostgrestFilterValue } from '@/lib/supabase/filter-sanitize'
 
@@ -254,12 +256,55 @@ export async function getAllPermissions(): Promise<{ success: boolean; data?: Pe
     }
 }
 
+function rethrowIfRedirect(error: unknown): void {
+    if (
+        typeof error === 'object' &&
+        error !== null &&
+        'digest' in error &&
+        typeof (error as { digest?: unknown }).digest === 'string' &&
+        (error as { digest: string }).digest.includes('NEXT_REDIRECT')
+    ) {
+        throw error
+    }
+}
+
+const ROLE_NAME_PATTERN = /^[a-z][a-z0-9_]{1,48}$/
+
+async function getRoleRecord(roleId: string) {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+        .from('roles')
+        .select('id, name, is_system_role')
+        .eq('id', roleId)
+        .single()
+    return { supabase, role: data, error: error?.message || null }
+}
+
+async function countOtherActiveSuperAdmins(userId: string): Promise<number> {
+    const admin = createServiceRoleClient()
+    const { data: role } = await admin.from('roles').select('id').eq('name', SUPER_ADMIN_ROLE).maybeSingle()
+    if (!role?.id) return 0
+    const { data: assignments } = await admin
+        .from('user_roles')
+        .select('user_id, user_profiles!user_id(is_active)')
+        .eq('role_id', role.id)
+    return (assignments || []).filter((row: { user_id: string; user_profiles?: { is_active?: boolean } | { is_active?: boolean }[] | null }) => {
+        if (row.user_id === userId) return false
+        const profile = Array.isArray(row.user_profiles) ? row.user_profiles[0] : row.user_profiles
+        return profile?.is_active !== false
+    }).length
+}
+
 // Update role permissions
 export async function updateRolePermissions(roleId: string, permissionIds: string[]): Promise<{ success: boolean; error?: string }> {
     try {
         await requirePermission('users.manage')
 
-        const supabase = await createClient()
+        const { supabase, role, error: roleError } = await getRoleRecord(roleId)
+        if (!role) return { success: false, error: roleError || 'Role not found' }
+        if (role.name === SUPER_ADMIN_ROLE) {
+            return { success: false, error: 'The super admin role always has full access and cannot be changed' }
+        }
 
         // Delete existing permissions for this role
         const { error: deleteError } = await supabase
@@ -290,6 +335,7 @@ export async function updateRolePermissions(roleId: string, permissionIds: strin
         revalidatePath('/admin/team')
         return { success: true }
     } catch (error) {
+        rethrowIfRedirect(error)
         console.error('Error updating role permissions:', error)
         return { success: false, error: 'Failed to update role permissions' }
     }
@@ -300,12 +346,17 @@ export async function createRole(roleData: { name: string; display_name: string;
     try {
         await requirePermission('users.manage')
 
+        const name = roleData.name.trim().toLowerCase()
+        if (!ROLE_NAME_PATTERN.test(name) || name === SUPER_ADMIN_ROLE) {
+            return { success: false, error: 'Use a short lowercase name such as showroom_lead' }
+        }
+
         const supabase = await createClient()
 
         const { data, error } = await supabase
             .from('roles')
             .insert({
-                name: roleData.name,
+                name,
                 display_name: roleData.display_name,
                 description: roleData.description || null,
                 color: roleData.color,
@@ -321,6 +372,7 @@ export async function createRole(roleData: { name: string; display_name: string;
         revalidatePath('/admin/team')
         return { success: true, data }
     } catch (error) {
+        rethrowIfRedirect(error)
         console.error('Error creating role:', error)
         return { success: false, error: 'Failed to create role' }
     }
@@ -331,7 +383,8 @@ export async function updateRole(roleId: string, roleData: { display_name?: stri
     try {
         await requirePermission('users.manage')
 
-        const supabase = await createClient()
+        const { supabase, role, error: roleError } = await getRoleRecord(roleId)
+        if (!role) return { success: false, error: roleError || 'Role not found' }
 
         const { error } = await supabase
             .from('roles')
@@ -342,7 +395,6 @@ export async function updateRole(roleId: string, roleData: { display_name?: stri
                 updated_at: new Date().toISOString()
             })
             .eq('id', roleId)
-            .eq('is_system_role', false) // Only allow updating non-system roles
 
         if (error) {
             return { success: false, error: error.message }
@@ -351,6 +403,7 @@ export async function updateRole(roleId: string, roleData: { display_name?: stri
         revalidatePath('/admin/team')
         return { success: true }
     } catch (error) {
+        rethrowIfRedirect(error)
         console.error('Error updating role:', error)
         return { success: false, error: 'Failed to update role' }
     }
@@ -378,15 +431,13 @@ export async function deleteRole(roleId: string): Promise<{ success: boolean; er
             return { success: false, error: 'Cannot delete role that has assigned members' }
         }
 
-        // Check if it's a system role
-        const { data: role, error: roleError } = await supabase
-            .from('roles')
-            .select('is_system_role')
-            .eq('id', roleId)
-            .single()
+        const { role, error: roleLookupError } = await getRoleRecord(roleId)
+        if (!role) {
+            return { success: false, error: roleLookupError || 'Role not found' }
+        }
 
-        if (roleError) {
-            return { success: false, error: roleError.message }
+        if (role?.name === SUPER_ADMIN_ROLE) {
+            return { success: false, error: 'The super admin role cannot be deleted' }
         }
 
         if (role?.is_system_role) {
@@ -406,6 +457,7 @@ export async function deleteRole(roleId: string): Promise<{ success: boolean; er
         revalidatePath('/admin/team')
         return { success: true }
     } catch (error) {
+        rethrowIfRedirect(error)
         console.error('Error deleting role:', error)
         return { success: false, error: 'Failed to delete role' }
     }
@@ -450,6 +502,14 @@ export async function assignUserRole(userId: string, roleId: string): Promise<{ 
             return { success: false, error: 'Not authenticated' }
         }
 
+        const { role } = await getRoleRecord(roleId)
+        if (role?.name === SUPER_ADMIN_ROLE) {
+            const actor = await getCurrentUser()
+            if (!actor || !isSuperAdmin(actor)) {
+                return { success: false, error: 'Only a super admin can assign the super admin role' }
+            }
+        }
+
         // Check if user already has this role
         const { data: existing } = await supabase
             .from('user_roles')
@@ -477,6 +537,7 @@ export async function assignUserRole(userId: string, roleId: string): Promise<{ 
         revalidatePath('/admin/team')
         return { success: true }
     } catch (error) {
+        rethrowIfRedirect(error)
         console.error('Error assigning role:', error)
         return { success: false, error: 'Failed to assign role' }
     }
@@ -486,6 +547,18 @@ export async function assignUserRole(userId: string, roleId: string): Promise<{ 
 export async function removeUserRole(userId: string, roleId: string): Promise<{ success: boolean; error?: string }> {
     try {
         await requirePermission('users.manage')
+
+        const { role } = await getRoleRecord(roleId)
+        if (role?.name === SUPER_ADMIN_ROLE) {
+            const actor = await getCurrentUser()
+            if (!actor || !isSuperAdmin(actor)) {
+                return { success: false, error: 'Only a super admin can remove the super admin role' }
+            }
+            const remaining = await countOtherActiveSuperAdmins(userId)
+            if (remaining < 1) {
+                return { success: false, error: 'Cannot remove the last super admin' }
+            }
+        }
 
         const supabase = await createClient()
 
@@ -502,6 +575,7 @@ export async function removeUserRole(userId: string, roleId: string): Promise<{ 
         revalidatePath('/admin/team')
         return { success: true }
     } catch (error) {
+        rethrowIfRedirect(error)
         console.error('Error removing role:', error)
         return { success: false, error: 'Failed to remove role' }
     }
@@ -522,6 +596,22 @@ export async function updateUserProfile(
     try {
         await requirePermission('users.manage')
 
+        if (profileData.is_active === false) {
+            const remaining = await countOtherActiveSuperAdmins(userId)
+            const admin = createServiceRoleClient()
+            const { data: assignment } = await admin
+                .from('user_roles')
+                .select('roles!role_id(name)')
+                .eq('user_id', userId)
+            const isSuper = (assignment || []).some((row: { roles?: { name?: string } | { name?: string }[] | null }) => {
+                const role = Array.isArray(row.roles) ? row.roles[0] : row.roles
+                return role?.name === SUPER_ADMIN_ROLE
+            })
+            if (isSuper && remaining < 1) {
+                return { success: false, error: 'Cannot deactivate the last super admin' }
+            }
+        }
+
         const supabase = await createClient()
 
         const { error } = await supabase
@@ -539,6 +629,7 @@ export async function updateUserProfile(
         revalidatePath('/admin/team')
         return { success: true }
     } catch (error) {
+        rethrowIfRedirect(error)
         console.error('Error updating user profile:', error)
         return { success: false, error: 'Failed to update user profile' }
     }

@@ -1,7 +1,17 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { getUserProfileForMiddleware, serializeAuthCache, deserializeAuthCache } from '@/lib/auth/middleware-auth'
+import { PORTAL_ACCESS, userHasPermission } from '@/lib/auth/permission-catalog'
 import { requireSupabaseAnonKey, requireSupabaseUrl } from '@/lib/supabase/env'
+
+const CACHE_EXPIRY_MS = 1000 * 60 * 5
+
+function permissionSubject(roles: string[], permissions: string[]) {
+    return {
+        roles: roles.map((name) => ({ name })),
+        permissions: permissions.map((name) => ({ name })),
+    }
+}
 
 export async function updateSession(request: NextRequest) {
     request.headers.set('x-pathname', request.nextUrl.pathname)
@@ -47,72 +57,88 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
-    // Staff portals: /admin and /innovate require active staff roles
-    if (isStaffPortal) {
-        if (!user) {
-            // No authenticated user, redirect to login
-            if (!pathname.startsWith('/admin/login')) {
-                const url = request.nextUrl.clone()
-                url.pathname = '/login'
-                url.searchParams.set('next', pathname)
-                return NextResponse.redirect(url)
-            }
-        } else {
-            // User is authenticated, check for cached permissions
-            try {
-                const cacheToken = request.cookies.get('admin-auth-cache')?.value
-                let authCache = cacheToken ? deserializeAuthCache(cacheToken) : null
+    const redirectWithSession = (path: string, nextPath?: string) => {
+        const url = request.nextUrl.clone()
+        url.pathname = path
+        url.search = ''
+        if (nextPath) url.searchParams.set('next', nextPath)
+        const redirected = NextResponse.redirect(url)
+        supabaseResponse.cookies.getAll().forEach((cookie) => {
+            redirected.cookies.set(cookie.name, cookie.value)
+        })
+        return redirected
+    }
 
-                // Validate cache (check if it belongs to current user and is < 5 mins old)
-                const CACHE_EXPIRY_MS = 1000 * 60 * 5 // 5 minutes
-                const isCacheValid = authCache &&
-                    authCache.id === user.id &&
-                    (Date.now() - authCache.ts) < CACHE_EXPIRY_MS
+    const needsPermissionCheck = Boolean(user) && (isStaffPortal || pathname.startsWith('/account'))
 
-                let hasAdminAccess = false
-                let isActive = false
+    if (needsPermissionCheck && user) {
+        try {
+            const cacheToken = request.cookies.get('admin-auth-cache')?.value
+            const authCache = cacheToken ? deserializeAuthCache(cacheToken) : null
+            const isCacheValid = Boolean(
+                authCache && authCache.id === user.id && (Date.now() - authCache.ts) < CACHE_EXPIRY_MS,
+            )
 
-                if (isCacheValid && authCache) {
-                    isActive = authCache.active
-                    hasAdminAccess = authCache.roles.some((role: string) =>
-                        ['admin', 'manager', 'staff'].includes(role)
-                    )
-                } else {
-                    // Cache miss or stale: Database lookup
-                    const userProfile = await getUserProfileForMiddleware(supabase, user.id)
-                    if (userProfile) {
-                        isActive = userProfile.is_active
-                        hasAdminAccess = userProfile.roles.some((role: { name: string }) =>
-                            ['admin', 'manager', 'staff'].includes(role.name)
-                        )
+            let isActive = false
+            let bridge = true
+            let mustChangePassword = false
+            let subject = permissionSubject([], [])
+            let resolved = false
 
-                        // Update HMAC-signed cache for next time (skip if no secret)
-                        const newCacheToken = serializeAuthCache(userProfile)
-                        if (newCacheToken) {
-                            supabaseResponse.cookies.set('admin-auth-cache', newCacheToken, {
-                                httpOnly: true,
-                                secure: process.env.NODE_ENV === 'production',
-                                sameSite: 'lax',
-                                maxAge: 60 * 60, // 1 hour (timestamp checked for 5 mins)
-                                path: '/',
-                            })
-                        }
+            if (isCacheValid && authCache) {
+                isActive = authCache.active
+                bridge = authCache.bridge
+                mustChangePassword = authCache.mustChangePassword
+                subject = permissionSubject(authCache.roles, authCache.permissions)
+                resolved = true
+            } else {
+                const userProfile = await getUserProfileForMiddleware(supabase, user.id)
+                if (userProfile) {
+                    const { data: catalogReady, error: catalogError } = await supabase.rpc('permission_catalog_ready')
+                    bridge = Boolean(catalogError) || catalogReady !== true
+                    isActive = userProfile.is_active
+                    mustChangePassword = userProfile.must_change_password === true
+                    subject = {
+                        roles: userProfile.roles.map((role) => ({ name: role.name })),
+                        permissions: userProfile.permissions.map((permission) => ({ name: permission.name })),
+                    }
+                    resolved = true
+                    const newCacheToken = serializeAuthCache(userProfile, { bridge })
+                    if (newCacheToken) {
+                        supabaseResponse.cookies.set('admin-auth-cache', newCacheToken, {
+                            httpOnly: true,
+                            secure: process.env.NODE_ENV === 'production',
+                            sameSite: 'lax',
+                            maxAge: 60 * 60,
+                            path: '/',
+                        })
                     }
                 }
+            }
 
-                if (!isActive || !hasAdminAccess) {
-                    const url = request.nextUrl.clone()
-                    url.pathname = isActive ? '/unauthorized' : '/login'
-                    return NextResponse.redirect(url)
+            if (
+                resolved &&
+                mustChangePassword &&
+                pathname !== '/login/change-password'
+            ) {
+                return redirectWithSession('/login/change-password')
+            }
+
+            if (isStaffPortal) {
+                const required = pathname.startsWith('/innovate') ? 'innovate.view' : PORTAL_ACCESS
+                const allowed = resolved && isActive && userHasPermission(subject, required, { bridge })
+                if (!allowed) {
+                    return redirectWithSession(resolved && isActive ? '/unauthorized' : '/login', pathname)
                 }
-
-            } catch (error) {
-                console.error('Error checking user permissions in middleware:', error)
-                const url = request.nextUrl.clone()
-                url.pathname = '/login'
-                return NextResponse.redirect(url)
+            }
+        } catch (error) {
+            console.error('Error checking user permissions in middleware:', error)
+            if (isStaffPortal) {
+                return redirectWithSession('/login', pathname)
             }
         }
+    } else if (isStaffPortal && !user && !pathname.startsWith('/admin/login')) {
+        return redirectWithSession('/login', pathname)
     }
 
     return supabaseResponse

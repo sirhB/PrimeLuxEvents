@@ -4,7 +4,8 @@ import { cache } from 'react'
 import { redirect } from 'next/navigation'
 import { NextResponse } from 'next/server'
 import { permissionForAdminPath } from '@/lib/admin/route-access'
-import { STAFF_ROLES } from '@/lib/auth/roles-shared'
+import { isCatalogBridgeActive } from '@/lib/auth/catalog-bridge'
+import { PORTAL_ACCESS, userHasPermission } from '@/lib/auth/permission-catalog'
 
 export interface UserProfile {
   id: string
@@ -163,37 +164,26 @@ export const getCurrentUser = cache(async (): Promise<UserProfile | null> => {
   }
 })
 
-export function userHasPermission(user: UserProfile, permissionName: string): boolean {
-  if (user.roles.some((role) => role.name === 'admin')) {
-    return true
-  }
+export { userHasPermission } from '@/lib/auth/permission-catalog'
 
-  if (user.permissions.some((permission) => permission.name === permissionName)) {
-    return true
-  }
-
-  const [resource] = permissionName.split('.')
-  if (resource && user.permissions.some((permission) => permission.name === `${resource}.manage`)) {
-    return true
-  }
-
-  return false
+async function userHas(user: UserProfile, permissionName: string): Promise<boolean> {
+  const bridge = await isCatalogBridgeActive()
+  return userHasPermission(user, permissionName, { bridge })
 }
 
 // Check if user has a specific permission
 export async function hasPermission(permissionName: string): Promise<boolean> {
   const user = await getCurrentUser()
   if (!user) return false
-
-  return userHasPermission(user, permissionName)
+  return userHas(user, permissionName)
 }
 
 // Check if user has any of the specified permissions
 export async function hasAnyPermission(permissionNames: string[]): Promise<boolean> {
   const user = await getCurrentUser()
   if (!user) return false
-
-  return permissionNames.some((permissionName) => userHasPermission(user, permissionName))
+  const bridge = await isCatalogBridgeActive()
+  return permissionNames.some((permissionName) => userHasPermission(user, permissionName, { bridge }))
 }
 
 // Check if user has a specific role
@@ -216,25 +206,7 @@ export async function hasAnyRole(roleNames: string[]): Promise<boolean> {
 export async function canPerformAction(resource: string, action: string): Promise<boolean> {
   const user = await getCurrentUser()
   if (!user) return false
-
-  // Check for specific permission
-  const specificPermission = `${resource}.${action}`
-  if (user.permissions.some(p => p.name === specificPermission)) {
-    return true
-  }
-
-  // Check for manage permission on resource
-  const managePermission = `${resource}.manage`
-  if (user.permissions.some(p => p.name === managePermission)) {
-    return true
-  }
-
-  // Check for admin role (has all permissions)
-  if (user.roles.some(r => r.name === 'admin')) {
-    return true
-  }
-
-  return false
+  return userHas(user, `${resource}.${action}`)
 }
 
 // Get all permissions for a resource
@@ -255,7 +227,7 @@ export async function requireAuth(): Promise<UserProfile> {
 }
 
 /**
- * Page guard for /admin. Staff role is required; finer permissions follow the route map.
+ * Page guard for /admin. Portal access is required; finer permissions follow the route map.
  */
 export async function requireAdminRouteAccess(pathname: string): Promise<UserProfile> {
   const user = await getCurrentUser()
@@ -264,15 +236,13 @@ export async function requireAdminRouteAccess(pathname: string): Promise<UserPro
     redirect(`/login?next=${encodeURIComponent(next)}`)
   }
 
-  const isStaff = user.roles.some((role) =>
-    STAFF_ROLES.includes(role.name as (typeof STAFF_ROLES)[number]),
-  )
-  if (!isStaff) {
+  const bridge = await isCatalogBridgeActive()
+  if (!userHasPermission(user, PORTAL_ACCESS, { bridge })) {
     redirect('/unauthorized')
   }
 
   const permission = permissionForAdminPath(next)
-  if (permission && !userHasPermission(user, permission)) {
+  if (permission && !userHasPermission(user, permission, { bridge })) {
     redirect('/unauthorized')
   }
 
@@ -285,7 +255,7 @@ export async function requireApiPermission(permissionName: string): Promise<Next
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!userHasPermission(user, permissionName)) {
+  if (!(await userHas(user, permissionName))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
   return null
@@ -296,7 +266,8 @@ export async function requireAnyApiPermission(permissionNames: string[]): Promis
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  if (!permissionNames.some((permissionName) => userHasPermission(user, permissionName))) {
+  const bridge = await isCatalogBridgeActive()
+  if (!permissionNames.some((permissionName) => userHasPermission(user, permissionName, { bridge }))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
   return null

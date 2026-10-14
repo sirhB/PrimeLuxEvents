@@ -4,7 +4,7 @@ import { requireAnyApiPermission } from '@/lib/auth/authorization'
 
 export async function POST(request: Request) {
   try {
-    const denied = await requireAnyApiPermission(['content.update', 'products.update', 'settings.update'])
+    const denied = await requireAnyApiPermission(['content.update', 'visual_editor.update', 'portfolio.update', 'products.update', 'settings.update'])
     if (denied) return denied
 
     const body = await request.json()

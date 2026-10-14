@@ -195,13 +195,14 @@ export function ModernSidebar() {
     setIsMobileOpen,
     permissionNames,
     roleNames,
+    catalogBridge,
   } = useAdminSidebar()
   const [user, setUser] = useState<{ email?: string; fullName?: string } | null>(null)
   const supabase = createClient()
 
   const navGroups = useMemo(
-    () => filterNavGroupsByPermission(ADMIN_NAV_GROUPS, permissionNames, roleNames),
-    [permissionNames, roleNames],
+    () => filterNavGroupsByPermission(ADMIN_NAV_GROUPS, permissionNames, roleNames, catalogBridge),
+    [permissionNames, roleNames, catalogBridge],
   )
 
   useEffect(() => {

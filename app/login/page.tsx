@@ -49,6 +49,16 @@ function LoginForm() {
 
       const userId = data.user?.id
       const isStaff = userId ? await fetchIsStaffClient(supabase, userId) : false
+      const { data: profile } = userId
+        ? await supabase.from('user_profiles').select('must_change_password').eq('id', userId).maybeSingle()
+        : { data: null }
+
+      if (profile?.must_change_password) {
+        toast.success('Signed in')
+        router.push('/login/change-password')
+        router.refresh()
+        return
+      }
 
       let destination = '/account'
       if (nextParam) {

@@ -26,15 +26,15 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const [recents, setRecents] = useState<string[]>([])
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
-  const { permissionNames, roleNames } = useAdminSidebar()
+  const { permissionNames, roleNames, catalogBridge } = useAdminSidebar()
 
   const navItems = useMemo(
-    () => flattenAdminNav().filter((item) => canAccessNavItem(permissionNames, roleNames, item)),
-    [permissionNames, roleNames],
+    () => flattenAdminNav().filter((item) => canAccessNavItem(permissionNames, roleNames, item, catalogBridge)),
+    [permissionNames, roleNames, catalogBridge],
   )
   const quickActions = useMemo(
-    () => ADMIN_QUICK_ACTIONS.filter((item) => canAccessNavItem(permissionNames, roleNames, item)),
-    [permissionNames, roleNames],
+    () => ADMIN_QUICK_ACTIONS.filter((item) => canAccessNavItem(permissionNames, roleNames, item, catalogBridge)),
+    [permissionNames, roleNames, catalogBridge],
   )
 
   useEffect(() => {

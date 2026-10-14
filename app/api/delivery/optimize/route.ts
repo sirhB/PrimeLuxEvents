@@ -16,7 +16,7 @@ type Body = {
 }
 
 export async function POST(request: Request) {
-  const denied = await requireApiPermission('orders.update')
+  const denied = await requireApiPermission('delivery.update')
   if (denied) return denied
 
   const supabase = await createClient()

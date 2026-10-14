@@ -11,8 +11,8 @@ import { ADMIN_MOBILE_TABS, canAccessNavItem, isAdminRouteActive } from '@/lib/a
 
 export function AdminBottomBar() {
   const pathname = usePathname()
-  const { counts, isMobileOpen, setIsMobileOpen, permissionNames, roleNames } = useAdminSidebar()
-  const tabs = ADMIN_MOBILE_TABS.filter((item) => canAccessNavItem(permissionNames, roleNames, item))
+  const { counts, isMobileOpen, setIsMobileOpen, permissionNames, roleNames, catalogBridge } = useAdminSidebar()
+  const tabs = ADMIN_MOBILE_TABS.filter((item) => canAccessNavItem(permissionNames, roleNames, item, catalogBridge))
   const [isScanOpen, setIsScanOpen] = useState(false)
 
   const badgeFor = (href: string) => {

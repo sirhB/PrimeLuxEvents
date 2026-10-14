@@ -34,7 +34,7 @@ export async function GET(
             return NextResponse.json({ error: 'Order not found' }, { status: 404 });
         }
 
-        const staff = await hasPermission('orders.view');
+        const staff = await hasPermission('invoices.view');
         if (!staff && !userOwnsOrder(user, order)) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }

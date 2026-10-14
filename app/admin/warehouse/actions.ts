@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { hasPermission } from '@/lib/auth/authorization'
 import { revalidatePath } from 'next/cache'
 import {
     generateWarehouseTasksForDeliveryDate,
@@ -407,6 +408,9 @@ export async function getPackTaskForOrder(orderId: string) {
 
 // Staff shifts
 export async function getShiftsForWeek(startDate: string) {
+    if (!(await hasPermission('shifts.view'))) {
+        return { success: false, error: 'Forbidden', shifts: [] }
+    }
     const supabase = await createClient()
     const end = new Date(startDate + 'T12:00:00')
     end.setDate(end.getDate() + 6)
@@ -434,6 +438,9 @@ export async function upsertStaffShift(data: {
     notes?: string
 }) {
     try {
+        if (!(await hasPermission('shifts.update'))) {
+            return { success: false, error: 'Forbidden' }
+        }
         const supabase = await createClient()
 
         const { error } = await supabase.from('staff_shifts').upsert(
@@ -458,6 +465,9 @@ export async function upsertStaffShift(data: {
 
 export async function deleteStaffShift(shiftId: string) {
     try {
+        if (!(await hasPermission('shifts.delete'))) {
+            return { success: false, error: 'Forbidden' }
+        }
         const supabase = await createClient()
         const { error } = await supabase.from('staff_shifts').delete().eq('id', shiftId)
         if (error) return { success: false, error: error.message }

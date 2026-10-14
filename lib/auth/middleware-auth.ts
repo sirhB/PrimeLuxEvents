@@ -7,6 +7,10 @@ import { getSupabaseServiceRoleKey } from '@/lib/supabase/env'
 type AuthCachePayload = {
     id: string
     roles: string[]
+    permissions: string[]
+    /** True until the canonical permission catalog exists in the database. */
+    bridge: boolean
+    mustChangePassword: boolean
     active: boolean
     ts: number
 }
@@ -44,6 +48,7 @@ export interface UserProfile {
     hire_date: string | null
     is_active: boolean
     last_login_at: string | null
+    must_change_password?: boolean
     roles: Role[]
     permissions: Permission[]
 }
@@ -172,6 +177,7 @@ export async function getUserProfileForMiddleware(supabase: any, userId: string)
             hire_date: profileData.hire_date,
             is_active: profileData.is_active,
             last_login_at: profileData.last_login_at,
+            must_change_password: profileData.must_change_password === true,
             roles: roles,
             permissions
         }
@@ -185,13 +191,19 @@ export async function getUserProfileForMiddleware(supabase: any, userId: string)
  * Serializes minimal profile info for an HMAC-signed middleware cookie.
  * Returns null when no server secret is available (caller should skip cache).
  */
-export function serializeAuthCache(profile: UserProfile): string | null {
+export function serializeAuthCache(
+    profile: UserProfile,
+    options?: { bridge?: boolean },
+): string | null {
     const secret = getAuthCacheSecret()
     if (!secret) return null
 
     const minProfile: AuthCachePayload = {
         id: profile.id,
         roles: profile.roles.map((r) => r.name),
+        permissions: profile.permissions.map((permission) => permission.name),
+        bridge: options?.bridge === true,
+        mustChangePassword: profile.must_change_password === true,
         active: profile.is_active,
         ts: Date.now(),
     }
@@ -225,6 +237,9 @@ export function deserializeAuthCache(token: string): AuthCachePayload | null {
         if (
             typeof parsed?.id !== 'string' ||
             !Array.isArray(parsed.roles) ||
+            !Array.isArray(parsed.permissions) ||
+            typeof parsed.bridge !== 'boolean' ||
+            typeof parsed.mustChangePassword !== 'boolean' ||
             typeof parsed.active !== 'boolean' ||
             typeof parsed.ts !== 'number'
         ) {
@@ -234,6 +249,9 @@ export function deserializeAuthCache(token: string): AuthCachePayload | null {
         return {
             id: parsed.id,
             roles: parsed.roles.filter((r): r is string => typeof r === 'string'),
+            permissions: parsed.permissions.filter((permission): permission is string => typeof permission === 'string'),
+            bridge: parsed.bridge,
+            mustChangePassword: parsed.mustChangePassword,
             active: parsed.active,
             ts: parsed.ts,
         }

@@ -9,7 +9,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test:security": "node --experimental-strip-types scripts/check-safe-path.mjs",
-    "seed:new-db": "node scripts/seed-new-database.mjs"
+    "seed:new-db": "node scripts/seed-new-database.mjs",
+    "bootstrap:super-admin": "node scripts/bootstrap-super-admin.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
