@@ -12,6 +12,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from 'sonner'
 import { usePwaContext } from '@/components/providers/pwa-provider'
 import { fetchIsStaffClient } from '@/lib/auth/roles-shared'
+import { safeInternalPath } from '@/lib/security/safe-path'
+import { assertAuthAttemptAllowed } from '@/app/actions/auth-rate-limit'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
@@ -19,7 +21,8 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const nextParam = searchParams.get('next')
+  const rawNext = searchParams.get('next')
+  const nextParam = rawNext ? safeInternalPath(rawNext, '/account') : null
   const { isStandalone } = usePwaContext()
 
   const isPortalIntent = Boolean(nextParam?.startsWith('/account'))
@@ -27,6 +30,12 @@ function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    const gate = await assertAuthAttemptAllowed('login')
+    if (!gate.ok) {
+      toast.error(gate.error)
+      setLoading(false)
+      return
+    }
     const supabase = createClient()
 
     try {

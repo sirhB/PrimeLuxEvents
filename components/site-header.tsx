@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { PwaBackButton } from "@/components/pwa/pwa-back-button"
 import { COMPANY } from "@/lib/company"
+import { ThemeSwitcher } from "@/components/theme-switcher"
 
 interface SiteHeaderProps {
   initialSettings?: {
@@ -98,6 +99,7 @@ export function SiteHeader({
             <Link href="/account" className="hover:text-gold transition-colors hidden sm:inline">
               Portal
             </Link>
+            <ThemeSwitcher className="h-8 border-transparent px-2 normal-case tracking-normal" />
           </div>
         </div>
       </div>
@@ -161,6 +163,7 @@ export function SiteHeader({
                     >
                       Client Portal
                     </Link>
+                    <ThemeSwitcher />
                   </nav>
                   <div className="p-8 border-t border-border">
                     <a

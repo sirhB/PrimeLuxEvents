@@ -38,6 +38,13 @@ export async function updateSession(request: NextRequest) {
     const isStaffPortal =
         pathname.startsWith('/admin') || pathname.startsWith('/innovate')
 
+    if (pathname.startsWith('/account') && !user) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/login'
+        url.searchParams.set('next', pathname)
+        return NextResponse.redirect(url)
+    }
+
     // Staff portals: /admin and /innovate require active staff roles
     if (isStaffPortal) {
         if (!user) {

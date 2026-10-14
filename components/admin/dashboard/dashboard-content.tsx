@@ -21,8 +21,6 @@ import {
   AdminEmptyState,
   AdminPanel,
   AdminPanelHeader,
-  AdminStat,
-  AdminStatGrid,
 } from '@/components/admin/page-shell'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -58,6 +56,21 @@ const READINESS_KEYS: PrepReadiness[] = [
   'delivered',
 ]
 
+const READINESS_TINT = [
+  'bg-[var(--lux-blush)]',
+  'bg-[var(--lux-cream)]',
+  'bg-[var(--lux-sage-mist)]',
+  'bg-[var(--lux-mist)]',
+  'bg-[var(--lux-lilac)]',
+]
+
+function timeGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
+}
+
 export function DashboardContent() {
   const router = useRouter()
   const supabase = createClient()
@@ -65,10 +78,22 @@ export function DashboardContent() {
   const [weekendSummary, setWeekendSummary] = useState<WeekPrepSummary | null>(null)
   const [weekendLabel, setWeekendLabel] = useState('')
   const [todayTasks, setTodayTasks] = useState<TodayTask[]>([])
+  const [firstName, setFirstName] = useState('there')
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
     setLoading(true)
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      const raw =
+        (user?.user_metadata?.full_name as string | undefined) ||
+        user?.email?.split('@')[0]
+      if (raw) setFirstName(raw.split(' ')[0])
+    } catch {
+      // Greeting falls back when the session lookup fails.
+    }
     const today = toDateString(new Date())
     const weekend = getUpcomingWeekendWindow()
     setWeekendLabel(weekend.label)
@@ -230,175 +255,249 @@ export function DashboardContent() {
     router.refresh()
   }
 
+  const attentionTotal = attention.reduce((sum, item) => sum + item.count, 0)
+  const stats = [
+    {
+      label: 'Needs attention',
+      value: loading ? '…' : attentionTotal,
+      hint: attentionTotal ? 'Open queues' : 'All clear',
+      hintClass: attentionTotal ? 'text-[var(--dashboard-accent-orange)]' : 'text-[var(--dashboard-accent-green)]',
+    },
+    {
+      label: 'Weekend orders',
+      value: loading ? '…' : weekendSummary?.total ?? 0,
+      hint: weekendLabel || 'Fri–Sun',
+      hintClass: 'text-[var(--dashboard-text-muted)]',
+    },
+    {
+      label: 'Ready to load',
+      value: loading ? '…' : weekendSummary?.ready ?? 0,
+      hint: 'This weekend',
+      hintClass: 'text-[var(--dashboard-accent-green)]',
+    },
+    {
+      label: 'Due today',
+      value: loading ? '…' : todayTasks.length,
+      hint: 'Tasks on the floor',
+      hintClass: 'text-[var(--dashboard-text-muted)]',
+    },
+  ]
+
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="flex flex-col gap-5">
-        <AdminStatGrid>
-          <AdminStat
-            label="Needs attention"
-            value={loading ? '…' : attention.reduce((sum, item) => sum + item.count, 0)}
-            tone="warning"
-          />
-          <AdminStat
-            label="Weekend orders"
-            value={loading ? '…' : weekendSummary?.total ?? 0}
-            hint={weekendLabel}
-            tone="accent"
-          />
-          <AdminStat
-            label="Ready this weekend"
-            value={loading ? '…' : weekendSummary?.ready ?? 0}
-            tone="success"
-          />
-          <AdminStat label="Due today" value={loading ? '…' : todayTasks.length} />
-        </AdminStatGrid>
-
-        <div className="grid gap-5 xl:grid-cols-3">
-          <AdminPanel className="xl:col-span-1">
-            <AdminPanelHeader title="Needs attention" description="Queues that block today’s flow." />
-            {attention.length === 0 && !loading ? (
-              <AdminEmptyState
-                title="You're clear"
-                description="No pending confirmations, leads, or overdue warehouse work."
-              />
-            ) : (
-              <ul className="space-y-2">
-                {attention.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      href={item.href}
-                      className="flex items-center justify-between gap-3 rounded-md border border-[var(--dashboard-border)] bg-[var(--dashboard-card-hover)]/40 px-3 py-2.5 transition-colors hover:bg-[var(--dashboard-card-hover)]"
-                    >
-                      <span className="flex items-center gap-2 text-sm text-[var(--dashboard-text)]">
-                        <AlertTriangle
-                          className={cn(
-                            'h-4 w-4',
-                            item.tone === 'danger'
-                              ? 'text-[var(--dashboard-accent-red)]'
-                              : 'text-[var(--dashboard-accent-orange)]',
-                          )}
-                        />
-                        {item.label}
-                      </span>
-                      <span className="text-sm font-semibold tabular-nums text-[var(--dashboard-accent-gold)]">
-                        {item.count}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </AdminPanel>
-
-          <AdminPanel className="xl:col-span-2">
-            <AdminPanelHeader
-              title="This weekend"
-              description={weekendLabel || 'Upcoming Fri–Sun deliveries'}
-              actions={
-                <Button asChild size="sm" className="bg-[var(--dashboard-accent-gold)] text-[#000000]">
-                  <Link href="/admin/week-prep">
-                    Open Week Prep
-                    <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-              }
-            />
-            <div className="grid gap-3 sm:grid-cols-5">
-              {READINESS_KEYS.map((key) => (
-                <div
-                  key={key}
-                  className="rounded-md border border-[var(--dashboard-border)] bg-[var(--dashboard-background)]/40 px-3 py-3"
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--dashboard-text-muted)]">
-                    {PREP_READINESS_LABELS[key]}
-                  </p>
-                  <p className="mt-1 text-xl font-semibold tabular-nums text-[var(--dashboard-text)]">
-                    {loading ? '…' : weekendSummary?.[key] ?? 0}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </AdminPanel>
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight text-[var(--dashboard-text)] sm:text-4xl">
+              {timeGreeting()}, {firstName}
+            </h1>
+            <p className="mt-1 text-sm text-[var(--dashboard-text-muted)]">
+              Let&apos;s see what the floor needs today.
+            </p>
+          </div>
+          <Button asChild className="h-11 rounded-full px-5">
+            <Link href="/admin/orders/new">
+              <Plus className="h-4 w-4" />
+              New order
+            </Link>
+          </Button>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-3">
-          <AdminPanel className="xl:col-span-2">
-            <AdminPanelHeader
-              title="Today’s work"
-              description="Warehouse and delivery tasks due today."
-              actions={
-                <Button
-                  asChild
-                  size="sm"
-                  variant="outline"
-                  className="border-[var(--dashboard-border)] bg-transparent"
+        <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
+          <div className="flex min-w-0 flex-col gap-6">
+            <section className="grid grid-cols-2 overflow-hidden rounded-[var(--dashboard-radius)] border border-[var(--dashboard-border)] bg-white shadow-[var(--dashboard-shadow)] lg:grid-cols-4">
+              {stats.map((stat, index) => (
+                <div
+                  key={stat.label}
+                  className={cn(
+                    'px-5 py-5',
+                    index > 0 && 'lg:border-l lg:border-[var(--dashboard-border)]',
+                    index >= 2 && 'border-t border-[var(--dashboard-border)] lg:border-t-0',
+                    index % 2 === 1 && 'border-l border-[var(--dashboard-border)] lg:border-l',
+                  )}
                 >
-                  <Link href={`/admin/warehouse/schedule?date=${toDateString(new Date())}`}>
-                    <CalendarDays className="mr-1.5 h-3.5 w-3.5" />
-                    Schedule
-                  </Link>
-                </Button>
-              }
-            />
-            {todayTasks.length === 0 && !loading ? (
-              <AdminEmptyState
-                title="No tasks due today"
-                description="When pick, pack, or load work is scheduled for today, it will show up here."
-              />
-            ) : (
-              <ul className="divide-y divide-[var(--dashboard-border)]">
-                {todayTasks.map((task) => (
-                  <li key={task.id}>
-                    <Link
-                      href={task.href}
-                      className="flex items-center justify-between gap-3 py-3 transition-colors hover:text-[var(--dashboard-accent-gold)]"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-[var(--dashboard-text)]">
-                          {task.title}
-                        </p>
-                        <p className="text-xs text-[var(--dashboard-text-muted)]">
-                          {task.category || 'task'}
-                          {task.customerName ? ` · ${task.customerName}` : ''}
-                          {` · ${task.status.replace('_', ' ')}`}
-                        </p>
-                      </div>
-                      <ArrowRight className="h-4 w-4 shrink-0 text-[var(--dashboard-text-muted)]" />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </AdminPanel>
+                  <p className="text-sm text-[var(--dashboard-text-muted)]">{stat.label}</p>
+                  <p className="mt-2 text-3xl font-bold tabular-nums tracking-tight text-[var(--dashboard-text)]">
+                    {stat.value}
+                  </p>
+                  <p className={cn('mt-1 text-xs font-medium', stat.hintClass)}>{stat.hint}</p>
+                </div>
+              ))}
+            </section>
 
-          <AdminPanel>
-            <AdminPanelHeader title="Quick actions" description="Common next steps." />
-            <div className="grid gap-2">
-              {[
-                { href: '/admin/orders/new', label: 'New order', icon: Plus },
-                { href: '/admin/week-prep', label: 'Week Prep', icon: ClipboardCheck },
-                { href: '/admin/scan', label: 'Open scanner', icon: QrCode },
-                { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
-                { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
-                { href: '/admin/delivery', label: 'Delivery planner', icon: Truck },
-                { href: '/admin/warehouse/schedule', label: 'Warehouse schedule', icon: Package },
-              ].map((action) => {
-                const Icon = action.icon
-                return (
-                  <Link
-                    key={action.href}
-                    href={action.href}
-                    className="flex items-center gap-3 rounded-md border border-[var(--dashboard-border)] px-3 py-2.5 text-sm text-[var(--dashboard-text)] transition-colors hover:bg-[var(--dashboard-card-hover)]"
-                  >
-                    <Icon className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
-                    {action.label}
-                  </Link>
-                )
-              })}
-            </div>
-          </AdminPanel>
+            <AdminPanel>
+              <AdminPanelHeader
+                title="This weekend"
+                description={weekendLabel || 'Upcoming Fri–Sun deliveries'}
+                actions={
+                  <Button asChild size="sm" className="rounded-full">
+                    <Link href="/admin/week-prep">
+                      Week Prep
+                      <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
+                }
+              />
+              <div className="grid gap-3 sm:grid-cols-5">
+                {READINESS_KEYS.map((key, index) => (
+                  <div key={key} className={cn('rounded-2xl px-3 py-4', READINESS_TINT[index])}>
+                    <p className="text-xs font-medium text-[var(--dashboard-text-muted)]">
+                      {PREP_READINESS_LABELS[key]}
+                    </p>
+                    <p className="mt-2 text-2xl font-bold tabular-nums text-[var(--dashboard-text)]">
+                      {loading ? '…' : weekendSummary?.[key] ?? 0}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </AdminPanel>
+
+            <AdminPanel>
+              <AdminPanelHeader
+                title="Today's work"
+                description="Warehouse and delivery tasks due today."
+                actions={
+                  <Button asChild size="sm" variant="outline" className="rounded-full bg-white">
+                    <Link href={`/admin/warehouse/schedule?date=${toDateString(new Date())}`}>
+                      <CalendarDays className="mr-1.5 h-3.5 w-3.5" />
+                      Schedule
+                    </Link>
+                  </Button>
+                }
+              />
+              {todayTasks.length === 0 && !loading ? (
+                <AdminEmptyState
+                  title="No tasks due today"
+                  description="When pick, pack, or load work is scheduled for today, it will show up here."
+                />
+              ) : (
+                <ul className="divide-y divide-[var(--dashboard-border)]">
+                  {todayTasks.map((task) => (
+                    <li key={task.id}>
+                      <Link
+                        href={task.href}
+                        className="flex items-center justify-between gap-3 rounded-xl px-1 py-3 transition-colors hover:bg-[var(--dashboard-card-hover)]"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-[var(--dashboard-text)]">
+                            {task.title}
+                          </p>
+                          <p className="text-xs text-[var(--dashboard-text-muted)]">
+                            {task.category || 'task'}
+                            {task.customerName ? ` · ${task.customerName}` : ''}
+                          </p>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-[var(--lux-cream)] px-2.5 py-1 text-[11px] font-semibold capitalize text-[var(--lux-gold)]">
+                          {task.status.replace('_', ' ')}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </AdminPanel>
+          </div>
+
+          <aside className="flex flex-col gap-4">
+            <MonthRail />
+            <AdminPanel>
+              <AdminPanelHeader title="Needs attention" description="Queues blocking today's flow." />
+              {attention.length === 0 && !loading ? (
+                <AdminEmptyState title="You're clear" description="Nothing is waiting on you." />
+              ) : (
+                <ul className="space-y-2">
+                  {attention.map((item) => (
+                    <li key={item.id}>
+                      <Link
+                        href={item.href}
+                        className="flex items-center justify-between gap-3 rounded-2xl bg-[var(--lux-ivory)] px-3 py-2.5 transition-colors hover:bg-[var(--dashboard-card-hover)]"
+                      >
+                        <span className="flex items-center gap-2 text-sm text-[var(--dashboard-text)]">
+                          <AlertTriangle
+                            className={cn(
+                              'h-4 w-4',
+                              item.tone === 'danger'
+                                ? 'text-[var(--dashboard-accent-red)]'
+                                : 'text-[var(--dashboard-accent-orange)]',
+                            )}
+                          />
+                          {item.label}
+                        </span>
+                        <span className="text-sm font-bold tabular-nums">{item.count}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </AdminPanel>
+            <AdminPanel>
+              <AdminPanelHeader title="Shortcuts" />
+              <div className="grid gap-2">
+                {[
+                  { href: '/admin/week-prep', label: 'Week Prep', icon: ClipboardCheck },
+                  { href: '/admin/scan', label: 'Scanner', icon: QrCode },
+                  { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
+                  { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+                  { href: '/admin/delivery', label: 'Delivery', icon: Truck },
+                  { href: '/admin/tasks', label: 'Staff tasks', icon: Package },
+                ].map((action) => {
+                  const Icon = action.icon
+                  return (
+                    <Link
+                      key={action.href}
+                      href={action.href}
+                      className="flex items-center gap-3 rounded-2xl px-2 py-2 text-sm font-medium text-[var(--dashboard-text)] transition-colors hover:bg-[var(--lux-ivory)]"
+                    >
+                      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--lux-mist)] text-[var(--lux-navy)]">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      {action.label}
+                    </Link>
+                  )
+                })}
+              </div>
+            </AdminPanel>
+          </aside>
         </div>
       </div>
     </PullToRefresh>
+  )
+}
+
+function MonthRail() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth()
+  const startPad = new Date(year, month, 1).getDay()
+  const days = new Date(year, month + 1, 0).getDate()
+  const cells = [...Array(startPad).fill(null), ...Array.from({ length: days }, (_, i) => i + 1)]
+  const label = now.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+
+  return (
+    <section className="rounded-[var(--dashboard-radius)] border border-[var(--dashboard-border)] bg-white p-5 shadow-[var(--dashboard-shadow)]">
+      <h2 className="text-sm font-semibold text-[var(--dashboard-text)]">{label}</h2>
+      <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase tracking-wide text-[var(--dashboard-text-muted)]">
+        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+          <span key={`${day}-${index}`}>{day}</span>
+        ))}
+      </div>
+      <div className="mt-2 grid grid-cols-7 gap-1 text-center text-xs">
+        {cells.map((day, index) => {
+          const isToday = day === now.getDate()
+          return (
+            <span
+              key={index}
+              className={cn(
+                'flex h-8 items-center justify-center rounded-full text-[var(--dashboard-text)]',
+                isToday && 'bg-[var(--lux-navy)] font-semibold text-[#ffffff]',
+                !day && 'pointer-events-none opacity-0',
+              )}
+            >
+              {day ?? ''}
+            </span>
+          )
+        })}
+      </div>
+    </section>
   )
 }

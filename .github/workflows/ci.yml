@@ -19,6 +19,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Security path checks
+        run: npm run test:security
+
       - name: Lint
         run: npm run lint
 

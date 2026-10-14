@@ -139,7 +139,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                                     initialValue={content['about.story.title']}
                                     isEditing={isEditing}
                                     as="h2"
-                                    className="text-4xl md:text-7xl font-serif font-light text-white tracking-tighter leading-[0.9] mb-8"
+                                    className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter leading-[0.9] mb-8"
                                 />
                                 <div className="space-y-6">
                                     <EditableContent
@@ -148,7 +148,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                                         type="textarea"
                                         isEditing={isEditing}
                                         as="p"
-                                        className="text-gray-400 text-xl font-light leading-relaxed"
+                                        className="text-muted-foreground text-xl font-light leading-relaxed"
                                     />
                                     <EditableContent
                                         contentKey="about.story.p2"
@@ -156,22 +156,22 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                                         type="textarea"
                                         isEditing={isEditing}
                                         as="p"
-                                        className="text-gray-400 text-lg font-light leading-relaxed"
+                                        className="text-muted-foreground text-lg font-light leading-relaxed"
                                     />
                                 </div>
                             </div>
 
                             <div className="flex gap-12 pt-8 border-t border-white/5">
                                 <div className="space-y-1">
-                                    <span className="text-3xl font-serif text-white">15+</span>
+                                    <span className="text-3xl font-serif text-foreground">15+</span>
                                     <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Years of Magic</span>
                                 </div>
                                 <div className="space-y-1">
-                                    <span className="text-3xl font-serif text-white">2.5k</span>
+                                    <span className="text-3xl font-serif text-foreground">2.5k</span>
                                     <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Events Shaped</span>
                                 </div>
                                 <div className="space-y-1">
-                                    <span className="text-3xl font-serif text-white">100%</span>
+                                    <span className="text-3xl font-serif text-foreground">100%</span>
                                     <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Luxury Defined</span>
                                 </div>
                             </div>
@@ -197,7 +197,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                             initialValue={content['about.values.title']}
                             isEditing={isEditing}
                             as="h2"
-                            className="text-4xl md:text-7xl font-serif font-light text-white mb-8 tracking-tighter"
+                            className="text-4xl md:text-7xl font-serif font-light text-foreground mb-8 tracking-tighter"
                         />
                         <EditableContent
                             contentKey="about.values.description"
@@ -205,7 +205,7 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                             type="textarea"
                             isEditing={isEditing}
                             as="p"
-                            className="text-xl text-gray-400 font-light leading-relaxed"
+                            className="text-xl text-muted-foreground font-light leading-relaxed"
                         />
                     </motion.div>
 
@@ -217,13 +217,13 @@ export function AboutPageContent({ content, isEditing = false }: AboutPageConten
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                                className="glass-card p-12 rounded-2xl border border-white/5 group hover:border-gold/30 transition-all duration-500"
+                                className="surface-panel p-12 rounded-2xl group hover:border-[var(--theme-accent)]/40 transition-all duration-500"
                             >
                                 <div className="w-16 h-16 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center mb-8 group-hover:bg-gold group-hover:text-black transition-all duration-500">
                                     {index === 0 ? <ShieldCheck className="w-8 h-8" /> : index === 1 ? <Heart className="w-8 h-8" /> : <Award className="w-8 h-8" />}
                                 </div>
-                                <h3 className="text-2xl font-serif text-white mb-6 tracking-tight group-hover:text-gold transition-colors">{value.title}</h3>
-                                <p className="text-gray-400 font-light leading-relaxed">{value.description}</p>
+                                <h3 className="text-2xl font-serif text-foreground mb-6 tracking-tight group-hover:text-gold transition-colors">{value.title}</h3>
+                                <p className="text-muted-foreground font-light leading-relaxed">{value.description}</p>
                             </motion.div>
                         ))}
                     </div>

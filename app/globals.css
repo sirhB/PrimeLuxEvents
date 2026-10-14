@@ -1,20 +1,50 @@
 @import "tailwindcss";
 
 @import "tw-animate-css";
+@import "../styles/brand-themes.css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Mist & Cedar — light botanical storefront (redeploy 2026-09-17) */
-  --ink: #1a2420;
-  --surface: #e3ebe6;
+  /* Midnight Gold seeds. html[data-theme] overrides these. */
+  --theme-dark: #0f1b2d;
+  --theme-dark-hover: #2a3a52;
+  --theme-accent: #c9a962;
+  --theme-accent-text: #846f40;
+  --theme-accent-on-dark: #c9a962;
+  --theme-on-accent: #0f1b2d;
+  --theme-canvas: #faf7f2;
+  --theme-surface: #efeae3;
+  --theme-surface-muted: #e6e0d6;
+  --theme-card-hover: #f3efe8;
+  --theme-muted: #686f78;
+  --theme-on-dark: #ffffff;
+  --theme-on-dark-muted: #c5ccd6;
+  --theme-tint-1: #f4ead4;
+  --theme-tint-2: #e7e4de;
+  --theme-tint-3: #f3ead8;
+  --theme-tint-4: #f6f0e4;
+  --theme-tint-5: #f4eee4;
+
+  --ink: var(--theme-dark);
+  --surface: var(--theme-surface);
   --surface-elevated: #ffffff;
-  --surface-muted: #d5e0d9;
-  --linen: #f4f7f5;
-  --champagne: #2f6b57;
-  --champagne-soft: color-mix(in srgb, var(--champagne) 14%, transparent);
-  --sage: #5f8f7c;
-  --signal: #ffffff;
+  --surface-muted: var(--theme-surface-muted);
+  --linen: var(--theme-canvas);
+  --champagne: var(--theme-accent-text);
+  --champagne-soft: color-mix(in srgb, var(--theme-accent) 16%, transparent);
+  --sage: #1f7a4d;
+  --signal: var(--theme-on-dark);
+  --lux-navy: var(--theme-dark);
+  --lux-navy-soft: var(--theme-dark-hover);
+  --lux-ivory: var(--theme-canvas);
+  --lux-gold: var(--theme-accent-text);
+  --lux-gold-bright: var(--theme-accent-on-dark);
+  --lux-cream: var(--theme-tint-1);
+  --lux-mist: var(--theme-tint-2);
+  --lux-sage-mist: var(--theme-tint-4);
+  --lux-blush: var(--theme-tint-3);
+  --lux-lilac: var(--theme-tint-5);
 
   --background: var(--linen);
   --foreground: var(--ink);
@@ -25,8 +55,8 @@
   --popover: var(--surface-elevated);
   --popover-foreground: var(--ink);
 
-  --primary: var(--champagne);
-  --primary-foreground: #ffffff;
+  --primary: var(--theme-dark);
+  --primary-foreground: var(--theme-on-dark);
 
   --safe-area-inset-top: env(safe-area-inset-top);
   --safe-area-inset-bottom: env(safe-area-inset-bottom);
@@ -37,21 +67,21 @@
   --secondary-foreground: var(--ink);
 
   --muted: var(--surface);
-  --muted-foreground: #5a6b64;
+  --muted-foreground: var(--theme-muted);
 
-  --accent: var(--champagne);
-  --accent-foreground: #ffffff;
+  --accent: var(--theme-accent);
+  --accent-foreground: var(--theme-on-accent);
 
   --destructive: #c4574e;
   --destructive-foreground: #ffffff;
 
-  --border: rgba(26, 36, 32, 0.12);
-  --input: rgba(26, 36, 32, 0.14);
-  --ring: var(--champagne);
+  --border: color-mix(in srgb, var(--theme-dark) 12%, transparent);
+  --input: color-mix(in srgb, var(--theme-dark) 16%, transparent);
+  --ring: var(--theme-accent-text);
 
-  /* Refined editorial corners — not pill, not razor */
-  --radius: 0.25rem;
-  --radius-cta: 0.125rem;
+  /* Soft luxury corners; CTAs stay pill-shaped */
+  --radius: 1rem;
+  --radius-cta: 999px;
 
   --chart-1: oklch(0.55 0.1 160);
   --chart-2: oklch(0.65 0.08 140);
@@ -68,26 +98,37 @@
   --sidebar-border: var(--border);
   --sidebar-ring: var(--champagne);
 
-  /* Admin — keep graphite ops, cedar accent */
-  --dashboard-background: #121614;
-  --dashboard-surface: #181c1a;
-  --dashboard-card: #1e2421;
-  --dashboard-card-hover: #272e2a;
-  --dashboard-text: #eef2f0;
-  --dashboard-text-muted: #8a9690;
-  --dashboard-border: rgba(255, 255, 255, 0.08);
-  --dashboard-accent-gold: var(--champagne);
-  --dashboard-accent-green: #3d9a78;
-  --dashboard-accent-orange: #d4924a;
-  --dashboard-accent-blue: #5b8def;
-  --dashboard-accent-red: #d4655a;
-  --dashboard-accent-purple: #8b7bb8;
-  --dashboard-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 24px -12px rgba(0, 0, 0, 0.55);
-  --dashboard-shadow-lg: 0 16px 40px -16px rgba(0, 0, 0, 0.65);
-  --dashboard-glass-bg: rgba(24, 28, 26, 0.92);
-  --dashboard-glass-border: rgba(255, 255, 255, 0.06);
-  --dashboard-radius: 0.375rem;
-  --dashboard-rail: 2px;
+  /* Ops + client panels — ivory paper, navy chrome */
+  --dashboard-background: var(--theme-canvas);
+  --dashboard-surface: #fffcf8;
+  --dashboard-card: #ffffff;
+  --dashboard-card-hover: var(--theme-card-hover);
+  --dashboard-text: var(--theme-dark);
+  --dashboard-text-muted: var(--theme-muted);
+  --dashboard-border: color-mix(in srgb, var(--theme-dark) 10%, transparent);
+  --dashboard-accent-gold: var(--theme-accent-text);
+  --dashboard-accent-green: #1f7a4d;
+  --dashboard-accent-orange: #b86a1a;
+  --dashboard-accent-blue: #2f5fbf;
+  --dashboard-accent-red: #c04545;
+  --dashboard-accent-purple: #6d5aa8;
+  --dashboard-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 16px 40px -24px rgba(16, 24, 40, 0.28);
+  --dashboard-shadow-lg: 0 24px 50px -28px rgba(16, 24, 40, 0.3);
+  --dashboard-glass-bg: rgba(255, 252, 248, 0.92);
+  --dashboard-glass-border: rgba(16, 24, 40, 0.08);
+  --dashboard-radius: 1.25rem;
+  --dashboard-rail: 3px;
+  --sidebar-navy: var(--theme-dark);
+  --sidebar-navy-text: var(--theme-on-dark);
+  --sidebar-navy-muted: var(--theme-on-dark-muted);
+  --sidebar-navy-hover: color-mix(in srgb, var(--theme-on-dark) 8%, transparent);
+  --sidebar-navy-active: color-mix(in srgb, var(--theme-accent-on-dark) 22%, transparent);
+}
+
+/* Solid accent fills use the metal color with a label that clears WCAG AA. */
+.admin-theme [class~="bg-[var(--dashboard-accent-gold)]"] {
+  background-color: var(--theme-accent);
+  color: var(--theme-on-accent);
 }
 
 .admin-theme {
@@ -95,21 +136,21 @@
   --foreground: var(--dashboard-text);
   --card: var(--dashboard-card);
   --card-foreground: var(--dashboard-text);
-  --popover: var(--dashboard-card);
+  --popover: #ffffff;
   --popover-foreground: var(--dashboard-text);
   --muted: var(--dashboard-card-hover);
   --muted-foreground: var(--dashboard-text-muted);
-  --primary: var(--dashboard-accent-gold);
-  --primary-foreground: #ffffff;
+  --primary: var(--theme-dark);
+  --primary-foreground: var(--theme-on-dark);
   --secondary: var(--dashboard-card-hover);
   --secondary-foreground: var(--dashboard-text);
-  --accent: var(--dashboard-accent-gold);
-  --accent-foreground: #ffffff;
+  --accent: var(--theme-accent);
+  --accent-foreground: var(--theme-on-accent);
   --border: var(--dashboard-border);
-  --input: var(--dashboard-border);
-  --ring: var(--dashboard-accent-gold);
+  --input: rgba(16, 24, 40, 0.14);
+  --ring: var(--theme-accent-text);
   --radius: var(--dashboard-radius);
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 .admin-theme,
@@ -376,12 +417,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(16, 24, 40, 0.18);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(16, 24, 40, 0.28);
   }
 
   /* Public Mist & Cedar primitives */
@@ -406,7 +447,7 @@
     min-height: 3.25rem;
     padding-inline: 2rem;
     border-radius: var(--radius-cta);
-    background: var(--champagne);
+    background: var(--lux-navy);
     color: #ffffff;
     font-size: 11px;
     font-weight: 700;
@@ -416,7 +457,7 @@
   }
 
   .lux-cta:hover {
-    background: var(--ink);
+    background: var(--lux-navy-soft);
     color: #ffffff;
   }
 
@@ -514,7 +555,7 @@
   textarea,
   select,
   [role="button"] {
-    @apply outline-none focus-visible:ring-2 focus-visible:ring-[var(--champagne,#2f6b57)] focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-[var(--lux-gold,#6f542e)] focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
   /* Allow text selection in inputs */
@@ -539,4 +580,58 @@
   h6 {
     @apply font-serif tracking-tight;
   }
+}
+
+/* Ops panels use a crisp sans, even where the storefront stays serif. */
+.admin-theme h1,
+.admin-theme h2,
+.admin-theme h3,
+.admin-theme h4,
+.admin-theme h5,
+.admin-theme h6 {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Older dark-glass utilities inside the light ops canvas stay readable. */
+#admin-main .text-white {
+  color: var(--dashboard-text);
+}
+#admin-main .text-white\/80,
+#admin-main .text-white\/70,
+#admin-main .text-white\/60,
+#admin-main .text-white\/50,
+#admin-main .text-white\/40,
+#admin-main .text-white\/30,
+#admin-main .text-white\/20 {
+  color: var(--dashboard-text-muted);
+}
+#admin-main .bg-black\/40,
+#admin-main .bg-black\/20,
+#admin-main .bg-black\/10,
+#admin-main .bg-black\/5,
+#admin-main .bg-black\/95,
+#admin-main .bg-black\/80,
+#admin-main .bg-black\/60 {
+  background-color: var(--dashboard-card);
+}
+#admin-main .border-white\/5,
+#admin-main .border-white\/10 {
+  border-color: var(--dashboard-border);
+}
+#admin-main .text-gray-900,
+#admin-main .text-gray-800 {
+  color: var(--dashboard-text);
+}
+#admin-main .text-gray-700,
+#admin-main .text-gray-600,
+#admin-main .text-gray-500,
+#admin-main .text-gray-400,
+#admin-main .text-gray-300 {
+  color: var(--dashboard-text-muted);
+}
+#admin-main .bg-gray-50,
+#admin-main .bg-gray-100,
+#admin-main .hover\:bg-gray-50:hover {
+  background-color: #f6f4ef;
 }

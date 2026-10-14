@@ -186,8 +186,8 @@ export function GalleryPageContent({ content, isEditing = false }: GalleryPageCo
                     {filteredImages.length === 0 && (
                         <div className="text-center py-40">
                             <Sparkles className="h-16 w-16 text-gold/20 mx-auto mb-8" />
-                            <h3 className="text-2xl font-serif text-white mb-4">No Masterpieces Found</h3>
-                            <p className="text-gray-500 font-light">The curtain will rise again soon.</p>
+                            <h3 className="text-2xl font-serif text-foreground mb-4">Nothing in this set yet</h3>
+                            <p className="text-muted-foreground font-light">Try another category, or check back after the next installation.</p>
                         </div>
                     )}
                 </div>

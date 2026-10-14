@@ -26,7 +26,7 @@ const AdminChromeContext = createContext<AdminChromeContextType | undefined>(und
 const EMPTY_COUNTS: BadgeCounts = { orders: 0, leads: 0, messages: 0 }
 
 export function AdminSidebarProvider({ children }: { children: React.ReactNode }) {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(true)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [counts, setCounts] = useState<BadgeCounts>(EMPTY_COUNTS)
   const [permissionNames, setPermissionNames] = useState<string[] | null>(null)

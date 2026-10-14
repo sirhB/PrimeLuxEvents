@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport = {
-  themeColor: "#f4f7f5",
+  themeColor: "#f7f5f1",
 }
 
 export default async function AccountLayout({
@@ -62,7 +62,7 @@ export default async function AccountLayout({
     const displayName = profile?.full_name || user.email?.split('@')[0] || 'Guest'
 
     return (
-        <div className="flex min-h-screen bg-[var(--linen,var(--ink))]">
+        <div className="flex min-h-screen bg-[var(--lux-ivory)] text-[var(--dashboard-text)]">
             <AccountSidebar partnerStatus={partnerStatus} />
             <div className="flex min-w-0 flex-1 flex-col">
                 <AccountPortalHeader
@@ -71,7 +71,7 @@ export default async function AccountLayout({
                     upcomingOrderStatus={upcomingOrder?.status}
                     partnerStatus={partnerStatus}
                 />
-                <main className="flex-1 p-6 pb-24 md:p-10 md:pb-10">
+                <main className="flex-1 p-4 pb-24 sm:p-6 md:p-8 md:pb-10">
                     {children}
                 </main>
                 <AccountBottomBar partnerStatus={partnerStatus} />

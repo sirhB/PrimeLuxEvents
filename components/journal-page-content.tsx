@@ -170,21 +170,21 @@ function JournalPostCard({ post, index }: { post: any, index: number }) {
                         </div>
                     </div>
 
-                    <h3 className="text-4xl md:text-6xl font-serif font-light text-white leading-tight tracking-tighter group-hover:text-gold transition-colors duration-500">
+                    <h3 className="text-4xl md:text-6xl font-serif font-light text-foreground leading-tight tracking-tighter group-hover:text-gold transition-colors duration-500">
                         {post.title}
                     </h3>
 
-                    <p className="text-gray-400 text-lg font-light leading-relaxed">
+                    <p className="text-muted-foreground text-lg font-light leading-relaxed">
                         {post.excerpt}
                     </p>
                 </div>
 
                 <div className="pt-8">
                     <Link
-                        href="#"
+                        href="/contact"
                         className="group/link inline-flex items-center gap-4 text-gold"
                     >
-                        <span className="text-[11px] font-bold uppercase tracking-[0.3em]">Read Feature</span>
+                        <span className="text-[11px] font-bold uppercase tracking-[0.3em]">Plan a look like this</span>
                         <div className="relative overflow-visible">
                             <ArrowRight className="h-5 w-5 transition-transform duration-500 group-hover/link:translate-x-4" />
                             <div className="absolute top-1/2 left-0 h-px bg-gold w-0 transition-all duration-500 group-hover/link:w-8 -translate-y-1/2 -translate-x-full" />

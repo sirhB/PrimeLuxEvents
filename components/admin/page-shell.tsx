@@ -61,7 +61,7 @@ export function AdminPageHeader({
           </p>
         )}
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--dashboard-text)] sm:text-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--dashboard-text)] sm:text-[2rem]">
             {title}
           </h1>
           {description && (
@@ -150,11 +150,11 @@ export function AdminStat({
   }[tone]
 
   return (
-    <div className="admin-panel rounded-[var(--dashboard-radius)] border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] p-4">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--dashboard-text-muted)]">
+    <div className="admin-panel rounded-[var(--dashboard-radius)] border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] px-5 py-4">
+      <p className="text-xs font-medium text-[var(--dashboard-text-muted)]">
         {label}
       </p>
-      <p className={cn('mt-2 text-2xl font-semibold tabular-nums tracking-tight', toneClass)}>
+      <p className={cn('mt-2 text-3xl font-bold tabular-nums tracking-tight', toneClass)}>
         {value}
       </p>
       {hint && <p className="mt-1 text-xs text-[var(--dashboard-text-muted)]">{hint}</p>}

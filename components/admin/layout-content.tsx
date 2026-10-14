@@ -12,6 +12,7 @@ import { AdminNotifications } from '@/components/admin/notifications'
 import { AdminBottomBar } from '@/components/admin/admin-bottom-bar'
 import { usePwaContext } from '@/components/providers/pwa-provider'
 import { InstallPrompt } from '@/components/pwa/install-prompt'
+import { ThemeSwitcher } from '@/components/theme-switcher'
 
 const CommandPalette = dynamic(
   () => import('@/components/admin/command-palette').then((m) => m.CommandPalette),
@@ -59,10 +60,10 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
       <div
         className={cn(
           'flex max-w-full flex-1 flex-col overflow-x-hidden transition-[padding] duration-300',
-          isCollapsed ? 'md:pl-[4.5rem]' : 'md:pl-60',
+          isCollapsed ? 'md:pl-20' : 'md:pl-60',
         )}
       >
-        <header className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between gap-3 border-b border-[var(--dashboard-border)] bg-[var(--dashboard-background)]/90 px-3 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:px-5 md:px-6 print:hidden">
+        <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between gap-3 border-b border-[var(--dashboard-border)] bg-white/85 px-3 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:px-5 md:px-6 print:hidden">
           <div className="flex min-w-0 items-center gap-2">
             {!isStandalone && (
               <button
@@ -83,7 +84,7 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
               className="group relative hidden w-72 cursor-pointer items-center md:flex"
             >
               <Search className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-[var(--dashboard-text-muted)] transition-colors group-hover:text-[var(--dashboard-accent-gold)]" />
-              <span className="flex w-full items-center justify-between rounded-md border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] py-2 pl-9 pr-3 text-xs text-[var(--dashboard-text-muted)] transition-colors group-hover:border-[var(--dashboard-accent-gold)]/35">
+              <span className="flex w-full items-center justify-between rounded-full border border-[var(--dashboard-border)] bg-[var(--lux-ivory)] py-2 pl-9 pr-3 text-xs text-[var(--dashboard-text-muted)] transition-colors group-hover:border-[var(--lux-gold)]/40">
                 Search pages and actions…
                 <kbd className="inline-flex items-center gap-0.5 rounded border border-[var(--dashboard-border)] bg-black/20 px-1.5 py-0.5 text-[9px]">
                   <Command className="h-2.5 w-2.5" />
@@ -102,6 +103,7 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
             >
               <Search className="h-5 w-5" />
             </button>
+            <ThemeSwitcher className="h-9 px-2.5" />
             <AdminNotifications />
           </div>
         </header>

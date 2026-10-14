@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport = {
-  themeColor: '#0f1215',
+  themeColor: '#f7f5f1',
 }
 
 export default function AdminLayout({

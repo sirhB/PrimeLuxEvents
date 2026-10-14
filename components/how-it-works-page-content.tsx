@@ -178,10 +178,10 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                         className="text-center max-w-3xl mx-auto mb-32 md:mb-56"
                     >
                         <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">The Journey</span>
-                        <h2 className="text-4xl md:text-7xl font-serif font-light text-white mb-8 tracking-tighter">
+                        <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground mb-8 tracking-tighter">
                             A Seamless Path to Luxury
                         </h2>
-                        <p className="text-xl text-gray-400 font-light leading-relaxed">
+                        <p className="text-xl text-muted-foreground font-light leading-relaxed">
                             Every step of our process is meticulously crafted to ensure your event planning is as elegant as the celebration itself.
                         </p>
                     </motion.div>
@@ -249,7 +249,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                                     initialValue={content['howitworks.concierge.title']}
                                     isEditing={isEditing}
                                     as="h2"
-                                    className="text-4xl md:text-6xl font-serif font-light text-white tracking-tighter leading-tight"
+                                    className="text-4xl md:text-6xl font-serif font-light text-foreground tracking-tighter leading-tight"
                                 />
                                 <EditableContent
                                     contentKey="howitworks.concierge.description"
@@ -257,17 +257,17 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                                     type="textarea"
                                     isEditing={isEditing}
                                     as="p"
-                                    className="text-gray-400 text-xl leading-relaxed font-light"
+                                    className="text-muted-foreground text-xl leading-relaxed font-light"
                                 />
                             </div>
 
-                            <div className="glass-card p-10 rounded-2xl border border-white/5 space-y-8">
+                            <div className="surface-panel p-10 rounded-2xl space-y-8">
                                 <EditableContent
                                     contentKey="howitworks.concierge.list.title"
                                     initialValue={content['howitworks.concierge.list.title']}
                                     isEditing={isEditing}
                                     as="h3"
-                                    className="text-xl font-serif text-white tracking-tight"
+                                    className="text-xl font-serif text-foreground tracking-tight"
                                 />
                                 <ul className="space-y-8">
                                     {[1, 2, 3].map((num) => (
@@ -287,7 +287,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                                                 initialValue={content[`howitworks.concierge.list.item${num}`]}
                                                 isEditing={isEditing}
                                                 as="span"
-                                                className="text-lg font-light text-gray-300 mt-2 block"
+                                                className="text-lg font-light text-foreground mt-2 block"
                                             />
                                         </motion.li>
                                     ))}
@@ -326,7 +326,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                             initialValue={content['howitworks.faq.title']}
                             isEditing={isEditing}
                             as="h2"
-                            className="text-4xl md:text-7xl font-serif font-light text-white mb-8 tracking-tighter"
+                            className="text-4xl md:text-7xl font-serif font-light text-foreground mb-8 tracking-tighter"
                         />
                         <EditableContent
                             contentKey="howitworks.faq.description"
@@ -334,7 +334,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                             type="textarea"
                             isEditing={isEditing}
                             as="p"
-                            className="text-xl text-gray-400 font-light leading-relaxed max-w-2xl mx-auto"
+                            className="text-xl text-muted-foreground font-light leading-relaxed max-w-2xl mx-auto"
                         />
                     </motion.div>
 
@@ -349,10 +349,10 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                             >
                                 <Accordion type="single" collapsible className="w-full">
                                     <AccordionItem value={`item-${index}`} className="border-b border-white/5 last:border-0">
-                                        <AccordionTrigger className="text-xl md:text-2xl font-serif font-light text-white hover:text-gold transition-colors py-8 text-left uppercase tracking-tight">
+                                        <AccordionTrigger className="text-xl md:text-2xl font-serif font-light text-foreground hover:text-gold transition-colors py-8 text-left tracking-tight">
                                             {faq.question}
                                         </AccordionTrigger>
-                                        <AccordionContent className="text-gray-400 text-lg leading-relaxed pb-8 font-light max-w-2xl">
+                                        <AccordionContent className="text-muted-foreground text-lg leading-relaxed pb-8 font-light max-w-2xl">
                                             {faq.answer}
                                         </AccordionContent>
                                     </AccordionItem>
@@ -370,7 +370,7 @@ export function HowItWorksPageContent({ content, isEditing = false }: HowItWorks
                     >
                         <Link
                             href="/faq"
-                            className="group inline-flex items-center gap-4 text-[11px] font-bold uppercase tracking-[0.3em] text-white hover:text-gold transition-colors"
+                            className="group inline-flex items-center gap-4 text-[11px] font-bold uppercase tracking-[0.3em] text-foreground hover:text-gold transition-colors"
                         >
                             <EditableContent
                                 contentKey="howitworks.faq.button"
@@ -434,23 +434,23 @@ function StepCard({ step, index }: { step: any, index: number }) {
                 )}
             >
                 <div className="space-y-6">
-                    <h3 className="text-4xl md:text-6xl font-serif font-light text-white tracking-tighter leading-tight uppercase">
+                    <h3 className="text-4xl md:text-6xl font-serif font-light text-foreground tracking-tighter leading-tight">
                         {step.title}
                     </h3>
-                    <p className="text-gray-400 text-xl leading-relaxed font-light">
+                    <p className="text-muted-foreground text-xl leading-relaxed font-light">
                         {step.description}
                     </p>
                 </div>
 
                 {step.details && (
-                    <div className="glass-card p-10 rounded-2xl border border-white/5 space-y-6">
+                    <div className="surface-panel p-10 rounded-2xl space-y-6">
                         <div className="flex items-center gap-3 text-gold">
                             <CheckCircle2 className="h-5 w-5" />
                             <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Key Details</span>
                         </div>
                         <ul className="grid gap-4">
                             {step.details.map((detail: string, idx: number) => (
-                                <li key={idx} className="flex items-start gap-4 text-gray-300 font-light">
+                                <li key={idx} className="flex items-start gap-4 text-foreground font-light">
                                     <span className="w-1.5 h-1.5 rounded-full bg-gold/60 mt-2 shrink-0" />
                                     <span className="text-lg">{detail}</span>
                                 </li>

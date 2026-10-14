@@ -113,16 +113,16 @@ export function AccountNav({
                                 href={item.href}
                                 onClick={onNavigate}
                                 className={cn(
-                                    'flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200',
+                                    'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors',
                                     isActive
-                                        ? 'bg-primary/10 font-semibold text-primary shadow-sm'
-                                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                        ? 'bg-white/10 font-semibold text-white'
+                                        : 'text-[var(--sidebar-navy-muted)] hover:bg-white/5 hover:text-white'
                                 )}
                             >
                                 <item.icon
                                     className={cn(
                                         'h-4 w-4',
-                                        isActive ? 'text-primary' : 'text-muted-foreground'
+                                        isActive ? 'text-[var(--lux-gold-bright)]' : 'text-[var(--sidebar-navy-muted)]'
                                     )}
                                 />
                                 {item.title}
@@ -130,8 +130,8 @@ export function AccountNav({
                         )
                     })}
 
-                    <div className="mt-4 space-y-2 border-t pt-4">
-                        <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    <div className="mt-4 space-y-2 border-t border-white/10 pt-4">
+                        <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--sidebar-navy-muted)]">
                             Preferred vendor
                         </p>
                         {partnerStatus === 'active' ? (
@@ -143,16 +143,16 @@ export function AccountNav({
                                         href={item.href}
                                         onClick={onNavigate}
                                         className={cn(
-                                            'flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200',
+                                            'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors',
                                             isActive
-                                                ? 'bg-primary/10 font-semibold text-primary shadow-sm'
-                                                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                                ? 'bg-white/10 font-semibold text-white'
+                                                : 'text-[var(--sidebar-navy-muted)] hover:bg-white/5 hover:text-white'
                                         )}
                                     >
                                         <item.icon
                                             className={cn(
                                                 'h-4 w-4',
-                                                isActive ? 'text-primary' : 'text-muted-foreground'
+                                                isActive ? 'text-[var(--lux-gold-bright)]' : 'text-[var(--sidebar-navy-muted)]'
                                             )}
                                         />
                                         {item.title}
@@ -164,10 +164,10 @@ export function AccountNav({
                                 href="/account/partner/apply"
                                 onClick={onNavigate}
                                 className={cn(
-                                    'flex items-center gap-3 rounded-lg px-3 py-2 transition-all duration-200',
+                                    'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors',
                                     pathname.startsWith('/account/partner')
-                                        ? 'bg-primary/10 font-semibold text-primary shadow-sm'
-                                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                                        ? 'bg-white/10 font-semibold text-white'
+                                        : 'text-[var(--sidebar-navy-muted)] hover:bg-white/5 hover:text-white'
                                 )}
                             >
                                 <ClipboardList className="h-4 w-4" />
@@ -181,10 +181,10 @@ export function AccountNav({
                     </div>
                 </nav>
             </div>
-            <div className="mt-auto border-t p-4">
+            <div className="mt-auto border-t border-white/10 p-4">
                 <Button
                     variant="ghost"
-                    className="w-full justify-start gap-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    className="w-full justify-start gap-2 rounded-xl text-[var(--sidebar-navy-muted)] hover:bg-white/10 hover:text-white"
                     onClick={handleLogout}
                 >
                     <LogOut className="h-4 w-4" />
@@ -198,13 +198,13 @@ export function AccountNav({
 /** Desktop-only sidebar. Mobile uses the bottom bar + header sheet menu. */
 export function AccountSidebar({ partnerStatus = 'none' }: { partnerStatus?: PartnerNavStatus }) {
     return (
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r bg-background text-foreground md:flex">
-            <div className="flex h-16 items-center border-b px-6">
-                <Link
-                    className="flex items-center gap-2 font-serif text-lg font-semibold tracking-wide"
-                    href="/"
-                >
-                    <span>PrimeLux Portal</span>
+        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col bg-[var(--sidebar-navy)] text-[var(--sidebar-navy-text)] md:flex">
+            <div className="flex h-16 items-center gap-3 border-b border-white/10 px-5">
+                <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-sm font-bold text-[var(--sidebar-navy)]">
+                    P
+                </span>
+                <Link className="text-sm font-semibold tracking-tight text-white" href="/">
+                    PrimeLux
                 </Link>
             </div>
             <AccountNav partnerStatus={partnerStatus} />

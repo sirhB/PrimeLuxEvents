@@ -62,22 +62,22 @@ function SidebarItem({
       }}
       aria-current={isActive ? 'page' : undefined}
       className={cn(
-        'relative flex items-center gap-3 rounded-md px-2.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent-gold)]/60',
+        'relative flex items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lux-gold-bright)]/70',
         isActive
-          ? 'bg-[var(--dashboard-card-hover)] text-[var(--dashboard-text)]'
-          : 'text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)]/70 hover:text-[var(--dashboard-text)]',
+          ? 'bg-[var(--sidebar-navy-active)] text-white'
+          : 'text-[var(--sidebar-navy-muted)] hover:bg-[var(--sidebar-navy-hover)] hover:text-white',
       )}
     >
       {isActive && (
         <span
           aria-hidden
-          className="absolute left-0 top-1/2 h-5 w-[var(--dashboard-rail)] -translate-y-1/2 rounded-r-full bg-[var(--dashboard-accent-gold)]"
+          className="absolute left-0 top-1/2 h-5 w-[var(--dashboard-rail)] -translate-y-1/2 rounded-r-full bg-[var(--lux-gold-bright)]"
         />
       )}
       <Icon
         className={cn(
           'h-[18px] w-[18px] shrink-0',
-          isActive ? 'text-[var(--dashboard-accent-gold)]' : 'opacity-80',
+          isActive ? 'text-[var(--lux-gold-bright)]' : 'opacity-80',
         )}
         aria-hidden
       />
@@ -92,7 +92,7 @@ function SidebarItem({
         <TooltipTrigger asChild>{content}</TooltipTrigger>
         <TooltipContent
           side="right"
-          className="border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] text-[var(--dashboard-text)]"
+          className="border border-white/10 bg-[var(--lux-navy-soft)] text-white"
         >
           {item.label}
         </TooltipContent>
@@ -128,7 +128,7 @@ function SidebarSection({
 
   if (isCollapsed) {
     return (
-      <div className="mb-2 space-y-0.5 border-t border-[var(--dashboard-border)]/60 pt-2 first:border-0 first:pt-0">
+        <div className="mb-2 space-y-0.5 border-t border-white/10 pt-2 first:border-0 first:pt-0">
         {items.map((item) => (
           <SidebarItem
             key={item.href}
@@ -149,7 +149,7 @@ function SidebarSection({
         onClick={() => setIsOpen((v) => !v)}
         aria-expanded={isOpen}
         aria-controls={panelId}
-        className="mb-0.5 flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--dashboard-text-muted)] transition-colors hover:bg-[var(--dashboard-card)]/60 hover:text-[var(--dashboard-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent-gold)]/60"
+        className="mb-0.5 flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--sidebar-navy-muted)] transition-colors hover:bg-[var(--sidebar-navy-hover)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lux-gold-bright)]/70"
       >
         <span>{title}</span>
         <ChevronDown
@@ -247,30 +247,30 @@ export function ModernSidebar() {
         id="admin-mobile-nav"
         aria-label="Admin navigation"
         className={cn(
-          'fixed inset-y-0 left-0 z-[70] flex flex-col border-r border-[var(--dashboard-border)] bg-[var(--dashboard-surface)] transition-[width,transform] duration-300 ease-out',
-          isCollapsed ? 'md:w-[4.5rem]' : 'md:w-60',
+          'fixed inset-y-0 left-0 z-[70] flex flex-col border-r border-white/10 bg-[var(--sidebar-navy)] text-[var(--sidebar-navy-text)] transition-[width,transform] duration-300 ease-out',
+          isCollapsed ? 'md:w-20' : 'md:w-60',
           'w-60',
           'md:translate-x-0',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full',
           'pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]',
         )}
       >
-        <div className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-[var(--dashboard-border)] px-3">
+        <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-white/10 px-3">
           <Link
             href="/admin"
             className={cn(
-              'flex min-w-0 items-center gap-2.5 overflow-hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent-gold)]/60',
+              'flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lux-gold-bright)]/70',
               isCollapsed && !isMobileOpen && 'md:justify-center',
             )}
             onClick={() => setIsMobileOpen(false)}
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[var(--dashboard-accent-gold)] text-sm font-bold text-[#000000]">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white text-sm font-bold text-[var(--sidebar-navy)]">
               P
             </div>
             {(!isCollapsed || isMobileOpen) && (
               <div className="min-w-0 leading-tight">
-                <p className="truncate font-serif text-lg text-[var(--dashboard-text)]">PrimeLux</p>
-                <p className="truncate text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--dashboard-text-muted)]">
+                <p className="truncate text-sm font-semibold tracking-tight text-white">PrimeLux</p>
+                <p className="truncate text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--sidebar-navy-muted)]">
                   Ops
                 </p>
               </div>
@@ -281,7 +281,7 @@ export function ModernSidebar() {
             variant="ghost"
             size="icon"
             className={cn(
-              'hidden h-8 w-8 text-[var(--dashboard-text-muted)] hover:bg-[var(--dashboard-card-hover)] hover:text-[var(--dashboard-text)] md:flex',
+              'hidden h-8 w-8 text-[var(--sidebar-navy-muted)] hover:bg-white/10 hover:text-white md:flex',
               isCollapsed && 'mx-auto',
             )}
             onClick={() => {
@@ -297,7 +297,7 @@ export function ModernSidebar() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-[var(--dashboard-text-muted)] md:hidden"
+            className="h-8 w-8 text-[var(--sidebar-navy-muted)] hover:bg-white/10 hover:text-white md:hidden"
             onClick={() => setIsMobileOpen(false)}
             aria-label="Close menu"
           >
@@ -322,25 +322,25 @@ export function ModernSidebar() {
           ))}
         </nav>
 
-        <div className="shrink-0 border-t border-[var(--dashboard-border)] p-2">
+        <div className="shrink-0 border-t border-white/10 p-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
                 className={cn(
-                  'flex w-full items-center gap-2.5 rounded-md p-2 text-left outline-none transition-colors hover:bg-[var(--dashboard-card-hover)] focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent-gold)]/60',
+                  'flex w-full items-center gap-2.5 rounded-xl p-2 text-left outline-none transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[var(--lux-gold-bright)]/70',
                   isCollapsed && !isMobileOpen && 'justify-center',
                 )}
               >
-                <Avatar className="h-8 w-8 border border-[var(--dashboard-border)]">
-                  <AvatarFallback className="bg-[var(--dashboard-card)] text-[10px] font-semibold text-[var(--dashboard-text-muted)]">
+                <Avatar className="h-8 w-8 border border-white/15">
+                  <AvatarFallback className="bg-white/10 text-[10px] font-semibold text-white">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
                 {(!isCollapsed || isMobileOpen) && (
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-semibold text-[var(--dashboard-text)]">{displayName}</p>
-                    <p className="truncate text-[10px] text-[var(--dashboard-text-muted)]">
+                    <p className="truncate text-xs font-semibold text-white">{displayName}</p>
+                    <p className="truncate text-[10px] text-[var(--sidebar-navy-muted)]">
                       {user?.email || 'Signed in'}
                     </p>
                   </div>

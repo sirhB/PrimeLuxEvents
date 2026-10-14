@@ -10,9 +10,18 @@ export async function POST(request: NextRequest) {
         const body = await request.json()
         const { email, role_ids } = body
 
-        if (!email || !role_ids || !Array.isArray(role_ids) || role_ids.length === 0) {
+        const emailValue = typeof email === 'string' ? email.trim().toLowerCase() : ''
+        if (
+            !emailValue ||
+            emailValue.length > 200 ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue) ||
+            !role_ids ||
+            !Array.isArray(role_ids) ||
+            role_ids.length === 0 ||
+            role_ids.length > 20
+        ) {
             return NextResponse.json(
-                { error: 'Email and at least one role are required' },
+                { error: 'A valid email and at least one role are required' },
                 { status: 400 }
             )
         }
@@ -27,7 +36,7 @@ export async function POST(request: NextRequest) {
         const { data: existingInvitation } = await supabase
             .from('user_invitations')
             .select('id, status')
-            .eq('email', email.toLowerCase().trim())
+            .eq('email', emailValue)
             .single()
 
         if (existingInvitation?.status === 'accepted') {
@@ -38,7 +47,7 @@ export async function POST(request: NextRequest) {
         }
 
         const invitationData = {
-            email: email.toLowerCase().trim(),
+            email: emailValue,
             role_ids,
             temp_password: null,
             invitation_token,

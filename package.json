@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "test:security": "node --experimental-strip-types scripts/check-safe-path.mjs",
     "seed:new-db": "node scripts/seed-new-database.mjs"
   },
   "dependencies": {
@@ -65,7 +66,7 @@
     "html5-qrcode": "^2.3.8",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
-    "next": "16.0.10",
+    "next": "16.4.0",
     "next-themes": "^0.4.6",
     "pg": "^8.23.0",
     "qrcode": "^1.5.4",
@@ -96,7 +97,7 @@
     "@types/react-dom": "^19",
     "cheerio": "^1.1.2",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.0.10",
+    "eslint-config-next": "16.4.0",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",

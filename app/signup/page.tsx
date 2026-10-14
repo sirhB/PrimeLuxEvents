@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { safeInternalPath } from '@/lib/security/safe-path'
+import { assertAuthAttemptAllowed } from '@/app/actions/auth-rate-limit'
 
 function SignupForm() {
   const [fullName, setFullName] = useState('')
@@ -17,11 +19,17 @@ function SignupForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams.get('next') || '/account'
+  const next = safeInternalPath(searchParams.get('next'), '/account')
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    const gate = await assertAuthAttemptAllowed('signup')
+    if (!gate.ok) {
+      toast.error(gate.error)
+      setLoading(false)
+      return
+    }
     const supabase = createClient()
 
     try {
