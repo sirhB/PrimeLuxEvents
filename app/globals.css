@@ -670,10 +670,6 @@
   animation: reveal-cue 1.8s ease-in-out 1.6s infinite;
 }
 
-.scroll-story-static {
-  display: none;
-}
-
 @keyframes reveal-curtain-left {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(-105%, 0, 0); }
@@ -705,6 +701,4 @@
   .reveal-curtain-left { transform: translate3d(-105%, 0, 0); }
   .reveal-curtain-right { transform: translate3d(105%, 0, 0); }
   .reveal-letter { opacity: 1; transform: none; }
-  .scroll-story-pin { display: none !important; }
-  .scroll-story-static { display: block !important; }
 }

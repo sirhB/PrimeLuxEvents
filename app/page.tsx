@@ -5,6 +5,7 @@ import { loadPublicCatalog } from "@/lib/catalog/public-catalog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { HomePackagesSection } from "@/components/home-packages-section"
 import { GrandRevealHero } from "@/components/home/grand-reveal-hero"
+import { ScrollStory } from "@/components/home/scroll-story"
 import { ArrowRight } from "lucide-react"
 
 const sectionFallback = (
@@ -19,9 +20,6 @@ const sectionFallback = (
   </div>
 )
 
-const ScrollStory = nextDynamic(() =>
-  import("@/components/home/scroll-story").then((m) => m.ScrollStory),
-)
 const ShowroomCarousel = nextDynamic(() =>
   import("@/components/catalog/showroom-carousel").then((m) => m.ShowroomCarousel),
 )
