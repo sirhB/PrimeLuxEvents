@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { EditableContent } from "@/components/admin/editable-content"
 import { NonEditableOverlay } from "@/components/admin/non-editable-overlay"
 import { COMPANY } from "@/lib/company"
+import Link from "next/link"
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion"
 
 interface ContactPageContentProps {
@@ -32,8 +33,8 @@ export function ContactPageContent({ content, settings = {}, isEditing = false }
                     >
                         <div className="space-y-6">
                             <p className="lux-label">Connect with us</p>
-                            <h1 className="text-5xl md:text-7xl font-serif font-light tracking-tighter text-foreground leading-[0.95]">
-                                Concierge <span className="italic text-gold">inquiry</span>
+                            <h1 className="font-serif text-5xl font-medium leading-[0.95] text-[var(--theme-dark)] md:text-7xl">
+                                Write to the house
                             </h1>
                             <EditableContent
                                 contentKey="contact.hero.description"
@@ -42,6 +43,9 @@ export function ContactPageContent({ content, settings = {}, isEditing = false }
                                 as="p"
                                 className="text-muted-foreground text-lg font-light leading-relaxed max-w-md"
                             />
+                            <Link href="/plan" className="inline-block text-[11px] uppercase tracking-[0.2em] underline">
+                              Plan your event
+                            </Link>
                         </div>
 
                         <div className="space-y-8">
@@ -97,8 +101,8 @@ function ContactInfoItem({ icon: Icon, title, value, href }: { icon: any; title:
 
     return (
         <div className="flex items-start gap-5 group">
-            <div className="h-12 w-12 rounded-[var(--radius)] bg-[var(--surface-elevated)] border border-border flex items-center justify-center shrink-0 group-hover:border-gold/40 transition-colors">
-                <Icon className="h-5 w-5 text-gold stroke-[1.5]" />
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center border border-[var(--theme-dark)]/15">
+                <Icon className="h-4 w-4 stroke-[1.5] text-[var(--theme-dark)]" />
             </div>
             <div className="space-y-1 pt-1">
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{title}</p>

@@ -1,235 +1,147 @@
 'use client'
 
-import Link from "next/link"
-import { Menu, Search, X, Phone, Mail, Instagram } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { CartSheet } from "@/components/cart-sheet"
-import { usePathname } from "next/navigation"
-import { SearchTrigger } from "@/components/search-trigger"
-import { SearchModal } from "@/components/search-modal"
-import { motion, AnimatePresence } from "framer-motion"
-import { cn } from "@/lib/utils"
-import { PwaBackButton } from "@/components/pwa/pwa-back-button"
-import { COMPANY } from "@/lib/company"
-import { ThemeSwitcher } from "@/components/theme-switcher"
-import { BrandMonogram } from "@/components/brand/brand-logo"
+import Link from 'next/link'
+import { Menu, Phone } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { CartSheet } from '@/components/cart-sheet'
+import { SearchTrigger } from '@/components/search-trigger'
+import { SearchModal } from '@/components/search-modal'
+import { cn } from '@/lib/utils'
+import { PwaBackButton } from '@/components/pwa/pwa-back-button'
+import { COMPANY } from '@/lib/company'
+import { ThemeSwitcher } from '@/components/theme-switcher'
+import { BrandMonogram } from '@/components/brand/brand-logo'
+import { SuiteToggle } from '@/components/suite/suite-toggle'
+import { useSuite } from '@/components/suite/use-suite'
 
-interface SiteHeaderProps {
-  initialSettings?: {
-    company_email: string
-    company_phone: string
-  }
-}
+const VENUE_LINKS = [
+  { href: '/venues', label: 'Venues' },
+  { href: '/plan', label: 'Plan' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/about', label: 'About' },
+]
 
-export function SiteHeader({
-  initialSettings = {
-    company_email: COMPANY.email,
-    company_phone: COMPANY.phone,
-  },
-}: SiteHeaderProps) {
+const RENTAL_LINKS = [
+  { href: '/catalog', label: 'Collection' },
+  { href: '/packages', label: 'Packages' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/about', label: 'About' },
+]
+
+export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
-  const headerRef = useRef<HTMLElement>(null)
-  const settings = initialSettings
+  const { suite } = useSuite()
+  const links = suite === 'venue' ? VENUE_LINKS : RENTAL_LINKS
+  const onHero = pathname === '/' && !scrolled
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    const onScroll = () => setScrolled(window.scrollY > 12)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   useEffect(() => {
-    const updateHeaderHeight = () => {
-      if (headerRef.current) {
-        document.documentElement.style.setProperty('--header-height', `${headerRef.current.offsetHeight}px`)
-      }
+    const header = document.querySelector('[data-site-header]')
+    if (!header) return
+    const write = () => {
+      document.documentElement.style.setProperty('--header-height', `${header.getBoundingClientRect().height}px`)
     }
+    write()
+    window.addEventListener('resize', write)
+    return () => window.removeEventListener('resize', write)
+  }, [suite, scrolled])
 
-    updateHeaderHeight()
-    window.addEventListener('resize', updateHeaderHeight)
-
-    // Check periodically during transition to ensure smoothness
-    const interval = setInterval(updateHeaderHeight, 50)
-    const timeout = setTimeout(() => {
-      clearInterval(interval)
-      updateHeaderHeight()
-    }, 600)
-
-    return () => {
-      window.removeEventListener('resize', updateHeaderHeight)
-      clearInterval(interval)
-      clearTimeout(timeout)
-    }
-  }, [scrolled])
-
-  if (pathname?.startsWith('/admin')) {
-    return null
-  }
-
-  const navLinks = [
-    { href: "/catalog", label: "Collection" },
-    { href: "/packages", label: "Packages" },
-    { href: "/gallery", label: "Portfolio" },
-    { href: "/how-it-works", label: "Process" },
-    { href: "/about", label: "About" },
-  ]
+  if (pathname?.startsWith('/admin')) return null
 
   return (
     <>
-      <div className="bg-[var(--surface)] text-foreground py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.2em] relative z-50 border-b border-border">
-        <div className="container mx-auto flex justify-between items-center">
-          <p className="hidden md:block text-muted-foreground">
-            Serving {COMPANY.serviceArea}
-          </p>
-            <div className="flex items-center gap-6 w-full md:w-auto justify-center md:justify-end">
-            <a href={`tel:${settings.company_phone.replace(/\D/g, '')}`} className="hover:text-gold transition-colors flex items-center gap-2">
-              <Phone className="h-3 w-3" /> {settings.company_phone}
-            </a>
-            <a href={`mailto:${settings.company_email}`} className="hover:text-gold transition-colors flex items-center gap-2 hidden sm:flex">
-              <Mail className="h-3 w-3" /> {settings.company_email}
-            </a>
-            <Link href="/account" className="hover:text-gold transition-colors hidden sm:inline">
-              Portal
-            </Link>
-            <ThemeSwitcher className="h-8 border-transparent px-2 normal-case tracking-normal" />
-          </div>
-        </div>
-      </div>
-
       <header
-        ref={headerRef}
+        data-site-header
         className={cn(
-          "sticky top-0 z-50 w-full transition-all duration-500 bg-[var(--linen)]/90 backdrop-blur-xl border-b border-border",
-          scrolled ? "py-3" : "py-5"
+          'sticky top-0 z-50 border-b transition-colors',
+          onHero
+            ? 'border-transparent bg-[var(--suite-paper)]/80 backdrop-blur-md'
+            : 'border-[var(--theme-dark)]/10 bg-[var(--suite-paper)]/95 backdrop-blur-md',
         )}
       >
-
-        <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
-          {/* Mobile Menu Trigger */}
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 md:h-16 md:px-6">
           <div className="flex items-center lg:hidden">
             <PwaBackButton isDark={false} />
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Open menu"
-                  className="hover:bg-gold/10 transition-colors text-black"
-                >
-                  <Menu className="h-6 w-6" />
-                  <span className="sr-only">Open menu</span>
+                <Button variant="ghost" size="icon" aria-label="Open menu" className="text-[var(--theme-dark)]">
+                  <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-full sm:w-[400px] bg-[var(--surface)] border-r border-border p-0 text-foreground">
-                <div className="flex flex-col h-full">
-                  <div className="p-8 border-b border-border">
+              <SheetContent side="left" className="w-full bg-[var(--suite-paper)] p-0 sm:w-[380px]">
+                <div className="flex h-full flex-col">
+                  <div className="border-b border-[var(--theme-dark)]/10 p-6">
                     <Link href="/" onClick={() => setIsOpen(false)} aria-label="Prime Lux Events" className="brand-lockup inline-flex">
-                      <BrandMonogram className="h-14" />
+                      <BrandMonogram className="h-12" />
                     </Link>
                   </div>
-                  <nav className="flex-1 px-8 py-12 flex flex-col gap-8">
-                    {navLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setIsOpen(false)}
-                        className="text-4xl font-serif font-light hover:text-gold transition-colors"
-                      >
+                  <nav className="flex flex-1 flex-col gap-5 px-6 py-8">
+                    {links.map((link) => (
+                      <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className="font-serif text-4xl font-medium">
                         {link.label}
                       </Link>
                     ))}
-                    <Link
-                      href="/contact"
-                      onClick={() => setIsOpen(false)}
-                      className="text-4xl font-serif font-light text-gold"
-                    >
-                      Inquire
+                    <Link href="/plan" onClick={() => setIsOpen(false)} className="font-serif text-4xl font-medium italic">
+                      Plan your event
                     </Link>
-                    <Link
-                      href="/account"
-                      onClick={() => setIsOpen(false)}
-                      className="text-2xl font-serif font-light text-muted-foreground"
-                    >
-                      Client Portal
+                    <Link href={suite === 'venue' ? '/catalog' : '/venues'} onClick={() => setIsOpen(false)} className="text-sm uppercase tracking-[0.18em] text-[var(--theme-muted)]">
+                      {suite === 'venue' ? 'Rentals collection' : 'Venue rooms'}
                     </Link>
                     <ThemeSwitcher />
                   </nav>
-                  <div className="p-8 border-t border-border">
-                    <a
-                      href="https://www.instagram.com/primeluxevents/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex text-muted-foreground hover:text-gold transition-colors"
-                      aria-label="Instagram"
-                    >
-                      <Instagram className="h-5 w-5" />
-                    </a>
-                  </div>
+                  <a href={`tel:${COMPANY.phone.replace(/\D/g, '')}`} className="flex items-center gap-2 border-t border-[var(--theme-dark)]/10 px-6 py-5 text-sm">
+                    <Phone className="h-4 w-4" /> {COMPANY.phone}
+                  </a>
                 </div>
               </SheetContent>
             </Sheet>
           </div>
 
-          {/* Logo */}
-          <Link href="/" aria-label="Prime Lux Events" className="brand-lockup inline-flex items-center">
-            <BrandMonogram className="h-12 sm:h-14" />
+          <Link href="/" aria-label="Prime Lux Events" className="brand-lockup inline-flex">
+            <BrandMonogram className="h-10 md:h-12" />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-10">
-            {navLinks.map((link) => (
+          <nav className="hidden items-center gap-8 lg:flex">
+            {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "text-[11px] font-bold uppercase tracking-[0.2em] transition-all relative group",
-                  pathname === link.href
-                    ? "text-gold"
-                    : "text-gray-600 hover:text-black"
+                  'text-[11px] uppercase tracking-[0.22em]',
+                  pathname === link.href ? 'text-[var(--theme-dark)]' : 'text-[var(--theme-muted)] hover:text-[var(--theme-dark)]',
                 )}
               >
                 {link.label}
-                <span className={cn(
-                  "absolute -bottom-1 left-0 w-0 h-px bg-gold transition-all duration-300 group-hover:w-full",
-                  pathname === link.href && "w-full"
-                )} />
               </Link>
             ))}
           </nav>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2 md:gap-6">
-            <div className="text-black">
-              <SearchTrigger onClick={() => setIsSearchOpen(true)} />
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="hidden lg:block">
+              <SuiteToggle />
             </div>
-
-            <Link
-              href="/account"
-              className={cn(
-                "hidden lg:block text-[11px] font-bold uppercase tracking-[0.2em] transition-colors",
-                "text-gray-600 hover:text-black"
-              )}
-            >
-              Portal
+            <SearchTrigger onClick={() => setIsSearchOpen(true)} />
+            <ThemeSwitcher className="hidden h-9 px-2 lg:inline-flex" />
+            <Link href="/plan" className="hidden text-[11px] uppercase tracking-[0.2em] md:inline">
+              Plan
             </Link>
-
-            <Link
-              href="/contact"
-              className="hidden md:inline-flex lux-cta !min-h-10 !px-5 text-[10px]"
-            >
-              Inquire
-            </Link>
-
-            <div className="relative text-black">
-              <CartSheet />
-            </div>
+            <CartSheet />
           </div>
+        </div>
+        <div className="flex justify-center border-t border-[var(--theme-dark)]/10 px-4 py-2 lg:hidden">
+          <SuiteToggle />
         </div>
       </header>
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />

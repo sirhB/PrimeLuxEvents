@@ -19,6 +19,8 @@ export const ADMIN_ROUTE_RULES: AdminRouteRule[] = [
   { prefix: '/admin/packages/new', permission: 'catalog.create' },
   { prefix: '/admin/packages', permission: 'catalog.view' },
   { prefix: '/admin/consultations', permission: 'consultations.view' },
+  { prefix: '/admin/venue', permission: 'venues.view' },
+  { prefix: '/admin/event-plans', permission: 'consultations.view' },
   { prefix: '/admin/customers', permission: 'customers.view' },
   { prefix: '/admin/messages', permission: 'customers.view' },
   { prefix: '/admin/partners', permission: 'customers.view' },

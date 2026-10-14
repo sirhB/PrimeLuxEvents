@@ -22,7 +22,7 @@ export function SiteLayout({
   const isPortal = isAdmin || isAccount || isShareInvoice || isInnovate
 
   return (
-    <div className="ambient-bg flex min-h-screen flex-col">
+    <div className={cn("ambient-bg flex min-h-screen flex-col", !isPortal && "editorial-site")}>
       {!isPortal && header}
       {isPortal ? (
         <div className={cn("relative z-[1] flex-1")}>{children}</div>

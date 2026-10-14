@@ -32,6 +32,8 @@ import {
   Handshake,
   Sparkles,
   KeyRound,
+  Landmark,
+  NotebookPen,
 } from 'lucide-react'
 
 export type AdminNavItem = {
@@ -83,6 +85,25 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         href: '/innovate',
         permission: 'innovate.view',
         keywords: ['studio', 'visualizer', 'atelier', 'backdrop', 'vip', 'custom'],
+      },
+    ],
+  },
+  {
+    title: 'Venue',
+    items: [
+      {
+        icon: Landmark,
+        label: 'Venue desk',
+        href: '/admin/venue',
+        permission: 'venues.view',
+        keywords: ['venue', 'crm', 'tours', 'bookings', 'rooms'],
+      },
+      {
+        icon: NotebookPen,
+        label: 'Event plans',
+        href: '/admin/event-plans',
+        permission: 'consultations.view',
+        keywords: ['plan', 'inquiry', 'budget', 'guests'],
       },
     ],
   },

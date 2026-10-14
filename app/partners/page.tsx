@@ -1,46 +1,22 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 
 export default function PartnersMarketingPage() {
   return (
-    <div className="bg-[var(--linen,#f4f7f5)]">
-      <section className="relative min-h-[78vh] overflow-hidden bg-gradient-to-br from-[#1a2420] via-[#243830] to-[#2f6b57] px-6 py-24 text-white md:px-12">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              'radial-gradient(ellipse at 15% 20%, rgba(47,107,87,0.45), transparent 50%), url(/open-planner.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            mixBlendMode: 'overlay',
-          }}
-        />
-        <div className="relative mx-auto flex max-w-3xl flex-col justify-end gap-6 pt-24">
-          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[var(--champagne,#2f6b57)]">
-            Preferred vendor program
-          </p>
-          <h1 className="font-serif text-5xl font-light tracking-tight md:text-6xl">
-            PrimeLux
-          </h1>
-          <p className="max-w-md text-base font-light leading-relaxed text-white/75">
-            Trade rates and client share carts for planners and decorators who list us as their
-            preferred rental house.
-          </p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <Button asChild className="rounded-full bg-[var(--champagne,#2f6b57)] text-black hover:bg-white">
-              <Link href="/signup?next=/account/partner/apply" className="gap-2">
-                Apply to partner <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="rounded-full border-white/30 bg-transparent text-white hover:bg-white/10"
-            >
-              <Link href="/login?next=/account/partner/apply">Partner login</Link>
-            </Button>
-          </div>
+    <div>
+      <section className="mx-auto max-w-3xl px-6 py-28 md:px-8 md:py-36">
+        <p className="lux-label">Preferred vendors</p>
+        <h1 className="mt-4 font-serif text-5xl font-medium leading-none md:text-7xl">Partners</h1>
+        <p className="mt-5 max-w-md font-light leading-relaxed text-[var(--theme-muted)]">
+          Trade rates and client share carts for planners and decorators who list Prime Lux as their rental house.
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/signup?next=/account/partner/apply" className="lux-cta">
+            Apply <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link href="/login?next=/account/partner/apply" className="lux-cta-ghost">
+            Partner login
+          </Link>
         </div>
       </section>
 
