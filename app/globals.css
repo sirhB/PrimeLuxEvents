@@ -646,3 +646,65 @@
 #admin-main .hover\:bg-gray-50:hover {
   background-color: #f6f4ef;
 }
+
+/* Grand reveal — transform and opacity only, so the curtains stay on the compositor. */
+.reveal-curtain {
+  will-change: transform;
+}
+
+.reveal-curtain-left {
+  animation: reveal-curtain-left 1.45s cubic-bezier(0.77, 0, 0.18, 1) 0.15s forwards;
+}
+
+.reveal-curtain-right {
+  animation: reveal-curtain-right 1.45s cubic-bezier(0.77, 0, 0.18, 1) 0.15s forwards;
+}
+
+.reveal-letter {
+  display: inline-block;
+  opacity: 0;
+  animation: reveal-letter 0.55s ease forwards;
+}
+
+.reveal-cue {
+  animation: reveal-cue 1.8s ease-in-out 1.6s infinite;
+}
+
+.scroll-story-static {
+  display: none;
+}
+
+@keyframes reveal-curtain-left {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-105%, 0, 0); }
+}
+
+@keyframes reveal-curtain-right {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(105%, 0, 0); }
+}
+
+@keyframes reveal-letter {
+  from { opacity: 0; transform: translate3d(0, 0.4em, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes reveal-cue {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, 6px, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-curtain-left,
+  .reveal-curtain-right,
+  .reveal-letter,
+  .reveal-cue {
+    animation: none !important;
+  }
+
+  .reveal-curtain-left { transform: translate3d(-105%, 0, 0); }
+  .reveal-curtain-right { transform: translate3d(105%, 0, 0); }
+  .reveal-letter { opacity: 1; transform: none; }
+  .scroll-story-pin { display: none !important; }
+  .scroll-story-static { display: block !important; }
+}

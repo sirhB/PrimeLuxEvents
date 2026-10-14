@@ -1,8 +1,10 @@
 import nextDynamic from "next/dynamic"
 import Link from "next/link"
 import { getSiteContent } from "@/lib/content"
+import { loadPublicCatalog } from "@/lib/catalog/public-catalog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { HomePackagesSection } from "@/components/home-packages-section"
+import { GrandRevealHero } from "@/components/home/grand-reveal-hero"
 import { ArrowRight } from "lucide-react"
 
 const sectionFallback = (
@@ -17,8 +19,11 @@ const sectionFallback = (
   </div>
 )
 
-const HeroSection = nextDynamic(() =>
-  import("@/components/hero-section").then((m) => m.HeroSection),
+const ScrollStory = nextDynamic(() =>
+  import("@/components/home/scroll-story").then((m) => m.ScrollStory),
+)
+const ShowroomCarousel = nextDynamic(() =>
+  import("@/components/catalog/showroom-carousel").then((m) => m.ShowroomCarousel),
 )
 const FeaturedCategories = nextDynamic(
   () =>
@@ -34,16 +39,20 @@ const InteractiveProcess = nextDynamic(
 export const revalidate = 60
 
 export default async function Home() {
-  const content = await getSiteContent()
+  const [content, catalog] = await Promise.all([
+    getSiteContent(),
+    loadPublicCatalog(),
+  ])
 
   return (
     <main className="flex min-h-screen flex-col">
-      <HeroSection
-        title={content["home.hero.title"]}
+      <GrandRevealHero
         subtitle={content["home.hero.subtitle"]}
         ctaPrimary={content["home.hero.cta_primary"]}
         ctaSecondary={content["home.hero.cta_secondary"]}
       />
+      <ScrollStory />
+      <ShowroomCarousel pieces={catalog.showroom} variant="teaser" />
       <InteractiveProcess />
       <FeaturedCategories />
       <HomePackagesSection />

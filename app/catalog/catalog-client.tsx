@@ -1,556 +1,261 @@
 'use client'
 
-import { useState, useMemo, useEffect, useTransition } from 'react'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { ProductCard } from '@/components/product-card'
-import { CategoryCard } from '@/components/catalog/category-card'
-import { FeaturedProductCard } from '@/components/catalog/featured-product-card'
-import { DealCard } from '@/components/catalog/deal-card'
-import { CarouselSection } from '@/components/catalog/carousel-section'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, LayoutGrid, List, Filter, X, Menu, Search, SlidersHorizontal, Grid3X3, Columns, ArrowRight } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
+import { useEffect, useMemo, useState, useTransition } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Search, SlidersHorizontal } from 'lucide-react'
+import { ShowroomCarousel } from '@/components/catalog/showroom-carousel'
+import { EditorialCard } from '@/components/catalog/editorial-card'
+import { filterCatalogProducts, type PublicCategory, type PublicProduct } from '@/lib/catalog/catalog-view'
 import { cn, formatCurrency } from '@/lib/utils'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-
-interface Product {
-    id: string
-    name: string
-    description: string | null
-    price: number
-    image_url: string | null
-    category_id: string | null
-    categories?: { name: string } | null
-    is_featured?: boolean
-    rental_price_daily?: number
-    created_at?: string
-    slug?: string
-}
-
-interface Category {
-    id: string
-    name: string
-    image_url?: string | null
-    is_featured?: boolean
-}
-
-interface Package {
-    id: string
-    name: string
-    description: string | null
-    price: number
-    image_url: string | null
-    is_featured?: boolean
-}
 
 interface CatalogClientProps {
-    heroTitle?: string
-    products: Product[]
-    categories: Category[]
-    packages: Package[]
+  heroTitle?: string
+  products: PublicProduct[]
+  categories: PublicCategory[]
+  showroom: PublicProduct[]
 }
 
-export default function CatalogClient({ heroTitle, products, categories, packages }: CatalogClientProps) {
-    const searchParams = useSearchParams()
-    const router = useRouter()
-    const pathname = usePathname()
+const PAGE_SIZE = 8
 
-    const [viewMode, setViewMode] = useState<'grid' | 'masonry'>('grid')
-    const [inputValue, setInputValue] = useState('')
-    const [searchQuery, setSearchQuery] = useState('')
-    const [sortBy, setSortBy] = useState<'name' | 'price-low' | 'price-high' | 'newest'>('name')
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-    const [isPending, startTransition] = useTransition()
+export default function CatalogClient({ heroTitle, products, categories, showroom }: CatalogClientProps) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const [inputValue, setInputValue] = useState(searchParams.get('search') || '')
+  const [sortBy, setSortBy] = useState<'name' | 'price-low' | 'price-high' | 'newest'>('name')
+  const [pageState, setPageState] = useState({ key: '', page: 0 })
+  const [remote, setRemote] = useState<{ key: string; products: PublicProduct[] } | null>(null)
+  const [isPending, startTransition] = useTransition()
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
-    // Initialize results with server-rendered initial products
-    const [searchResults, setSearchResults] = useState<Product[]>(products)
+  const selectedCategory = searchParams.get('category')
+  const browsingProducts = Boolean(selectedCategory || inputValue.trim())
+  const viewKey = `${selectedCategory || ''}|${inputValue}|${sortBy}`
+  const page = pageState.key === viewKey ? pageState.page : 0
 
-    const selectedCategory = searchParams.get('category')
+  useEffect(() => {
+    const key = viewKey
+    const handle = window.setTimeout(() => {
+      const params = new URLSearchParams(window.location.search)
+      if (inputValue.trim()) params.set('search', inputValue.trim())
+      else params.delete('search')
+      if (selectedCategory) params.set('category', selectedCategory)
+      const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname
+      window.history.replaceState(null, '', nextUrl)
 
-    // Initial load sync
-    useEffect(() => {
-        setSearchResults(products)
-    }, [products])
-
-    // Featured first then alphabetically
-    const orderedCategories = useMemo(() => {
-        const featured = categories.filter(c => c.is_featured).sort((a, b) => a.name.localeCompare(b.name))
-        const nonFeatured = categories.filter(c => !c.is_featured).sort((a, b) => a.name.localeCompare(b.name))
-        return [...featured, ...nonFeatured]
-    }, [categories])
-
-    const featuredPackages = useMemo(() => {
-        return packages.filter(p => p.is_featured)
-    }, [packages])
-
-    const featuredProducts = useMemo(() => {
-        const marked = products.filter(p => p.is_featured)
-        // plux has no is_featured — fall back to newest products for the hero strip
-        return marked.length > 0 ? marked : products.slice(0, 8)
-    }, [products])
-
-    // Handlers
-    const handleCategoryClick = (categoryName: string) => {
-        const params = new URLSearchParams(searchParams.toString())
-        params.set('category', categoryName)
-        params.delete('search')
-        setInputValue('')
-        setSearchQuery('')
-        router.push(`${pathname}?${params.toString()}`)
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-
-    const handleBackToCatalog = () => {
-        const params = new URLSearchParams(searchParams.toString())
-        params.delete('category')
-        params.delete('search')
-        setInputValue('')
-        setSearchQuery('')
-        router.push(`${pathname}?${params.toString()}`)
-    }
-
-    const handleSearchChange = (value: string) => {
-        setInputValue(value)
-    }
-
-    // Debounce search updates
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            const params = new URLSearchParams(searchParams.toString())
-            const currentSearch = params.get('search') || ''
-
-            // Only search if query changed or sort changed
-            if (inputValue.trim() !== currentSearch || sortBy) {
-
-                // 1. Update URL visually (history API)
-                if (inputValue.trim()) {
-                    params.set('search', inputValue)
-                } else {
-                    params.delete('search')
-                }
-                const newUrl = `${pathname}?${params.toString()}`
-                window.history.replaceState(null, '', newUrl)
-
-                // 2. Perform Server Search
-                startTransition(async () => {
-                    // Import dynamically to avoid build issues if mixed environment
-                    const { searchProducts } = await import('./actions')
-                    const results = await searchProducts(inputValue, sortBy, selectedCategory)
-                    setSearchResults(results as Product[])
-                })
-
-                setSearchQuery(inputValue)
-            }
-        }, 300)
-
-        return () => clearTimeout(timer)
-    }, [inputValue, sortBy, selectedCategory, pathname, searchParams])
-
-    // Sync state with URL only on mount or external navigation (like back button)
-    useEffect(() => {
-        const searchParam = searchParams.get('search') || ''
-        // Only update if the URL param is different from what we have
-        // This check prevents overwriting our local state when we manually update history
-        if (searchParam !== inputValue && searchParam !== searchQuery) {
-            setInputValue(searchParam)
-            setSearchQuery(searchParam)
+      startTransition(async () => {
+        try {
+          const { searchProducts } = await import('./actions')
+          const results = await searchProducts(inputValue, sortBy, selectedCategory)
+          setRemote({ key, products: results as PublicProduct[] })
+        } catch {
+          setRemote(null)
         }
-    }, [searchParams])
+      })
+    }, 280)
 
-    return (
-        <main className="min-h-screen bg-background text-foreground selection:bg-gold selection:text-black">
-            {/* Background Texture Overlays */}
-            <div className="fixed inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none z-0" />
+    return () => window.clearTimeout(handle)
+  }, [viewKey, inputValue, sortBy, selectedCategory, pathname])
 
-            {/* Immersive Hero Section */}
-            <div className="relative h-[60vh] md:h-[70vh] overflow-hidden bg-black">
-                <div className="hero-parallax absolute inset-0 w-full h-full">
-                    <Image
-                        src={selectedCategory
-                            ? (categories.find(c => c.name === selectedCategory)?.image_url || "/images/mist-cedar-hero-vivid.jpg")
-                            : "/images/mist-cedar-hero-vivid.jpg"
-                        }
-                        alt="Catalog hero"
-                        fill
-                        className="object-cover opacity-40 scale-105"
-                        priority
-                        sizes="100vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[var(--ink)]" />
-                </div>
+  const local = useMemo(
+    () => filterCatalogProducts(products, { query: inputValue, category: selectedCategory, sort: sortBy }),
+    [products, inputValue, selectedCategory, sortBy],
+  )
+  const pieces = remote?.key === viewKey ? remote.products : local
+  const pageCount = Math.max(1, Math.ceil((browsingProducts ? pieces.length : categories.length) / PAGE_SIZE))
+  const safePage = Math.min(page, pageCount - 1)
+  const categoryPage = categories.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE)
+  const productPage = pieces.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE)
 
-                <div className="relative container mx-auto h-full flex flex-col justify-center items-center text-center px-4 md:px-6 z-10">
-                    <div className="hero-enter max-w-4xl space-y-10">
-                        <div className="flex items-center justify-center gap-3">
-                            <span className="w-12 h-px bg-gold/30" />
-                            <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Browse & book</span>
-                            <span className="w-12 h-px bg-gold/30" />
-                        </div>
+  const setCategory = (name: string | null) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (name) params.set('category', name)
+    else params.delete('category')
+    params.delete('search')
+    setInputValue('')
+    const next = params.toString()
+    router.push(next ? `${pathname}?${next}` : pathname)
+  }
 
-                        <h1 className="text-6xl md:text-9xl font-serif font-light tracking-tighter leading-[0.85] text-foreground">
-                            {selectedCategory
-                                ? selectedCategory
-                                : searchQuery
-                                    ? `Search`
-                                    : (heroTitle || "The Collection")
-                            }
-                        </h1>
+  const headline = selectedCategory
+    ? selectedCategory
+    : inputValue.trim()
+      ? 'Search'
+      : heroTitle || 'Event rentals, curated to perfection'
 
-                        <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto leading-relaxed">
-                            {selectedCategory
-                                ? `${selectedCategory} for weddings, parties, and gatherings — ready to reserve online.`
-                                : searchQuery
-                                    ? `Showing results for "${searchQuery}" in our rental catalog.`
-                                    : "Find the pieces for your space — lighting, seating, tents, and décor."
-                            }
-                        </p>
-                    </div>
-                </div>
+  return (
+    <main className="min-h-screen bg-[var(--theme-canvas)] text-[var(--theme-dark)]">
+      <section className="mx-auto grid max-w-7xl gap-10 px-5 pb-6 pt-14 md:px-8 lg:grid-cols-12 lg:pt-20">
+        <div className="lg:col-span-8">
+          <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[var(--theme-accent-text)]">The collection</p>
+          <h1 className="mt-4 max-w-4xl font-serif text-5xl font-light leading-[0.95] tracking-tight md:text-7xl">
+            {headline}
+          </h1>
+          <p className="mt-6 max-w-xl text-base font-light leading-relaxed text-[var(--theme-muted)] md:text-lg">
+            {selectedCategory
+              ? `${selectedCategory} for weddings, parties, and gatherings — ready to reserve.`
+              : inputValue.trim()
+                ? `Showing matches for “${inputValue.trim()}” in the rental catalog.`
+                : 'From timeless seating to statement lighting, each piece is chosen for the room, the table, and the night.'}
+          </p>
+          {!selectedCategory && !inputValue.trim() && (
+            <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--theme-accent-text)]">
+              Elevate every occasion.
+            </p>
+          )}
+        </div>
+        <blockquote className="border-t border-[var(--theme-dark)]/10 pt-6 lg:col-span-4 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-16">
+          <p className="font-serif text-2xl font-light italic leading-snug text-[var(--theme-dark)]">
+            “The room should feel finished before the first guest arrives.”
+          </p>
+          <footer className="mt-4 text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--theme-muted)]">
+            — PrimeLux Events
+          </footer>
+        </blockquote>
+      </section>
+
+      <div className="sticky top-[var(--header-height,7.25rem)] z-30 border-y border-[var(--theme-dark)]/10 bg-[var(--theme-canvas)]/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-4 md:px-8">
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            <button
+              type="button"
+              aria-pressed={!selectedCategory}
+              onClick={() => setCategory(null)}
+              className={cn(
+                'shrink-0 rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em]',
+                !selectedCategory
+                  ? 'bg-[var(--theme-accent)] text-[var(--theme-on-accent)]'
+                  : 'border border-[var(--theme-dark)]/15 text-[var(--theme-dark)]',
+              )}
+            >
+              All items
+            </button>
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                aria-pressed={selectedCategory === category.name}
+                onClick={() => setCategory(category.name)}
+                className={cn(
+                  'shrink-0 rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em]',
+                  selectedCategory === category.name
+                    ? 'bg-[var(--theme-accent)] text-[var(--theme-on-accent)]'
+                    : 'border border-[var(--theme-dark)]/15 text-[var(--theme-dark)]',
+                )}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <label className="relative min-w-0 flex-1">
+              <span className="sr-only">Search the collection</span>
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--theme-accent-text)]" />
+              <input
+                value={inputValue}
+                onChange={(event) => setInputValue(event.target.value)}
+                placeholder="Search the collection…"
+                className="h-12 w-full rounded-full border border-[var(--theme-dark)]/15 bg-transparent pl-11 pr-4 text-sm font-light outline-none focus-visible:border-[var(--theme-accent)]"
+              />
+            </label>
+            <button
+              type="button"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-[var(--theme-dark)]/15 px-4 text-[11px] font-bold uppercase tracking-[0.16em] sm:hidden"
+              aria-expanded={filtersOpen}
+              onClick={() => setFiltersOpen((open) => !open)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Filters
+            </button>
+            <label className={cn('items-center gap-3 text-[11px] font-bold uppercase tracking-[0.16em]', filtersOpen ? 'flex' : 'hidden sm:flex')}>
+              Sort
+              <select
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value as typeof sortBy)}
+                className="h-12 rounded-full border border-[var(--theme-dark)]/15 bg-transparent px-4 font-medium normal-case tracking-normal"
+              >
+                <option value="name">Name</option>
+                <option value="price-low">Price, low to high</option>
+                <option value="price-high">Price, high to low</option>
+                <option value="newest">Featured first</option>
+              </select>
+            </label>
+            {isPending && <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--theme-muted)]">Updating</span>}
+          </div>
+        </div>
+      </div>
+
+      {!selectedCategory && !inputValue.trim() && <ShowroomCarousel pieces={showroom} variant="feature" />}
+
+      <section id="collection" className="mx-auto max-w-7xl px-5 py-14 md:px-8">
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <h2 className="font-serif text-3xl font-light md:text-5xl">
+            {browsingProducts ? 'Ready to reserve' : 'Collections'}
+          </h2>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--theme-accent-text)]">
+            {String(safePage + 1).padStart(2, '0')} / {String(pageCount).padStart(2, '0')}
+          </p>
+        </div>
+
+        {browsingProducts ? (
+          remote?.key !== viewKey && productPage.length === 0 ? (
+            <p className="py-16 text-center font-serif text-2xl font-light text-[var(--theme-muted)]">Gathering the collection…</p>
+          ) : productPage.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
+              {productPage.map((product, index) => (
+                <EditorialCard
+                  key={product.id}
+                  href={`/catalog/${product.category_slug}/${product.slug}`}
+                  title={product.name}
+                  meta={formatCurrency(product.price)}
+                  imageUrl={product.image_url}
+                  eyebrow={product.category_name}
+                  featured={index === 0}
+                />
+              ))}
             </div>
+          ) : (
+            <p className="py-16 text-center font-serif text-2xl font-light text-[var(--theme-muted)]">
+              Nothing in the collection matches that search yet.
+            </p>
+          )
+        ) : (
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
+            {categoryPage.map((category, index) => (
+              <EditorialCard
+                key={category.id}
+                href={`/catalog?category=${encodeURIComponent(category.name)}`}
+                title={category.name}
+                meta={`${category.product_count} ${category.product_count === 1 ? 'item' : 'items'}`}
+                imageUrl={category.image_url}
+                featured={index === 0}
+              />
+            ))}
+          </div>
+        )}
 
-            {/* Sticky Search & Filter Bar */}
-            <div className="sticky top-[72px] z-40 bg-background/80 backdrop-blur-xl border-y border-border transition-all duration-300" style={{ top: 'var(--header-height, 72px)' }}>
-                <div className="container mx-auto px-4 md:px-6 py-6 transition-all duration-300">
-                    <div className="flex flex-col lg:flex-row gap-6 items-center">
-                        {/* Search Input */}
-                        <div className="relative flex-1 max-w-md w-full">
-                            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gold/40" />
-                            <Input
-                                placeholder="Search the collection…"
-                                value={inputValue}
-                                onChange={(e) => handleSearchChange(e.target.value)}
-                                className="pl-14 pr-6 h-14 border-border focus:border-gold/30 rounded-[var(--radius-cta)] bg-white/5 transition-all duration-300 focus:bg-white/10 text-foreground placeholder:text-gray-600 font-light shadow-2xl"
-                            />
-                            {isPending && (
-                                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                                    <div className="w-4 h-4 border-2 border-gold/30 border-t-gold rounded-[var(--radius-cta)] animate-spin" />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Controls */}
-                        <div className="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-end">
-                            {selectedCategory && (
-                                <Button
-                                    variant="ghost"
-                                    onClick={handleBackToCatalog}
-                                    className="flex gap-2 rounded-[var(--radius-cta)] hover:bg-white/5 text-muted-foreground hover:text-gold transition-colors font-bold uppercase tracking-widest text-[10px]"
-                                >
-                                    <ArrowLeft className="h-4 w-4" />
-                                    All Collections
-                                </Button>
-                            )}
-
-                            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                                <SelectTrigger className="w-44 h-14 rounded-[var(--radius-cta)] border-border bg-white/5 text-foreground font-light shadow-2xl">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="bg-[var(--surface-elevated)] border-border text-foreground">
-                                    <SelectItem value="name">Name A-Z</SelectItem>
-                                    <SelectItem value="price-low">Price: Low to High</SelectItem>
-                                    <SelectItem value="price-high">Price: High to Low</SelectItem>
-                                    <SelectItem value="newest">Newest First</SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            <div className="flex items-center gap-1 bg-white/5 border border-border rounded-[var(--radius-cta)] p-1 shadow-2xl">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setViewMode('grid')}
-                                    className={cn(
-                                        "h-12 w-12 rounded-[var(--radius-cta)] transition-all duration-500",
-                                        viewMode === 'grid' ? "bg-gold text-black hover:bg-white shadow-xl" : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                >
-                                    <Grid3X3 className="h-5 w-5" />
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setViewMode('masonry')}
-                                    className={cn(
-                                        "h-12 w-12 rounded-[var(--radius-cta)] transition-all duration-500",
-                                        viewMode === 'masonry' ? "bg-gold text-black hover:bg-white shadow-xl" : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                >
-                                    <Columns className="h-5 w-5" />
-                                </Button>
-                            </div>
-
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setIsSidebarOpen(true)}
-                                className="lg:hidden h-14 w-14 rounded-[var(--radius-cta)] border border-border bg-white/5 shadow-2xl text-gold"
-                            >
-                                <SlidersHorizontal className="h-5 w-5" />
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Content Area */}
-            <div className="container mx-auto px-4 md:px-6 py-24 relative z-10">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={selectedCategory || 'main'}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.5 }}
-                        className="space-y-32"
-                    >
-                        {/* Featured (only on main catalog) */}
-                        {!selectedCategory && !searchQuery && (
-                            <>
-                                {featuredProducts.length > 0 && (
-                                    <section>
-                                        <div className="mb-16">
-                                            <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Premium Selection</span>
-                                            <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">Featured Collection</h2>
-                                        </div>
-                                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10">
-                                            {featuredProducts.slice(0, 4).map((product, index) => (
-                                                <motion.div
-                                                    key={product.id}
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    whileInView={{ opacity: 1, y: 0 }}
-                                                    viewport={{ once: true }}
-                                                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                                                >
-                                                    <ProductCard product={product} />
-                                                </motion.div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                )}
-
-                                {featuredPackages.length > 0 && (
-                                    <section>
-                                        <div className="mb-16">
-                                            <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Ready-made sets</span>
-                                            <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">Event Packages</h2>
-                                        </div>
-                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-12">
-                                            {featuredPackages.slice(0, 3).map((pkg, index) => (
-                                                <motion.div
-                                                    key={pkg.id}
-                                                    initial={{ opacity: 0, scale: 0.95 }}
-                                                    whileInView={{ opacity: 1, scale: 1 }}
-                                                    viewport={{ once: true }}
-                                                    transition={{ duration: 0.6, delay: index * 0.15 }}
-                                                >
-                                                    <DealCard
-                                                        name={pkg.name}
-                                                        description={pkg.description}
-                                                        price={pkg.price}
-                                                        imageUrl={pkg.image_url}
-                                                        onViewDetails={() => router.push(`/packages/${pkg.id}`)}
-                                                        dealBadge="PACKAGE"
-                                                    />
-                                                </motion.div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                )}
-                            </>
-                        )}
-
-                        {/* Browse Categories */}
-                        {!selectedCategory && !searchQuery && (
-                            <section>
-                                <div className="mb-16">
-                                    <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Explore by category</span>
-                                    <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">Browse Categories</h2>
-                                </div>
-                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-8">
-                                    {orderedCategories.map((category, index) => (
-                                        <motion.div
-                                            key={category.id}
-                                            initial={{ opacity: 0, scale: 0.95 }}
-                                            whileInView={{ opacity: 1, scale: 1 }}
-                                            viewport={{ once: true }}
-                                            transition={{ duration: 0.5, delay: index * 0.05 }}
-                                        >
-                                            <CategoryCard
-                                                name={category.name}
-                                                imageUrl={category.image_url}
-                                                onClick={() => handleCategoryClick(category.name)}
-                                            />
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
-                        {/* All products on main catalog (when not filtered) */}
-                        {!selectedCategory && !searchQuery && searchResults.length > 0 && (
-                            <section>
-                                <div className="mb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-                                    <div>
-                                        <span className="text-gold text-[10px] font-bold uppercase tracking-[0.4em] mb-4 block">Inventory</span>
-                                        <h2 className="text-4xl md:text-7xl font-serif font-light text-foreground tracking-tighter">All Rentals</h2>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground font-light max-w-md">
-                                        {searchResults.length} pieces available. Select a category above to refine.
-                                    </p>
-                                </div>
-                                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
-                                    {searchResults.slice(0, 60).map((product, index) => (
-                                        <motion.div
-                                            key={product.id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            transition={{ duration: 0.4, delay: Math.min(index * 0.02, 0.2) }}
-                                        >
-                                            <ProductCard product={product} />
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
-                        {/* Products Results List */}
-                        {(selectedCategory || searchQuery) && (
-                            <div className="flex flex-col lg:flex-row gap-16">
-                                {/* Desktop Sidebar */}
-                                <aside className="hidden lg:block w-72 flex-shrink-0">
-                                    <div className="sticky top-48 space-y-12">
-                                        <div className="space-y-6">
-                                            <h3 className="text-gold text-[10px] font-bold uppercase tracking-[0.4em]">Collections</h3>
-                                            <nav className="flex flex-col gap-2">
-                                                <button
-                                                    className={cn(
-                                                        "w-full text-left px-4 py-3 rounded-xl transition-all duration-300 text-sm",
-                                                        !selectedCategory
-                                                            ? "bg-gold text-black font-bold tracking-widest uppercase text-[10px]"
-                                                            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                                                    )}
-                                                    onClick={handleBackToCatalog}
-                                                >
-                                                    All Collections
-                                                </button>
-                                                {orderedCategories.map((category) => (
-                                                    <button
-                                                        key={category.id}
-                                                        className={cn(
-                                                            "w-full text-left px-4 py-3 rounded-xl transition-all duration-300 text-sm",
-                                                            selectedCategory === category.name
-                                                                ? "bg-gold text-black font-bold tracking-widest uppercase text-[10px]"
-                                                                : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                                                        )}
-                                                        onClick={() => handleCategoryClick(category.name)}
-                                                    >
-                                                        {category.name}
-                                                    </button>
-                                                ))}
-                                            </nav>
-                                        </div>
-                                    </div>
-                                </aside>
-
-                                {/* Grid */}
-                                <div className="flex-1">
-                                    {searchResults.length > 0 ? (
-                                        <motion.div
-                                            layout
-                                            className={cn(
-                                                "transition-all duration-500",
-                                                viewMode === 'grid'
-                                                    ? "grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10"
-                                                    : "columns-2 md:columns-3 gap-6 md:gap-10 space-y-6 md:space-y-10"
-                                            )}
-                                        >
-                                            {searchResults.map((product, index) => (
-                                                <motion.div
-                                                    key={product.id}
-                                                    layout
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{
-                                                        duration: 0.5,
-                                                        delay: Math.min(index * 0.03, 0.2),
-                                                        layout: { duration: 0.3 }
-                                                    }}
-                                                    className={cn(viewMode === 'masonry' && "break-inside-avoid")}
-                                                >
-                                                    <ProductCard product={product} />
-                                                </motion.div>
-                                            ))}
-                                        </motion.div>
-                                    ) : (
-                                        <div className="spotlight-frame rounded-[2.5rem] border border-border bg-white/5 py-40 text-center">
-                                            <Search className="mx-auto mb-8 h-16 w-16 text-[var(--champagne,#2f6b57)]/30" />
-                                            <h3 className="mb-4 font-serif text-2xl text-foreground">No pieces match this search</h3>
-                                            <p className="mx-auto mb-12 max-w-md font-light text-muted-foreground">
-                                                Try another category or browse the full collection to find rentals for your event.
-                                            </p>
-                                            <Button
-                                                onClick={handleBackToCatalog}
-                                                className="rounded-[var(--radius-cta)] bg-[var(--champagne,#2f6b57)] px-12 py-6 text-[10px] font-bold uppercase tracking-widest text-black transition-all duration-500 hover:bg-white"
-                                            >
-                                                Browse the collection
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </motion.div>
-                </AnimatePresence>
-            </div>
-
-            {/* Mobile Category Drawer */}
-            <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-                <SheetContent side="left" className="w-80 p-0 bg-background border-r border-border text-foreground">
-                    <div className="p-8 border-b border-border">
-                        <SheetTitle className="text-2xl font-serif font-light text-foreground">Collections</SheetTitle>
-                    </div>
-                    <div className="flex-1 overflow-y-auto px-6 py-8">
-                        <nav className="flex flex-col gap-2">
-                            <button
-                                className={cn(
-                                    "w-full text-left px-6 py-5 rounded-2xl transition-all duration-300",
-                                    !selectedCategory && !searchQuery
-                                        ? "bg-gold text-black font-bold uppercase tracking-widest text-[10px]"
-                                        : "text-muted-foreground hover:text-foreground"
-                                )}
-                                onClick={() => {
-                                    handleBackToCatalog()
-                                    setIsSidebarOpen(false)
-                                }}
-                            >
-                                All Collections
-                            </button>
-                            {orderedCategories.map(category => (
-                                <button
-                                    key={category.id}
-                                    className={cn(
-                                        "w-full text-left px-6 py-5 rounded-2xl transition-all duration-300",
-                                        selectedCategory === category.name
-                                            ? "bg-gold text-black font-bold uppercase tracking-widest text-[10px]"
-                                            : "text-muted-foreground hover:text-foreground"
-                                    )}
-                                    onClick={() => {
-                                        handleCategoryClick(category.name)
-                                        setIsSidebarOpen(false)
-                                    }}
-                                >
-                                    {category.name}
-                                </button>
-                            ))}
-                        </nav>
-                    </div>
-                </SheetContent>
-            </Sheet>
-        </main>
-    )
+        {pageCount > 1 && (
+          <div className="mt-10 flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => setPageState({ key: viewKey, page: Math.max(0, page - 1) })}
+              disabled={safePage === 0}
+              className="text-[11px] font-bold uppercase tracking-[0.18em] disabled:opacity-30"
+            >
+              Previous
+            </button>
+            <div className="h-px flex-1 bg-[var(--theme-accent)]/40" />
+            <button
+              type="button"
+              onClick={() => setPageState({ key: viewKey, page: Math.min(pageCount - 1, page + 1) })}
+              disabled={safePage >= pageCount - 1}
+              className="text-[11px] font-bold uppercase tracking-[0.18em] disabled:opacity-30"
+            >
+              Next
+            </button>
+          </div>
+        )}
+      </section>
+    </main>
+  )
 }
