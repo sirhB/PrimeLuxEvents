@@ -18,6 +18,7 @@ import {
     Palette,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { BrandLockup } from '@/components/brand/brand-logo'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
@@ -199,12 +200,9 @@ export function AccountNav({
 export function AccountSidebar({ partnerStatus = 'none' }: { partnerStatus?: PartnerNavStatus }) {
     return (
         <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col bg-[var(--sidebar-navy)] text-[var(--sidebar-navy-text)] md:flex">
-            <div className="flex h-16 items-center gap-3 border-b border-white/10 px-5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-white text-sm font-bold text-[var(--sidebar-navy)]">
-                    P
-                </span>
-                <Link className="text-sm font-semibold tracking-tight text-white" href="/">
-                    PrimeLux
+            <div className="flex items-center justify-center border-b border-white/10 px-4 py-5">
+                <Link href="/" aria-label="Prime Lux Events" className="inline-flex">
+                    <BrandLockup tone="on-dark" className="text-[1rem]" />
                 </Link>
             </div>
             <AccountNav partnerStatus={partnerStatus} />

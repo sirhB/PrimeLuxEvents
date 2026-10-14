@@ -295,12 +295,17 @@ export function DashboardContent() {
               Let&apos;s see what the floor needs today.
             </p>
           </div>
-          <Button asChild className="h-11 rounded-full px-5">
-            <Link href="/admin/orders/new">
-              <Plus className="h-4 w-4" />
-              New order
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" className="h-11 rounded-full px-5">
+              <Link href="/admin/week-prep">Week Prep</Link>
+            </Button>
+            <Button asChild className="h-11 rounded-full px-5">
+              <Link href="/admin/orders/new">
+                <Plus className="h-4 w-4" />
+                New order
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">

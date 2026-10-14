@@ -4,6 +4,11 @@ import { useCallback, useEffect, useState } from "react"
 
 export type PwaSurface = "store" | "account" | "admin"
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>
+}
+
 export function detectStandalone(): boolean {
   if (typeof window === "undefined") return false
   return (

@@ -1,5 +1,6 @@
 'use client'
 
+import type { ComponentType } from 'react'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -8,7 +9,7 @@ interface StatsCardProps {
     title: string
     value: string | number
     subtitle?: string
-    icon?: React.ElementType
+    icon?: ComponentType<{ className?: string }>
     className?: string
     index?: number
 }

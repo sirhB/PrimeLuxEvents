@@ -71,7 +71,17 @@ export async function generateWarehouseTasksForOrder(
         return { success: false, error: itemsError.message }
     }
 
-    const checklist = buildChecklistFromOrderItems(orderItems || [])
+    const checklist = buildChecklistFromOrderItems(
+        (orderItems || []).map((item) => {
+            const products = item.products as { name?: string } | { name?: string }[] | null
+            const name = Array.isArray(products) ? products[0]?.name : products?.name
+            return {
+                product_id: String(item.product_id),
+                quantity: Number(item.quantity) || 0,
+                products: name ? { name } : null,
+            }
+        }),
+    )
     const warehouseRoleId = await getWarehouseRoleId(supabase)
 
     await deleteExistingOrderWarehouseTasks(supabase, orderId)
@@ -123,7 +133,8 @@ export async function generateWarehouseTasksForOrder(
     let parentTaskId: string | null = null
 
     for (const step of chain) {
-        const { data: task, error: insertError } = await supabase
+        const parentId: string | null = parentTaskId
+        const inserted = await supabase
             .from('tasks')
             .insert({
                 title: step.title,
@@ -137,7 +148,7 @@ export async function generateWarehouseTasksForOrder(
                 due_date: step.dueDate,
                 scheduled_start: step.scheduledStart,
                 checklist,
-                parent_task_id: parentTaskId,
+                parent_task_id: parentId,
                 meta_data: {
                     delivery_address: order.delivery_address,
                     auto_generated: true,
@@ -145,6 +156,8 @@ export async function generateWarehouseTasksForOrder(
             })
             .select('id')
             .single()
+        const insertError = inserted.error
+        const task = inserted.data as { id: string } | null
 
         if (insertError) {
             return { success: false, error: insertError.message }

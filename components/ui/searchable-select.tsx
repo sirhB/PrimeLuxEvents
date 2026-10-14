@@ -13,7 +13,7 @@ export interface SearchResult<T> {
     subLabel?: string
     value: T
     image?: string | null
-    icon?: React.ElementType
+    icon?: React.ComponentType<{ className?: string }>
 }
 
 interface SearchableSelectProps<T> {
@@ -134,7 +134,7 @@ export function SearchableSelect<T>({
             <div
                 onClick={() => setIsOpen(true)}
                 className={cn(
-                    "flex items-center justify-between w-full p-3 rounded-xl border border-[var(--dashboard-border)] bg-[var(--dashboard-background)] text-white cursor-pointer transition-all duration-200 hover:border-[var(--dashboard-accent-gold)]/50 hover:bg-[var(--dashboard-card-hover)]",
+                    "flex items-center justify-between w-full p-3 rounded-xl border border-[var(--dashboard-border)] bg-[var(--dashboard-background)] text-[var(--dashboard-text)] cursor-pointer transition-all duration-200 hover:border-[var(--dashboard-accent-gold)]/50 hover:bg-[var(--dashboard-card-hover)]",
                     isOpen && "ring-2 ring-[var(--dashboard-accent-gold)]/20 border-[var(--dashboard-accent-gold)]"
                 )}
             >
@@ -157,8 +157,8 @@ export function SearchableSelect<T>({
 
                 <div className="flex items-center gap-2">
                     {selectedItem ? (
-                        <button onClick={clearSelection} className="p-1 hover:bg-white/10 rounded-full transition-colors">
-                            <X className="w-4 h-4 text-muted-foreground hover:text-white" />
+                        <button onClick={clearSelection} className="p-1 hover:bg-black/5 rounded-full transition-colors">
+                            <X className="w-4 h-4 text-muted-foreground hover:text-[var(--dashboard-text)]" />
                         </button>
                     ) : (
                         <Search className="w-4 h-4 text-muted-foreground" />
@@ -186,7 +186,7 @@ export function SearchableSelect<T>({
                                     onChange={(e) => setQuery(e.target.value)}
                                     onKeyDown={handleKeyDown}
                                     placeholder="Type to search..."
-                                    className="w-full bg-[var(--dashboard-background)] border border-[var(--dashboard-border)] rounded-lg py-2 pl-9 pr-4 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:border-[var(--dashboard-accent-gold)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/20 transition-all"
+                                    className="w-full bg-[var(--dashboard-background)] border border-[var(--dashboard-border)] rounded-lg py-2 pl-9 pr-4 text-sm text-[var(--dashboard-text)] placeholder:text-muted-foreground focus:outline-none focus:border-[var(--dashboard-accent-gold)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/20 transition-all"
                                 />
                                 {isLoading && (
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -215,7 +215,7 @@ export function SearchableSelect<T>({
                                                     {item.image ? (
                                                         <img src={item.image} alt="" className="w-8 h-8 rounded-full object-cover border border-white/10" />
                                                     ) : item.icon ? (
-                                                        <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/5">
+                                                        <div className="w-8 h-8 rounded-full bg-[var(--dashboard-card)] flex items-center justify-center border border-[var(--dashboard-border)]">
                                                             <item.icon className="w-4 h-4 text-muted-foreground" />
                                                         </div>
                                                     ) : (
@@ -225,7 +225,7 @@ export function SearchableSelect<T>({
                                                     )}
 
                                                     <div className="flex flex-col flex-1 min-w-0">
-                                                        <span className={cn("text-sm font-medium truncate", activeIndex === idx ? "text-[var(--dashboard-accent-gold)]" : "text-white")}>
+                                                        <span className={cn("text-sm font-medium truncate", activeIndex === idx ? "text-[var(--dashboard-accent-gold)]" : "text-[var(--dashboard-text)]")}>
                                                             {item.label}
                                                         </span>
                                                         {item.subLabel && (

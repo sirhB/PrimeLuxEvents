@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createClient } from "@/lib/supabase/client"
+import { Html5QrcodeScanner } from "html5-qrcode"
 import { updateProductStock } from "@/app/admin/scan/actions"
 import { toast } from "sonner"
 
@@ -35,7 +36,7 @@ export function ScanModal({ isOpen, onClose }: ScanModalProps) {
     useEffect(() => {
         if (!isOpen) {
             if (scannerRef.current) {
-                scannerRef.current.clear().catch((error) => {
+                scannerRef.current.clear().catch((error: unknown) => {
                     console.error("Failed to clear scanner", error)
                 })
                 scannerRef.current = null
@@ -84,13 +85,13 @@ export function ScanModal({ isOpen, onClose }: ScanModalProps) {
             }
         }
 
-        function onScanFailure(error: any) {
+        function onScanFailure(_error: unknown) {
             // ignore
         }
 
         return () => {
             if (scannerRef.current) {
-                scannerRef.current.clear().catch((error) => {
+                scannerRef.current.clear().catch((error: unknown) => {
                     console.error("Failed to clear scanner", error)
                 })
                 scannerRef.current = null

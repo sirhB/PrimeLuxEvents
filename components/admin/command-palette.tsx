@@ -7,9 +7,11 @@ import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   ADMIN_QUICK_ACTIONS,
+  canAccessNavItem,
   flattenAdminNav,
   type AdminNavItem,
 } from '@/lib/admin/nav'
+import { useAdminSidebar } from '@/components/admin/sidebar-context'
 
 interface CommandPaletteProps {
   isOpen: boolean
@@ -24,8 +26,16 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const [recents, setRecents] = useState<string[]>([])
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
+  const { permissionNames, roleNames } = useAdminSidebar()
 
-  const navItems = useMemo(() => flattenAdminNav(), [])
+  const navItems = useMemo(
+    () => flattenAdminNav().filter((item) => canAccessNavItem(permissionNames, roleNames, item)),
+    [permissionNames, roleNames],
+  )
+  const quickActions = useMemo(
+    () => ADMIN_QUICK_ACTIONS.filter((item) => canAccessNavItem(permissionNames, roleNames, item)),
+    [permissionNames, roleNames],
+  )
 
   useEffect(() => {
     try {
@@ -43,9 +53,9 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
   const filteredActions = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return ADMIN_QUICK_ACTIONS
-    return ADMIN_QUICK_ACTIONS.filter((item) => matches(item, q))
-  }, [query, matches])
+    if (!q) return quickActions
+    return quickActions.filter((item) => matches(item, q))
+  }, [query, matches, quickActions])
 
   const filteredNav = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -56,9 +66,9 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
   const recentItems = useMemo(() => {
     if (query.trim()) return []
     return recents
-      .map((href) => navItems.find((item) => item.href === href) || ADMIN_QUICK_ACTIONS.find((item) => item.href === href))
+      .map((href) => navItems.find((item) => item.href === href) || quickActions.find((item) => item.href === href))
       .filter(Boolean) as AdminNavItem[]
-  }, [recents, navItems, query])
+  }, [recents, navItems, quickActions, query])
 
   const allItems = useMemo(() => {
     if (!query.trim() && recentItems.length) {

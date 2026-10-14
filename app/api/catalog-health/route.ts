@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { isStaffUser } from '@/lib/auth/roles'
+import { requireAnyApiPermission } from '@/lib/auth/authorization'
 import {
   getSupabaseAnonKey,
   getSupabaseServiceRoleKey,
@@ -14,14 +13,8 @@ export const dynamic = 'force-dynamic'
  * Launch diagnostics — staff only. Does not expose secret values.
  */
 export async function GET() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user || !(await isStaffUser(user.id))) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = await requireAnyApiPermission(['products.view', 'settings.view'])
+  if (denied) return denied
 
   const url = getSupabaseUrl() || null
   const hasAnon = Boolean(getSupabaseAnonKey())

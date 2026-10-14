@@ -2,6 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import { cache } from 'react'
 import { redirect } from 'next/navigation'
+import { NextResponse } from 'next/server'
+import { permissionForAdminPath } from '@/lib/admin/route-access'
+import { STAFF_ROLES } from '@/lib/auth/roles-shared'
 
 export interface UserProfile {
   id: string
@@ -160,7 +163,7 @@ export const getCurrentUser = cache(async (): Promise<UserProfile | null> => {
   }
 })
 
-function userHasPermission(user: UserProfile, permissionName: string): boolean {
+export function userHasPermission(user: UserProfile, permissionName: string): boolean {
   if (user.roles.some((role) => role.name === 'admin')) {
     return true
   }
@@ -249,6 +252,54 @@ export async function requireAuth(): Promise<UserProfile> {
     redirect('/login')
   }
   return user
+}
+
+/**
+ * Page guard for /admin. Staff role is required; finer permissions follow the route map.
+ */
+export async function requireAdminRouteAccess(pathname: string): Promise<UserProfile> {
+  const user = await getCurrentUser()
+  const next = pathname && pathname.startsWith('/') ? pathname : '/admin'
+  if (!user) {
+    redirect(`/login?next=${encodeURIComponent(next)}`)
+  }
+
+  const isStaff = user.roles.some((role) =>
+    STAFF_ROLES.includes(role.name as (typeof STAFF_ROLES)[number]),
+  )
+  if (!isStaff) {
+    redirect('/unauthorized')
+  }
+
+  const permission = permissionForAdminPath(next)
+  if (permission && !userHasPermission(user, permission)) {
+    redirect('/unauthorized')
+  }
+
+  return user
+}
+
+/** JSON 401/403 for route handlers. Returns null when the caller may continue. */
+export async function requireApiPermission(permissionName: string): Promise<NextResponse | null> {
+  const user = await getCurrentUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  if (!userHasPermission(user, permissionName)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  return null
+}
+
+export async function requireAnyApiPermission(permissionNames: string[]): Promise<NextResponse | null> {
+  const user = await getCurrentUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  if (!permissionNames.some((permissionName) => userHasPermission(user, permissionName))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  return null
 }
 
 // Require specific permission

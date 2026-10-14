@@ -341,13 +341,17 @@ export async function updateChecklistFromOrder(
 
         if (error) return { success: false, error: error.message }
 
-        const checklist: ChecklistItem[] = (orderItems || []).map((item, index) => ({
-            id: `item-${item.product_id}-${index}`,
-            label: (item.products as { name: string } | null)?.name || 'Product',
-            product_id: item.product_id,
-            qty: item.quantity,
-            completed: false,
-        }))
+        const checklist: ChecklistItem[] = (orderItems || []).map((item, index) => {
+            const products = item.products as { name?: string } | { name?: string }[] | null
+            const productName = Array.isArray(products) ? products[0]?.name : products?.name
+            return {
+                id: `item-${item.product_id}-${index}`,
+                label: productName || 'Product',
+                product_id: item.product_id,
+                qty: item.quantity,
+                completed: false,
+            }
+        })
 
         await supabase
             .from('tasks')

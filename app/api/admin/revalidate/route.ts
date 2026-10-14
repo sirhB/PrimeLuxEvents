@@ -1,18 +1,11 @@
 import { revalidatePath } from 'next/cache'
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { isStaffUser } from '@/lib/auth/roles'
+import { requireAnyApiPermission } from '@/lib/auth/authorization'
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    if (!user || !(await isStaffUser(user.id))) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const denied = await requireAnyApiPermission(['content.update', 'products.update', 'settings.update'])
+    if (denied) return denied
 
     const body = await request.json()
     const path = typeof body.path === 'string' ? body.path : '/'

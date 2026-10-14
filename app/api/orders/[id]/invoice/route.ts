@@ -5,14 +5,14 @@ import { InvoicePDF } from '@/components/pdf/invoice-pdf';
 import { RentalAgreementPDF } from '@/components/pdf/rental-agreement-pdf';
 import React from 'react';
 import { userOwnsOrder } from '@/lib/orders/ownership';
-import { isStaffUser } from '@/lib/auth/roles';
+import { hasPermission } from '@/lib/auth/authorization';
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: Promise<{ id: string }> | { id: string } }
+        { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const resolvedParams = await Promise.resolve(params);
+        const resolvedParams = await params;
         const orderId = resolvedParams.id;
         const { searchParams } = new URL(req.url);
         const type = searchParams.get('type') || 'invoice';
@@ -34,7 +34,7 @@ export async function GET(
             return NextResponse.json({ error: 'Order not found' }, { status: 404 });
         }
 
-        const staff = await isStaffUser(user.id);
+        const staff = await hasPermission('orders.view');
         if (!staff && !userOwnsOrder(user, order)) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }

@@ -64,14 +64,16 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: ClipboardCheck,
         label: 'Week Prep',
         href: '/admin/week-prep',
+        permission: 'orders.view',
         keywords: ['weekend', 'prep', 'readiness', 'fulfillment'],
       },
-      { icon: Calendar, label: 'Calendar', href: '/admin/calendar', keywords: ['schedule'] },
-      { icon: Activity, label: 'Activity', href: '/admin/activity', keywords: ['feed', 'audit'] },
+      { icon: Calendar, label: 'Calendar', href: '/admin/calendar', permission: 'orders.view', keywords: ['schedule'] },
+      { icon: Activity, label: 'Activity', href: '/admin/activity', permission: 'settings.view', keywords: ['feed', 'audit'] },
       {
         icon: TrendingUp,
         label: 'Ops Intelligence',
         href: '/admin/analytics',
+        permission: 'reports.view',
         keywords: ['reports', 'revenue', 'analytics', 'gmv', 'intelligence', 'funnel'],
       },
       {
@@ -96,6 +98,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: FileText,
         label: 'Leads',
         href: '/admin/consultations',
+        permission: 'consultations.view',
         keywords: ['consultations', 'inquiries', 'crm'],
       },
       {
@@ -108,6 +111,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: MessageSquare,
         label: 'Messages',
         href: '/admin/messages',
+        permission: 'customers.view',
         keywords: ['inbox', 'chat'],
       },
       {
@@ -126,26 +130,29 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: CalendarDays,
         label: 'Warehouse schedule',
         href: '/admin/warehouse/schedule',
+        permission: 'orders.view',
         keywords: ['pick', 'pack', 'load', 'warehouse tasks'],
       },
-      { icon: QrCode, label: 'Scanner', href: '/admin/scan', keywords: ['qr', 'pick'] },
+      { icon: QrCode, label: 'Scanner', href: '/admin/scan', permission: 'orders.view', keywords: ['qr', 'pick'] },
       {
         icon: FileOutput,
         label: 'Pack slips',
         href: '/admin/pack-slip',
+        permission: 'orders.view',
         keywords: ['packing', 'warehouse slip'],
       },
-      { icon: Box, label: 'Delivery', href: '/admin/delivery', keywords: ['routes', 'dropoff'] },
-      { icon: Briefcase, label: 'Bags', href: '/admin/bags', keywords: ['kits', 'manifests'] },
-      { icon: Archive, label: 'Inventory', href: '/admin/inventory', keywords: ['stock'] },
+      { icon: Box, label: 'Delivery', href: '/admin/delivery', permission: 'orders.view', keywords: ['routes', 'dropoff'] },
+      { icon: Briefcase, label: 'Bags', href: '/admin/bags', permission: 'orders.view', keywords: ['kits', 'manifests'] },
+      { icon: Archive, label: 'Inventory', href: '/admin/inventory', permission: 'orders.view', keywords: ['stock'] },
       {
         icon: MapPin,
         label: 'Warehouse',
         href: '/admin/warehouse/locations',
+        permission: 'orders.view',
         keywords: ['locations', 'bins'],
       },
-      { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks', keywords: ['todo', 'team'] },
-      { icon: Truck, label: 'Logistics', href: '/admin/logistics', keywords: ['hub', 'ops', 'map'] },
+      { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks', permission: 'orders.view', keywords: ['todo', 'team'] },
+      { icon: Truck, label: 'Logistics', href: '/admin/logistics', permission: 'orders.view', keywords: ['hub', 'ops', 'map'] },
     ],
   },
   {
@@ -159,8 +166,8 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         permission: 'products.view',
         keywords: ['items', 'rentals'],
       },
-      { icon: Layers, label: 'Categories', href: '/admin/categories', keywords: ['taxonomy'] },
-      { icon: ClipboardList, label: 'Packages', href: '/admin/packages', keywords: ['bundles'] },
+      { icon: Layers, label: 'Categories', href: '/admin/categories', permission: 'products.view', keywords: ['taxonomy'] },
+      { icon: ClipboardList, label: 'Packages', href: '/admin/packages', permission: 'products.view', keywords: ['bundles'] },
       {
         icon: ImageIcon,
         label: 'Portfolio',
@@ -183,6 +190,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: Handshake,
         label: 'Preferred partners',
         href: '/admin/partners',
+        permission: 'customers.view',
         keywords: ['planners', 'decorators', 'preferred', 'trade', 'partner', 'vendor'],
       },
       {
@@ -223,28 +231,30 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
 ]
 
 export const ADMIN_QUICK_ACTIONS: AdminNavItem[] = [
-  { icon: Plus, label: 'New order', href: '/admin/orders/new', keywords: ['create'] },
+  { icon: Plus, label: 'New order', href: '/admin/orders/new', permission: 'orders.create', keywords: ['create'] },
   {
     icon: ClipboardCheck,
     label: 'Open Week Prep',
     href: '/admin/week-prep',
+    permission: 'orders.view',
     keywords: ['weekend', 'prep', 'ready'],
   },
-  { icon: Plus, label: 'New product', href: '/admin/products/new', keywords: ['add', 'create'] },
-  { icon: Plus, label: 'New package', href: '/admin/packages/new', keywords: ['add', 'create'] },
+  { icon: Plus, label: 'New product', href: '/admin/products/new', permission: 'products.create', keywords: ['add', 'create'] },
+  { icon: Plus, label: 'New package', href: '/admin/packages/new', permission: 'products.view', keywords: ['add', 'create'] },
   {
     icon: Handshake,
     label: 'Review partners',
     href: '/admin/partners',
+    permission: 'customers.view',
     keywords: ['approve', 'planner', 'preferred'],
   },
 ]
 
 /** Primary mobile tabs (scan + menu are chrome, not listed here) */
 export const ADMIN_MOBILE_TABS: AdminNavItem[] = [
-  { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
-  { icon: ClipboardCheck, label: 'Week Prep', href: '/admin/week-prep' },
-  { icon: MessageSquare, label: 'Inbox', href: '/admin/messages' },
+  { icon: ShoppingCart, label: 'Orders', href: '/admin/orders', permission: 'orders.view' },
+  { icon: ClipboardCheck, label: 'Week Prep', href: '/admin/week-prep', permission: 'orders.view' },
+  { icon: MessageSquare, label: 'Inbox', href: '/admin/messages', permission: 'customers.view' },
 ]
 
 export function isAdminRouteActive(pathname: string, href: string): boolean {

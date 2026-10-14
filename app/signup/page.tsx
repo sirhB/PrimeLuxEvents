@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from 'sonner'
 import { safeInternalPath } from '@/lib/security/safe-path'
 import { assertAuthAttemptAllowed } from '@/app/actions/auth-rate-limit'
+import { BrandLockup } from '@/components/brand/brand-logo'
 
 function SignupForm() {
   const [fullName, setFullName] = useState('')
@@ -64,7 +65,10 @@ function SignupForm() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--linen,var(--ink))] px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-[var(--linen,var(--ink))] px-4">
+      <Link href="/" aria-label="Prime Lux Events" className="inline-flex">
+        <BrandLockup className="text-[1.7rem]" />
+      </Link>
       <Card className="w-full max-w-md border-border/60 bg-white/90 shadow-xl">
         <CardHeader className="space-y-2">
           <CardTitle className="font-serif text-3xl font-light tracking-tight">Create your portal</CardTitle>

@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/sheet'
 import { AccountNav, type PartnerNavStatus } from '@/components/account-sidebar'
 import { ThemeSwitcher } from '@/components/theme-switcher'
+import { BrandLockup } from '@/components/brand/brand-logo'
 
 interface AccountPortalHeaderProps {
   userName: string
@@ -85,8 +86,9 @@ export function AccountPortalHeader({
       <Sheet open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
         <SheetContent side="left" className="w-[min(100%,20rem)] gap-0 border-white/10 bg-[var(--sidebar-navy)] p-0 text-[var(--sidebar-navy-text)]">
           <SheetHeader className="border-b border-white/10 px-6 py-5 text-left">
-            <SheetTitle className="text-lg font-semibold tracking-tight text-white">
-              PrimeLux Portal
+            <SheetTitle className="text-white">
+              <BrandLockup tone="on-dark" className="text-[1rem]" />
+              <span className="sr-only">Prime Lux Events</span>
             </SheetTitle>
             <SheetDescription className="sr-only">
               Account navigation

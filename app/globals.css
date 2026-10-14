@@ -175,6 +175,17 @@
   box-shadow: var(--dashboard-shadow);
 }
 
+.brand-lockup {
+  --brand-ink: var(--theme-dark);
+  --brand-gold: var(--theme-accent);
+  color: var(--brand-gold);
+}
+
+.brand-lockup-on-dark {
+  --brand-ink: var(--theme-accent-on-dark);
+  --brand-gold: var(--theme-accent-on-dark);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .admin-theme *,
   .admin-theme *::before,

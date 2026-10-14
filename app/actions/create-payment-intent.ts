@@ -8,7 +8,7 @@ import {
 } from './checkout'
 import { createClient } from '@/lib/supabase/server'
 import { userOwnsOrder } from '@/lib/orders/ownership'
-import { isStaffUser } from '@/lib/auth/roles'
+import { hasPermission } from '@/lib/auth/authorization'
 import { clampCheckoutAmount } from '@/lib/security/checkout-amounts'
 import { checkRateLimit, clientIpFromHeaders } from '@/lib/security/rate-limit'
 import { headers } from 'next/headers'
@@ -180,7 +180,7 @@ export async function createBalancePaymentIntent(orderId: string, amount: number
             return { error: 'Order not found' }
         }
 
-        const staff = await isStaffUser(user.id)
+        const staff = await hasPermission('orders.update')
         if (!staff && !userOwnsOrder(user, order)) {
             return { error: 'You do not have permission to pay this order' }
         }

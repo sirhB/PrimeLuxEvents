@@ -4,6 +4,8 @@ import { getUserProfileForMiddleware, serializeAuthCache, deserializeAuthCache }
 import { requireSupabaseAnonKey, requireSupabaseUrl } from '@/lib/supabase/env'
 
 export async function updateSession(request: NextRequest) {
+    request.headers.set('x-pathname', request.nextUrl.pathname)
+
     let supabaseResponse = NextResponse.next({
         request,
     })

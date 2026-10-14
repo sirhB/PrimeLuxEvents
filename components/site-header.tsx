@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils"
 import { PwaBackButton } from "@/components/pwa/pwa-back-button"
 import { COMPANY } from "@/lib/company"
 import { ThemeSwitcher } from "@/components/theme-switcher"
+import { BrandLockup } from "@/components/brand/brand-logo"
 
 interface SiteHeaderProps {
   initialSettings?: {
@@ -79,9 +80,6 @@ export function SiteHeader({
     { href: "/about", label: "About" },
   ]
 
-  const isDarkPage = false
-  const headerTheme = scrolled ? 'light' : 'light'
-
   return (
     <>
       <div className="bg-[var(--surface)] text-foreground py-2.5 px-4 text-[10px] font-bold uppercase tracking-[0.2em] relative z-50 border-b border-border">
@@ -115,17 +113,14 @@ export function SiteHeader({
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
           {/* Mobile Menu Trigger */}
           <div className="flex items-center lg:hidden">
-            <PwaBackButton isDark={headerTheme === 'dark'} />
+            <PwaBackButton isDark={false} />
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
                   aria-label="Open menu"
-                  className={cn(
-                    "hover:bg-gold/10 transition-colors",
-                    headerTheme === 'dark' ? "text-white" : "text-black"
-                  )}
+                  className="hover:bg-gold/10 transition-colors text-black"
                 >
                   <Menu className="h-6 w-6" />
                   <span className="sr-only">Open menu</span>
@@ -134,8 +129,8 @@ export function SiteHeader({
               <SheetContent side="left" className="w-full sm:w-[400px] bg-[var(--surface)] border-r border-border p-0 text-foreground">
                 <div className="flex flex-col h-full">
                   <div className="p-8 border-b border-border">
-                    <Link href="/" onClick={() => setIsOpen(false)} className="font-serif text-2xl font-light tracking-tighter">
-                      PrimeLux<span className="text-gold">.</span>
+                    <Link href="/" onClick={() => setIsOpen(false)} aria-label="Prime Lux Events" className="inline-flex">
+                      <BrandLockup className="text-[1.35rem]" />
                     </Link>
                   </div>
                   <nav className="flex-1 px-8 py-12 flex flex-col gap-8">
@@ -182,13 +177,8 @@ export function SiteHeader({
           </div>
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <span className={cn(
-              "font-serif text-2xl md:text-3xl font-light tracking-tighter transition-colors group-hover:text-gold",
-              headerTheme === 'dark' ? "text-white" : "text-black"
-            )}>
-              PrimeLux<span className="text-gold">.</span>
-            </span>
+          <Link href="/" aria-label="Prime Lux Events" className="inline-flex items-center">
+            <BrandLockup className="text-[1.05rem] sm:text-[1.2rem]" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -201,7 +191,7 @@ export function SiteHeader({
                   "text-[11px] font-bold uppercase tracking-[0.2em] transition-all relative group",
                   pathname === link.href
                     ? "text-gold"
-                    : headerTheme === 'dark' ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-black"
+                    : "text-gray-600 hover:text-black"
                 )}
               >
                 {link.label}
@@ -215,9 +205,7 @@ export function SiteHeader({
 
           {/* Actions */}
           <div className="flex items-center gap-2 md:gap-6">
-            <div className={cn(
-              headerTheme === 'dark' ? "text-white" : "text-black"
-            )}>
+            <div className="text-black">
               <SearchTrigger onClick={() => setIsSearchOpen(true)} />
             </div>
 
@@ -225,7 +213,7 @@ export function SiteHeader({
               href="/account"
               className={cn(
                 "hidden lg:block text-[11px] font-bold uppercase tracking-[0.2em] transition-colors",
-                headerTheme === 'dark' ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-black"
+                "text-gray-600 hover:text-black"
               )}
             >
               Portal
@@ -238,10 +226,7 @@ export function SiteHeader({
               Inquire
             </Link>
 
-            <div className={cn(
-              "relative",
-              headerTheme === 'dark' ? "text-white" : "text-black"
-            )}>
+            <div className="relative text-black">
               <CartSheet />
             </div>
           </div>

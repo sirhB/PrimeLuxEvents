@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { BrandLockup, CrownMark } from '@/components/brand/brand-logo'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { useAdminSidebar } from './sidebar-context'
@@ -255,25 +256,23 @@ export function ModernSidebar() {
           'pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]',
         )}
       >
-        <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-white/10 px-3">
+        <div className={cn(
+          'relative flex shrink-0 items-center border-b border-white/10 px-3',
+          isCollapsed && !isMobileOpen ? 'flex-col py-3' : 'justify-center py-4 pr-10',
+        )}>
           <Link
             href="/admin"
+            aria-label="Prime Lux Events"
             className={cn(
-              'flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lux-gold-bright)]/70',
-              isCollapsed && !isMobileOpen && 'md:justify-center',
+              'flex min-w-0 items-center justify-center overflow-hidden rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lux-gold-bright)]/70',
+              isCollapsed && !isMobileOpen && 'mx-auto',
             )}
             onClick={() => setIsMobileOpen(false)}
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white text-sm font-bold text-[var(--sidebar-navy)]">
-              P
-            </div>
-            {(!isCollapsed || isMobileOpen) && (
-              <div className="min-w-0 leading-tight">
-                <p className="truncate text-sm font-semibold tracking-tight text-white">PrimeLux</p>
-                <p className="truncate text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--sidebar-navy-muted)]">
-                  Ops
-                </p>
-              </div>
+            {isCollapsed && !isMobileOpen ? (
+              <CrownMark className="h-8 w-8 text-[var(--theme-accent-on-dark)]" />
+            ) : (
+              <BrandLockup tone="on-dark" className="text-[0.95rem]" />
             )}
           </Link>
 
@@ -282,7 +281,7 @@ export function ModernSidebar() {
             size="icon"
             className={cn(
               'hidden h-8 w-8 text-[var(--sidebar-navy-muted)] hover:bg-white/10 hover:text-white md:flex',
-              isCollapsed && 'mx-auto',
+              isCollapsed && !isMobileOpen ? 'static mx-auto mt-1' : 'absolute right-1 top-2',
             )}
             onClick={() => {
               void haptics.impact('light')

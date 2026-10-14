@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { isStaffUser } from '@/lib/auth/roles'
+import { requireApiPermission } from '@/lib/auth/authorization'
 import { checkRateLimit } from '@/lib/security/rate-limit'
 import {
   optimizeDeliveryRoute,
@@ -16,12 +16,14 @@ type Body = {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireApiPermission('orders.update')
+  if (denied) return denied
+
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-
-  if (!user || !(await isStaffUser(user.id))) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

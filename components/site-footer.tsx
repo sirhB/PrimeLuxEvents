@@ -5,6 +5,7 @@ import { Instagram, Mail, Phone, MapPin, ArrowRight } from "lucide-react"
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { COMPANY } from "@/lib/company"
+import { BrandLockup } from "@/components/brand/brand-logo"
 
 export function SiteFooter() {
   const [settings, setSettings] = useState({
@@ -41,8 +42,8 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-16">
           {/* Brand Column */}
           <div className="space-y-6">
-            <Link href="/" className="font-serif text-3xl font-light tracking-tighter group">
-              PrimeLux<span className="text-gold group-hover:text-foreground transition-colors">.</span>
+            <Link href="/" aria-label="Prime Lux Events" className="inline-flex">
+              <BrandLockup tone="on-dark" className="text-[1.45rem]" />
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs font-light">
               Luxury party rentals and event styling from Shelton, CT — serving Connecticut, Rhode Island, and Massachusetts.
