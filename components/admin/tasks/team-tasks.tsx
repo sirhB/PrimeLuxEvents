@@ -27,7 +27,7 @@ export function TeamTasks({ initial, live = false }: { initial: DeskWorkspace; l
               <ul className="mt-3 space-y-2">
                 {api.desk.tasks.filter((task) => task.status === status).map((task) => (
                   <li key={task.id} className="border border-[var(--dashboard-border)] p-3 text-sm">
-                    <p className="font-medium">{task.title}</p>
+                    <p className="font-medium">{task.title}{task.audience === 'client' ? ' · client' : ''}</p>
                     <p className="text-[var(--dashboard-text-muted)]">{task.assignee_name} · {task.due_on || 'No date'}</p>
                     {status !== 'completed' && <button type="button" className="mt-2 text-[11px] uppercase tracking-[0.14em] underline" onClick={() => api.markTask(task.id, status === 'pending' ? 'in_progress' : 'completed')}>{status === 'pending' ? 'Start' : 'Done'}</button>}
                   </li>

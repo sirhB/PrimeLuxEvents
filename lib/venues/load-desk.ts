@@ -5,7 +5,7 @@ export async function loadVenueDesk(): Promise<{ desk: DeskWorkspace; live: bool
   const sample = buildSampleDesk()
   try {
     const supabase = await createClient()
-    const [leads, contacts, companies, activities, tours, holds, proposals, lines, contracts, payments, reminders, tasks, comments, templates, items, views, notifications] = await Promise.all([
+    const [leads, contacts, companies, activities, tours, holds, proposals, lines, contracts, payments, reminders, tasks, comments, templates, items, views, notifications, schedule, layouts, documents, messages] = await Promise.all([
       supabase.from('venue_leads').select('*').order('created_at', { ascending: false }),
       supabase.from('crm_contacts').select('*'),
       supabase.from('crm_companies').select('*'),
@@ -23,6 +23,10 @@ export async function loadVenueDesk(): Promise<{ desk: DeskWorkspace; live: bool
       supabase.from('task_template_items').select('*'),
       supabase.from('crm_saved_views').select('*'),
       supabase.from('staff_notifications').select('*').order('created_at', { ascending: false }),
+      supabase.from('crm_schedule').select('*').order('starts_at', { ascending: true }),
+      supabase.from('crm_layouts').select('*'),
+      supabase.from('crm_documents').select('*').order('created_at', { ascending: false }),
+      supabase.from('crm_messages').select('*').order('created_at', { ascending: true }),
     ])
     if (leads.error || !leads.data) return { desk: sample, live: false }
     const contactRows = contacts.data || []
@@ -43,7 +47,15 @@ export async function loadVenueDesk(): Promise<{ desk: DeskWorkspace; live: bool
         value_cents: row.value_cents || 0,
         event_type: row.event_type || 'Event',
       })),
-      activities: (activities.data || []).map((row) => ({ id: row.id, lead_id: row.lead_id, kind: row.kind, body: row.body, author_name: row.author_name || 'Staff', created_at: row.created_at })),
+      activities: (activities.data || []).map((row) => ({
+        id: row.id,
+        lead_id: row.lead_id,
+        kind: row.kind === 'call' || row.kind === 'email' || row.kind === 'stage' || row.kind === 'client' ? row.kind : 'note',
+        body: row.body,
+        author_name: row.author_name || 'Staff',
+        created_at: row.created_at,
+        visibility: row.visibility === 'client' || row.kind === 'client' || row.kind === 'stage' ? 'client' as const : 'internal' as const,
+      })),
       tours: (tours.data || []).map((row) => ({ id: row.id, lead_id: row.lead_id, venue_id: row.venue_id, venue_name: row.venue_name || 'Venue', starts_at: row.starts_at, status: row.status })),
       holds: (holds.data || []).map((row) => ({ id: row.id, lead_id: row.lead_id, venue_id: row.venue_id, venue_name: row.venue_name || 'Venue', starts_on: row.starts_on, ends_on: row.ends_on, status: row.status })),
       proposals: (proposals.data || []).map((row) => ({
@@ -69,6 +81,7 @@ export async function loadVenueDesk(): Promise<{ desk: DeskWorkspace; live: bool
         checklist: Array.isArray(row.checklist) ? row.checklist : [],
         comments: (comments.data || []).filter((comment) => comment.task_id === row.id).map((comment) => ({ id: comment.id, body: comment.body, author_name: comment.author_name || 'Staff', created_at: comment.created_at })),
         template_key: row.template_key,
+        audience: row.audience === 'client' ? 'client' as const : 'staff' as const,
       })) as StaffTask[],
       templates: (templates.data && templates.data.length ? templates.data : sample.templates).map((row) => ({
         id: row.id,
@@ -92,6 +105,10 @@ export async function loadVenueDesk(): Promise<{ desk: DeskWorkspace; live: bool
         read: Boolean(row.read_at),
         kind: row.kind === 'due' ? 'due' as const : 'assignment' as const,
       })),
+      schedule: (schedule.data || []).map((row) => ({ id: row.id, lead_id: row.lead_id, starts_at: row.starts_at, title: row.title, notes: row.notes || '' })),
+      layouts: (layouts.data || []).map((row) => ({ lead_id: row.lead_id, body: row.body || '', floor_plan_label: row.floor_plan_label || 'Floor plan' })),
+      documents: (documents.data || []).map((row) => ({ id: row.id, lead_id: row.lead_id, name: row.name, kind: row.kind === 'vendor' || row.kind === 'inspiration' ? row.kind : 'other', uploaded_by: row.uploaded_by || 'Client', created_at: row.created_at })),
+      messages: (messages.data || []).map((row) => ({ id: row.id, lead_id: row.lead_id, author_name: row.author_name || 'Client', role: row.role === 'staff' ? 'staff' as const : 'client' as const, body: row.body, created_at: row.created_at })),
     }
     if (!desk.contacts.length) {
       desk.contacts = desk.leads.map((lead) => ({

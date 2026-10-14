@@ -43,6 +43,9 @@ export function LeadFile({
   const reminders = api.desk.reminders.filter((item) => item.lead_id === lead.id)
   const tours = api.desk.tours.filter((item) => item.lead_id === lead.id)
   const holds = api.desk.holds.filter((item) => item.lead_id === lead.id)
+  const clientNotes = api.desk.messages.filter((item) => item.lead_id === lead.id)
+  const clientFiles = api.desk.documents.filter((item) => item.lead_id === lead.id)
+  const layout = api.desk.layouts.find((item) => item.lead_id === lead.id)
 
   function addLine() {
     const lines: ProposalLine[] = [...(proposal?.lines || []), { id: `line-${Date.now()}`, kind: 'service', name: 'Service', quantity: 1, unit_cents: 100_000 }]
@@ -102,6 +105,18 @@ export function LeadFile({
                 </li>
               ))}
             </ol>
+          </section>
+
+          <section className="border border-[var(--dashboard-border)] bg-white p-4">
+            <h2 className="font-serif text-2xl">From the client</h2>
+            <p className="mt-2 text-sm text-[var(--dashboard-text-muted)]">{layout ? layout.floor_plan_label : 'No floor plan yet'}{layout?.body ? ` · ${layout.body}` : ''}</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              {clientFiles.map((file) => <li key={file.id}>{file.kind} · {file.name}</li>)}
+              {clientFiles.length === 0 && <li className="text-[var(--dashboard-text-muted)]">No documents yet.</li>}
+            </ul>
+            <ul className="mt-3 space-y-2 text-sm">
+              {clientNotes.map((item) => <li key={item.id}><span className="uppercase tracking-[0.12em] text-[var(--dashboard-text-muted)]">{item.author_name}</span> · {item.body}</li>)}
+            </ul>
           </section>
 
           <section className="border border-[var(--dashboard-border)] bg-white p-4">
@@ -165,7 +180,7 @@ export function LeadFile({
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-medium">{task.title}</p>
-                      <p className="text-xs uppercase tracking-[0.12em] text-[var(--dashboard-text-muted)]">{task.priority} · {task.assignee_name} · {task.due_on || 'No date'} · {task.status}</p>
+                      <p className="text-xs uppercase tracking-[0.12em] text-[var(--dashboard-text-muted)]">{task.audience === 'client' ? 'Shared with client · ' : ''}{task.priority} · {task.assignee_name} · {task.due_on || 'No date'} · {task.status}</p>
                     </div>
                     {task.status !== 'completed' && (
                       <button type="button" className="text-[11px] uppercase tracking-[0.14em] underline" onClick={() => api.markTask(task.id, 'completed')}>Done</button>

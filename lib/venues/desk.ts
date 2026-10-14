@@ -1,3 +1,5 @@
+import { VENUE_LISTINGS } from './directory'
+
 export const PIPELINE_STAGES = [
   { id: 'inquiry', label: 'Inquiry' },
   { id: 'tour', label: 'Tour' },
@@ -24,10 +26,11 @@ export type Contact = { id: string; company_id: string | null; name: string; ema
 export type Activity = {
   id: string
   lead_id: string
-  kind: 'note' | 'call' | 'email' | 'stage'
+  kind: 'note' | 'call' | 'email' | 'stage' | 'client'
   body: string
   author_name: string
   created_at: string
+  visibility?: 'internal' | 'client'
 }
 
 export type Tour = { id: string; lead_id: string; venue_id: string | null; venue_name: string; starts_at: string; status: string }
@@ -54,7 +57,20 @@ export type StaffTask = {
   checklist: CheckItem[]
   comments: { id: string; body: string; author_name: string; created_at: string }[]
   template_key: string | null
+  audience: 'staff' | 'client'
 }
+
+export type RunCue = { id: string; lead_id: string; starts_at: string; title: string; notes: string }
+export type LayoutNote = { lead_id: string; body: string; floor_plan_label: string }
+export type ClientDocument = { id: string; lead_id: string; name: string; kind: 'vendor' | 'inspiration' | 'other'; uploaded_by: string; created_at: string }
+export type ClientMessage = { id: string; lead_id: string; author_name: string; role: 'client' | 'staff'; body: string; created_at: string }
+
+export type ClientChange =
+  | { type: 'details'; guest_count: number; details: string }
+  | { type: 'message'; body: string }
+  | { type: 'document'; name: string; kind: ClientDocument['kind'] }
+  | { type: 'sign'; name: string }
+  | { type: 'complete_task'; taskId: string }
 
 export type TaskTemplateItem = {
   key: string
@@ -105,6 +121,10 @@ export type DeskWorkspace = {
   templates: TaskTemplate[]
   views: SavedView[]
   notices: Notice[]
+  schedule: RunCue[]
+  layouts: LayoutNote[]
+  documents: ClientDocument[]
+  messages: ClientMessage[]
 }
 
 export function normalizeStage(stage: string | null | undefined): PipelineStage {
@@ -188,6 +208,7 @@ export function tasksForStage(desk: DeskWorkspace, lead: Lead, stage: PipelineSt
       checklist: item.checklist.map((label) => label.trim()).filter(Boolean).map((label, index) => ({ id: `${item.key}-${index}`, label, done: false })),
       comments: [],
       template_key: item.key,
+      audience: 'staff',
     }))
 }
 
@@ -217,6 +238,7 @@ export function applyStage(desk: DeskWorkspace, leadId: string, stage: PipelineS
       body: `Stage moved from ${from} to ${to}.`,
       author_name: author,
       created_at: stamp(),
+      visibility: 'client',
     }, ...desk.activities],
     notices: [...notices, ...desk.notices],
   }
@@ -294,6 +316,7 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
       ],
       comments: [{ id: 'cm1', body: 'Left a voicemail at 9:40.', author_name: 'Mara Quinn', created_at: `${today}T13:40:00Z` }],
       template_key: 'tour-confirm',
+      audience: 'staff',
     },
     {
       id: 'task-prep',
@@ -311,6 +334,7 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
       ],
       comments: [],
       template_key: 'tour-prep',
+      audience: 'staff',
     },
     {
       id: 'task-vendors',
@@ -329,6 +353,52 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
       ],
       comments: [],
       template_key: 'book-vendors',
+      audience: 'staff',
+    },
+    {
+      id: 'task-guests',
+      lead_id: 'lead-avery',
+      booking_id: null,
+      title: 'Confirm your guest count',
+      description: 'Shared with Avery Cole.',
+      status: 'pending',
+      priority: 'medium',
+      assignee_name: 'Avery Cole',
+      due_on: isoOffset(3, now),
+      checklist: [],
+      comments: [],
+      template_key: null,
+      audience: 'client',
+    },
+    {
+      id: 'task-inspiration',
+      lead_id: 'lead-avery',
+      booking_id: null,
+      title: 'Upload inspiration',
+      description: 'Shared with Avery Cole.',
+      status: 'pending',
+      priority: 'low',
+      assignee_name: 'Avery Cole',
+      due_on: isoOffset(6, now),
+      checklist: [],
+      comments: [],
+      template_key: null,
+      audience: 'client',
+    },
+    {
+      id: 'task-vendors-client',
+      lead_id: 'lead-avery',
+      booking_id: null,
+      title: 'Send vendor contacts',
+      description: 'Shared with Avery Cole.',
+      status: 'pending',
+      priority: 'medium',
+      assignee_name: 'Avery Cole',
+      due_on: isoOffset(8, now),
+      checklist: [],
+      comments: [],
+      template_key: null,
+      audience: 'client',
     },
   ]
   return {
@@ -336,9 +406,10 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
     contacts,
     leads,
     activities: [
-      { id: 'act1', lead_id: 'lead-avery', kind: 'email', body: 'Sent the Conservatory lookbook and November dates.', author_name: 'Mara Quinn', created_at: `${isoOffset(-3, now)}T15:00:00Z` },
-      { id: 'act2', lead_id: 'lead-avery', kind: 'call', body: 'Spoke for twelve minutes. They want a ceremony and a seated dinner.', author_name: 'Mara Quinn', created_at: `${isoOffset(-1, now)}T18:10:00Z` },
-      { id: 'act3', lead_id: 'lead-avery', kind: 'note', body: 'Asked for a late-afternoon ceremony.', author_name: 'Mara Quinn', created_at: `${today}T14:00:00Z` },
+      { id: 'act1', lead_id: 'lead-avery', kind: 'email', body: 'Sent the Conservatory lookbook and November dates.', author_name: 'Mara Quinn', created_at: `${isoOffset(-3, now)}T15:00:00Z`, visibility: 'client' },
+      { id: 'act2', lead_id: 'lead-avery', kind: 'call', body: 'Spoke for twelve minutes. They want a ceremony and a seated dinner.', author_name: 'Mara Quinn', created_at: `${isoOffset(-1, now)}T18:10:00Z`, visibility: 'internal' },
+      { id: 'act3', lead_id: 'lead-avery', kind: 'note', body: 'Asked for a late-afternoon ceremony.', author_name: 'Mara Quinn', created_at: `${today}T14:00:00Z`, visibility: 'internal' },
+      { id: 'act4', lead_id: 'lead-avery', kind: 'client', body: 'Updated the guest count to 140.', author_name: 'Avery Cole', created_at: `${isoOffset(-2, now)}T16:20:00Z`, visibility: 'client' },
     ],
     tours: [
       { id: 'tour-avery', lead_id: 'lead-avery', venue_id: '11111111-1111-4111-8111-111111111111', venue_name: 'The Conservatory', starts_at: `${isoOffset(4, now)}T18:00:00Z`, status: 'scheduled' },
@@ -360,6 +431,7 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
       },
     ],
     contracts: [
+      { id: 'con-avery', lead_id: 'lead-avery', proposal_id: 'prop-avery', status: 'sent', signed_at: null },
       { id: 'con-nina', lead_id: 'lead-nina', proposal_id: null, status: 'sent', signed_at: null },
       { id: 'con-priya', lead_id: 'lead-priya', proposal_id: null, status: 'signed', signed_at: `${isoOffset(-6, now)}T00:00:00Z` },
     ],
@@ -381,7 +453,212 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
       { id: 'n-assign', title: 'Task assigned', body: 'Confirm the tour time is on your list for today.', href: '/admin/my-tasks', read: false, kind: 'assignment' },
       { id: 'n-due', title: 'Task overdue', body: 'Prep the room was due two days ago.', href: '/admin/my-tasks', read: false, kind: 'due' },
     ],
+    schedule: [
+      { id: 'cue-1', lead_id: 'lead-avery', starts_at: '16:00', title: 'Guests arrive', notes: 'Lawn doors open. Coat check in the foyer.' },
+      { id: 'cue-2', lead_id: 'lead-avery', starts_at: '16:30', title: 'Ceremony', notes: 'Facing the glass. Seating for 140.' },
+      { id: 'cue-3', lead_id: 'lead-avery', starts_at: '17:15', title: 'Cocktails', notes: 'Passed bites. Lounge on the west wall.' },
+      { id: 'cue-4', lead_id: 'lead-avery', starts_at: '18:30', title: 'Dinner', notes: 'Long table under the ridge.' },
+      { id: 'cue-5', lead_id: 'lead-avery', starts_at: '20:00', title: 'Dancing', notes: 'Floor clears to the stone.' },
+    ],
+    layouts: [
+      { lead_id: 'lead-avery', floor_plan_label: 'Conservatory, ceremony and dinner', body: 'Ceremony faces the glass. Dinner is a single long table. The dance floor takes the west end after the cake is cut. Keep the bridal room closed during cocktails.' },
+    ],
+    documents: [
+      { id: 'doc-1', lead_id: 'lead-avery', name: 'Florist agreement.pdf', kind: 'vendor', uploaded_by: 'Avery Cole', created_at: `${isoOffset(-1, now)}T12:00:00Z` },
+      { id: 'doc-2', lead_id: 'lead-avery', name: 'Evening light references', kind: 'inspiration', uploaded_by: 'Avery Cole', created_at: `${today}T09:10:00Z` },
+    ],
+    messages: [
+      { id: 'msg-1', lead_id: 'lead-avery', author_name: 'Mara Quinn', role: 'staff', body: 'The Conservatory is held for the afternoon of the 14th. I will walk you through the room on the tour.', created_at: `${isoOffset(-2, now)}T15:00:00Z` },
+      { id: 'msg-2', lead_id: 'lead-avery', author_name: 'Avery Cole', role: 'client', body: 'Can we add a small lounge for the cocktail hour, away from the ceremony chairs?', created_at: `${isoOffset(-1, now)}T19:40:00Z` },
+    ],
   }
+}
+
+export type ClientHub = {
+  lead: Lead
+  contact: Contact | null
+  venue: { name: string; neighborhood: string; city: string; capacity: number; description: string; amenities: string[] } | null
+  timeline: Activity[]
+  schedule: RunCue[]
+  layout: LayoutNote | null
+  proposalTitle: string | null
+  proposalStatus: Proposal['status'] | null
+  lines: ProposalLine[]
+  totalCents: number
+  contract: Contract | null
+  payments: Payment[]
+  tasks: StaffTask[]
+  documents: ClientDocument[]
+  messages: ClientMessage[]
+  meetings: { id: string; when: string; label: string; place: string }[]
+  coordinator: string
+}
+
+export function clientCanSeeActivity(activity: Activity) {
+  if (activity.visibility) return activity.visibility === 'client'
+  return activity.kind === 'client' || activity.kind === 'stage'
+}
+
+export function deskFromHub(hub: ClientHub): DeskWorkspace {
+  return {
+    companies: [],
+    contacts: hub.contact ? [hub.contact] : [],
+    leads: [hub.lead],
+    activities: hub.timeline,
+    tours: hub.meetings.map((item) => ({
+      id: item.id,
+      lead_id: hub.lead.id,
+      venue_id: hub.lead.venue_id,
+      venue_name: item.place,
+      starts_at: item.when.includes('T') ? item.when : item.when.replace(' ', 'T'),
+      status: 'scheduled',
+    })),
+    holds: [],
+    proposals: hub.proposalTitle
+      ? [{ id: hub.contract?.proposal_id || 'proposal', lead_id: hub.lead.id, title: hub.proposalTitle, status: hub.proposalStatus || 'sent', lines: hub.lines }]
+      : [],
+    contracts: hub.contract ? [hub.contract] : [],
+    payments: hub.payments,
+    reminders: [],
+    tasks: hub.tasks,
+    templates: [],
+    views: [],
+    notices: [],
+    schedule: hub.schedule,
+    layouts: hub.layout ? [hub.layout] : [],
+    documents: hub.documents,
+    messages: hub.messages,
+  }
+}
+
+export function toClientHub(desk: DeskWorkspace, leadId: string): ClientHub | null {
+  const lead = desk.leads.find((item) => item.id === leadId)
+  if (!lead) return null
+  const listing = VENUE_LISTINGS.find((item) => item.id === lead.venue_id) || null
+  const proposal = desk.proposals.find((item) => item.lead_id === lead.id && item.status !== 'draft')
+  return {
+    lead,
+    contact: desk.contacts.find((item) => item.id === lead.contact_id) || null,
+    venue: listing
+      ? { name: listing.name, neighborhood: listing.neighborhood, city: listing.city, capacity: listing.capacity, description: listing.description, amenities: listing.amenities }
+      : lead.venue_name
+        ? { name: lead.venue_name, neighborhood: '', city: '', capacity: 0, description: '', amenities: [] }
+        : null,
+    timeline: desk.activities.filter((item) => item.lead_id === lead.id && clientCanSeeActivity(item)).sort((a, b) => b.created_at.localeCompare(a.created_at)),
+    schedule: desk.schedule.filter((item) => item.lead_id === lead.id).sort((a, b) => a.starts_at.localeCompare(b.starts_at)),
+    layout: desk.layouts.find((item) => item.lead_id === lead.id) || null,
+    proposalTitle: proposal?.title || null,
+    proposalStatus: proposal?.status || null,
+    lines: proposal?.lines || [],
+    totalCents: proposal ? proposalTotal(proposal) : lead.value_cents,
+    contract: desk.contracts.find((item) => item.lead_id === lead.id) || null,
+    payments: desk.payments.filter((item) => item.lead_id === lead.id),
+    tasks: desk.tasks.filter((item) => item.lead_id === lead.id && item.audience === 'client' && item.status !== 'cancelled'),
+    documents: desk.documents.filter((item) => item.lead_id === lead.id),
+    messages: desk.messages.filter((item) => item.lead_id === lead.id).sort((a, b) => a.created_at.localeCompare(b.created_at)),
+    meetings: desk.tours.filter((item) => item.lead_id === lead.id && item.status !== 'cancelled').map((item) => ({
+      id: item.id,
+      when: item.starts_at.slice(0, 16).replace('T', ' '),
+      label: 'Tour',
+      place: item.venue_name,
+    })),
+    coordinator: lead.owner_name || 'Your coordinator',
+  }
+}
+
+function hubId(prefix: string) {
+  return `${prefix}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+export function applyClientChange(desk: DeskWorkspace, leadId: string, change: ClientChange): DeskWorkspace {
+  const lead = desk.leads.find((item) => item.id === leadId)
+  if (!lead) return desk
+  const author = contactName(desk, lead.contact_id)
+  const now = new Date().toISOString()
+  const activity = (body: string): Activity => ({
+    id: hubId('act'),
+    lead_id: leadId,
+    kind: 'client',
+    body,
+    author_name: author,
+    created_at: now,
+    visibility: 'client',
+  })
+  const taskFor = (title: string, body: string): StaffTask => ({
+    id: hubId('staff'),
+    lead_id: leadId,
+    booking_id: null,
+    title,
+    description: body,
+    status: 'pending',
+    priority: 'high',
+    assignee_name: lead.owner_name || 'Unassigned',
+    due_on: isoOffset(1),
+    checklist: [],
+    comments: [],
+    template_key: null,
+    audience: 'staff',
+  })
+  const withStaff = (body: string, title: string, patch: Partial<DeskWorkspace> = {}): DeskWorkspace => {
+    const spawned = taskFor(title, body)
+    return {
+      ...desk,
+      ...patch,
+      leads: patch.leads || desk.leads,
+      activities: [activity(body), ...desk.activities],
+      tasks: [spawned, ...(patch.tasks || desk.tasks)],
+      notices: [{ id: hubId('notice'), title: 'Task assigned', body: title, href: '/admin/my-tasks', read: false, kind: 'assignment' }, ...desk.notices],
+    }
+  }
+
+  if (change.type === 'details') {
+    const count = Math.max(1, Math.round(change.guest_count))
+    const body = change.details.trim()
+      ? `Updated the guest count to ${count}. ${change.details.trim()}`
+      : `Updated the guest count to ${count}.`
+    return withStaff(body, `Review guest count for ${author}`, {
+      leads: desk.leads.map((item) => item.id === leadId ? { ...item, guest_count: count } : item),
+    })
+  }
+  if (change.type === 'message') {
+    const body = change.body.trim()
+    if (!body) return desk
+    return withStaff(`${author} wrote: ${body}`, `Reply to ${author}`, {
+      messages: [...desk.messages, { id: hubId('msg'), lead_id: leadId, author_name: author, role: 'client', body, created_at: now }],
+    })
+  }
+  if (change.type === 'document') {
+    const name = change.name.trim()
+    if (!name) return desk
+    const body = `Uploaded ${name}.`
+    return withStaff(body, `Review ${author}'s upload`, {
+      documents: [...desk.documents, { id: hubId('doc'), lead_id: leadId, name, kind: change.kind, uploaded_by: author, created_at: now }],
+    })
+  }
+  if (change.type === 'sign') {
+    const name = change.name.trim()
+    if (!name) return desk
+    const existing = desk.contracts.find((item) => item.lead_id === leadId)
+    if (existing?.status === 'signed') return desk
+    const contract: Contract = {
+      id: existing?.id || hubId('con'),
+      lead_id: leadId,
+      proposal_id: existing?.proposal_id || null,
+      status: 'signed',
+      signed_at: now,
+    }
+    return withStaff(`${name} signed the contract.`, 'File the signed contract', {
+      contracts: existing
+        ? desk.contracts.map((item) => item.lead_id === leadId ? contract : item)
+        : [...desk.contracts, contract],
+    })
+  }
+  const shared = desk.tasks.find((item) => item.id === change.taskId && item.audience === 'client')
+  if (!shared || shared.status === 'completed') return desk
+  const body = `Completed “${shared.title}”.`
+  return withStaff(body, `Client finished: ${shared.title}`, {
+    tasks: desk.tasks.map((item) => item.id === shared.id ? { ...item, status: 'completed' } : item),
+  })
 }
 
 export function contactName(desk: DeskWorkspace, contactId: string) {

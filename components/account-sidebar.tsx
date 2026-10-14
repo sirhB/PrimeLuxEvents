@@ -10,6 +10,7 @@ import {
     LogOut,
     Heart,
     CalendarCheck,
+    CalendarRange,
     MessageSquare,
     Handshake,
     Percent,
@@ -30,6 +31,11 @@ export const accountNavItems = [
         title: 'Dashboard',
         href: '/account',
         icon: LayoutDashboard,
+    },
+    {
+        title: 'My event',
+        href: '/account/event',
+        icon: CalendarRange,
     },
     {
         title: 'My Orders',
