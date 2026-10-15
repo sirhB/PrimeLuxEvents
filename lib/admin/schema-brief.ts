@@ -3,7 +3,7 @@ import path from 'node:path'
 
 export type ColumnBrief = { name: string; type: string }
 
-const SECRET_COLUMN = /password|secret|service_role|api_key|anon_key|webhook|private_key/i
+const SECRET_COLUMN = /password|secret|service_role|api_key|anon_key|private_key/i
 
 const GROUPS: { title: string; tables: string[] }[] = [
   { title: 'Plans and leads', tables: ['event_plans', 'venue_leads', 'venues', 'venue_tours', 'venue_bookings'] },
@@ -27,6 +27,19 @@ const GROUPS: { title: string; tables: string[] }[] = [
   },
   { title: 'Client hub', tables: ['crm_schedule', 'crm_layouts', 'crm_documents', 'crm_messages'] },
   { title: 'Orders and payments', tables: ['orders', 'order_items', 'payments'] },
+  {
+    title: 'Bot control',
+    tables: [
+      'ops_bots',
+      'ops_bot_keys',
+      'ops_bot_activity',
+      'ops_bot_approvals',
+      'ops_bot_guardrails',
+      'ops_bot_prompt_versions',
+      'ops_bot_requests',
+      'ops_bot_webhook_deliveries',
+    ],
+  },
 ]
 
 function stripComments(sql: string) {

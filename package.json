@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:security": "node --experimental-strip-types scripts/check-safe-path.mjs",
+    "test:security": "node --experimental-strip-types scripts/check-safe-path.mjs && node --experimental-strip-types scripts/check-bot-control.mjs",
     "seed:new-db": "node scripts/seed-new-database.mjs",
     "bootstrap:super-admin": "node scripts/bootstrap-super-admin.mjs"
   },

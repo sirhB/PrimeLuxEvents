@@ -270,6 +270,13 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         keywords: ['grok', 'assistant', 'prompts', 'digest', 'ops'],
       },
       {
+        icon: Bot,
+        label: 'Bot inbox',
+        href: '/admin/bot-inbox',
+        permission: 'bot_inbox.view',
+        keywords: ['request', 'bot', 'ask'],
+      },
+      {
         icon: KeyRound,
         label: 'API keys',
         href: '/admin/api-keys',
