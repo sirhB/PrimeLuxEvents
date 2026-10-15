@@ -1,0 +1,27 @@
+Prime Lux Siri shortcut
+
+A signed .shortcut file cannot be produced here, so build this once on the iPhone. The Siri phrase is "Prime Lux".
+
+1. In Bot Control, create a key for the voice bot.
+   Scopes: leads:read and tasks:read.
+   Add tasks:write only if Siri may add a task or mark one done.
+2. Copy the token when it is shown. It is not shown again. Only a hash is stored.
+3. Open Shortcuts. Tap the plus button.
+4. Add Dictate Text.
+5. Add Get Contents of URL.
+   URL: https://YOUR-SITE/api/bot/voice
+   Method: POST
+   Header: Authorization
+   Value: Bearer YOUR-TOKEN
+   Request body: JSON
+   Field: query
+   Value: the Dictated Text variable
+6. Add Speak Text. Use the contents of the URL.
+7. Name the shortcut Prime Lux.
+8. Say "Prime Lux", then "What's due today?"
+9. If the phone is lost, revoke that key in Bot Control. The token stops working.
+
+The endpoint replies in short plain text.
+401 means the token is missing, wrong, or revoked.
+429 means the key was used too many times. Wait a minute.
+503 means the site or the database is offline.

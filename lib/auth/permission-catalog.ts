@@ -48,6 +48,8 @@ export const PERMISSION_AREAS: PermissionArea[] = [
   { resource: 'users', label: 'Team', description: 'Members, roles, and invitations', actions: ['view', 'create', 'update', 'delete', 'manage'] },
   { resource: 'reports', label: 'Reports', description: 'Analytics and reports', actions: ['view', 'create', 'manage'] },
   { resource: 'tasks', label: 'Tasks', description: 'Operational tasks', actions: ['view', 'create', 'update', 'delete', 'manage'] },
+  { resource: 'bot', label: 'Bot control', description: 'Copy setup prompts and run the operations bots', actions: ['view', 'manage'] },
+  { resource: 'bot_inbox', label: 'Bot inbox', description: 'Ask a bot to do something', actions: ['view', 'create'] },
 ]
 
 const ACTION_LABEL: Record<PermissionAction, string> = {
@@ -113,14 +115,15 @@ const STAFF_GRANTS = [
   'catalog.view', 'catalog.create', 'catalog.update',
   'delivery.view', 'delivery.update',
   'invoices.view', 'invoices.create', 'invoices.update',
+  'bot_inbox.view', 'bot_inbox.create',
 ]
 
 const VIEWER_RESOURCES = [
   'events', 'orders', 'products', 'customers', 'consultations', 'venues', 'crm',
-  'appointments', 'content', 'settings', 'users', 'reports', 'tasks',
+  'appointments', 'content', 'settings', 'users', 'reports', 'tasks', 'bot_inbox',
 ]
 
-const COORDINATOR_RESOURCES = ['events', 'consultations', 'customers', 'orders', 'venues', 'crm', 'tasks']
+const COORDINATOR_RESOURCES = ['events', 'consultations', 'customers', 'orders', 'venues', 'crm', 'tasks', 'bot_inbox']
 
 function namesFor(resources: string[], actions: PermissionAction[]): string[] {
   const allowed = new Set(actions)

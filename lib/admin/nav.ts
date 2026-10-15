@@ -34,6 +34,7 @@ import {
   KeyRound,
   Landmark,
   NotebookPen,
+  Bot,
 } from 'lucide-react'
 
 export type AdminNavItem = {
@@ -260,6 +261,20 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         href: '/admin/team/shifts',
         permission: 'shifts.view',
         keywords: ['schedule', 'shifts', 'roster'],
+      },
+      {
+        icon: Bot,
+        label: 'Bot control',
+        href: '/admin/bot-control',
+        permission: 'bot.view',
+        keywords: ['grok', 'assistant', 'prompts', 'digest', 'ops'],
+      },
+      {
+        icon: Bot,
+        label: 'Bot inbox',
+        href: '/admin/bot-inbox',
+        permission: 'bot_inbox.view',
+        keywords: ['request', 'bot', 'ask'],
       },
       {
         icon: KeyRound,
