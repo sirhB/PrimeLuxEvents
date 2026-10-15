@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Search, SlidersHorizontal } from 'lucide-react'
-import { ShowroomCarousel } from '@/components/catalog/showroom-carousel'
 import { EditorialCard } from '@/components/catalog/editorial-card'
 import { filterCatalogProducts, type PublicCategory, type PublicProduct } from '@/lib/catalog/catalog-view'
 import { cn, formatCurrency } from '@/lib/utils'
@@ -185,7 +184,11 @@ export default function CatalogClient({ heroTitle, products, categories, showroo
         </div>
       </div>
 
-      {!selectedCategory && !inputValue.trim() && <ShowroomCarousel pieces={showroom} variant="feature" />}
+      {!selectedCategory && !inputValue.trim() && showroom.length > 0 && (
+        <p className="mb-6 text-sm font-light text-[var(--theme-muted)]">
+          {showroom.length} pieces ready to place in a room.
+        </p>
+      )}
 
       <section id="collection" className="mx-auto max-w-7xl px-5 py-14 md:px-8">
         <div className="mb-8 flex items-end justify-between gap-4">

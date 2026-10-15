@@ -2,7 +2,6 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import PackageConfigurator from '@/components/packages/PackageConfigurator'
-import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -119,51 +118,33 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
     }
 
     return (
-        <div className="min-h-screen bg-background pb-24">
-            {/* Hero Header */}
-            <div className="relative h-[40vh] min-h-[400px] w-full overflow-hidden">
-                <div className="absolute inset-0 bg-black/50 z-10" />
-                {pkg.image_url ? (
-                    <Image
-                        src={pkg.image_url}
-                        alt={pkg.name}
-                        fill
-                        className="object-cover"
-                        priority
-                    />
-                ) : (
-                    <div className="w-full h-full bg-secondary" />
-                )}
-
-                <div className="relative z-20 container mx-auto h-full flex flex-col justify-center px-4 md:px-6 text-white">
-                    <Link href="/packages" className="inline-flex items-center text-white/80 hover:text-gold mb-6 transition-colors">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Packages
+        <div className="pb-24">
+            <div className="mx-auto grid max-w-6xl items-end gap-8 px-5 py-12 md:grid-cols-2 md:px-8 md:py-20">
+                <div>
+                    <Link href="/packages" className="inline-flex items-center text-[11px] uppercase tracking-[0.18em] text-[var(--theme-muted)]">
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Packages
                     </Link>
-                    <div className="flex flex-wrap gap-3 mb-4">
-                        {pkg.is_featured && (
-                            <Badge className="bg-gold text-black border-none">Featured Collection</Badge>
-                        )}
-                        {pkg.savings_amount > 0 && (
-                            <Badge className="bg-white/20 backdrop-blur-md text-white border-white/30">
-                                Save {formatCurrency(pkg.savings_amount)}
-                            </Badge>
-                        )}
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-serif font-light mb-4">{pkg.name}</h1>
-                    <p className="text-lg md:text-xl text-white/90 max-w-2xl font-light leading-relaxed">
+                    <p className="lux-label mt-6">
+                        {pkg.is_featured ? 'Featured' : 'Package'}
+                        {pkg.savings_amount > 0 ? ` · Save ${formatCurrency(pkg.savings_amount)}` : ''}
+                    </p>
+                    <h1 className="mt-3 font-serif text-5xl font-medium leading-[0.95] md:text-6xl">{pkg.name}</h1>
+                    <p className="mt-4 max-w-xl text-base font-light leading-relaxed text-[var(--theme-muted)]">
                         {pkg.description}
                     </p>
+                </div>
+                <div className="relative aspect-[4/5] overflow-hidden bg-[var(--theme-surface)]">
+                    {pkg.image_url ? (
+                        <Image src={pkg.image_url} alt="" fill className="object-cover" priority />
+                    ) : null}
                 </div>
             </div>
 
             {/* Included Items Section (Static) */}
             {pkg.package_items && pkg.package_items.length > 0 && (
                 <div className="container mx-auto px-4 md:px-6 py-12 -mt-10 relative z-30 mb-8">
-                    <div className="bg-white rounded-[2rem] p-8 shadow-xl border border-gray-100">
-                        <h2 className="text-2xl font-serif font-light mb-6 flex items-center gap-3">
-                            <span className="w-8 h-px bg-gold"></span>
-                            Included in this Package
-                        </h2>
+                    <div className="border border-[var(--theme-dark)]/10 bg-white p-6 md:p-8">
+                        <h2 className="mb-6 font-serif text-3xl font-medium">Included</h2>
                         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                             {pkg.package_items.map((item: any) => {
                                 const product = productMap.get(item.product_id)

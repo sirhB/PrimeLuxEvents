@@ -1,10 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/lib/utils'
-import { ArrowRight, Check, Star, Sparkles } from 'lucide-react'
 
 export const metadata = {
     title: 'Event Packages | PrimeLux Events',
@@ -20,107 +17,53 @@ export default async function PackagesPage() {
         .order('price', { ascending: true })
 
     return (
-        <main className="min-h-screen bg-background text-foreground selection:bg-gold selection:text-black pt-32 pb-24 md:pt-48 md:pb-40 relative overflow-hidden">
-            {/* Background elements */}
-            <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gold/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute inset-0 bg-[url('/images/luxury-texture.svg')] opacity-5 mix-blend-overlay pointer-events-none" />
-
-            {/* Hero Section */}
-            <section className="container mx-auto px-4 md:px-6 relative z-10 mb-24 md:mb-32">
-                <div className="max-w-4xl mx-auto text-center space-y-8">
-                    <div className="flex items-center justify-center gap-3">
-                        <span className="w-12 h-px bg-gold/30" />
-                        <span className="text-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.4em]">Save planning time</span>
-                        <span className="w-12 h-px bg-gold/30" />
-                    </div>
-
-                    <h1 className="text-6xl md:text-9xl font-serif font-light tracking-tighter leading-[0.85]">
-                        Event <br />
-                        <span className="italic text-gold">Packages</span>
-                    </h1>
-
-                    <p className="text-xl text-muted-foreground font-light max-w-2xl mx-auto leading-relaxed">
-                        Thoughtfully grouped rentals so you can plan faster and stay on budget.
-                    </p>
-                </div>
+        <main>
+            <section className="mx-auto max-w-3xl px-5 py-16 md:px-8 md:py-28">
+                <p className="lux-label">Rentals</p>
+                <h1 className="mt-4 font-serif text-5xl font-medium leading-[0.95] md:text-7xl">Packages</h1>
+                <p className="mt-5 text-base font-light leading-relaxed text-[var(--theme-muted)]">
+                    Thoughtfully grouped rentals so you can plan faster and stay on budget.
+                </p>
             </section>
 
-            {/* Packages Grid */}
-            <section className="container mx-auto px-4 md:px-6 relative z-10">
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-12">
-                    {packages?.map((pkg, index) => (
-                        <Link
-                            href={`/packages/${pkg.id}`}
-                            key={pkg.id}
-                            className="group relative flex flex-col h-full overflow-hidden border border-border bg-card transition-all duration-700 hover:border-gold/40 hover:-translate-y-1"
-                        >
-                            {/* Image Container */}
-                            <div className="relative aspect-[4/5] overflow-hidden">
-                                {pkg.image_url ? (
-                                    <Image
-                                        src={pkg.image_url}
-                                        alt={pkg.name}
-                                        fill
-                                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-muted">
-                                        <Sparkles className="w-12 h-12 text-gold/30" />
-                                    </div>
-                                )}
-
-                                {/* Badges */}
-                                <div className="absolute top-4 left-4 md:top-6 md:left-6 flex flex-col gap-2 z-20">
-                                    {pkg.is_featured && (
-                                        <div className="bg-gold text-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest flex items-center shadow-xl">
-                                            <Star className="w-3 h-3 mr-1.5 fill-white" /> Featured
-                                        </div>
-                                    )}
-                                    {pkg.savings_amount > 0 && (
-                                        <div className="bg-[var(--ink)]/70 backdrop-blur-md text-white border border-white/20 px-3 py-1 md:px-4 md:py-1.5 text-[8px] md:text-[10px] font-bold uppercase tracking-widest text-center">
-                                            Save {formatCurrency(pkg.savings_amount)}
-                                        </div>
-                                    )}
+            <section className="mx-auto max-w-6xl px-5 pb-20 md:px-8">
+                {packages && packages.length > 0 ? (
+                    <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+                        {packages.map((pkg) => (
+                            <Link href={`/packages/${pkg.id}`} key={pkg.id} className="group block">
+                                <div className="relative aspect-[4/5] overflow-hidden bg-[var(--theme-surface)]">
+                                    {pkg.image_url ? (
+                                        <Image
+                                            src={pkg.image_url}
+                                            alt=""
+                                            fill
+                                            className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                                        />
+                                    ) : null}
                                 </div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-[var(--ink)] via-transparent to-transparent opacity-50" />
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex flex-col flex-1 p-5 md:p-10">
-                                <h3 className="text-xl md:text-3xl font-serif font-light mb-2 md:mb-4 group-hover:text-gold transition-colors tracking-tight text-foreground line-clamp-1 md:line-clamp-none">
-                                    {pkg.name}
-                                </h3>
-                                <p className="text-xs md:text-base text-muted-foreground line-clamp-2 mb-4 md:mb-8 flex-1 font-light leading-relaxed">
+                                <p className="mt-4 text-[11px] uppercase tracking-[0.18em] text-[var(--theme-muted)]">
+                                    {pkg.is_featured ? 'Featured' : 'Package'}
+                                    {pkg.savings_amount > 0 ? ` · Save ${formatCurrency(pkg.savings_amount)}` : ''}
+                                </p>
+                                <h2 className="mt-1 font-serif text-3xl font-medium">{pkg.name}</h2>
+                                <p className="mt-2 line-clamp-2 text-sm font-light leading-relaxed text-[var(--theme-muted)]">
                                     {pkg.description}
                                 </p>
-
-                                <div className="pt-4 md:pt-8 border-t border-border flex items-center justify-between">
-                                    <div className="space-y-1">
-                                        {pkg.original_price > pkg.price && (
-                                            <div className="text-xs text-muted-foreground line-through font-light">
-                                                {formatCurrency(pkg.original_price)}
-                                            </div>
-                                        )}
-                                        <div className="text-xl md:text-3xl font-serif font-light text-gold">
-                                            {formatCurrency(pkg.price)}
-                                        </div>
-                                    </div>
-
-                                    <div className="h-10 w-10 md:h-12 md:w-12 border border-border flex items-center justify-center group-hover:bg-gold group-hover:text-white group-hover:border-gold transition-all duration-500">
-                                        <ArrowRight className="w-4 h-4 md:w-5 md:h-5 transition-transform group-hover:translate-x-1" />
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-
-                {(!packages || packages.length === 0) && (
-                    <div className="text-center py-40">
-                        <Sparkles className="h-16 w-16 text-gold/20 mx-auto mb-8" />
-                        <h3 className="text-2xl font-serif text-foreground mb-4">Masterpieces in Preparation</h3>
-                        <p className="text-muted-foreground font-light">We are tailoring our exclusive collections.</p>
+                                <p className="mt-3 font-serif text-2xl">
+                                    {pkg.original_price > pkg.price && (
+                                        <span className="mr-2 text-base text-[var(--theme-muted)] line-through">
+                                            {formatCurrency(pkg.original_price)}
+                                        </span>
+                                    )}
+                                    {formatCurrency(pkg.price)}
+                                </p>
+                            </Link>
+                        ))}
                     </div>
+                ) : (
+                    <p className="py-20 text-center font-serif text-3xl text-[var(--theme-muted)]">
+                        Packages are being prepared for the next season.
+                    </p>
                 )}
             </section>
         </main>

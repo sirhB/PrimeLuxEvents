@@ -13,6 +13,8 @@ import { AdminBottomBar } from '@/components/admin/admin-bottom-bar'
 import { usePwaContext } from '@/components/providers/pwa-provider'
 import { InstallPrompt } from '@/components/pwa/install-prompt'
 import { ThemeSwitcher } from '@/components/theme-switcher'
+import { SuiteToggle } from '@/components/suite/suite-toggle'
+import { useSuite } from '@/components/suite/use-suite'
 
 const CommandPalette = dynamic(
   () => import('@/components/admin/command-palette').then((m) => m.CommandPalette),
@@ -25,6 +27,7 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
   const { isCollapsed, setIsMobileOpen } = useAdminSidebar()
   const { isStandalone } = usePwaContext()
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+  const { suite } = useSuite()
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -95,6 +98,10 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
+            <span className="hidden text-[10px] uppercase tracking-[0.2em] text-[var(--dashboard-text-muted)] sm:inline">
+              {suite === 'venue' ? 'Venue suite' : 'Rentals suite'}
+            </span>
+            <SuiteToggle />
             <button
               type="button"
               onClick={() => setIsCommandPaletteOpen(true)}

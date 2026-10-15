@@ -40,6 +40,8 @@ import {
   isAdminRouteActive,
   type AdminNavItem,
 } from '@/lib/admin/nav'
+import { SuiteToggle } from '@/components/suite/suite-toggle'
+import { useSuite } from '@/components/suite/use-suite'
 
 function SidebarItem({
   item,
@@ -200,10 +202,12 @@ export function ModernSidebar() {
   const [user, setUser] = useState<{ email?: string; fullName?: string } | null>(null)
   const supabase = createClient()
 
-  const navGroups = useMemo(
-    () => filterNavGroupsByPermission(ADMIN_NAV_GROUPS, permissionNames, roleNames, catalogBridge),
-    [permissionNames, roleNames, catalogBridge],
-  )
+  const { suite } = useSuite()
+  const navGroups = useMemo(() => {
+    const groups = filterNavGroupsByPermission(ADMIN_NAV_GROUPS, permissionNames, roleNames, catalogBridge)
+    const preferred = suite === 'venue' ? 'Venue' : 'Catalog'
+    return [...groups].sort((a, b) => Number(b.title === preferred) - Number(a.title === preferred))
+  }, [permissionNames, roleNames, catalogBridge, suite])
 
   useEffect(() => {
     let mounted = true
@@ -258,8 +262,8 @@ export function ModernSidebar() {
         )}
       >
         <div className={cn(
-          'relative flex shrink-0 items-center border-b border-white/10 px-3',
-          isCollapsed && !isMobileOpen ? 'flex-col py-3' : 'justify-center py-4 pr-10',
+          'relative flex shrink-0 flex-col items-center border-b border-white/10 px-3',
+          isCollapsed && !isMobileOpen ? 'py-3' : 'py-4 pr-10',
         )}>
           <Link
             href="/admin"
@@ -276,6 +280,7 @@ export function ModernSidebar() {
               <BrandLockup tone="on-dark" className="text-[0.95rem]" />
             )}
           </Link>
+          {!(isCollapsed && !isMobileOpen) && <SuiteToggle tone="dark" className="mt-3" />}
 
           <Button
             variant="ghost"
