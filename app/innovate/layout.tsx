@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { Toaster } from 'sonner'
-import { createClient } from '@/lib/supabase/server'
-import { isStaffUser } from '@/lib/auth/roles'
+import { hasPermission } from '@/lib/auth/authorization'
 import {
   InnovateMobileHeader,
   InnovateSidebar,
@@ -20,17 +19,8 @@ export default async function InnovateLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login?next=/innovate')
-  }
-
-  const staff = await isStaffUser(user.id)
-  if (!staff) {
+  const allowed = await hasPermission('innovate.view')
+  if (!allowed) {
     redirect('/unauthorized')
   }
 

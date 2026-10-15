@@ -2,7 +2,6 @@
 
 import { Suspense, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -10,8 +9,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { usePwaContext } from '@/components/providers/pwa-provider'
 import { fetchIsStaffClient } from '@/lib/auth/roles-shared'
+import { safeInternalPath } from '@/lib/security/safe-path'
+import { assertAuthAttemptAllowed } from '@/app/actions/auth-rate-limit'
+import { BrandLockup } from '@/components/brand/brand-logo'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
@@ -19,14 +20,20 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const nextParam = searchParams.get('next')
-  const { isStandalone } = usePwaContext()
+  const rawNext = searchParams.get('next')
+  const nextParam = rawNext ? safeInternalPath(rawNext, '/account') : null
 
   const isPortalIntent = Boolean(nextParam?.startsWith('/account'))
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    const gate = await assertAuthAttemptAllowed('login')
+    if (!gate.ok) {
+      toast.error(gate.error)
+      setLoading(false)
+      return
+    }
     const supabase = createClient()
 
     try {
@@ -42,6 +49,16 @@ function LoginForm() {
 
       const userId = data.user?.id
       const isStaff = userId ? await fetchIsStaffClient(supabase, userId) : false
+      const { data: profile } = userId
+        ? await supabase.from('user_profiles').select('must_change_password').eq('id', userId).maybeSingle()
+        : { data: null }
+
+      if (profile?.must_change_password) {
+        toast.success('Signed in')
+        router.push('/login/change-password')
+        router.refresh()
+        return
+      }
 
       let destination = '/account'
       if (nextParam) {
@@ -67,24 +84,9 @@ function LoginForm() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--linen,var(--ink))] px-4 gap-8 dark:bg-gray-900">
-      {isStandalone && (
-        <div className="relative h-16 w-48">
-          <Image
-            src="/images/logo-dark-mode.png"
-            alt="PrimeLux Events"
-            fill
-            className="object-contain dark:hidden"
-            priority
-          />
-          <Image
-            src="/images/logo-light-mode.png"
-            alt="PrimeLux Events"
-            fill
-            className="hidden object-contain dark:block"
-            priority
-          />
-        </div>
-      )}
+      <Link href="/" aria-label="Prime Lux Events" className="inline-flex">
+        <BrandLockup className="text-[1.7rem]" />
+      </Link>
       <Card className="w-full max-w-md border-border/60 bg-white/90 shadow-xl">
         <CardHeader className="space-y-2">
           <CardTitle className="font-serif text-3xl font-light tracking-tight">

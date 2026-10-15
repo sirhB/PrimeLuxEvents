@@ -12,6 +12,8 @@ import {
     SheetDescription,
 } from '@/components/ui/sheet'
 import { AccountNav, type PartnerNavStatus } from '@/components/account-sidebar'
+import { ThemeSwitcher } from '@/components/theme-switcher'
+import { BrandLockup } from '@/components/brand/brand-logo'
 
 interface AccountPortalHeaderProps {
   userName: string
@@ -28,37 +30,39 @@ export function AccountPortalHeader({
 }: AccountPortalHeaderProps) {
   const firstName = userName.split(' ')[0] || userName
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border/60 bg-[var(--linen,#f4f7f5)]/90 px-4 py-4 backdrop-blur-md md:px-10 pt-[max(1rem,env(safe-area-inset-top))]">
+    <header className="sticky top-0 z-20 border-b border-[var(--dashboard-border)] bg-white/85 px-4 py-4 backdrop-blur-md md:px-8 pt-[max(1rem,env(safe-area-inset-top))]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
           <Button
             type="button"
             variant="outline"
             size="icon"
-            className="mt-0.5 shrink-0 rounded-xl border-[var(--champagne,#2f6b57)]/30 md:hidden"
+            className="mt-0.5 shrink-0 rounded-2xl bg-white md:hidden"
             aria-label="Open menu"
             onClick={() => setIsMobileNavOpen(true)}
           >
             <Menu className="h-5 w-5" />
           </Button>
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-[var(--champagne,#2f6b57)]">
-              Client portal
-            </p>
-            <h1 className="font-serif text-2xl font-light tracking-tight text-[var(--ink,#1a2420)]">
-              Hello, {firstName}
+            <p className="text-xs font-medium text-[var(--dashboard-text-muted)]">Client portal</p>
+            <h1 className="font-sans text-2xl font-semibold tracking-tight text-[var(--dashboard-text)] sm:text-3xl">
+              {greeting}, {firstName}
             </h1>
           </div>
         </div>
 
+        <div className="flex items-center gap-3">
+          <ThemeSwitcher className="h-9 px-2.5" />
         {upcomingOrderDate ? (
-          <div className="rounded-2xl border border-[var(--champagne,#2f6b57)]/30 bg-white/90 px-4 py-3 text-sm shadow-sm">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--ink,#1a2420)]/55">
+          <div className="rounded-2xl border border-[var(--dashboard-border)] bg-white px-4 py-3 text-sm shadow-[var(--dashboard-shadow)]">
+            <p className="text-xs font-medium text-[var(--dashboard-text-muted)]">
               Next delivery
             </p>
-            <p className="font-medium text-[var(--ink,#1a2420)]">
+            <p className="font-semibold text-[var(--dashboard-text)]">
               {new Date(upcomingOrderDate).toLocaleDateString(undefined, {
                 month: 'long',
                 day: 'numeric',
@@ -66,23 +70,25 @@ export function AccountPortalHeader({
               })}
             </p>
             {upcomingOrderStatus && (
-              <p className="mt-1 text-xs capitalize text-[var(--sage,#5f8f7c)]">{upcomingOrderStatus}</p>
+              <p className="mt-1 text-xs font-medium capitalize text-[var(--dashboard-accent-green)]">{upcomingOrderStatus}</p>
             )}
           </div>
         ) : (
-          <Button asChild variant="outline" className="rounded-full border-[var(--champagne,#2f6b57)]/30">
+          <Button asChild className="rounded-full">
             <Link href="/catalog" className="gap-2">
               Browse collection <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         )}
+        </div>
       </div>
 
       <Sheet open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
-        <SheetContent side="left" className="w-[min(100%,20rem)] gap-0 p-0">
-          <SheetHeader className="border-b px-6 py-5 text-left">
-            <SheetTitle className="font-serif text-lg font-semibold tracking-wide">
-              PrimeLux Portal
+        <SheetContent side="left" className="w-[min(100%,20rem)] gap-0 border-white/10 bg-[var(--sidebar-navy)] p-0 text-[var(--sidebar-navy-text)]">
+          <SheetHeader className="border-b border-white/10 px-6 py-5 text-left">
+            <SheetTitle className="text-white">
+              <BrandLockup tone="on-dark" className="text-[1rem]" />
+              <span className="sr-only">Prime Lux Events</span>
             </SheetTitle>
             <SheetDescription className="sr-only">
               Account navigation

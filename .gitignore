@@ -14,5 +14,5 @@ coverage/
 .vscode/
 .next/
 public/sw.js
-public/swe-worker-*.jstsconfig.tsbuildinfo
+public/swe-worker-*.js
 tsconfig.tsbuildinfo

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
-import { requirePermission } from '@/lib/auth/authorization'
+import { hasPermission, requirePermission } from '@/lib/auth/authorization'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -71,8 +71,8 @@ export default async function TeamManagementPage() {
     // Get current user for invited_by display
     const { data: { user: currentUser } } = await supabase.auth.getUser()
 
-    const canInviteUsers = await requirePermission('users.create').then(() => true).catch(() => false)
-    const canManageRoles = await requirePermission('users.manage').then(() => true).catch(() => false)
+    const canInviteUsers = await hasPermission('users.create')
+    const canManageRoles = await hasPermission('users.manage')
 
     return (
         <AdminPage>
@@ -109,17 +109,17 @@ export default async function TeamManagementPage() {
 
                 <Card className="border-none glass-card overflow-hidden">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Administrators</CardTitle>
+                        <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-[var(--dashboard-text-muted)]">Super admins</CardTitle>
                         <Shield className="h-4 w-4 text-[var(--dashboard-accent-gold)]" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-semibold text-[var(--dashboard-text)]">
                             {teamMembers?.filter(m =>
-                                m.is_active && m.user_roles?.some((ur: any) => ur.roles?.name === 'admin')
+                                m.is_active && m.user_roles?.some((ur: any) => ur.roles?.name === 'super_admin')
                             ).length || 0}
                         </div>
                         <p className="text-[10px] text-[var(--dashboard-text-muted)] font-bold uppercase tracking-wider mt-1">
-                            Admin access users
+                            Full access accounts
                         </p>
                     </CardContent>
                 </Card>

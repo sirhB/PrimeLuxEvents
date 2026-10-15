@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ShoppingCart, Heart, CalendarCheck, Handshake } from 'lucide-react'
+import { LayoutDashboard, ShoppingCart, Heart, CalendarCheck, Handshake, CalendarRange } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { usePwaContext } from '@/components/providers/pwa-provider'
 import type { PartnerNavStatus } from '@/components/account-sidebar'
@@ -13,6 +13,7 @@ export function AccountBottomBar({ partnerStatus = 'none' }: { partnerStatus?: P
 
   const navItems = [
     { title: 'Home', href: '/account', icon: LayoutDashboard },
+    { title: 'Event', href: '/account/event', icon: CalendarRange },
     { title: 'Orders', href: '/account/orders', icon: ShoppingCart },
     partnerStatus === 'active'
       ? { title: 'Partner', href: '/account/partner', icon: Handshake }
@@ -38,6 +39,7 @@ export function AccountBottomBar({ partnerStatus = 'none' }: { partnerStatus?: P
       ? items
       : [
           { title: 'Home', href: '/account', icon: LayoutDashboard },
+          { title: 'Event', href: '/account/event', icon: CalendarRange },
           { title: 'Orders', href: '/account/orders', icon: ShoppingCart },
           { title: 'Saved', href: '/account/favorites', icon: Heart },
           { title: 'Visits', href: '/account/appointments', icon: CalendarCheck },

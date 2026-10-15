@@ -4,13 +4,22 @@ import {
   fetchProductBySlug,
   fetchRelatedProducts,
 } from "@/lib/catalog/queries"
+import { findSeedProduct, getSeedCatalog, seedProductToApp } from "@/lib/catalog/seed-snapshot"
 
 export const revalidate = 60
 
 export default async function ProductPage({ params }: { params: Promise<{ categorySlug: string, productSlug: string }> }) {
     const { categorySlug, productSlug } = await params
 
-    const product = await fetchProductBySlug(productSlug)
+    let product = null
+    try {
+        product = await fetchProductBySlug(productSlug)
+    } catch (error) {
+        console.error('Product lookup failed:', error)
+    }
+    if (!product) {
+        product = findSeedProduct(categorySlug, productSlug)
+    }
     if (!product) {
         notFound()
     }
@@ -25,7 +34,15 @@ export default async function ProductPage({ params }: { params: Promise<{ catego
         )
     }
 
-    const allProducts = await fetchRelatedProducts(80)
+    let allProducts: Awaited<ReturnType<typeof fetchRelatedProducts>> = []
+    try {
+        allProducts = await fetchRelatedProducts(80)
+    } catch (error) {
+        console.error('Related products failed:', error)
+    }
+    if (allProducts.length === 0) {
+        allProducts = getSeedCatalog().products.slice(0, 12).map(seedProductToApp)
+    }
 
     const productWithImages = {
         ...product,

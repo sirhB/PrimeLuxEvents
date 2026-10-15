@@ -6,6 +6,7 @@ import { ArrowLeft, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { innovateNavItems, isInnovateRouteActive } from '@/lib/innovate/nav'
+import { BrandLockup, CrownMark } from '@/components/brand/brand-logo'
 
 export function InnovateNav({
   onNavigate,
@@ -61,9 +62,9 @@ export function InnovateNav({
 export function InnovateSidebar() {
   return (
     <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-[var(--linen)]/10 bg-[var(--surface)] text-[var(--linen)] md:flex">
-      <div className="flex h-16 items-center border-b border-[var(--linen)]/10 px-5">
-        <Link href="/innovate" className="font-serif text-xl tracking-wide text-[var(--linen)]">
-          Innovate<span className="text-[var(--champagne)]">.</span>
+      <div className="flex flex-col items-center gap-2 border-b border-[var(--linen)]/10 px-5 py-5">
+        <Link href="/innovate" aria-label="Prime Lux Events" className="inline-flex">
+          <BrandLockup tone="on-dark" className="text-[1rem]" />
         </Link>
       </div>
       <div className="flex-1 overflow-auto">
@@ -95,8 +96,8 @@ export function InnovateMobileHeader() {
       >
         <Menu className="h-5 w-5" />
       </button>
-      <Link href="/innovate" className="font-serif text-lg text-[var(--linen)]">
-        Innovate<span className="text-[var(--champagne)]">.</span>
+      <Link href="/innovate" aria-label="Prime Lux Events" className="inline-flex">
+        <CrownMark className="h-7 w-7 text-[var(--theme-accent-on-dark)]" />
       </Link>
       <Link href="/admin" className="text-xs uppercase tracking-wider text-[var(--linen)]/55">
         Admin

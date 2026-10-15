@@ -19,6 +19,8 @@ type AdminChromeContextType = {
   /** null while loading; string permission names once loaded */
   permissionNames: string[] | null
   roleNames: string[] | null
+  /** True when the canonical permission catalog is not installed yet. */
+  catalogBridge: boolean
 }
 
 const AdminChromeContext = createContext<AdminChromeContextType | undefined>(undefined)
@@ -26,11 +28,12 @@ const AdminChromeContext = createContext<AdminChromeContextType | undefined>(und
 const EMPTY_COUNTS: BadgeCounts = { orders: 0, leads: 0, messages: 0 }
 
 export function AdminSidebarProvider({ children }: { children: React.ReactNode }) {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(true)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [counts, setCounts] = useState<BadgeCounts>(EMPTY_COUNTS)
   const [permissionNames, setPermissionNames] = useState<string[] | null>(null)
   const [roleNames, setRoleNames] = useState<string[] | null>(null)
+  const [catalogBridge, setCatalogBridge] = useState(false)
   const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
@@ -102,14 +105,17 @@ export function AdminSidebarProvider({ children }: { children: React.ReactNode }
             if (name) permissions.add(name)
           }
         }
+        const { data: catalogReady, error: catalogError } = await supabase.rpc('permission_catalog_ready')
         if (!mounted) return
         setRoleNames(roles)
         setPermissionNames(Array.from(permissions))
+        setCatalogBridge(Boolean(catalogError) || catalogReady !== true)
       } catch (error) {
         console.error('Error loading admin permissions:', error)
         if (mounted) {
           setRoleNames([])
           setPermissionNames([])
+          setCatalogBridge(true)
         }
       }
     }
@@ -150,8 +156,9 @@ export function AdminSidebarProvider({ children }: { children: React.ReactNode }
       refreshCounts,
       permissionNames,
       roleNames,
+      catalogBridge,
     }),
-    [isCollapsed, handleSetCollapsed, isMobileOpen, counts, refreshCounts, permissionNames, roleNames],
+    [isCollapsed, handleSetCollapsed, isMobileOpen, counts, refreshCounts, permissionNames, roleNames, catalogBridge],
   )
 
   return <AdminChromeContext.Provider value={value}>{children}</AdminChromeContext.Provider>

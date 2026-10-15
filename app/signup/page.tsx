@@ -9,6 +9,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { safeInternalPath } from '@/lib/security/safe-path'
+import { assertAuthAttemptAllowed } from '@/app/actions/auth-rate-limit'
+import { BrandLockup } from '@/components/brand/brand-logo'
 
 function SignupForm() {
   const [fullName, setFullName] = useState('')
@@ -17,11 +20,17 @@ function SignupForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const next = searchParams.get('next') || '/account'
+  const next = safeInternalPath(searchParams.get('next'), '/account')
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    const gate = await assertAuthAttemptAllowed('signup')
+    if (!gate.ok) {
+      toast.error(gate.error)
+      setLoading(false)
+      return
+    }
     const supabase = createClient()
 
     try {
@@ -56,7 +65,10 @@ function SignupForm() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--linen,var(--ink))] px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-[var(--linen,var(--ink))] px-4">
+      <Link href="/" aria-label="Prime Lux Events" className="inline-flex">
+        <BrandLockup className="text-[1.7rem]" />
+      </Link>
       <Card className="w-full max-w-md border-border/60 bg-white/90 shadow-xl">
         <CardHeader className="space-y-2">
           <CardTitle className="font-serif text-3xl font-light tracking-tight">Create your portal</CardTitle>

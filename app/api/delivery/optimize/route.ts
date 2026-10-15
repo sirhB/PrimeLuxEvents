@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { isStaffUser } from '@/lib/auth/roles'
+import { requireApiPermission } from '@/lib/auth/authorization'
+import { checkRateLimit } from '@/lib/security/rate-limit'
 import {
   optimizeDeliveryRoute,
   type OptimizeOrigin,
@@ -15,13 +16,23 @@ type Body = {
 }
 
 export async function POST(request: Request) {
+  const denied = await requireApiPermission('delivery.update')
+  if (denied) return denied
+
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-
-  if (!user || !(await isStaffUser(user.id))) {
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const rate = checkRateLimit(`delivery-optimize:${user.id}`, 20, 60_000)
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(rate.retryAfterSec) } },
+    )
   }
 
   let body: Body

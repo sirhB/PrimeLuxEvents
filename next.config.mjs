@@ -9,18 +9,17 @@ const withSerwist = withSerwistInit({
 })
 
 /**
- * Report-Only CSP — observes violations without blocking.
- * Allows Stripe, Supabase, Google Maps, Puter, Vercel Analytics, and Next.js defaults.
+ * Enforced CSP. Next.js and Stripe still need unsafe-inline/unsafe-eval until
+ * a nonce pipeline exists. The allowlist blocks every other origin.
  */
-const contentSecurityPolicyReportOnly = [
+const contentSecurityPolicy = [
   "default-src 'self'",
-  // Next.js needs unsafe-inline/eval without nonces; Stripe/Maps/Puter/Vercel scripts
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com https://maps.gstatic.com https://js.puter.com https://va.vercel-scripts.com https://*.vercel-scripts.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://*.js.stripe.com https://maps.googleapis.com https://maps.gstatic.com https://js.puter.com https://va.vercel-scripts.com https://*.vercel-scripts.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https: https://*.supabase.co https://maps.gstatic.com https://maps.googleapis.com https://*.stripe.com",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://maps.googleapis.com https://nominatim.openstreetmap.org https://api.puter.com https://js.puter.com https://vitals.vercel-insights.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
-  "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://*.stripe.com",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://r.stripe.com https://m.stripe.network https://q.stripe.com https://maps.googleapis.com https://nominatim.openstreetmap.org https://api.puter.com https://js.puter.com https://vitals.vercel-insights.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io",
+  "frame-src 'self' https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com https://*.stripe.com",
   "worker-src 'self' blob:",
   "child-src 'self' blob:",
   "object-src 'none'",
@@ -31,9 +30,8 @@ const contentSecurityPolicyReportOnly = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Keep builds green while typing debt is paid down; CI still runs tsc separately.
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   async headers() {
     return [
@@ -52,8 +50,8 @@ const nextConfig = {
             value: "max-age=63072000; includeSubDomains; preload",
           },
           {
-            key: "Content-Security-Policy-Report-Only",
-            value: contentSecurityPolicyReportOnly,
+            key: "Content-Security-Policy",
+            value: contentSecurityPolicy,
           },
         ],
       },

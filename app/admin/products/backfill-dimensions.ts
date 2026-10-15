@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { isStaffUser } from '@/lib/auth/roles'
+import { hasPermission } from '@/lib/auth/authorization'
 import { dimensionsUpdatePayload } from '@/lib/products/dimensions'
 
 /**
@@ -19,7 +19,7 @@ export async function backfillProductDimensions(): Promise<{
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user || !(await isStaffUser(user.id))) {
+  if (!user || !(await hasPermission('products.update'))) {
     return { updated: 0, scanned: 0, error: 'Unauthorized' }
   }
 

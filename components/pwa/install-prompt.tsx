@@ -28,26 +28,47 @@ function isIosSafari() {
 
 export function InstallPrompt({ surface }: { surface: PwaSurface }) {
   const { isStandalone, canInstall, promptInstall } = usePwa()
-  const [dismissed, setDismissed] = useState(true)
+  const [open, setOpen] = useState(false)
   const [showIosHelp, setShowIosHelp] = useState(false)
   const copy = SURFACE_COPY[surface]
   const storageKey = `pwa-install-dismissed-${surface}`
 
   useEffect(() => {
-    const wasDismissed = localStorage.getItem(storageKey) === "true"
-    setDismissed(wasDismissed)
-  }, [storageKey])
+    if (localStorage.getItem(storageKey) === "true") return
 
-  if (isStandalone || dismissed) return null
+    if (surface !== "store") {
+      const id = window.setTimeout(() => setOpen(true), 0)
+      return () => window.clearTimeout(id)
+    }
+
+    const started = performance.now()
+    let interval = 0
+    const tick = () => {
+      if (localStorage.getItem(storageKey) === "true") return
+      const stillOnHero = window.location.pathname === "/" && window.scrollY < window.innerHeight * 0.9
+      if (performance.now() - started < 12000 || stillOnHero) return
+      setOpen(true)
+      window.clearInterval(interval)
+      window.removeEventListener("scroll", tick)
+    }
+    interval = window.setInterval(tick, 500)
+    window.addEventListener("scroll", tick, { passive: true })
+    return () => {
+      window.clearInterval(interval)
+      window.removeEventListener("scroll", tick)
+    }
+  }, [storageKey, surface])
+
+  if (isStandalone || !open) return null
 
   const dismiss = () => {
     localStorage.setItem(storageKey, "true")
-    setDismissed(true)
+    setOpen(false)
   }
 
   if (canInstall) {
     return (
-      <div className="fixed bottom-4 left-4 right-4 z-[60] mx-auto max-w-lg rounded-2xl border border-border bg-background/95 p-4 shadow-2xl backdrop-blur-md md:left-auto md:right-6 md:bottom-6">
+      <div className="fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-sm rounded-2xl border border-border bg-background/90 p-4 shadow-lg backdrop-blur-md md:left-auto md:right-6 md:bottom-6">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 rounded-xl bg-primary/10 p-2 text-primary">
             <Download className="h-4 w-4" />
@@ -74,7 +95,7 @@ export function InstallPrompt({ surface }: { surface: PwaSurface }) {
 
   if (isIosSafari()) {
     return (
-      <div className="fixed bottom-4 left-4 right-4 z-[60] mx-auto max-w-lg rounded-2xl border border-border bg-background/95 p-4 shadow-2xl backdrop-blur-md md:left-auto md:right-6 md:bottom-6">
+      <div className="fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-sm rounded-2xl border border-border bg-background/90 p-4 shadow-lg backdrop-blur-md md:left-auto md:right-6 md:bottom-6">
         <div className="flex items-start gap-3">
           <div className="mt-0.5 rounded-xl bg-primary/10 p-2 text-primary">
             <Share className="h-4 w-4" />

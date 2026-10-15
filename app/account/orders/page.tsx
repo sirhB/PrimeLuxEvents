@@ -8,14 +8,15 @@ import { cn } from '@/lib/utils'
 export default async function OrdersPage({
     searchParams,
 }: {
-    searchParams: { status?: string }
+    searchParams: Promise<{ status?: string }>
 }) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) return null
 
-    const statusFilter = searchParams.status || 'all'
+    const params = await searchParams
+    const statusFilter = params.status || 'all'
 
     let query = supabase
         .from('orders')

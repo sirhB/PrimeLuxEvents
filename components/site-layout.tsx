@@ -19,10 +19,11 @@ export function SiteLayout({
   const isAccount = pathname?.startsWith("/account")
   const isShareInvoice = pathname?.startsWith("/share")
   const isInnovate = pathname?.startsWith("/innovate")
-  const isPortal = isAdmin || isAccount || isShareInvoice || isInnovate
+  const isPreview = pathname?.startsWith("/preview")
+  const isPortal = isAdmin || isAccount || isShareInvoice || isInnovate || isPreview
 
   return (
-    <div className="ambient-bg flex min-h-screen flex-col">
+    <div className={cn("ambient-bg flex min-h-screen flex-col", !isPortal && "editorial-site")}>
       {!isPortal && header}
       {isPortal ? (
         <div className={cn("relative z-[1] flex-1")}>{children}</div>

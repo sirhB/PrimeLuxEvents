@@ -1,9 +1,10 @@
 'use client'
 
+import { useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CreateTaskDialog } from '@/components/admin/tasks/create-task-dialog'
-import { CheckCircle2, Clock, Flag, Briefcase, Truck, Home, Building, MapPin, Calendar, AlertCircle } from 'lucide-react'
+import { CheckCircle2, Clock, Briefcase, Truck, Home, Building, MapPin, Calendar, Search } from 'lucide-react'
 import { TaskItem } from '@/components/admin/tasks/task-item'
 import { cn } from '@/lib/utils'
 import { AdminPageHeader } from '@/components/admin/page-shell'
@@ -37,7 +38,7 @@ function getPriorityColor(priority: string) {
 
 function TaskBoardItem({ task }: { task: any }) {
     return (
-        <Card className="glass-card border-[var(--dashboard-border)] hover:border-[var(--dashboard-accent-gold)]/30 transition-all cursor-pointer group">
+        <Card className="border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-[var(--dashboard-shadow)] hover:border-[var(--dashboard-accent-gold)]/40 transition-all cursor-pointer group">
             <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-2">
                     <span className={cn(
@@ -78,17 +79,29 @@ function TaskBoardItem({ task }: { task: any }) {
 export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
     const now = new Date()
     now.setHours(0, 0, 0, 0)
+    const [query, setQuery] = useState('')
+    const filteredTasks = useMemo(() => {
+        const q = query.trim().toLowerCase()
+        if (!q) return tasks || []
+        return (tasks || []).filter((task) =>
+            [task.title, task.description, task.assigned_to_text, task.priority, task.status, task.task_type]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase()
+                .includes(q),
+        )
+    }, [tasks, query])
 
-    const pendingTasks = tasks?.filter(t => t.status === 'pending') || []
-    const inProgressTasks = tasks?.filter(t => t.status === 'in_progress') || []
-    const completedTasks = tasks?.filter(t => t.status === 'completed') || []
+    const pendingTasks = filteredTasks.filter(t => t.status === 'pending')
+    const inProgressTasks = filteredTasks.filter(t => t.status === 'in_progress')
+    const completedTasks = filteredTasks.filter(t => t.status === 'completed')
 
-    const myTasks = tasks?.filter(t =>
+    const myTasks = filteredTasks.filter(t =>
         (user?.id && t.assigned_to === user.id) ||
         (t.assigned_role_id && roleIds.includes(t.assigned_role_id))
     ) || []
 
-    const overdueTasks = tasks?.filter(t => {
+    const overdueTasks = (tasks || []).filter(t => {
         if (!t.due_date) return false
         const dueDate = new Date(t.due_date)
         return dueDate < now && t.status !== 'completed' && t.status !== 'cancelled'
@@ -103,80 +116,49 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
                 actions={<CreateTaskDialog />}
             />
 
-            <div className="grid gap-6 md:grid-cols-4 animate-fade-in-up delay-100">
-                <Card className="glass-card border-none overflow-hidden relative group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider">Overdue</CardTitle>
-                        <div className="p-2 rounded-lg bg-red-400/10 text-red-400">
-                            <AlertCircle className="h-4 w-4" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-light text-[var(--dashboard-text)]">{overdueTasks.length}</div>
-                        <p className="text-xs text-[var(--dashboard-text-muted)] mt-1">Action required</p>
-                    </CardContent>
-                </Card>
-
-                <Card className="glass-card border-none overflow-hidden relative group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--dashboard-accent-orange)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider">Pending</CardTitle>
-                        <div className="p-2 rounded-lg bg-[var(--dashboard-accent-orange)]/10 text-[var(--dashboard-accent-orange)]">
-                            <Clock className="h-4 w-4" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-light text-[var(--dashboard-text)]">{pendingTasks.length}</div>
-                        <p className="text-xs text-[var(--dashboard-text-muted)] mt-1">Awaiting start</p>
-                    </CardContent>
-                </Card>
-                <Card className="glass-card border-none overflow-hidden relative group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--dashboard-accent-blue)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider">In Progress</CardTitle>
-                        <div className="p-2 rounded-lg bg-[var(--dashboard-accent-blue)]/10 text-[var(--dashboard-accent-blue)]">
-                            <Flag className="h-4 w-4" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-light text-[var(--dashboard-text)]">{inProgressTasks.length}</div>
-                        <p className="text-xs text-[var(--dashboard-text-muted)] mt-1">Currently active</p>
-                    </CardContent>
-                </Card>
-                <Card className="glass-card border-none overflow-hidden relative group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--dashboard-accent-green)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-[var(--dashboard-text-muted)] uppercase tracking-wider">Completed</CardTitle>
-                        <div className="p-2 rounded-lg bg-[var(--dashboard-accent-green)]/10 text-[var(--dashboard-accent-green)]">
-                            <CheckCircle2 className="h-4 w-4" />
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-light text-[var(--dashboard-text)]">{completedTasks.length}</div>
-                        <p className="text-xs text-[var(--dashboard-text-muted)] mt-1">Successfully finished</p>
-                    </CardContent>
-                </Card>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                {[
+                    { label: 'Overdue', value: overdueTasks.length, tint: 'bg-[var(--lux-blush)]', hint: 'Action required' },
+                    { label: 'Pending', value: pendingTasks.length, tint: 'bg-[var(--lux-cream)]', hint: 'Awaiting start' },
+                    { label: 'In progress', value: inProgressTasks.length, tint: 'bg-[var(--lux-mist)]', hint: 'Currently active' },
+                    { label: 'Completed', value: completedTasks.length, tint: 'bg-[var(--lux-sage-mist)]', hint: 'Finished' },
+                ].map((stat) => (
+                    <div key={stat.label} className={cn('rounded-[var(--dashboard-radius)] border border-[var(--dashboard-border)] p-4', stat.tint)}>
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--dashboard-text-muted)]">{stat.label}</p>
+                        <p className="mt-2 text-3xl font-semibold tracking-tight text-[var(--dashboard-text)]">{stat.value}</p>
+                        <p className="mt-1 text-xs text-[var(--dashboard-text-muted)]">{stat.hint}</p>
+                    </div>
+                ))}
             </div>
+
+            <label className="relative block max-w-md">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--dashboard-text-muted)]" />
+                <input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Search tasks"
+                    className="h-11 w-full rounded-full border border-[var(--dashboard-border)] bg-white pl-10 pr-4 text-sm text-[var(--dashboard-text)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--lux-gold)]"
+                />
+            </label>
 
             <Tabs defaultValue="all" className="w-full animate-fade-in-up delay-200">
                 <div className="flex items-center justify-between mb-6">
-                    <TabsList className="glass-card border-none p-1 bg-black/20 w-fit h-auto">
+                    <TabsList className="h-auto w-fit rounded-full border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] p-1">
                         <TabsTrigger
                             value="all"
-                            className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6"
+                            className="rounded-full px-5 data-[state=active]:bg-[var(--lux-navy)] data-[state=active]:text-[var(--theme-on-dark)]"
                         >
                             All Tasks
                         </TabsTrigger>
                         <TabsTrigger
                             value="board"
-                            className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6"
+                            className="rounded-full px-5 data-[state=active]:bg-[var(--lux-navy)] data-[state=active]:text-[var(--theme-on-dark)]"
                         >
                             Board View
                         </TabsTrigger>
                         <TabsTrigger
                             value="my-tasks"
-                            className="data-[state=active]:bg-[var(--dashboard-accent-gold)] data-[state=active]:text-black px-6"
+                            className="rounded-full px-5 data-[state=active]:bg-[var(--lux-navy)] data-[state=active]:text-[var(--theme-on-dark)]"
                         >
                             My Tasks
                         </TabsTrigger>
@@ -187,7 +169,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
                     <Card className="glass-card border-none overflow-hidden">
                         <CardContent className="p-0">
                             <div className="divide-y divide-[var(--dashboard-border)]">
-                                {tasks?.map((task) => (
+                                {filteredTasks.map((task) => (
                                     <TaskItem key={task.id} task={task} />
                                 ))}
                             </div>
@@ -198,7 +180,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
                 <TabsContent value="board" className="mt-0">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="flex flex-col gap-4">
-                            <div className="flex items-center justify-between px-4 py-3 glass-card border-none rounded-2xl mb-2">
+                            <div className="flex items-center justify-between px-4 py-3 mb-2 rounded-2xl border border-[var(--dashboard-border)] bg-[var(--dashboard-card)]">
                                 <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--dashboard-text)]">
                                     <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-orange)]" />
                                     Pending
@@ -215,7 +197,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
                         </div>
 
                         <div className="flex flex-col gap-4">
-                            <div className="flex items-center justify-between px-4 py-3 glass-card border-none rounded-2xl mb-2">
+                            <div className="flex items-center justify-between px-4 py-3 mb-2 rounded-2xl border border-[var(--dashboard-border)] bg-[var(--dashboard-card)]">
                                 <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--dashboard-text)]">
                                     <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-blue)]" />
                                     In Progress
@@ -232,7 +214,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
                         </div>
 
                         <div className="flex flex-col gap-4">
-                            <div className="flex items-center justify-between px-4 py-3 glass-card border-none rounded-2xl mb-2">
+                            <div className="flex items-center justify-between px-4 py-3 mb-2 rounded-2xl border border-[var(--dashboard-border)] bg-[var(--dashboard-card)]">
                                 <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--dashboard-text)]">
                                     <span className="w-2 h-2 rounded-full bg-[var(--dashboard-accent-green)]" />
                                     Completed
@@ -252,7 +234,7 @@ export function TasksContent({ tasks, user, roleIds }: TasksContentProps) {
 
                 <TabsContent value="my-tasks" className="mt-0">
                     <Card className="glass-card border-none overflow-hidden">
-                        <CardHeader className="border-b border-[var(--dashboard-border)] bg-black/10">
+                        <CardHeader className="border-b border-[var(--dashboard-border)] bg-[var(--lux-cream)]">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <CardTitle className="text-sm font-semibold">My Assignments</CardTitle>

@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
-import { isStaffUser } from '@/lib/auth/roles'
+import { hasPermission } from '@/lib/auth/authorization'
 import { revalidatePath } from 'next/cache'
 
 /**
@@ -14,7 +14,7 @@ export async function refundSecurityDeposit(orderId: string, amountCents?: numbe
         const {
             data: { user },
         } = await supabase.auth.getUser()
-        if (!user || !(await isStaffUser(user.id))) {
+        if (!user || !(await hasPermission('orders.update'))) {
             return { success: false, error: 'Unauthorized' }
         }
 
@@ -110,7 +110,7 @@ export async function updatePickupSchedule(orderId: string, input: UpdatePickupS
         const {
             data: { user },
         } = await supabase.auth.getUser()
-        if (!user || !(await isStaffUser(user.id))) {
+        if (!user || !(await hasPermission('orders.update'))) {
             return { success: false, error: 'Unauthorized' }
         }
 

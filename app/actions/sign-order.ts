@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { userOwnsOrder } from '@/lib/orders/ownership'
-import { isStaffUser } from '@/lib/auth/roles'
+import { hasPermission } from '@/lib/auth/authorization'
 import { uploadSignatureImage } from '@/app/actions/upload-signature'
 
 /**
@@ -33,7 +33,7 @@ export async function signOrder(orderId: string, signatureDataUrl: string) {
             return { success: false, error: 'Order not found' }
         }
 
-        const staff = await isStaffUser(user.id)
+        const staff = await hasPermission('orders.update')
         if (!staff && !userOwnsOrder(user, order)) {
             return { success: false, error: 'You do not have permission to sign this order' }
         }

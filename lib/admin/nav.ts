@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
+import { userHasPermission } from '@/lib/auth/permission-catalog'
 import {
   LayoutDashboard,
   ClipboardCheck,
@@ -31,6 +32,8 @@ import {
   Handshake,
   Sparkles,
   KeyRound,
+  Landmark,
+  NotebookPen,
 } from 'lucide-react'
 
 export type AdminNavItem = {
@@ -64,21 +67,64 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: ClipboardCheck,
         label: 'Week Prep',
         href: '/admin/week-prep',
+        permission: 'orders.view',
         keywords: ['weekend', 'prep', 'readiness', 'fulfillment'],
       },
-      { icon: Calendar, label: 'Calendar', href: '/admin/calendar', keywords: ['schedule'] },
-      { icon: Activity, label: 'Activity', href: '/admin/activity', keywords: ['feed', 'audit'] },
+      { icon: Calendar, label: 'Calendar', href: '/admin/calendar', permission: 'orders.view', keywords: ['schedule'] },
+      { icon: Activity, label: 'Activity', href: '/admin/activity', permission: 'settings.view', keywords: ['feed', 'audit'] },
       {
         icon: TrendingUp,
         label: 'Ops Intelligence',
         href: '/admin/analytics',
+        permission: 'reports.view',
         keywords: ['reports', 'revenue', 'analytics', 'gmv', 'intelligence', 'funnel'],
       },
       {
         icon: Sparkles,
         label: 'Innovate',
         href: '/innovate',
+        permission: 'innovate.view',
         keywords: ['studio', 'visualizer', 'atelier', 'backdrop', 'vip', 'custom'],
+      },
+    ],
+  },
+  {
+    title: 'Venue',
+    items: [
+      {
+        icon: Landmark,
+        label: 'Venue desk',
+        href: '/admin/venue',
+        permission: 'venues.view',
+        keywords: ['venue', 'crm', 'tours', 'bookings', 'rooms'],
+      },
+      {
+        icon: NotebookPen,
+        label: 'Event plans',
+        href: '/admin/event-plans',
+        permission: 'consultations.view',
+        keywords: ['plan', 'inquiry', 'budget', 'guests'],
+      },
+      {
+        icon: CheckSquare,
+        label: 'My tasks',
+        href: '/admin/my-tasks',
+        permission: 'tasks.view',
+        keywords: ['today', 'overdue', 'assigned', 'checklist'],
+      },
+      {
+        icon: ClipboardCheck,
+        label: 'Team tasks',
+        href: '/admin/staff-tasks',
+        permission: 'tasks.view',
+        keywords: ['board', 'workload', 'calendar', 'staff'],
+      },
+      {
+        icon: ClipboardList,
+        label: 'Task templates',
+        href: '/admin/task-templates',
+        permission: 'tasks.manage',
+        keywords: ['automation', 'stage', 'checklist'],
       },
     ],
   },
@@ -96,18 +142,21 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: FileText,
         label: 'Leads',
         href: '/admin/consultations',
+        permission: 'consultations.view',
         keywords: ['consultations', 'inquiries', 'crm'],
       },
       {
         icon: CalendarCheck,
         label: 'Appointments',
         href: '/admin/appointments',
+        permission: 'appointments.view',
         keywords: ['showroom', 'visits'],
       },
       {
         icon: MessageSquare,
         label: 'Messages',
         href: '/admin/messages',
+        permission: 'customers.view',
         keywords: ['inbox', 'chat'],
       },
       {
@@ -126,26 +175,29 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: CalendarDays,
         label: 'Warehouse schedule',
         href: '/admin/warehouse/schedule',
+        permission: 'orders.view',
         keywords: ['pick', 'pack', 'load', 'warehouse tasks'],
       },
-      { icon: QrCode, label: 'Scanner', href: '/admin/scan', keywords: ['qr', 'pick'] },
+      { icon: QrCode, label: 'Scanner', href: '/admin/scan', permission: 'orders.view', keywords: ['qr', 'pick'] },
       {
         icon: FileOutput,
         label: 'Pack slips',
         href: '/admin/pack-slip',
+        permission: 'orders.view',
         keywords: ['packing', 'warehouse slip'],
       },
-      { icon: Box, label: 'Delivery', href: '/admin/delivery', keywords: ['routes', 'dropoff'] },
-      { icon: Briefcase, label: 'Bags', href: '/admin/bags', keywords: ['kits', 'manifests'] },
-      { icon: Archive, label: 'Inventory', href: '/admin/inventory', keywords: ['stock'] },
+      { icon: Box, label: 'Delivery', href: '/admin/delivery', permission: 'delivery.view', keywords: ['routes', 'dropoff'] },
+      { icon: Briefcase, label: 'Bags', href: '/admin/bags', permission: 'orders.view', keywords: ['kits', 'manifests'] },
+      { icon: Archive, label: 'Inventory', href: '/admin/inventory', permission: 'orders.view', keywords: ['stock'] },
       {
         icon: MapPin,
         label: 'Warehouse',
         href: '/admin/warehouse/locations',
+        permission: 'orders.view',
         keywords: ['locations', 'bins'],
       },
-      { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks', keywords: ['todo', 'team'] },
-      { icon: Truck, label: 'Logistics', href: '/admin/logistics', keywords: ['hub', 'ops', 'map'] },
+      { icon: CheckSquare, label: 'Tasks', href: '/admin/tasks', permission: 'orders.view', keywords: ['todo', 'team'] },
+      { icon: Truck, label: 'Logistics', href: '/admin/logistics', permission: 'orders.view', keywords: ['hub', 'ops', 'map'] },
     ],
   },
   {
@@ -159,18 +211,20 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         permission: 'products.view',
         keywords: ['items', 'rentals'],
       },
-      { icon: Layers, label: 'Categories', href: '/admin/categories', keywords: ['taxonomy'] },
-      { icon: ClipboardList, label: 'Packages', href: '/admin/packages', keywords: ['bundles'] },
+      { icon: Layers, label: 'Categories', href: '/admin/categories', permission: 'catalog.view', keywords: ['taxonomy'] },
+      { icon: ClipboardList, label: 'Packages', href: '/admin/packages', permission: 'catalog.view', keywords: ['bundles'] },
       {
         icon: ImageIcon,
         label: 'Portfolio',
         href: '/admin/portfolio',
+        permission: 'portfolio.view',
         keywords: ['gallery', 'events'],
       },
       {
         icon: PenLine,
         label: 'Site editor',
         href: '/admin/visual-editor',
+        permission: 'visual_editor.view',
         keywords: ['cms', 'content', 'visual'],
       },
     ],
@@ -183,12 +237,14 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: Handshake,
         label: 'Preferred partners',
         href: '/admin/partners',
+        permission: 'customers.view',
         keywords: ['planners', 'decorators', 'preferred', 'trade', 'partner', 'vendor'],
       },
       {
         icon: Tag,
         label: 'Discounts',
         href: '/admin/marketing/discounts',
+        permission: 'discounts.view',
         keywords: ['coupons', 'promo', 'marketing'],
       },
       {
@@ -202,6 +258,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         icon: CalendarDays,
         label: 'Staff shifts',
         href: '/admin/team/shifts',
+        permission: 'shifts.view',
         keywords: ['schedule', 'shifts', 'roster'],
       },
       {
@@ -223,28 +280,30 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
 ]
 
 export const ADMIN_QUICK_ACTIONS: AdminNavItem[] = [
-  { icon: Plus, label: 'New order', href: '/admin/orders/new', keywords: ['create'] },
+  { icon: Plus, label: 'New order', href: '/admin/orders/new', permission: 'orders.create', keywords: ['create'] },
   {
     icon: ClipboardCheck,
     label: 'Open Week Prep',
     href: '/admin/week-prep',
+    permission: 'orders.view',
     keywords: ['weekend', 'prep', 'ready'],
   },
-  { icon: Plus, label: 'New product', href: '/admin/products/new', keywords: ['add', 'create'] },
-  { icon: Plus, label: 'New package', href: '/admin/packages/new', keywords: ['add', 'create'] },
+  { icon: Plus, label: 'New product', href: '/admin/products/new', permission: 'products.create', keywords: ['add', 'create'] },
+  { icon: Plus, label: 'New package', href: '/admin/packages/new', permission: 'catalog.create', keywords: ['add', 'create'] },
   {
     icon: Handshake,
     label: 'Review partners',
     href: '/admin/partners',
+    permission: 'customers.view',
     keywords: ['approve', 'planner', 'preferred'],
   },
 ]
 
 /** Primary mobile tabs (scan + menu are chrome, not listed here) */
 export const ADMIN_MOBILE_TABS: AdminNavItem[] = [
-  { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
-  { icon: ClipboardCheck, label: 'Week Prep', href: '/admin/week-prep' },
-  { icon: MessageSquare, label: 'Inbox', href: '/admin/messages' },
+  { icon: ShoppingCart, label: 'Orders', href: '/admin/orders', permission: 'orders.view' },
+  { icon: ClipboardCheck, label: 'Week Prep', href: '/admin/week-prep', permission: 'orders.view' },
+  { icon: MessageSquare, label: 'Inbox', href: '/admin/messages', permission: 'customers.view' },
 ]
 
 export function isAdminRouteActive(pathname: string, href: string): boolean {
@@ -256,31 +315,36 @@ export function flattenAdminNav(): AdminNavItem[] {
   return ADMIN_NAV_GROUPS.flatMap((group) => group.items)
 }
 
-/** Client-side permission check mirroring server manage.* inheritance + admin role */
+/** Client-side permission check. super_admin bypasses; resource.manage covers that resource. */
 export function canAccessNavItem(
   permissionNames: string[] | null | undefined,
   roleNames: string[] | null | undefined,
   item: AdminNavItem,
+  bridge = false,
 ): boolean {
   if (!item.permission) return true
-  // Until permissions load, show all items to avoid empty nav flash
-  if (permissionNames == null) return true
-  if (roleNames?.includes('admin')) return true
-  if (permissionNames.includes(item.permission)) return true
-  const [resource] = item.permission.split('.')
-  if (resource && permissionNames.includes(`${resource}.manage`)) return true
-  return false
+  // Until permissions load, show all items to avoid an empty nav flash
+  if (permissionNames == null || roleNames == null) return true
+  return userHasPermission(
+    {
+      roles: roleNames.map((name) => ({ name })),
+      permissions: permissionNames.map((name) => ({ name })),
+    },
+    item.permission,
+    { bridge },
+  )
 }
 
 export function filterNavGroupsByPermission(
   groups: AdminNavGroup[],
   permissionNames: string[] | null | undefined,
   roleNames: string[] | null | undefined = null,
+  bridge = false,
 ): AdminNavGroup[] {
   return groups
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => canAccessNavItem(permissionNames, roleNames, item)),
+      items: group.items.filter((item) => canAccessNavItem(permissionNames, roleNames, item, bridge)),
     }))
     .filter((group) => group.items.length > 0)
 }
