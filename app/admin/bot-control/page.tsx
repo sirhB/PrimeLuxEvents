@@ -3,7 +3,7 @@ import { BotDesk } from '@/components/admin/bot/bot-desk'
 import { BOT_PROMPTS, DEFAULT_BOT_VARIABLES, assertPromptIsPublic, fillPrompt, promptValues, supabaseProjectRef } from '@/lib/admin/bot-prompts'
 import { loadSchemaBrief } from '@/lib/admin/schema-brief'
 import { renderDigest } from '@/lib/bots/digest'
-import { digestFromDesk } from '@/lib/bots/from-desk'
+import { digestFromDesk, voiceFromDesk } from '@/lib/bots/from-desk'
 import { sampleBotDesk } from '@/lib/bots/state'
 import { loadVenueDesk } from '@/lib/venues/load-desk'
 
@@ -25,7 +25,7 @@ export default async function BotControlPage() {
         title="Bot control"
         description="Prompts, bots, scoped keys, and the checks that hold a risky write for a person."
       />
-      <BotDesk projectRef={projectRef} schema={schema} digest={digest} initial={initial} />
+      <BotDesk projectRef={projectRef} schema={schema} digest={digest} voice={voiceFromDesk(desk)} initial={initial} />
     </AdminPage>
   )
 }

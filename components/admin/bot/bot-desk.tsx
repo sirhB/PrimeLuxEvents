@@ -7,6 +7,8 @@ import { BOT_SCOPES, decideBotAction, type Guardrails } from '@/lib/bots/policy'
 import { reduceBotDesk, WEBHOOK_EVENTS, type BotDeskState, type BotRecord, type WebhookEvent } from '@/lib/bots/state'
 import { diffLines } from '@/lib/bots/versions'
 import { deliveryStatus, MAX_WEBHOOK_ATTEMPTS } from '@/lib/bots/delivery'
+import { SiriSetup } from '@/components/admin/bot/siri-setup'
+import type { VoiceSnapshot } from '@/lib/bots/voice'
 
 const SECTIONS = [
   ['prompts', 'Prompts'],
@@ -20,6 +22,7 @@ const SECTIONS = [
   ['versions', 'Versions'],
   ['inbox', 'Inbox'],
   ['webhooks', 'Webhooks'],
+  ['siri', 'Siri'],
 ] as const
 
 type SectionId = (typeof SECTIONS)[number][0]
@@ -38,12 +41,14 @@ export function BotDesk({
   projectRef,
   schema,
   digest,
+  voice,
   initial,
   hostToast = false,
 }: {
   projectRef: string
   schema: string
   digest: string
+  voice: VoiceSnapshot
   initial: BotDeskState
   hostToast?: boolean
 }) {
@@ -298,6 +303,7 @@ export function BotDesk({
         </Section>
       )}
       {section === 'webhooks' && <WebhookSection state={state} onApply={apply} />}
+      {section === 'siri' && <SiriSetup snapshot={voice} guardrails={state.guardrails} />}
     </div>
   )
 }

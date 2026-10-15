@@ -116,4 +116,65 @@ assert.equal(userHasPermission(staff, 'bot_inbox.create', { bridge: true }), tru
 assert.equal(userHasPermission({ roles: [{ name: 'manager' }], permissions: [] }, 'bot.manage', { bridge: true }), true)
 assert.equal(userHasPermission({ roles: [{ name: 'viewer' }], permissions: [] }, 'bot.view', { bridge: true }), false)
 
+import { parseVoiceIntent, answerVoice, actionForIntent, speakable } from '../lib/bots/voice.ts'
+import { decideBotAction as decideVoiceAction } from '../lib/bots/policy.ts'
+
+const voiceNow = '2026-10-15T19:00:00.000Z'
+const voiceSnapshot = {
+  now: voiceNow,
+  timezone: 'America/New_York',
+  tasks: [
+    { id: 't1', title: 'Confirm the tour time', assignee: 'Mara Quinn', dueOn: '2026-10-15', status: 'pending' },
+    { id: 't2', title: 'Prep the room', assignee: 'Mara Quinn', dueOn: '2026-10-13', status: 'pending' },
+  ],
+  leads: [
+    { name: 'Jordan Hale', stage: 'inquiry', eventDate: '2026-12-04', venue: 'The Gallery' },
+    { name: 'Avery Cole', stage: 'tour', eventDate: '2026-11-14', venue: 'The Conservatory' },
+  ],
+  tours: [{ name: 'Avery Cole', venue: 'The Conservatory', startsAt: '2026-10-18T18:00:00.000Z' }],
+}
+const voiceOpen = {
+  scopes: ['leads:read', 'tasks:read', 'tasks:write'],
+  botStatus: 'active',
+  guardrails: DEFAULT_GUARDRAILS,
+  at: new Date(voiceNow),
+  timeZone: 'America/New_York',
+  runDays: [1, 2, 3, 4, 5],
+  runStart: '08:00',
+  runEnd: '18:00',
+}
+
+assert.equal(parseVoiceIntent("What's due today?").type, 'due_today')
+assert.equal(parseVoiceIntent('What is overdue?').type, 'overdue')
+assert.equal(parseVoiceIntent("What's on this week?").type, 'events_week')
+assert.equal(parseVoiceIntent('Any new leads?').type, 'new_leads')
+assert.equal(parseVoiceIntent('Status of Avery').type, 'lead_status')
+assert.equal(parseVoiceIntent('Add a task call the florist').type, 'add_task')
+assert.equal(parseVoiceIntent('Mark prep the room done').type, 'complete_task')
+assert.equal(parseVoiceIntent('hello there').type, 'unknown')
+
+const due = answerVoice(parseVoiceIntent('what is due today'), voiceSnapshot, { effect: 'allow' })
+assert.match(due, /Confirm the tour time/)
+assert.doesNotMatch(due, /Prep the room/)
+const late = answerVoice(parseVoiceIntent('what is overdue'), voiceSnapshot, { effect: 'allow' })
+assert.match(late, /Prep the room/)
+const leads = answerVoice(parseVoiceIntent('new leads'), voiceSnapshot, { effect: 'allow' })
+assert.match(leads, /Jordan Hale/)
+assert.doesNotMatch(leads, /Avery Cole/)
+const status = answerVoice(parseVoiceIntent('status of Avery'), voiceSnapshot, { effect: 'allow' })
+assert.match(status, /tour/)
+assert.match(status, /Conservatory/)
+
+const addAction = actionForIntent(parseVoiceIntent('add a task call the florist'))
+assert.equal(addAction, 'tasks.create')
+assert.equal(decideVoiceAction({ ...voiceOpen, action: addAction, scopes: ['tasks:read'] }).effect, 'deny')
+assert.equal(decideVoiceAction({ ...voiceOpen, action: 'tasks.create', at: new Date('2026-10-17T19:00:00Z'), runDays: [6] }).code, 'weekend_read_only')
+assert.equal(decideVoiceAction({ ...voiceOpen, action: 'tasks.create' }).effect, 'allow')
+const added = answerVoice(parseVoiceIntent('add a task call the florist'), voiceSnapshot, { effect: 'allow' })
+assert.match(added, /Added the task/)
+const held = answerVoice(parseVoiceIntent('add a task call the florist'), voiceSnapshot, { effect: 'hold', code: 'approval_required', message: 'waiting' })
+assert.match(held, /waiting for a person/)
+assert.equal(speakable('token plxbot_' + 'a'.repeat(20)), 'I cannot say that.')
+assert.doesNotMatch(due + late + status + added, /service_role|plxbot_|sk_test/)
+
 console.log('bot control checks passed')

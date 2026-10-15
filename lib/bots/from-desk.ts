@@ -1,6 +1,7 @@
 import type { DeskWorkspace } from '@/lib/venues/desk'
 import type { DigestInput } from './digest'
 import type { ActivityEntry } from './activity'
+import type { VoiceSnapshot } from './voice'
 
 export function digestFromDesk(desk: DeskWorkspace, now = new Date(), activity: ActivityEntry[] = []): DigestInput {
   const contacts = new Map(desk.contacts.map((contact) => [contact.id, contact.name]))
@@ -50,5 +51,37 @@ export function digestFromDesk(desk: DeskWorkspace, now = new Date(), activity: 
     clientActivity: desk.activities
       .filter((item) => item.visibility === 'client' || item.kind === 'client')
       .map((item) => ({ name: item.author_name, body: item.body, at: item.created_at })),
+  }
+}
+
+export function voiceFromDesk(desk: DeskWorkspace, now = new Date()): VoiceSnapshot {
+  const contacts = new Map(desk.contacts.map((contact) => [contact.id, contact.name]))
+  const leadName = (leadId: string | null) => {
+    const lead = desk.leads.find((item) => item.id === leadId)
+    return lead ? contacts.get(lead.contact_id) || 'Lead' : 'Lead'
+  }
+  return {
+    now: now.toISOString(),
+    timezone: 'America/New_York',
+    tasks: desk.tasks
+      .filter((task) => task.audience === 'staff')
+      .map((task) => ({
+        id: task.id,
+        title: task.title,
+        assignee: task.assignee_name,
+        dueOn: task.due_on,
+        status: task.status,
+      })),
+    leads: desk.leads.map((lead) => ({
+      name: contacts.get(lead.contact_id) || 'Lead',
+      stage: lead.stage,
+      eventDate: lead.event_date,
+      venue: lead.venue_name,
+    })),
+    tours: desk.tours.map((tour) => ({
+      name: leadName(tour.lead_id),
+      venue: tour.venue_name,
+      startsAt: tour.starts_at,
+    })),
   }
 }
