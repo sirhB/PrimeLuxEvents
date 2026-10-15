@@ -1,12 +1,7 @@
 'use server'
 
-import { fetchCatalogProducts } from "@/lib/catalog/queries"
+import { searchPublicCatalog } from '@/lib/catalog/public-catalog'
 
 export async function searchProducts(query: string, sort: string, category: string | null) {
-    return fetchCatalogProducts({
-        query: query || null,
-        sort: sort || 'name',
-        categorySlug: category,
-        limit: 100,
-    })
+  return searchPublicCatalog(query, sort, category)
 }

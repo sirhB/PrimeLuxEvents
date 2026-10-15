@@ -1,138 +1,96 @@
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { PencilRuler, Truck, Armchair, Sparkles } from "lucide-react"
 import { getSiteContent } from "@/lib/content"
 
 export const revalidate = 60
 
+const SERVICES = [
+  {
+    key: 'design',
+    imageKey: 'services.list.design.image',
+    titleKey: 'services.list.design.title',
+    descriptionKey: 'services.list.design.description',
+    featuresKey: 'services.design.features',
+    fallbackImage: '/images/service-design.png',
+    alt: 'Design consultation',
+  },
+  {
+    key: 'delivery',
+    imageKey: 'services.list.delivery.image',
+    titleKey: 'services.list.delivery.title',
+    descriptionKey: 'services.list.delivery.description',
+    featuresKey: 'services.delivery.features',
+    fallbackImage: '/images/service-logistics.png',
+    alt: 'Delivery crew unloading rentals',
+  },
+  {
+    key: 'setup',
+    imageKey: 'services.list.setup.image',
+    titleKey: 'services.list.setup.title',
+    descriptionKey: 'services.list.setup.description',
+    featuresKey: 'services.setup.features',
+    fallbackImage: '/images/service-setup.png',
+    alt: 'Setup and breakdown',
+  },
+] as const
+
 export default async function ServicesPage() {
   const content = await getSiteContent()
 
-  const designFeatures = content['services.design.features'] || []
-  const deliveryFeatures = content['services.delivery.features'] || []
-  const setupFeatures = content['services.setup.features'] || []
-
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-32 bg-muted/30">
-        <div className="container mx-auto px-4 md:px-6 text-center space-y-6">
-          <h1 className="text-4xl md:text-6xl font-serif font-medium tracking-tight">{content['services.hero.title']}</h1>
-          <p className="text-lg md:text-xl font-light text-muted-foreground max-w-2xl mx-auto">
-            {content['services.hero.description']}
-          </p>
-        </div>
+    <div>
+      <section className="mx-auto max-w-3xl px-5 py-16 md:px-8 md:py-28">
+        <p className="lux-label">Services</p>
+        <h1 className="mt-4 font-serif text-5xl font-medium leading-[0.95] md:text-7xl">
+          {content['services.hero.title']}
+        </h1>
+        <p className="mt-5 text-base font-light leading-relaxed text-[var(--theme-muted)] md:text-lg">
+          {content['services.hero.description']}
+        </p>
       </section>
 
-      {/* Services Grid */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid gap-12 md:gap-24">
-            {/* Service 1 */}
-            <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
-              <div className="order-2 md:order-1 relative aspect-video md:aspect-[4/3] bg-muted rounded-lg overflow-hidden">
-                <Image
-                  src={content['services.list.design.image'] || "/images/service-design.png"}
-                  alt="Design Consultation"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="order-1 md:order-2 space-y-6">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <PencilRuler className="h-6 w-6" />
+      <div className="border-t border-[var(--theme-dark)]/10">
+        {SERVICES.map((service, index) => {
+          const features: string[] = content[service.featuresKey] || []
+          return (
+            <section key={service.key} className="border-b border-[var(--theme-dark)]/10">
+              <div className="mx-auto grid max-w-6xl items-center gap-8 px-5 py-12 md:grid-cols-2 md:gap-16 md:px-8 md:py-20">
+                <div className={index % 2 === 1 ? 'md:order-2' : ''}>
+                  <div className="relative aspect-[4/3] overflow-hidden bg-[var(--theme-surface)]">
+                    <Image
+                      src={content[service.imageKey] || service.fallbackImage}
+                      alt={service.alt}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                 </div>
-                <h2 className="text-3xl font-serif">{content['services.list.design.title']}</h2>
-                <p className="text-muted-foreground text-lg leading-relaxed">
-                  {content['services.list.design.description']}
-                </p>
-                <ul className="space-y-2 text-muted-foreground">
-                  {designFeatures.map((feature: string, index: number) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* Service 2 */}
-            <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
-              <div className="space-y-6">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <Truck className="h-6 w-6" />
+                <div>
+                  <p className="lux-label">{String(index + 1).padStart(2, '0')}</p>
+                  <h2 className="mt-3 font-serif text-4xl font-medium leading-none">{content[service.titleKey]}</h2>
+                  <p className="mt-4 text-base font-light leading-relaxed text-[var(--theme-muted)]">
+                    {content[service.descriptionKey]}
+                  </p>
+                  {features.length > 0 && (
+                    <ul className="mt-6 space-y-2 text-sm font-light text-[var(--theme-dark)]">
+                      {features.map((feature) => (
+                        <li key={feature} className="border-t border-[var(--theme-dark)]/10 py-2">{feature}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
-                <h2 className="text-3xl font-serif">{content['services.list.delivery.title']}</h2>
-                <p className="text-muted-foreground text-lg leading-relaxed">
-                  {content['services.list.delivery.description']}
-                </p>
-                <ul className="space-y-2 text-muted-foreground">
-                  {deliveryFeatures.map((feature: string, index: number) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
               </div>
-              <div className="relative aspect-video md:aspect-[4/3] bg-muted rounded-lg overflow-hidden">
-                <Image
-                  src={content['services.list.delivery.image'] || "/images/service-logistics.png"}
-                  alt="Delivery crew unloading rentals"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            </div>
+            </section>
+          )
+        })}
+      </div>
 
-            {/* Service 3 */}
-            <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
-              <div className="order-2 md:order-1 relative aspect-video md:aspect-[4/3] bg-muted rounded-lg overflow-hidden">
-                <Image
-                  src={content['services.list.setup.image'] || "/images/service-setup.png"}
-                  alt="Setup and Breakdown"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="order-1 md:order-2 space-y-6">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <Armchair className="h-6 w-6" />
-                </div>
-                <h2 className="text-3xl font-serif">{content['services.list.setup.title']}</h2>
-                <p className="text-muted-foreground text-lg leading-relaxed">
-                  {content['services.list.setup.description']}
-                </p>
-                <ul className="space-y-2 text-muted-foreground">
-                  {setupFeatures.map((feature: string, index: number) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-24 bg-muted/30">
-        <div className="container mx-auto px-4 md:px-6 text-center space-y-8">
-          <div className="h-16 w-16 mx-auto rounded-full bg-background border border-border flex items-center justify-center text-primary mb-6">
-            <Sparkles className="h-8 w-8" />
-          </div>
-          <h2 className="text-3xl md:text-4xl font-serif">{content['services.cta.title']}</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            {content['services.cta.description']}
-          </p>
-          <Button asChild size="lg" className="min-w-[200px]">
-            <Link href="/contact">{content['services.cta.button']}</Link>
-          </Button>
-        </div>
+      <section className="mx-auto max-w-3xl px-5 py-20 text-center md:py-28">
+        <h2 className="font-serif text-4xl font-medium leading-none md:text-5xl">{content['services.cta.title']}</h2>
+        <p className="mx-auto mt-5 max-w-lg text-base font-light leading-relaxed text-[var(--theme-muted)]">
+          {content['services.cta.description']}
+        </p>
+        <Link href="/plan" className="lux-cta mt-8">{content['services.cta.button'] || 'Plan your event'}</Link>
       </section>
     </div>
   )
