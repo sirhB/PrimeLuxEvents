@@ -30,6 +30,7 @@ export const ADMIN_ROUTE_RULES: AdminRouteRule[] = [
   { prefix: '/admin/team/shifts', permission: 'shifts.view' },
   { prefix: '/admin/team', permission: 'users.view' },
   { prefix: '/admin/settings', permission: 'settings.view' },
+  { prefix: '/admin/bot-control', permission: 'bot.view' },
   { prefix: '/admin/api-keys', permission: 'settings.view' },
   { prefix: '/admin/activity', permission: 'settings.view' },
   { prefix: '/admin/analytics', permission: 'reports.view' },

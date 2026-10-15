@@ -48,6 +48,7 @@ export const PERMISSION_AREAS: PermissionArea[] = [
   { resource: 'users', label: 'Team', description: 'Members, roles, and invitations', actions: ['view', 'create', 'update', 'delete', 'manage'] },
   { resource: 'reports', label: 'Reports', description: 'Analytics and reports', actions: ['view', 'create', 'manage'] },
   { resource: 'tasks', label: 'Tasks', description: 'Operational tasks', actions: ['view', 'create', 'update', 'delete', 'manage'] },
+  { resource: 'bot', label: 'Bot control', description: 'Copy setup prompts for the external operations assistant', actions: ['view', 'manage'] },
 ]
 
 const ACTION_LABEL: Record<PermissionAction, string> = {
