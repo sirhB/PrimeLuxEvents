@@ -33,6 +33,7 @@ ALTER TABLE conversation_participants ADD COLUMN IF NOT EXISTS is_archived boole
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "access_own_conversations" ON conversations;
+drop policy if exists "access_own_conversations" on conversations;
 CREATE POLICY "access_own_conversations"
 ON conversations FOR SELECT
 USING (
@@ -45,6 +46,7 @@ USING (
 );
 
 DROP POLICY IF EXISTS "create_conversations" ON conversations;
+drop policy if exists "create_conversations" on conversations;
 CREATE POLICY "create_conversations"
 ON conversations FOR INSERT
 WITH CHECK (auth.uid() = created_by);
@@ -61,6 +63,7 @@ RETURNS boolean LANGUAGE sql SECURITY DEFINER AS $$
 $$;
 
 DROP POLICY IF EXISTS "view_participants" ON conversation_participants;
+drop policy if exists "view_participants" on conversation_participants;
 CREATE POLICY "view_participants"
 ON conversation_participants FOR SELECT
 USING (
@@ -68,6 +71,7 @@ USING (
 );
 
 DROP POLICY IF EXISTS "insert_participants" ON conversation_participants;
+drop policy if exists "insert_participants" on conversation_participants;
 CREATE POLICY "insert_participants"
 ON conversation_participants FOR INSERT
 WITH CHECK (
@@ -79,6 +83,7 @@ WITH CHECK (
 );
 
 DROP POLICY IF EXISTS "update_own_participant" ON conversation_participants;
+drop policy if exists "update_own_participant" on conversation_participants;
 CREATE POLICY "update_own_participant"
 ON conversation_participants FOR UPDATE
 USING (user_id = auth.uid());
@@ -87,6 +92,7 @@ USING (user_id = auth.uid());
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "view_messages" ON messages;
+drop policy if exists "view_messages" on messages;
 CREATE POLICY "view_messages"
 ON messages FOR SELECT
 USING (
@@ -94,6 +100,7 @@ USING (
 );
 
 DROP POLICY IF EXISTS "insert_messages" ON messages;
+drop policy if exists "insert_messages" on messages;
 CREATE POLICY "insert_messages"
 ON messages FOR INSERT
 WITH CHECK (

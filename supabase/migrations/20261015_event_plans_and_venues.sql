@@ -116,11 +116,13 @@ ALTER TABLE public.venue_bookings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.venue_availability ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Published venues are public" ON public.venues;
+drop policy if exists "Published venues are public" on public.venues;
 CREATE POLICY "Published venues are public"
   ON public.venues FOR SELECT
   USING (published = true OR public.can_manage_venue_crm());
 
 DROP POLICY IF EXISTS "Staff manage venues" ON public.venues;
+drop policy if exists "Staff manage venues" on public.venues;
 CREATE POLICY "Staff manage venues"
   ON public.venues FOR ALL
   TO authenticated
@@ -128,12 +130,14 @@ CREATE POLICY "Staff manage venues"
   WITH CHECK (public.can_manage_venue_crm());
 
 DROP POLICY IF EXISTS "Staff read event plans" ON public.event_plans;
+drop policy if exists "Staff read event plans" on public.event_plans;
 CREATE POLICY "Staff read event plans"
   ON public.event_plans FOR SELECT
   TO authenticated
   USING (public.can_manage_venue_crm() OR public.is_staff());
 
 DROP POLICY IF EXISTS "Staff update event plans" ON public.event_plans;
+drop policy if exists "Staff update event plans" on public.event_plans;
 CREATE POLICY "Staff update event plans"
   ON public.event_plans FOR UPDATE
   TO authenticated
@@ -141,38 +145,45 @@ CREATE POLICY "Staff update event plans"
   WITH CHECK (public.can_manage_venue_crm() OR public.is_staff());
 
 DROP POLICY IF EXISTS "Staff read venue leads" ON public.venue_leads;
+drop policy if exists "Staff read venue leads" on public.venue_leads;
 CREATE POLICY "Staff read venue leads"
   ON public.venue_leads FOR SELECT TO authenticated
   USING (public.can_manage_venue_crm());
 DROP POLICY IF EXISTS "Staff write venue leads" ON public.venue_leads;
+drop policy if exists "Staff write venue leads" on public.venue_leads;
 CREATE POLICY "Staff write venue leads"
   ON public.venue_leads FOR ALL TO authenticated
   USING (public.can_manage_venue_crm())
   WITH CHECK (public.can_manage_venue_crm());
 
 DROP POLICY IF EXISTS "Staff manage venue notes" ON public.venue_notes;
+drop policy if exists "Staff manage venue notes" on public.venue_notes;
 CREATE POLICY "Staff manage venue notes"
   ON public.venue_notes FOR ALL TO authenticated
   USING (public.can_manage_venue_crm())
   WITH CHECK (public.can_manage_venue_crm());
 
 DROP POLICY IF EXISTS "Staff manage venue tours" ON public.venue_tours;
+drop policy if exists "Staff manage venue tours" on public.venue_tours;
 CREATE POLICY "Staff manage venue tours"
   ON public.venue_tours FOR ALL TO authenticated
   USING (public.can_manage_venue_crm())
   WITH CHECK (public.can_manage_venue_crm());
 
 DROP POLICY IF EXISTS "Staff manage venue bookings" ON public.venue_bookings;
+drop policy if exists "Staff manage venue bookings" on public.venue_bookings;
 CREATE POLICY "Staff manage venue bookings"
   ON public.venue_bookings FOR ALL TO authenticated
   USING (public.can_manage_venue_crm())
   WITH CHECK (public.can_manage_venue_crm());
 
 DROP POLICY IF EXISTS "Public read venue availability" ON public.venue_availability;
+drop policy if exists "Public read venue availability" on public.venue_availability;
 CREATE POLICY "Public read venue availability"
   ON public.venue_availability FOR SELECT
   USING (true);
 DROP POLICY IF EXISTS "Staff manage venue availability" ON public.venue_availability;
+drop policy if exists "Staff manage venue availability" on public.venue_availability;
 CREATE POLICY "Staff manage venue availability"
   ON public.venue_availability FOR ALL TO authenticated
   USING (public.can_manage_venue_crm())

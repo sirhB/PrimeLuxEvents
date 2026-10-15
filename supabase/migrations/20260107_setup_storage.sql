@@ -5,11 +5,13 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Set up access control for the products bucket
 -- Allow public access to view images
+drop policy if exists "Public Access" on storage.objects;
 CREATE POLICY "Public Access"
 ON storage.objects FOR SELECT
 USING ( bucket_id = 'products' );
 
 -- Allow authenticated users (admins) to upload images
+drop policy if exists "Admin Upload" on storage.objects;
 CREATE POLICY "Admin Upload"
 ON storage.objects FOR INSERT
 WITH CHECK (
@@ -18,6 +20,7 @@ WITH CHECK (
 );
 
 -- Allow authenticated users (admins) to update/delete images
+drop policy if exists "Admin Update" on storage.objects;
 CREATE POLICY "Admin Update"
 ON storage.objects FOR UPDATE
 USING (
@@ -25,6 +28,7 @@ USING (
     AND auth.role() = 'authenticated'
 );
 
+drop policy if exists "Admin Delete" on storage.objects;
 CREATE POLICY "Admin Delete"
 ON storage.objects FOR DELETE
 USING (

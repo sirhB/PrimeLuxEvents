@@ -54,18 +54,22 @@ ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 
 -- 5. RLS Policies
 -- Allow authenticated users to view all tasks for now (simplifies transition)
+drop policy if exists "Authenticated users can view all tasks" on tasks;
 CREATE POLICY "Authenticated users can view all tasks" ON tasks
   FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Allow authenticated users to insert tasks
+drop policy if exists "Authenticated users can insert tasks" on tasks;
 CREATE POLICY "Authenticated users can insert tasks" ON tasks
   FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
 -- Allow authenticated users to update tasks
+drop policy if exists "Authenticated users can update tasks" on tasks;
 CREATE POLICY "Authenticated users can update tasks" ON tasks
   FOR UPDATE USING (auth.role() = 'authenticated');
 
 -- Allow authenticated users to delete tasks
+drop policy if exists "Authenticated users can delete tasks" on tasks;
 CREATE POLICY "Authenticated users can delete tasks" ON tasks
   FOR DELETE USING (auth.role() = 'authenticated');
 

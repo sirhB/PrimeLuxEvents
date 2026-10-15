@@ -19,10 +19,12 @@ ADD COLUMN IF NOT EXISTS signed_at timestamp with time zone;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
 -- Payments policies
+drop policy if exists "Admins can view all payments" on payments;
 CREATE POLICY "Admins can view all payments"
   ON payments FOR SELECT
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Public can insert payments (webhook)" on payments;
 CREATE POLICY "Public can insert payments (webhook)"
   ON payments FOR INSERT
   WITH CHECK (true);
@@ -33,14 +35,17 @@ VALUES ('signatures', 'signatures', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage policies for signatures
+drop policy if exists "Public Signature Access" on storage.objects;
 CREATE POLICY "Public Signature Access"
 ON storage.objects FOR SELECT
 USING ( bucket_id = 'signatures' );
 
+drop policy if exists "Public Signature Upload" on storage.objects;
 CREATE POLICY "Public Signature Upload"
 ON storage.objects FOR INSERT
 WITH CHECK ( bucket_id = 'signatures' );
 
+drop policy if exists "Admin Signature Delete" on storage.objects;
 CREATE POLICY "Admin Signature Delete"
 ON storage.objects FOR DELETE
 USING (

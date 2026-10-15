@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS tiered_discounts (
 ALTER TABLE tiered_discounts ENABLE ROW LEVEL SECURITY;
 
 -- Policies
+drop policy if exists "Admins can manage tiered_discounts" on tiered_discounts;
 CREATE POLICY "Admins can manage tiered_discounts"
   ON tiered_discounts
   USING (auth.role() = 'authenticated');

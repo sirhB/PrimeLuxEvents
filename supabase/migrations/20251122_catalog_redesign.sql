@@ -30,35 +30,43 @@ ALTER TABLE packages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE package_items ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for packages
+drop policy if exists "Public packages are viewable by everyone." on packages;
 CREATE POLICY "Public packages are viewable by everyone."
   ON packages FOR SELECT
   USING ( true );
 
+drop policy if exists "Admins can insert packages." on packages;
 CREATE POLICY "Admins can insert packages."
   ON packages FOR INSERT
   WITH CHECK ( auth.role() = 'authenticated' );
 
+drop policy if exists "Admins can update packages." on packages;
 CREATE POLICY "Admins can update packages."
   ON packages FOR UPDATE
   USING ( auth.role() = 'authenticated' );
 
+drop policy if exists "Admins can delete packages." on packages;
 CREATE POLICY "Admins can delete packages."
   ON packages FOR DELETE
   USING ( auth.role() = 'authenticated' );
 
 -- RLS Policies for package_items
+drop policy if exists "Public package items are viewable by everyone." on package_items;
 CREATE POLICY "Public package items are viewable by everyone."
   ON package_items FOR SELECT
   USING ( true );
 
+drop policy if exists "Admins can insert package items." on package_items;
 CREATE POLICY "Admins can insert package items."
   ON package_items FOR INSERT
   WITH CHECK ( auth.role() = 'authenticated' );
 
+drop policy if exists "Admins can update package items." on package_items;
 CREATE POLICY "Admins can update package items."
   ON package_items FOR UPDATE
   USING ( auth.role() = 'authenticated' );
 
+drop policy if exists "Admins can delete package items." on package_items;
 CREATE POLICY "Admins can delete package items."
   ON package_items FOR DELETE
   USING ( auth.role() = 'authenticated' );

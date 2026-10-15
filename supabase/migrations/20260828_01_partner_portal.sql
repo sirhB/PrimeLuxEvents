@@ -147,12 +147,14 @@ ALTER TABLE partner_shared_carts ENABLE ROW LEVEL SECURITY;
 
 -- Tier settings: authenticated read
 DROP POLICY IF EXISTS "Anyone authenticated can read partner tiers" ON partner_tier_settings;
+drop policy if exists "Anyone authenticated can read partner tiers" on partner_tier_settings;
 CREATE POLICY "Anyone authenticated can read partner tiers"
   ON partner_tier_settings FOR SELECT
   TO authenticated
   USING (true);
 
 DROP POLICY IF EXISTS "Staff can manage partner tiers" ON partner_tier_settings;
+drop policy if exists "Staff can manage partner tiers" on partner_tier_settings;
 CREATE POLICY "Staff can manage partner tiers"
   ON partner_tier_settings FOR ALL
   TO authenticated
@@ -166,6 +168,7 @@ CREATE POLICY "Staff can manage partner tiers"
 
 -- Partner profiles
 DROP POLICY IF EXISTS "Users can read own partner profile" ON partner_profiles;
+drop policy if exists "Users can read own partner profile" on partner_profiles;
 CREATE POLICY "Users can read own partner profile"
   ON partner_profiles FOR SELECT
   TO authenticated
@@ -179,12 +182,14 @@ CREATE POLICY "Users can read own partner profile"
   );
 
 DROP POLICY IF EXISTS "Users can create own partner application" ON partner_profiles;
+drop policy if exists "Users can create own partner application" on partner_profiles;
 CREATE POLICY "Users can create own partner application"
   ON partner_profiles FOR INSERT
   TO authenticated
   WITH CHECK (user_id = auth.uid());
 
 DROP POLICY IF EXISTS "Users can update own pending partner profile" ON partner_profiles;
+drop policy if exists "Users can update own pending partner profile" on partner_profiles;
 CREATE POLICY "Users can update own pending partner profile"
   ON partner_profiles FOR UPDATE
   TO authenticated
@@ -199,6 +204,7 @@ CREATE POLICY "Users can update own pending partner profile"
 
 -- Shared carts: partners manage own; public read via service role / token RPC
 DROP POLICY IF EXISTS "Partners manage own shared carts" ON partner_shared_carts;
+drop policy if exists "Partners manage own shared carts" on partner_shared_carts;
 CREATE POLICY "Partners manage own shared carts"
   ON partner_shared_carts FOR ALL
   TO authenticated

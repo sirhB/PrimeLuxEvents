@@ -10,10 +10,12 @@ DROP POLICY IF EXISTS "Admins can manage user roles" ON user_roles;
 
 -- 2. Create a NON-RECURSIVE read policy
 -- This is the key fix: Simple check, no table lookups
+drop policy if exists "Authenticated users can view user_roles" on user_roles;
 CREATE POLICY "Authenticated users can view user_roles" ON user_roles
   FOR SELECT USING (auth.role() = 'authenticated');
 
 -- 3. Create write policies (these can safely check admin status now because SELECT is open)
+drop policy if exists "Admins can insert user_roles" on user_roles;
 CREATE POLICY "Admins can insert user_roles" ON user_roles
   FOR INSERT WITH CHECK (
     EXISTS (
@@ -23,6 +25,7 @@ CREATE POLICY "Admins can insert user_roles" ON user_roles
     )
   );
 
+drop policy if exists "Admins can update user_roles" on user_roles;
 CREATE POLICY "Admins can update user_roles" ON user_roles
   FOR UPDATE USING (
     EXISTS (
@@ -32,6 +35,7 @@ CREATE POLICY "Admins can update user_roles" ON user_roles
     )
   );
 
+drop policy if exists "Admins can delete user_roles" on user_roles;
 CREATE POLICY "Admins can delete user_roles" ON user_roles
   FOR DELETE USING (
     EXISTS (
@@ -46,10 +50,12 @@ DROP POLICY IF EXISTS "Admins can view all user profiles" ON user_profiles;
 DROP POLICY IF EXISTS "Users can view their own profile" ON user_profiles;
 
 -- Allow users to view their own profile
+drop policy if exists "Users can view their own profile" on user_profiles;
 CREATE POLICY "Users can view their own profile" ON user_profiles
   FOR SELECT USING (auth.uid() = id);
 
 -- Allow admins to view all profiles (this is now safe because querying user_roles won't recurse)
+drop policy if exists "Admins can view all user profiles" on user_profiles;
 CREATE POLICY "Admins can view all user profiles" ON user_profiles
   FOR SELECT USING (
     EXISTS (

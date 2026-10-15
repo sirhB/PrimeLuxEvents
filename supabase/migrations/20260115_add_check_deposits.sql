@@ -7,10 +7,12 @@ VALUES ('check-deposits', 'check-deposits', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage policies for check-deposits
+drop policy if exists "Public Check Deposit Access" on storage.objects;
 CREATE POLICY "Public Check Deposit Access"
 ON storage.objects FOR SELECT
 USING ( bucket_id = 'check-deposits' );
 
+drop policy if exists "Admin Check Deposit Upload" on storage.objects;
 CREATE POLICY "Admin Check Deposit Upload"
 ON storage.objects FOR INSERT
 WITH CHECK ( 
@@ -18,6 +20,7 @@ WITH CHECK (
   AND auth.role() = 'authenticated'
 );
 
+drop policy if exists "Admin Check Deposit Delete" on storage.objects;
 CREATE POLICY "Admin Check Deposit Delete"
 ON storage.objects FOR DELETE
 USING (

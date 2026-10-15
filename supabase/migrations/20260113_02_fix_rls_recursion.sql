@@ -16,40 +16,49 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 2. Update user_profiles policies
 DROP POLICY IF EXISTS "Admins can view all user profiles" ON user_profiles;
+drop policy if exists "Admins can view all user profiles" on user_profiles;
 CREATE POLICY "Admins can view all user profiles" ON user_profiles
   FOR SELECT USING (is_admin());
 
 DROP POLICY IF EXISTS "Admins can insert user profiles" ON user_profiles;
+drop policy if exists "Admins can insert user profiles" on user_profiles;
 CREATE POLICY "Admins can insert user profiles" ON user_profiles
   FOR INSERT WITH CHECK (is_admin());
 
 DROP POLICY IF EXISTS "Admins can update user profiles" ON user_profiles;
+drop policy if exists "Admins can update user profiles" on user_profiles;
 CREATE POLICY "Admins can update user profiles" ON user_profiles
   FOR UPDATE USING (is_admin());
 
 DROP POLICY IF EXISTS "Admins can delete user profiles" ON user_profiles;
+drop policy if exists "Admins can delete user profiles" on user_profiles;
 CREATE POLICY "Admins can delete user profiles" ON user_profiles
   FOR DELETE USING (is_admin());
 
 -- 3. Update roles policies
 DROP POLICY IF EXISTS "Admins can view roles" ON roles;
+drop policy if exists "Admins can view roles" on roles;
 CREATE POLICY "Admins can view roles" ON roles
   FOR SELECT USING (is_admin());
 
 DROP POLICY IF EXISTS "Admins can manage roles" ON roles;
+drop policy if exists "Admins can manage roles" on roles;
 CREATE POLICY "Admins can manage roles" ON roles
   FOR ALL USING (is_admin()) WITH CHECK (is_admin());
 
 -- 4. Update user_roles policies
 DROP POLICY IF EXISTS "Admins can view all user roles" ON user_roles;
+drop policy if exists "Admins can view all user roles" on user_roles;
 CREATE POLICY "Admins can view all user roles" ON user_roles
   FOR SELECT USING (is_admin());
 
 DROP POLICY IF EXISTS "Admins can manage user roles" ON user_roles;
+drop policy if exists "Admins can manage user roles" on user_roles;
 CREATE POLICY "Admins can manage user roles" ON user_roles
   FOR ALL USING (is_admin()) WITH CHECK (is_admin());
 
 -- 5. Update user_invitations policies
 DROP POLICY IF EXISTS "Admins can manage user invitations" ON user_invitations;
+drop policy if exists "Admins can manage user invitations" on user_invitations;
 CREATE POLICY "Admins can manage user invitations" ON user_invitations
   FOR ALL USING (is_admin()) WITH CHECK (is_admin());

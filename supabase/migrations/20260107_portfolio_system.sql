@@ -24,13 +24,16 @@ ALTER TABLE portfolio_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE portfolio_images ENABLE ROW LEVEL SECURITY;
 
 -- Public read access
+drop policy if exists "Portfolio categories are viewable by everyone" on portfolio_categories;
 CREATE POLICY "Portfolio categories are viewable by everyone" 
 ON portfolio_categories FOR SELECT USING (true);
 
+drop policy if exists "Portfolio images are viewable by everyone" on portfolio_images;
 CREATE POLICY "Portfolio images are viewable by everyone" 
 ON portfolio_images FOR SELECT USING (true);
 
 -- Admin full access
+drop policy if exists "Admin full access on portfolio_categories" on portfolio_categories;
 CREATE POLICY "Admin full access on portfolio_categories" 
 ON portfolio_categories FOR ALL USING (
   EXISTS (
@@ -40,6 +43,7 @@ ON portfolio_categories FOR ALL USING (
   )
 );
 
+drop policy if exists "Admin full access on portfolio_images" on portfolio_images;
 CREATE POLICY "Admin full access on portfolio_images" 
 ON portfolio_images FOR ALL USING (
   EXISTS (

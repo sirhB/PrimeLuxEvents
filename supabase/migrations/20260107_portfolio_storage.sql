@@ -5,11 +5,13 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Set up access control for the portfolio bucket
 -- Allow public access to view images
+drop policy if exists "Public Access Portfolio" on storage.objects;
 CREATE POLICY "Public Access Portfolio"
 ON storage.objects FOR SELECT
 USING ( bucket_id = 'portfolio' );
 
 -- Allow authenticated users (admins) to upload images
+drop policy if exists "Admin Upload Portfolio" on storage.objects;
 CREATE POLICY "Admin Upload Portfolio"
 ON storage.objects FOR INSERT
 WITH CHECK (
@@ -18,6 +20,7 @@ WITH CHECK (
 );
 
 -- Allow authenticated users (admins) to update/delete images
+drop policy if exists "Admin Update Portfolio" on storage.objects;
 CREATE POLICY "Admin Update Portfolio"
 ON storage.objects FOR UPDATE
 USING (
@@ -25,6 +28,7 @@ USING (
     AND auth.role() = 'authenticated'
 );
 
+drop policy if exists "Admin Delete Portfolio" on storage.objects;
 CREATE POLICY "Admin Delete Portfolio"
 ON storage.objects FOR DELETE
 USING (

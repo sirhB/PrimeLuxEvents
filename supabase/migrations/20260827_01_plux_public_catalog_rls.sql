@@ -1,9 +1,14 @@
 -- Launch-ready: allow public catalog reads on plux
 -- Run this in Supabase Dashboard → SQL Editor for project "plux"
 
+-- is_active is formally added in 20260917_02_bootstrap_catalog; ensure it exists here for fresh runs
+alter table public.products add column if not exists is_active boolean default true;
+alter table public.categories add column if not exists is_active boolean default true;
+
 alter table public.products enable row level security;
 alter table public.categories enable row level security;
 
+drop policy if exists "Public can read active products" on public.products;
 drop policy if exists "Public can read active products" on public.products;
 create policy "Public can read active products"
   on public.products
@@ -11,6 +16,7 @@ create policy "Public can read active products"
   to anon, authenticated
   using (coalesce(is_active, true) = true);
 
+drop policy if exists "Public can read active categories" on public.categories;
 drop policy if exists "Public can read active categories" on public.categories;
 create policy "Public can read active categories"
   on public.categories
@@ -20,6 +26,7 @@ create policy "Public can read active categories"
 
 -- Optional: authenticated staff can write (adjust if you use custom roles)
 drop policy if exists "Authenticated can write products" on public.products;
+drop policy if exists "Authenticated can write products" on public.products;
 create policy "Authenticated can write products"
   on public.products
   for all
@@ -27,6 +34,7 @@ create policy "Authenticated can write products"
   using (true)
   with check (true);
 
+drop policy if exists "Authenticated can write categories" on public.categories;
 drop policy if exists "Authenticated can write categories" on public.categories;
 create policy "Authenticated can write categories"
   on public.categories

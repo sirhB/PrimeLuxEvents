@@ -8,10 +8,12 @@ DROP POLICY IF EXISTS "Authenticated users can view roles" ON roles;
 DROP POLICY IF EXISTS "Admins can manage roles" ON roles;
 
 -- Non-recursive read policy
+drop policy if exists "Authenticated users can view roles" on roles;
 CREATE POLICY "Authenticated users can view roles" ON roles
   FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Write policies (safe to check admin status now)
+drop policy if exists "Admins can insert roles" on roles;
 CREATE POLICY "Admins can insert roles" ON roles
   FOR INSERT WITH CHECK (
     EXISTS (
@@ -21,6 +23,7 @@ CREATE POLICY "Admins can insert roles" ON roles
     )
   );
 
+drop policy if exists "Admins can update roles" on roles;
 CREATE POLICY "Admins can update roles" ON roles
   FOR UPDATE USING (
     EXISTS (
@@ -30,6 +33,7 @@ CREATE POLICY "Admins can update roles" ON roles
     )
   );
 
+drop policy if exists "Admins can delete roles" on roles;
 CREATE POLICY "Admins can delete roles" ON roles
   FOR DELETE USING (
     EXISTS (
@@ -45,10 +49,12 @@ DROP POLICY IF EXISTS "Authenticated users can view permissions" ON permissions;
 DROP POLICY IF EXISTS "Admins can manage permissions" ON permissions;
 
 -- Non-recursive read policy
+drop policy if exists "Authenticated users can view permissions" on permissions;
 CREATE POLICY "Authenticated users can view permissions" ON permissions
   FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Write policies
+drop policy if exists "Admins can insert permissions" on permissions;
 CREATE POLICY "Admins can insert permissions" ON permissions
   FOR INSERT WITH CHECK (
     EXISTS (
@@ -58,6 +64,7 @@ CREATE POLICY "Admins can insert permissions" ON permissions
     )
   );
 
+drop policy if exists "Admins can update permissions" on permissions;
 CREATE POLICY "Admins can update permissions" ON permissions
   FOR UPDATE USING (
     EXISTS (
@@ -67,6 +74,7 @@ CREATE POLICY "Admins can update permissions" ON permissions
     )
   );
 
+drop policy if exists "Admins can delete permissions" on permissions;
 CREATE POLICY "Admins can delete permissions" ON permissions
   FOR DELETE USING (
     EXISTS (

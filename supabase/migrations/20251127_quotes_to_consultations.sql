@@ -2,6 +2,14 @@
 -- This migration renames the quotes table to consultations and updates the schema
 -- to support the new consultation workflow
 
+-- Guard: only runs on legacy databases that still have the quotes table.
+-- Fresh projects get consultations directly from the base schema.
+DO $quotes$
+BEGIN
+  IF to_regclass('public.quotes') IS NULL THEN
+    RETURN;
+  END IF;
+
 -- Step 1: Rename the quotes table to consultations
 ALTER TABLE quotes RENAME TO consultations;
 
@@ -47,18 +55,22 @@ DROP POLICY IF EXISTS "Admins can view all quotes." ON consultations;
 DROP POLICY IF EXISTS "Admins can update quotes." ON consultations;
 
 -- Create new consultation policies
+drop policy if exists "Anyone can create consultations." on consultations;
 CREATE POLICY "Anyone can create consultations."
   ON consultations FOR insert
   WITH CHECK (true);
 
+drop policy if exists "Admins can view all consultations." on consultations;
 CREATE POLICY "Admins can view all consultations."
   ON consultations FOR select
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can update consultations." on consultations;
 CREATE POLICY "Admins can update consultations."
   ON consultations FOR update
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can delete consultations." on consultations;
 CREATE POLICY "Admins can delete consultations."
   ON consultations FOR delete
   USING (auth.role() = 'authenticated');
@@ -69,3 +81,5 @@ CREATE INDEX IF NOT EXISTS idx_consultations_created_at ON consultations(created
 
 -- Step 8: Add a comment to the table
 COMMENT ON TABLE consultations IS 'Stores consultation requests from the contact form with workflow states: new_request, pending_response, appointment_confirmed, completed';
+
+END $quotes$;

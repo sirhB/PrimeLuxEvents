@@ -49,6 +49,7 @@ CREATE INDEX IF NOT EXISTS idx_messages_conversation_created ON messages(convers
 
 -- Conversations
 DROP POLICY IF EXISTS "Users can view conversations they participate in" ON conversations;
+drop policy if exists "Users can view conversations they participate in" on conversations;
 CREATE POLICY "Users can view conversations they participate in"
   ON conversations
   FOR SELECT
@@ -62,6 +63,7 @@ CREATE POLICY "Users can view conversations they participate in"
   );
 
 DROP POLICY IF EXISTS "Authenticated users can create conversations" ON conversations;
+drop policy if exists "Authenticated users can create conversations" on conversations;
 CREATE POLICY "Authenticated users can create conversations"
   ON conversations
   FOR INSERT
@@ -84,18 +86,21 @@ $$;
 
 -- Participants
 DROP POLICY IF EXISTS "Users can view participants of their conversations" ON conversation_participants;
+drop policy if exists "Users can view participants of their conversations" on conversation_participants;
 CREATE POLICY "Users can view participants of their conversations"
   ON conversation_participants
   FOR SELECT
   USING (is_conversation_participant(conversation_id, auth.uid()));
 
 DROP POLICY IF EXISTS "Users can add themselves as participants" ON conversation_participants;
+drop policy if exists "Users can add themselves as participants" on conversation_participants;
 CREATE POLICY "Users can add themselves as participants"
   ON conversation_participants
   FOR INSERT
   WITH CHECK (user_id = auth.uid());
 
 DROP POLICY IF EXISTS "Users can update their own participant record" ON conversation_participants;
+drop policy if exists "Users can update their own participant record" on conversation_participants;
 CREATE POLICY "Users can update their own participant record"
   ON conversation_participants
   FOR UPDATE
@@ -104,12 +109,14 @@ CREATE POLICY "Users can update their own participant record"
 
 -- Messages
 DROP POLICY IF EXISTS "Users can view messages in their conversations" ON messages;
+drop policy if exists "Users can view messages in their conversations" on messages;
 CREATE POLICY "Users can view messages in their conversations"
   ON messages
   FOR SELECT
   USING (is_conversation_participant(conversation_id, auth.uid()));
   
 DROP POLICY IF EXISTS "Users can insert messages in their conversations" ON messages;
+drop policy if exists "Users can insert messages in their conversations" on messages;
 CREATE POLICY "Users can insert messages in their conversations"
   ON messages
   FOR INSERT

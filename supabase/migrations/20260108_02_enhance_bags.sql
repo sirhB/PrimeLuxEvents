@@ -15,10 +15,12 @@ CREATE TABLE IF NOT EXISTS bag_catalog_items (
 ALTER TABLE bag_catalog_items ENABLE ROW LEVEL SECURITY;
 
 -- Policies
+drop policy if exists "Admins can view bag catalog items" on bag_catalog_items;
 CREATE POLICY "Admins can view bag catalog items" 
 ON bag_catalog_items FOR SELECT 
 USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can manage bag catalog items" on bag_catalog_items;
 CREATE POLICY "Admins can manage bag catalog items" 
 ON bag_catalog_items FOR ALL 
 USING (auth.role() = 'authenticated');

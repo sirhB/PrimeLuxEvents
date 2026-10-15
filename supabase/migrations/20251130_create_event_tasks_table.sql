@@ -20,18 +20,22 @@ CREATE TABLE IF NOT EXISTS event_tasks (
 ALTER TABLE event_tasks ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+drop policy if exists "Admins can view all event tasks." on event_tasks;
 CREATE POLICY "Admins can view all event tasks."
   ON event_tasks FOR SELECT
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can insert event tasks." on event_tasks;
 CREATE POLICY "Admins can insert event tasks."
   ON event_tasks FOR INSERT
   WITH CHECK (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can update event tasks." on event_tasks;
 CREATE POLICY "Admins can update event tasks."
   ON event_tasks FOR UPDATE
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can delete event tasks." on event_tasks;
 CREATE POLICY "Admins can delete event tasks."
   ON event_tasks FOR DELETE
   USING (auth.role() = 'authenticated');
@@ -48,7 +52,9 @@ CREATE INDEX IF NOT EXISTS idx_event_tasks_assigned_to ON event_tasks(assigned_t
 COMMENT ON TABLE event_tasks IS 'Stores tasks and checklist items associated with specific events';
 
 -- Seed some sample tasks for existing events
-INSERT INTO event_tasks (event_id, title, description, status, priority, assigned_to, due_date, created_by) VALUES
+INSERT INTO event_tasks (event_id, title, description, status, priority, assigned_to, due_date, created_by)
+SELECT v.event_id, v.title, v.description, v.status, v.priority, v.assigned_to, v.due_date::date, v.created_by
+FROM (VALUES
 -- Tasks for Emma & Liam's Wedding (EVT-001)
 ((SELECT id FROM events WHERE event_id = 'EVT-001'), 'Venue walkthrough and final confirmation', 'Conduct final walkthrough of Seaside Cliffs Resort and confirm all arrangements', 'completed', 'high', 'Maya Brooks', '2025-07-15', 'admin'),
 ((SELECT id FROM events WHERE event_id = 'EVT-001'), 'Catering menu tasting', 'Schedule and conduct menu tasting with caterer', 'completed', 'high', 'Maya Brooks', '2025-07-20', 'admin'),
@@ -65,4 +71,7 @@ INSERT INTO event_tasks (event_id, title, description, status, priority, assigne
 ((SELECT id FROM events WHERE event_id = 'EVT-003'), 'Cake design approval', 'Finalize cake design with bakery', 'completed', 'medium', 'Sarah Jones', '2025-06-20', 'admin'),
 ((SELECT id FROM events WHERE event_id = 'EVT-003'), 'Party favors assembly', 'Purchase and assemble party favors', 'completed', 'low', 'Sarah Jones', '2025-06-25', 'admin'),
 ((SELECT id FROM events WHERE event_id = 'EVT-003'), 'Music playlist creation', 'Create and organize music playlist', 'completed', 'low', 'Sarah Jones', '2025-06-28', 'admin')
+) AS v(event_id, title, description, status, priority, assigned_to, due_date, created_by)
+-- sample rows only when the sample events exist (no-op on fresh projects)
+WHERE v.event_id IS NOT NULL
 ON CONFLICT DO NOTHING;

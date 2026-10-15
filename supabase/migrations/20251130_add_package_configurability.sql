@@ -39,10 +39,12 @@ ALTER TABLE package_item_groups ENABLE ROW LEVEL SECURITY;
 ALTER TABLE package_item_options ENABLE ROW LEVEL SECURITY;
 
 -- 5. RLS Policies for package_item_groups
+drop policy if exists "Public package item groups are viewable by everyone." on package_item_groups;
 CREATE POLICY "Public package item groups are viewable by everyone."
   ON package_item_groups FOR SELECT
   USING ( true );
 
+drop policy if exists "Admins can insert package item groups." on package_item_groups;
 CREATE POLICY "Admins can insert package item groups."
   ON package_item_groups FOR INSERT
   WITH CHECK ( 
@@ -53,6 +55,7 @@ CREATE POLICY "Admins can insert package item groups."
     )
   );
 
+drop policy if exists "Admins can update package item groups." on package_item_groups;
 CREATE POLICY "Admins can update package item groups."
   ON package_item_groups FOR UPDATE
   USING ( 
@@ -63,6 +66,7 @@ CREATE POLICY "Admins can update package item groups."
     )
   );
 
+drop policy if exists "Admins can delete package item groups." on package_item_groups;
 CREATE POLICY "Admins can delete package item groups."
   ON package_item_groups FOR DELETE
   USING ( 
@@ -74,10 +78,12 @@ CREATE POLICY "Admins can delete package item groups."
   );
 
 -- 6. RLS Policies for package_item_options
+drop policy if exists "Public package item options are viewable by everyone." on package_item_options;
 CREATE POLICY "Public package item options are viewable by everyone."
   ON package_item_options FOR SELECT
   USING ( true );
 
+drop policy if exists "Admins can insert package item options." on package_item_options;
 CREATE POLICY "Admins can insert package item options."
   ON package_item_options FOR INSERT
   WITH CHECK ( 
@@ -88,6 +94,7 @@ CREATE POLICY "Admins can insert package item options."
     )
   );
 
+drop policy if exists "Admins can update package item options." on package_item_options;
 CREATE POLICY "Admins can update package item options."
   ON package_item_options FOR UPDATE
   USING ( 
@@ -98,6 +105,7 @@ CREATE POLICY "Admins can update package item options."
     )
   );
 
+drop policy if exists "Admins can delete package item options." on package_item_options;
 CREATE POLICY "Admins can delete package item options."
   ON package_item_options FOR DELETE
   USING ( 

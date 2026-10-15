@@ -14,10 +14,12 @@ create table if not exists product_images (
 alter table product_images enable row level security;
 
 -- Create policies
+drop policy if exists "Public read access" on product_images;
 create policy "Public read access"
   on product_images for select
   using (true);
 
+drop policy if exists "Admin full access" on product_images;
 create policy "Admin full access"
   on product_images for all
   using (auth.role() = 'service_role');
