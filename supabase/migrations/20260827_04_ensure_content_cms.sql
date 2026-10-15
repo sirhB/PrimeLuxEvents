@@ -15,11 +15,13 @@ CREATE TABLE IF NOT EXISTS public.content (
 ALTER TABLE public.content ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Public content is viewable by everyone." ON public.content;
+drop policy if exists "Public content is viewable by everyone." on public.content;
 CREATE POLICY "Public content is viewable by everyone."
   ON public.content FOR SELECT
   USING (true);
 
 DROP POLICY IF EXISTS "Admins can update content." ON public.content;
+drop policy if exists "Admins can update content." on public.content;
 CREATE POLICY "Admins can update content."
   ON public.content FOR UPDATE
   TO authenticated
@@ -27,6 +29,7 @@ CREATE POLICY "Admins can update content."
   WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Admins can insert content." ON public.content;
+drop policy if exists "Admins can insert content." on public.content;
 CREATE POLICY "Admins can insert content."
   ON public.content FOR INSERT
   TO authenticated

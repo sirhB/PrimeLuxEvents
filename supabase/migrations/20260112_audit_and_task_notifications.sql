@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- Admins can view all audit logs
+drop policy if exists "Admins can view audit logs" on audit_logs;
 CREATE POLICY "Admins can view audit logs" ON audit_logs
     FOR SELECT USING (
         EXISTS (

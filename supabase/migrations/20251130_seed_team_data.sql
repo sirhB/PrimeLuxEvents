@@ -40,6 +40,9 @@ BEGIN
   SELECT id INTO driver_role_id FROM roles WHERE name = 'driver';
   SELECT id INTO warehouse_role_id FROM roles WHERE name = 'warehouse';
   
+  -- Sample profiles have no auth.users rows; skip them where user_profiles.id
+  -- references auth.users (fresh projects), since the inserts cannot succeed there.
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'user_profiles_id_fkey') THEN
   -- Create sample user profiles (these won't have auth.users entries, just for display)
   INSERT INTO user_profiles (id, email, full_name, phone, job_title, department, hire_date, is_active)
   VALUES 
@@ -91,6 +94,7 @@ BEGIN
   VALUES (user6_id, driver_role_id)
   ON CONFLICT (user_id, role_id) DO NOTHING;
   
+  END IF;
   -- Create comprehensive permissions if they don't exist
   INSERT INTO permissions (name, display_name, description, resource, action)
   VALUES

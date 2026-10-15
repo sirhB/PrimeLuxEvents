@@ -7,7 +7,7 @@ Scratch checklist for deferred ops / launch steps. Check items off when done; ap
 ## Public API keys — go live
 
 - [ ] Merge / deploy the public catalog API PR (`cursor/public-catalog-api-8b90` / #42)
-- [ ] Apply Supabase migration `supabase/migrations/20260917_public_api_keys.sql` (SQL Editor or CLI) so the `api_keys` table exists
+- [ ] Apply Supabase migration `supabase/migrations/20260917_03_public_api_keys.sql` (SQL Editor or CLI) so the `api_keys` table exists
 - [ ] Confirm Admin → **API keys** loads without a “table missing” error
 - [ ] Create a labeled key (e.g. partner or integration name); copy the raw `plx_…` secret once — it is not shown again
 - [ ] Smoke-test against production (or staging) with the key:

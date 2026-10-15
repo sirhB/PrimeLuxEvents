@@ -60,7 +60,8 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Anyone can create orders." ON public.orders';
     EXECUTE 'DROP POLICY IF EXISTS "Staff can insert orders" ON public.orders';
     EXECUTE $p$
-      CREATE POLICY "Staff can insert orders"
+      drop policy if exists "Staff can insert orders" on public.orders;
+CREATE POLICY "Staff can insert orders"
         ON public.orders FOR INSERT
         TO authenticated
         WITH CHECK (public.is_staff())
@@ -72,7 +73,8 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Anyone can insert order items." ON public.order_items';
     EXECUTE 'DROP POLICY IF EXISTS "Staff can insert order items" ON public.order_items';
     EXECUTE $p$
-      CREATE POLICY "Staff can insert order items"
+      drop policy if exists "Staff can insert order items" on public.order_items;
+CREATE POLICY "Staff can insert order items"
         ON public.order_items FOR INSERT
         TO authenticated
         WITH CHECK (public.is_staff())
@@ -84,7 +86,8 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Anyone can insert reservations." ON public.rental_reservations';
     EXECUTE 'DROP POLICY IF EXISTS "Staff can insert rental reservations" ON public.rental_reservations';
     EXECUTE $p$
-      CREATE POLICY "Staff can insert rental reservations"
+      drop policy if exists "Staff can insert rental reservations" on public.rental_reservations;
+CREATE POLICY "Staff can insert rental reservations"
         ON public.rental_reservations FOR INSERT
         TO authenticated
         WITH CHECK (public.is_staff())
@@ -111,7 +114,8 @@ BEGIN
   EXECUTE 'DROP POLICY IF EXISTS "Customers can view payments for their orders" ON public.payments';
 
   EXECUTE $p$
-    CREATE POLICY "Staff can view payments"
+    drop policy if exists "Staff can view payments" on public.payments;
+CREATE POLICY "Staff can view payments"
       ON public.payments FOR SELECT
       TO authenticated
       USING (public.is_staff())
@@ -144,7 +148,8 @@ BEGIN
   END IF;
 
   EXECUTE format($p$
-    CREATE POLICY "Customers can view payments for their orders"
+    drop policy if exists "Customers can view payments for their orders" on public.payments;
+CREATE POLICY "Customers can view payments for their orders"
       ON public.payments FOR SELECT
       TO authenticated
       USING (
@@ -166,7 +171,8 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Authenticated can write products" ON public.products';
     EXECUTE 'DROP POLICY IF EXISTS "Staff can write products" ON public.products';
     EXECUTE $p$
-      CREATE POLICY "Staff can write products"
+      drop policy if exists "Staff can write products" on public.products;
+CREATE POLICY "Staff can write products"
         ON public.products FOR ALL
         TO authenticated
         USING (public.is_staff())
@@ -178,7 +184,8 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Authenticated can write categories" ON public.categories';
     EXECUTE 'DROP POLICY IF EXISTS "Staff can write categories" ON public.categories';
     EXECUTE $p$
-      CREATE POLICY "Staff can write categories"
+      drop policy if exists "Staff can write categories" on public.categories;
+CREATE POLICY "Staff can write categories"
         ON public.categories FOR ALL
         TO authenticated
         USING (public.is_staff())
@@ -206,26 +213,30 @@ BEGIN
   EXECUTE 'DROP POLICY IF EXISTS "Staff can delete consultations" ON public.consultations';
 
   EXECUTE $p$
-    CREATE POLICY "Staff can view consultations"
+    drop policy if exists "Staff can view consultations" on public.consultations;
+CREATE POLICY "Staff can view consultations"
       ON public.consultations FOR SELECT
       TO authenticated
       USING (public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff can insert consultations"
+    drop policy if exists "Staff can insert consultations" on public.consultations;
+CREATE POLICY "Staff can insert consultations"
       ON public.consultations FOR INSERT
       TO authenticated
       WITH CHECK (public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff can update consultations"
+    drop policy if exists "Staff can update consultations" on public.consultations;
+CREATE POLICY "Staff can update consultations"
       ON public.consultations FOR UPDATE
       TO authenticated
       USING (public.is_staff())
       WITH CHECK (public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff can delete consultations"
+    drop policy if exists "Staff can delete consultations" on public.consultations;
+CREATE POLICY "Staff can delete consultations"
       ON public.consultations FOR DELETE
       TO authenticated
       USING (public.is_staff())
@@ -243,14 +254,16 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Staff can update settings" ON public.settings';
     EXECUTE 'DROP POLICY IF EXISTS "Staff can insert settings" ON public.settings';
     EXECUTE $p$
-      CREATE POLICY "Staff can update settings"
+      drop policy if exists "Staff can update settings" on public.settings;
+CREATE POLICY "Staff can update settings"
         ON public.settings FOR UPDATE
         TO authenticated
         USING (public.is_staff())
         WITH CHECK (public.is_staff())
     $p$;
     EXECUTE $p$
-      CREATE POLICY "Staff can insert settings"
+      drop policy if exists "Staff can insert settings" on public.settings;
+CREATE POLICY "Staff can insert settings"
         ON public.settings FOR INSERT
         TO authenticated
         WITH CHECK (public.is_staff())
@@ -263,14 +276,16 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Staff can update content" ON public.content';
     EXECUTE 'DROP POLICY IF EXISTS "Staff can insert content" ON public.content';
     EXECUTE $p$
-      CREATE POLICY "Staff can update content"
+      drop policy if exists "Staff can update content" on public.content;
+CREATE POLICY "Staff can update content"
         ON public.content FOR UPDATE
         TO authenticated
         USING (public.is_staff())
         WITH CHECK (public.is_staff())
     $p$;
     EXECUTE $p$
-      CREATE POLICY "Staff can insert content"
+      drop policy if exists "Staff can insert content" on public.content;
+CREATE POLICY "Staff can insert content"
         ON public.content FOR INSERT
         TO authenticated
         WITH CHECK (public.is_staff())
@@ -309,47 +324,56 @@ BEGIN
   EXECUTE 'DROP POLICY IF EXISTS "Staff delete signatures" ON storage.objects';
 
   EXECUTE $p$
-    CREATE POLICY "Staff upload products"
+    drop policy if exists "Staff upload products" on storage.objects;
+CREATE POLICY "Staff upload products"
       ON storage.objects FOR INSERT TO authenticated
       WITH CHECK (bucket_id = 'products' AND public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff update products"
+    drop policy if exists "Staff update products" on storage.objects;
+CREATE POLICY "Staff update products"
       ON storage.objects FOR UPDATE TO authenticated
       USING (bucket_id = 'products' AND public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff delete products"
+    drop policy if exists "Staff delete products" on storage.objects;
+CREATE POLICY "Staff delete products"
       ON storage.objects FOR DELETE TO authenticated
       USING (bucket_id = 'products' AND public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff upload portfolio"
+    drop policy if exists "Staff upload portfolio" on storage.objects;
+CREATE POLICY "Staff upload portfolio"
       ON storage.objects FOR INSERT TO authenticated
       WITH CHECK (bucket_id = 'portfolio' AND public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff update portfolio"
+    drop policy if exists "Staff update portfolio" on storage.objects;
+CREATE POLICY "Staff update portfolio"
       ON storage.objects FOR UPDATE TO authenticated
       USING (bucket_id = 'portfolio' AND public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff delete portfolio"
+    drop policy if exists "Staff delete portfolio" on storage.objects;
+CREATE POLICY "Staff delete portfolio"
       ON storage.objects FOR DELETE TO authenticated
       USING (bucket_id = 'portfolio' AND public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff upload check deposits"
+    drop policy if exists "Staff upload check deposits" on storage.objects;
+CREATE POLICY "Staff upload check deposits"
       ON storage.objects FOR INSERT TO authenticated
       WITH CHECK (bucket_id = 'check-deposits' AND public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff delete check deposits"
+    drop policy if exists "Staff delete check deposits" on storage.objects;
+CREATE POLICY "Staff delete check deposits"
       ON storage.objects FOR DELETE TO authenticated
       USING (bucket_id = 'check-deposits' AND public.is_staff())
   $p$;
   EXECUTE $p$
-    CREATE POLICY "Staff delete signatures"
+    drop policy if exists "Staff delete signatures" on storage.objects;
+CREATE POLICY "Staff delete signatures"
       ON storage.objects FOR DELETE TO authenticated
       USING (bucket_id = 'signatures' AND public.is_staff())
   $p$;

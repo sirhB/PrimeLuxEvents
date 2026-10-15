@@ -19,19 +19,22 @@ ALTER TABLE admin_notifications ENABLE ROW LEVEL SECURITY;
 DO $$ 
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'admin_notifications' AND policyname = 'Admins can view notifications') THEN
-        CREATE POLICY "Admins can view notifications" ON admin_notifications
+        drop policy if exists "Admins can view notifications" on admin_notifications;
+CREATE POLICY "Admins can view notifications" ON admin_notifications
             FOR SELECT USING (auth.role() = 'authenticated');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'admin_notifications' AND policyname = 'Admins can update notifications') THEN
-        CREATE POLICY "Admins can update notifications" ON admin_notifications
+        drop policy if exists "Admins can update notifications" on admin_notifications;
+CREATE POLICY "Admins can update notifications" ON admin_notifications
             FOR UPDATE USING (auth.role() = 'authenticated');
     END IF;
     
     -- Insert also needed for triggers? Usually triggers handle insertion.
     -- But if manual insertion allowed:
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'admin_notifications' AND policyname = 'Admins can insert notifications') THEN
-        CREATE POLICY "Admins can insert notifications" ON admin_notifications
+        drop policy if exists "Admins can insert notifications" on admin_notifications;
+CREATE POLICY "Admins can insert notifications" ON admin_notifications
             FOR INSERT WITH CHECK (auth.role() = 'authenticated');
     END IF;
 END $$;

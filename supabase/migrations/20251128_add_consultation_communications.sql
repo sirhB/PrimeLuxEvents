@@ -15,18 +15,22 @@ CREATE TABLE IF NOT EXISTS consultation_communications (
 ALTER TABLE consultation_communications ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+drop policy if exists "Admins can view all consultation communications." on consultation_communications;
 CREATE POLICY "Admins can view all consultation communications."
   ON consultation_communications FOR SELECT
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can insert consultation communications." on consultation_communications;
 CREATE POLICY "Admins can insert consultation communications."
   ON consultation_communications FOR INSERT
   WITH CHECK (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can update consultation communications." on consultation_communications;
 CREATE POLICY "Admins can update consultation communications."
   ON consultation_communications FOR UPDATE
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can delete consultation communications." on consultation_communications;
 CREATE POLICY "Admins can delete consultation communications."
   ON consultation_communications FOR DELETE
   USING (auth.role() = 'authenticated');

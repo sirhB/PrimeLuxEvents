@@ -98,7 +98,7 @@ if (!sourceDbUrl && !sourceKey) {
 
 const bootstrapPath = resolve(
   root,
-  'supabase/migrations/20260917_bootstrap_catalog_for_new_project.sql',
+  'supabase/migrations/20260917_02_bootstrap_catalog_for_new_project.sql',
 )
 
 function pgClient(connectionString) {

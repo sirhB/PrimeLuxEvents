@@ -21,18 +21,22 @@ CREATE TABLE IF NOT EXISTS appointments (
 ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+drop policy if exists "Admins can view all appointments." on appointments;
 CREATE POLICY "Admins can view all appointments."
   ON appointments FOR SELECT
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can insert appointments." on appointments;
 CREATE POLICY "Admins can insert appointments."
   ON appointments FOR INSERT
   WITH CHECK (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can update appointments." on appointments;
 CREATE POLICY "Admins can update appointments."
   ON appointments FOR UPDATE
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can delete appointments." on appointments;
 CREATE POLICY "Admins can delete appointments."
   ON appointments FOR DELETE
   USING (auth.role() = 'authenticated');

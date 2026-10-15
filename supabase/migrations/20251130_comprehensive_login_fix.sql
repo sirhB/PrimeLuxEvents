@@ -9,11 +9,13 @@ DROP POLICY IF EXISTS "Users can view their own roles" ON user_roles;
 DROP POLICY IF EXISTS "Admins can view all user roles" ON user_roles;
 DROP POLICY IF EXISTS "Authenticated users can view user_roles" ON user_roles;
 
+drop policy if exists "Authenticated users can view user_roles" on user_roles;
 CREATE POLICY "Authenticated users can view user_roles" ON user_roles
   FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Ensure user_profiles is readable by owner
 DROP POLICY IF EXISTS "Users can view their own profile" ON user_profiles;
+drop policy if exists "Users can view their own profile" on user_profiles;
 CREATE POLICY "Users can view their own profile" ON user_profiles
   FOR SELECT USING (auth.uid() = id);
 

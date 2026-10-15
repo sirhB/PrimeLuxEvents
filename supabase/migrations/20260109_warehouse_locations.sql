@@ -18,10 +18,12 @@ ALTER TABLE warehouse_bags ADD COLUMN IF NOT EXISTS location_id UUID REFERENCES 
 ALTER TABLE warehouse_locations ENABLE ROW LEVEL SECURITY;
 
 -- Policies for warehouse_locations
+drop policy if exists "Admins can view warehouse locations" on warehouse_locations;
 CREATE POLICY "Admins can view warehouse locations" 
 ON warehouse_locations FOR SELECT 
 USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can manage warehouse locations" on warehouse_locations;
 CREATE POLICY "Admins can manage warehouse locations" 
 ON warehouse_locations FOR ALL 
 USING (auth.role() = 'authenticated');

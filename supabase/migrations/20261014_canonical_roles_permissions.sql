@@ -425,5 +425,6 @@ CREATE TRIGGER audit_user_roles
   FOR EACH ROW EXECUTE FUNCTION public.record_audit_log();
 
 DROP POLICY IF EXISTS "Settings viewers can read audit logs" ON audit_logs;
+drop policy if exists "Settings viewers can read audit logs" on audit_logs;
 CREATE POLICY "Settings viewers can read audit logs" ON audit_logs
   FOR SELECT USING (public.has_permission('settings.view'));

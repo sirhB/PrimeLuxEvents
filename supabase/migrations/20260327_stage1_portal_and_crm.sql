@@ -15,21 +15,25 @@ CREATE INDEX IF NOT EXISTS idx_favorites_product_id ON favorites(product_id);
 ALTER TABLE favorites ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Users can view their own favorites" ON favorites;
+drop policy if exists "Users can view their own favorites" on favorites;
 CREATE POLICY "Users can view their own favorites"
   ON favorites FOR SELECT
   USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "Users can insert their own favorites" ON favorites;
+drop policy if exists "Users can insert their own favorites" on favorites;
 CREATE POLICY "Users can insert their own favorites"
   ON favorites FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "Users can delete their own favorites" ON favorites;
+drop policy if exists "Users can delete their own favorites" on favorites;
 CREATE POLICY "Users can delete their own favorites"
   ON favorites FOR DELETE
   USING (auth.uid() = user_id);
 
 DROP POLICY IF EXISTS "Staff can view all favorites" ON favorites;
+drop policy if exists "Staff can view all favorites" on favorites;
 CREATE POLICY "Staff can view all favorites"
   ON favorites FOR SELECT
   USING (
@@ -43,6 +47,7 @@ CREATE POLICY "Staff can view all favorites"
 
 -- 2. Customers may update signature fields on their own orders
 DROP POLICY IF EXISTS "Customers can sign their own orders" ON orders;
+drop policy if exists "Customers can sign their own orders" on orders;
 CREATE POLICY "Customers can sign their own orders"
   ON orders FOR UPDATE
   USING (
@@ -75,6 +80,7 @@ DROP POLICY IF EXISTS "Customers can view own appointments" ON appointments;
 DROP POLICY IF EXISTS "Customers can create own appointments" ON appointments;
 DROP POLICY IF EXISTS "Customers can cancel own appointments" ON appointments;
 
+drop policy if exists "Staff can manage appointments" on appointments;
 CREATE POLICY "Staff can manage appointments"
   ON appointments FOR ALL
   USING (
@@ -94,6 +100,7 @@ CREATE POLICY "Staff can manage appointments"
     )
   );
 
+drop policy if exists "Customers can view own appointments" on appointments;
 CREATE POLICY "Customers can view own appointments"
   ON appointments FOR SELECT
   USING (
@@ -101,6 +108,7 @@ CREATE POLICY "Customers can view own appointments"
     OR lower(client_email) = lower(auth.jwt() ->> 'email')
   );
 
+drop policy if exists "Customers can create own appointments" on appointments;
 CREATE POLICY "Customers can create own appointments"
   ON appointments FOR INSERT
   WITH CHECK (
@@ -108,6 +116,7 @@ CREATE POLICY "Customers can create own appointments"
     OR lower(client_email) = lower(auth.jwt() ->> 'email')
   );
 
+drop policy if exists "Customers can cancel own appointments" on appointments;
 CREATE POLICY "Customers can cancel own appointments"
   ON appointments FOR UPDATE
   USING (
@@ -134,6 +143,7 @@ CREATE TABLE IF NOT EXISTS customer_details (
 ALTER TABLE customer_details ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Staff can manage customer_details" ON customer_details;
+drop policy if exists "Staff can manage customer_details" on customer_details;
 CREATE POLICY "Staff can manage customer_details"
   ON customer_details FOR ALL
   USING (

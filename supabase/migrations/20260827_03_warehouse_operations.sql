@@ -38,6 +38,19 @@ CREATE TABLE IF NOT EXISTS public.tasks (
     updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- Ensure columns exist on a pre-existing tasks table before adding FKs
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS warehouse_category text;
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS scheduled_start time;
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS estimated_minutes integer;
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS checklist jsonb DEFAULT '[]'::jsonb;
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS parent_task_id uuid;
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS is_recurring boolean DEFAULT false;
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS recurrence_rule text;
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS assigned_role_id uuid;
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS delivery_items jsonb DEFAULT '[]'::jsonb;
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS meta_data jsonb DEFAULT '{}'::jsonb;
+ALTER TABLE public.tasks ADD COLUMN IF NOT EXISTS route_order integer;
+
 -- Add optional FKs when parent tables exist (safe for partial databases)
 DO $$
 BEGIN
@@ -82,22 +95,26 @@ ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'tasks' AND policyname = 'Authenticated users can view all tasks') THEN
-        CREATE POLICY "Authenticated users can view all tasks" ON public.tasks
+        drop policy if exists "Authenticated users can view all tasks" on public.tasks;
+CREATE POLICY "Authenticated users can view all tasks" ON public.tasks
             FOR SELECT USING (auth.role() = 'authenticated');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'tasks' AND policyname = 'Authenticated users can insert tasks') THEN
-        CREATE POLICY "Authenticated users can insert tasks" ON public.tasks
+        drop policy if exists "Authenticated users can insert tasks" on public.tasks;
+CREATE POLICY "Authenticated users can insert tasks" ON public.tasks
             FOR INSERT WITH CHECK (auth.role() = 'authenticated');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'tasks' AND policyname = 'Authenticated users can update tasks') THEN
-        CREATE POLICY "Authenticated users can update tasks" ON public.tasks
+        drop policy if exists "Authenticated users can update tasks" on public.tasks;
+CREATE POLICY "Authenticated users can update tasks" ON public.tasks
             FOR UPDATE USING (auth.role() = 'authenticated');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'tasks' AND policyname = 'Authenticated users can delete tasks') THEN
-        CREATE POLICY "Authenticated users can delete tasks" ON public.tasks
+        drop policy if exists "Authenticated users can delete tasks" on public.tasks;
+CREATE POLICY "Authenticated users can delete tasks" ON public.tasks
             FOR DELETE USING (auth.role() = 'authenticated');
     END IF;
 END $$;
@@ -150,7 +167,8 @@ ALTER TABLE public.admin_notifications ENABLE ROW LEVEL SECURITY;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'admin_notifications' AND policyname = 'Admins can view notifications') THEN
-        CREATE POLICY "Admins can view notifications" ON public.admin_notifications
+        drop policy if exists "Admins can view notifications" on public.admin_notifications;
+CREATE POLICY "Admins can view notifications" ON public.admin_notifications
             FOR SELECT USING (auth.role() = 'authenticated');
     END IF;
 END $$;
@@ -185,13 +203,15 @@ ALTER TABLE public.warehouse_task_templates ENABLE ROW LEVEL SECURITY;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'warehouse_task_templates' AND policyname = 'Authenticated users can view warehouse task templates') THEN
-        CREATE POLICY "Authenticated users can view warehouse task templates"
+        drop policy if exists "Authenticated users can view warehouse task templates" on public.warehouse_task_templates;
+CREATE POLICY "Authenticated users can view warehouse task templates"
             ON public.warehouse_task_templates FOR SELECT
             USING (auth.role() = 'authenticated');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'warehouse_task_templates' AND policyname = 'Authenticated users can manage warehouse task templates') THEN
-        CREATE POLICY "Authenticated users can manage warehouse task templates"
+        drop policy if exists "Authenticated users can manage warehouse task templates" on public.warehouse_task_templates;
+CREATE POLICY "Authenticated users can manage warehouse task templates"
             ON public.warehouse_task_templates FOR ALL
             USING (auth.role() = 'authenticated');
     END IF;
@@ -224,13 +244,15 @@ ALTER TABLE public.staff_shifts ENABLE ROW LEVEL SECURITY;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'staff_shifts' AND policyname = 'Authenticated users can view staff shifts') THEN
-        CREATE POLICY "Authenticated users can view staff shifts"
+        drop policy if exists "Authenticated users can view staff shifts" on public.staff_shifts;
+CREATE POLICY "Authenticated users can view staff shifts"
             ON public.staff_shifts FOR SELECT
             USING (auth.role() = 'authenticated');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'staff_shifts' AND policyname = 'Authenticated users can manage staff shifts') THEN
-        CREATE POLICY "Authenticated users can manage staff shifts"
+        drop policy if exists "Authenticated users can manage staff shifts" on public.staff_shifts;
+CREATE POLICY "Authenticated users can manage staff shifts"
             ON public.staff_shifts FOR ALL
             USING (auth.role() = 'authenticated');
     END IF;

@@ -13,6 +13,7 @@ ALTER TABLE messages ALTER COLUMN sender_id DROP NOT NULL;
 -- we'll allow users to insert messages flagged as is_ai in conversations they participate in.
 
 DROP POLICY IF EXISTS "Users can insert messages in their conversations" ON messages;
+drop policy if exists "Users can insert messages in their conversations" on messages;
 CREATE POLICY "Users can insert messages in their conversations"
   ON messages
   FOR INSERT

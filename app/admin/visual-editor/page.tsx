@@ -85,7 +85,7 @@ function EditorWorkspace({
                             </p>
                             <p>
                                 In the Supabase SQL Editor, run{' '}
-                                <code className="rounded bg-gray-100 px-1">supabase/migrations/20260827_ensure_content_cms.sql</code>
+                                <code className="rounded bg-gray-100 px-1">supabase/migrations/20260827_04_ensure_content_cms.sql</code>
                                 , then try again.
                             </p>
                         </div>

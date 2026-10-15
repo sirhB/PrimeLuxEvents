@@ -4,9 +4,11 @@
 -- Update role_permissions policies
 DROP POLICY IF EXISTS "Admins can manage role permissions" ON role_permissions;
 
+drop policy if exists "Authenticated users can view role_permissions" on role_permissions;
 CREATE POLICY "Authenticated users can view role_permissions" ON role_permissions
   FOR SELECT USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can manage role_permissions" on role_permissions;
 CREATE POLICY "Admins can manage role_permissions" ON role_permissions
   FOR ALL USING (
     EXISTS (
@@ -28,6 +30,7 @@ CREATE POLICY "Admins can manage role_permissions" ON role_permissions
 
 -- Let's verify the user_profiles policy again just in case
 DROP POLICY IF EXISTS "Users can view their own profile" ON user_profiles;
+drop policy if exists "Users can view their own profile" on user_profiles;
 CREATE POLICY "Users can view their own profile" ON user_profiles
   FOR SELECT USING (auth.uid() = id);
 

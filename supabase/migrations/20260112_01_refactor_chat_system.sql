@@ -13,6 +13,7 @@ DROP POLICY IF EXISTS "Users can insert messages in their conversations" ON mess
 
 -- Conversations
 -- Read: Users can see conversations they created OR are participants in
+drop policy if exists "access_own_conversations" on conversations;
 CREATE POLICY "access_own_conversations"
 ON conversations FOR SELECT
 USING (
@@ -25,6 +26,7 @@ USING (
 );
 
 -- Insert: Authenticated users can create conversations
+drop policy if exists "create_conversations" on conversations;
 CREATE POLICY "create_conversations"
 ON conversations FOR INSERT
 WITH CHECK (auth.uid() = created_by);
@@ -40,6 +42,7 @@ RETURNS boolean LANGUAGE sql SECURITY DEFINER AS $$
   );
 $$;
 
+drop policy if exists "view_participants" on conversation_participants;
 CREATE POLICY "view_participants"
 ON conversation_participants FOR SELECT
 USING (
@@ -48,6 +51,7 @@ USING (
 );
 
 -- Insert: Users can add themselves, OR conversation creators can add others
+drop policy if exists "insert_participants" on conversation_participants;
 CREATE POLICY "insert_participants"
 ON conversation_participants FOR INSERT
 WITH CHECK (
@@ -61,12 +65,14 @@ WITH CHECK (
 );
 
 -- Update: Users can update their own record (read status)
+drop policy if exists "update_own_participant" on conversation_participants;
 CREATE POLICY "update_own_participant"
 ON conversation_participants FOR UPDATE
 USING (user_id = auth.uid());
 
 -- Messages
 -- Read: Visible if participant
+drop policy if exists "view_messages" on messages;
 CREATE POLICY "view_messages"
 ON messages FOR SELECT
 USING (
@@ -74,6 +80,7 @@ USING (
 );
 
 -- Insert: Can insert if participant
+drop policy if exists "insert_messages" on messages;
 CREATE POLICY "insert_messages"
 ON messages FOR INSERT
 WITH CHECK (

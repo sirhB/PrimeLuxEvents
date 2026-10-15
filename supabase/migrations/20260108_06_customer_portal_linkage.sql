@@ -18,6 +18,7 @@ DROP POLICY IF EXISTS "Admins can view all orders." ON orders;
 DROP POLICY IF EXISTS "Admins can update orders." ON orders;
 
 -- Policy for Admins/Staff
+drop policy if exists "Admins and staff can view all orders" on orders;
 CREATE POLICY "Admins and staff can view all orders"
     ON orders FOR SELECT
     USING (
@@ -29,6 +30,7 @@ CREATE POLICY "Admins and staff can view all orders"
         )
     );
 
+drop policy if exists "Admins and staff can update all orders" on orders;
 CREATE POLICY "Admins and staff can update all orders"
     ON orders FOR UPDATE
     USING (
@@ -41,6 +43,7 @@ CREATE POLICY "Admins and staff can update all orders"
     );
 
 -- Policy for Customers
+drop policy if exists "Customers can view their own orders" on orders;
 CREATE POLICY "Customers can view their own orders"
     ON orders FOR SELECT
     USING (
@@ -52,6 +55,7 @@ CREATE POLICY "Customers can view their own orders"
 -- 4. Update RLS for order_items table
 DROP POLICY IF EXISTS "Admins can view all order items." ON order_items;
 
+drop policy if exists "Admins and staff can view all order items" on order_items;
 CREATE POLICY "Admins and staff can view all order items"
     ON order_items FOR SELECT
     USING (
@@ -63,6 +67,7 @@ CREATE POLICY "Admins and staff can view all order items"
         )
     );
 
+drop policy if exists "Customers can view their own order items" on order_items;
 CREATE POLICY "Customers can view their own order items"
     ON order_items FOR SELECT
     USING (
@@ -75,6 +80,7 @@ CREATE POLICY "Customers can view their own order items"
 
 -- 5. Update RLS for user_profiles to allow users to update their own info
 DROP POLICY IF EXISTS "Users can update their own profiles" ON user_profiles;
+drop policy if exists "Users can update their own profiles" on user_profiles;
 CREATE POLICY "Users can update their own profiles"
     ON user_profiles FOR UPDATE
     USING (auth.uid() = id);

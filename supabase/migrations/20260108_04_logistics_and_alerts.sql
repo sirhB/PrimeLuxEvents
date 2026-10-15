@@ -73,11 +73,14 @@ CREATE TRIGGER on_order_created
 ALTER TABLE inventory_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_notifications ENABLE ROW LEVEL SECURITY;
 
+drop policy if exists "Admins can view inventory logs" on inventory_logs;
 CREATE POLICY "Admins can view inventory logs" ON inventory_logs
     FOR SELECT USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can view notifications" on admin_notifications;
 CREATE POLICY "Admins can view notifications" ON admin_notifications
     FOR SELECT USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can update notifications" on admin_notifications;
 CREATE POLICY "Admins can update notifications" ON admin_notifications
     FOR UPDATE USING (auth.role() = 'authenticated');

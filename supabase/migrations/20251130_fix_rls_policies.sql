@@ -4,12 +4,14 @@
 -- Update roles policies
 DROP POLICY IF EXISTS "Admins can view roles" ON roles;
 
+drop policy if exists "Authenticated users can view roles" on roles;
 CREATE POLICY "Authenticated users can view roles" ON roles
   FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Update permissions policies
 DROP POLICY IF EXISTS "Admins can view permissions" ON permissions;
 
+drop policy if exists "Authenticated users can view permissions" on permissions;
 CREATE POLICY "Authenticated users can view permissions" ON permissions
   FOR SELECT USING (auth.role() = 'authenticated');
 

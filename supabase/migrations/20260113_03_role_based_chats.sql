@@ -117,22 +117,26 @@ $$;
 
 -- 5. Fix RLS policies for conversations to ensure they use the new logic
 DROP POLICY IF EXISTS "access_own_conversations" ON conversations;
+drop policy if exists "access_own_conversations" on conversations;
 CREATE POLICY "access_own_conversations"
 ON conversations FOR SELECT
 USING (is_participant_of_conversation(id));
 
 -- Update other policies for consistency
 DROP POLICY IF EXISTS "view_participants" ON conversation_participants;
+drop policy if exists "view_participants" on conversation_participants;
 CREATE POLICY "view_participants"
 ON conversation_participants FOR SELECT
 USING (is_participant_of_conversation(conversation_id));
 
 DROP POLICY IF EXISTS "view_messages" ON messages;
+drop policy if exists "view_messages" on messages;
 CREATE POLICY "view_messages"
 ON messages FOR SELECT
 USING (is_participant_of_conversation(conversation_id));
 
 DROP POLICY IF EXISTS "insert_messages" ON messages;
+drop policy if exists "insert_messages" on messages;
 CREATE POLICY "insert_messages"
 ON messages FOR INSERT
 WITH CHECK (

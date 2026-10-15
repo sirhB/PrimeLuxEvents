@@ -44,187 +44,187 @@ BEGIN
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Backdrops & Panels', 'backdrops-panels', 'Backdrops & Panels rental.', 'https://placehold.co/600x400?text=Backdrops%20%26%20Panels', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_backdrops_panels;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Flower Walls', 'flower-walls', 'Flower Walls rental.', 'https://placehold.co/600x400?text=Flower%20Walls', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_flower_walls;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Shimmer Walls', 'shimmer-walls', 'Shimmer Walls rental.', 'https://placehold.co/600x400?text=Shimmer%20Walls', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_shimmer_walls;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Soft Touch Walls', 'soft-touch-walls', 'Soft Touch Walls rental.', 'https://placehold.co/600x400?text=Soft%20Touch%20Walls', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_soft_touch_walls;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Bar Counters', 'bar-counters', 'Bar Counters rental.', 'https://placehold.co/600x400?text=Bar%20Counters', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_bar_counters;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Bar Stools', 'bar-stools', 'Bar Stools rental.', 'https://placehold.co/600x400?text=Bar%20Stools', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_bar_stools;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Bar Tables', 'bar-tables', 'Bar Tables rental.', 'https://placehold.co/600x400?text=Bar%20Tables', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_bar_tables;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Benches & Ottomans', 'benches-ottomans', 'Benches & Ottomans rental.', 'https://placehold.co/600x400?text=Benches%20%26%20Ottomans', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_benches_ottomans;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Cake Tables & Stands', 'cake-tables-stands', 'Cake Tables & Stands rental.', 'https://placehold.co/600x400?text=Cake%20Tables%20%26%20Stands', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_cake_tables_stands;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Chafing Dishes', 'chafing-dishes', 'Chafing Dishes rental.', 'https://placehold.co/600x400?text=Chafing%20Dishes', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_chafing_dishes;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Cooking & Prep', 'cooking-prep', 'Cooking & Prep rental.', 'https://placehold.co/600x400?text=Cooking%20%26%20Prep', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_cooking_prep;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Decorations & Props', 'decorations-props', 'Decorations & Props rental.', 'https://placehold.co/600x400?text=Decorations%20%26%20Props', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_decorations_props;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Flooring & Staging', 'flooring-staging', 'Flooring & Staging rental.', 'https://placehold.co/600x400?text=Flooring%20%26%20Staging', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_flooring_staging;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Chairs', 'chairs', 'Chairs rental.', 'https://placehold.co/600x400?text=Chairs', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_chairs;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Sofas & Loveseats', 'sofas-loveseats', 'Sofas & Loveseats rental.', 'https://placehold.co/600x400?text=Sofas%20%26%20Loveseats', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_sofas_loveseats;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Kids Backdrops', 'kids-backdrops', 'Kids Backdrops rental.', 'https://placehold.co/600x400?text=Kids%20Backdrops', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_kids_backdrops;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Kids Chairs', 'kids-chairs', 'Kids Chairs rental.', 'https://placehold.co/600x400?text=Kids%20Chairs', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_kids_chairs;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Kids Tables', 'kids-tables', 'Kids Tables rental.', 'https://placehold.co/600x400?text=Kids%20Tables', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_kids_tables;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Kids Thrones', 'kids-thrones', 'Kids Thrones rental.', 'https://placehold.co/600x400?text=Kids%20Thrones', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_kids_thrones;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('LED Signs', 'led-signs', 'LED Signs rental.', 'https://placehold.co/600x400?text=LED%20Signs', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_led_signs;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Lit Letters & Numbers', 'lit-letters-and-numbers', 'Lit Letters & Numbers rental.', 'https://placehold.co/600x400?text=Lit%20Letters%20%26%20Numbers', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_lit_letters_and_numbers;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Luxury Thrones', 'thrones', 'Luxury Thrones rental.', 'https://placehold.co/600x400?text=Luxury%20Thrones', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_thrones;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Misc', 'misc', 'Misc rental.', 'https://placehold.co/600x400?text=Misc', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_misc;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Pedestals & Plinths', 'pedestals-plinths', 'Pedestals & Plinths rental.', 'https://placehold.co/600x400?text=Pedestals%20%26%20Plinths', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_pedestals_plinths;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Shelves', 'shelves', 'Shelves rental.', 'https://placehold.co/600x400?text=Shelves', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_shelves;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Sweets Carts', 'sweets-carts', 'Sweets Carts rental.', 'https://placehold.co/600x400?text=Sweets%20Carts', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_sweets_carts;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Charger Plates', 'charger-plates', 'Charger Plates rental.', 'https://placehold.co/600x400?text=Charger%20Plates', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_charger_plates;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Dinnerware', 'dinnerware', 'Dinnerware rental.', 'https://placehold.co/600x400?text=Dinnerware', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_dinnerware;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Flowers & Centerpieces', 'centerpeices-2', 'Flowers & Centerpieces rental.', 'https://placehold.co/600x400?text=Flowers%20%26%20Centerpieces', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_centerpeices_2;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Table Linens', 'table-linens', 'Table Linens rental.', 'https://placehold.co/600x400?text=Table%20Linens', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_table_linens;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Napkins & Rings', 'table-napkins-and-rings', 'Napkins & Rings rental.', 'https://placehold.co/600x400?text=Napkins%20%26%20Rings', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_table_napkins_and_rings;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Tables', 'dining-tables', 'Tables rental.', 'https://placehold.co/600x400?text=Tables', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_dining_tables;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Tents', 'tent', 'Tents rental.', 'https://placehold.co/600x400?text=Tents', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_tent;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Buffet Service', 'buffet-service', 'Buffet Service rental.', 'https://placehold.co/600x400?text=Buffet%20Service', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_buffet_service;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Glassware', 'glasswear', 'Glassware rental.', 'https://placehold.co/600x400?text=Glassware', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_glasswear;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Chargers', 'chargers', 'Chargers rental.', 'https://placehold.co/600x400?text=Chargers', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_chargers;
 
   INSERT INTO categories (name, slug, description, image_url, is_featured)
   VALUES ('Table Settings', 'table-settings', 'Table Settings rental.', 'https://placehold.co/600x400?text=Table%20Settings', false)
-  ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
+  ON CONFLICT (name) DO UPDATE SET slug = EXCLUDED.slug
   RETURNING id INTO cat_table_settings;
 
   -- Products

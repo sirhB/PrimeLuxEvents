@@ -25,10 +25,14 @@ ALTER TABLE warehouse_bags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bag_assignments ENABLE ROW LEVEL SECURITY;
 
 -- Policies
+drop policy if exists "Admins can view bags" on warehouse_bags;
 CREATE POLICY "Admins can view bags" ON warehouse_bags FOR SELECT USING (auth.role() = 'authenticated');
+drop policy if exists "Admins can update bags" on warehouse_bags;
 CREATE POLICY "Admins can update bags" ON warehouse_bags FOR ALL USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can view bag assignments" on bag_assignments;
 CREATE POLICY "Admins can view bag assignments" ON bag_assignments FOR SELECT USING (auth.role() = 'authenticated');
+drop policy if exists "Admins can manage bag assignments" on bag_assignments;
 CREATE POLICY "Admins can manage bag assignments" ON bag_assignments FOR ALL USING (auth.role() = 'authenticated');
 
 -- Seed initial bags (example set)

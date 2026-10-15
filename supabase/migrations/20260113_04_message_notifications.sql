@@ -11,6 +11,7 @@ END $$;
 
 -- 2. Update RLS for admin_notifications to be user-specific or admin-wide
 DROP POLICY IF EXISTS "Admins can view notifications" ON admin_notifications;
+drop policy if exists "Users can view their own notifications" on admin_notifications;
 CREATE POLICY "Users can view their own notifications" ON admin_notifications
     FOR SELECT USING (auth.uid() = user_id OR (user_id IS NULL AND public.is_admin()));
 

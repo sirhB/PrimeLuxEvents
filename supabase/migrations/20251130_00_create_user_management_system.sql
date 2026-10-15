@@ -82,9 +82,11 @@ ALTER TABLE role_permissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_invitations ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for user_profiles
+drop policy if exists "Users can view their own profile" on user_profiles;
 CREATE POLICY "Users can view their own profile" ON user_profiles
   FOR SELECT USING (auth.uid() = id);
 
+drop policy if exists "Admins can view all user profiles" on user_profiles;
 CREATE POLICY "Admins can view all user profiles" ON user_profiles
   FOR SELECT USING (
     EXISTS (
@@ -94,6 +96,7 @@ CREATE POLICY "Admins can view all user profiles" ON user_profiles
     )
   );
 
+drop policy if exists "Admins can insert user profiles" on user_profiles;
 CREATE POLICY "Admins can insert user profiles" ON user_profiles
   FOR INSERT WITH CHECK (
     EXISTS (
@@ -103,6 +106,7 @@ CREATE POLICY "Admins can insert user profiles" ON user_profiles
     )
   );
 
+drop policy if exists "Admins can update user profiles" on user_profiles;
 CREATE POLICY "Admins can update user profiles" ON user_profiles
   FOR UPDATE USING (
     EXISTS (
@@ -112,6 +116,7 @@ CREATE POLICY "Admins can update user profiles" ON user_profiles
     )
   );
 
+drop policy if exists "Admins can delete user profiles" on user_profiles;
 CREATE POLICY "Admins can delete user profiles" ON user_profiles
   FOR DELETE USING (
     EXISTS (
@@ -122,6 +127,7 @@ CREATE POLICY "Admins can delete user profiles" ON user_profiles
   );
 
 -- RLS Policies for roles (only admins can manage)
+drop policy if exists "Admins can view roles" on roles;
 CREATE POLICY "Admins can view roles" ON roles
   FOR SELECT USING (
     EXISTS (
@@ -131,6 +137,7 @@ CREATE POLICY "Admins can view roles" ON roles
     )
   );
 
+drop policy if exists "Admins can manage roles" on roles;
 CREATE POLICY "Admins can manage roles" ON roles
   FOR ALL USING (
     EXISTS (
@@ -147,6 +154,7 @@ CREATE POLICY "Admins can manage roles" ON roles
   );
 
 -- RLS Policies for permissions (only admins can manage)
+drop policy if exists "Admins can view permissions" on permissions;
 CREATE POLICY "Admins can view permissions" ON permissions
   FOR SELECT USING (
     EXISTS (
@@ -156,6 +164,7 @@ CREATE POLICY "Admins can view permissions" ON permissions
     )
   );
 
+drop policy if exists "Admins can manage permissions" on permissions;
 CREATE POLICY "Admins can manage permissions" ON permissions
   FOR ALL USING (
     EXISTS (
@@ -172,9 +181,11 @@ CREATE POLICY "Admins can manage permissions" ON permissions
   );
 
 -- RLS Policies for user_roles
+drop policy if exists "Users can view their own roles" on user_roles;
 CREATE POLICY "Users can view their own roles" ON user_roles
   FOR SELECT USING (auth.uid() = user_id);
 
+drop policy if exists "Admins can view all user roles" on user_roles;
 CREATE POLICY "Admins can view all user roles" ON user_roles
   FOR SELECT USING (
     EXISTS (
@@ -184,6 +195,7 @@ CREATE POLICY "Admins can view all user roles" ON user_roles
     )
   );
 
+drop policy if exists "Admins can manage user roles" on user_roles;
 CREATE POLICY "Admins can manage user roles" ON user_roles
   FOR ALL USING (
     EXISTS (
@@ -200,6 +212,7 @@ CREATE POLICY "Admins can manage user roles" ON user_roles
   );
 
 -- RLS Policies for role_permissions (only admins)
+drop policy if exists "Admins can manage role permissions" on role_permissions;
 CREATE POLICY "Admins can manage role permissions" ON role_permissions
   FOR ALL USING (
     EXISTS (
@@ -216,6 +229,7 @@ CREATE POLICY "Admins can manage role permissions" ON role_permissions
   );
 
 -- RLS Policies for user_invitations (only admins)
+drop policy if exists "Admins can manage user invitations" on user_invitations;
 CREATE POLICY "Admins can manage user invitations" ON user_invitations
   FOR ALL USING (
     EXISTS (

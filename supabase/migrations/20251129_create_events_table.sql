@@ -26,18 +26,22 @@ CREATE TABLE IF NOT EXISTS events (
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+drop policy if exists "Admins can view all events." on events;
 CREATE POLICY "Admins can view all events."
   ON events FOR SELECT
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can insert events." on events;
 CREATE POLICY "Admins can insert events."
   ON events FOR INSERT
   WITH CHECK (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can update events." on events;
 CREATE POLICY "Admins can update events."
   ON events FOR UPDATE
   USING (auth.role() = 'authenticated');
 
+drop policy if exists "Admins can delete events." on events;
 CREATE POLICY "Admins can delete events."
   ON events FOR DELETE
   USING (auth.role() = 'authenticated');

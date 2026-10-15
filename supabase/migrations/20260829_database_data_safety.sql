@@ -43,23 +43,27 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Staff can delete tasks" ON public.tasks';
 
     EXECUTE $p$
-      CREATE POLICY "Staff can view tasks"
+      drop policy if exists "Staff can view tasks" on public.tasks;
+CREATE POLICY "Staff can view tasks"
         ON public.tasks FOR SELECT
         USING (public.is_staff())
     $p$;
     EXECUTE $p$
-      CREATE POLICY "Staff can insert tasks"
+      drop policy if exists "Staff can insert tasks" on public.tasks;
+CREATE POLICY "Staff can insert tasks"
         ON public.tasks FOR INSERT
         WITH CHECK (public.is_staff())
     $p$;
     EXECUTE $p$
-      CREATE POLICY "Staff can update tasks"
+      drop policy if exists "Staff can update tasks" on public.tasks;
+CREATE POLICY "Staff can update tasks"
         ON public.tasks FOR UPDATE
         USING (public.is_staff())
         WITH CHECK (public.is_staff())
     $p$;
     EXECUTE $p$
-      CREATE POLICY "Staff can delete tasks"
+      drop policy if exists "Staff can delete tasks" on public.tasks;
+CREATE POLICY "Staff can delete tasks"
         ON public.tasks FOR DELETE
         USING (public.is_staff())
     $p$;
@@ -78,12 +82,14 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Staff can manage warehouse task templates" ON public.warehouse_task_templates';
 
     EXECUTE $p$
-      CREATE POLICY "Staff can view warehouse task templates"
+      drop policy if exists "Staff can view warehouse task templates" on public.warehouse_task_templates;
+CREATE POLICY "Staff can view warehouse task templates"
         ON public.warehouse_task_templates FOR SELECT
         USING (public.is_staff())
     $p$;
     EXECUTE $p$
-      CREATE POLICY "Staff can manage warehouse task templates"
+      drop policy if exists "Staff can manage warehouse task templates" on public.warehouse_task_templates;
+CREATE POLICY "Staff can manage warehouse task templates"
         ON public.warehouse_task_templates FOR ALL
         USING (public.is_staff())
         WITH CHECK (public.is_staff())
@@ -97,12 +103,14 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Staff can manage staff shifts" ON public.staff_shifts';
 
     EXECUTE $p$
-      CREATE POLICY "Staff can view staff shifts"
+      drop policy if exists "Staff can view staff shifts" on public.staff_shifts;
+CREATE POLICY "Staff can view staff shifts"
         ON public.staff_shifts FOR SELECT
         USING (public.is_staff())
     $p$;
     EXECUTE $p$
-      CREATE POLICY "Staff can manage staff shifts"
+      drop policy if exists "Staff can manage staff shifts" on public.staff_shifts;
+CREATE POLICY "Staff can manage staff shifts"
         ON public.staff_shifts FOR ALL
         USING (public.is_staff())
         WITH CHECK (public.is_staff())
@@ -116,12 +124,14 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Staff can manage bags" ON public.warehouse_bags';
 
     EXECUTE $p$
-      CREATE POLICY "Staff can view bags"
+      drop policy if exists "Staff can view bags" on public.warehouse_bags;
+CREATE POLICY "Staff can view bags"
         ON public.warehouse_bags FOR SELECT
         USING (public.is_staff())
     $p$;
     EXECUTE $p$
-      CREATE POLICY "Staff can manage bags"
+      drop policy if exists "Staff can manage bags" on public.warehouse_bags;
+CREATE POLICY "Staff can manage bags"
         ON public.warehouse_bags FOR ALL
         USING (public.is_staff())
         WITH CHECK (public.is_staff())
@@ -135,12 +145,14 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Staff can manage bag assignments" ON public.bag_assignments';
 
     EXECUTE $p$
-      CREATE POLICY "Staff can view bag assignments"
+      drop policy if exists "Staff can view bag assignments" on public.bag_assignments;
+CREATE POLICY "Staff can view bag assignments"
         ON public.bag_assignments FOR SELECT
         USING (public.is_staff())
     $p$;
     EXECUTE $p$
-      CREATE POLICY "Staff can manage bag assignments"
+      drop policy if exists "Staff can manage bag assignments" on public.bag_assignments;
+CREATE POLICY "Staff can manage bag assignments"
         ON public.bag_assignments FOR ALL
         USING (public.is_staff())
         WITH CHECK (public.is_staff())
@@ -154,12 +166,14 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Staff can manage warehouse locations" ON public.warehouse_locations';
 
     EXECUTE $p$
-      CREATE POLICY "Staff can view warehouse locations"
+      drop policy if exists "Staff can view warehouse locations" on public.warehouse_locations;
+CREATE POLICY "Staff can view warehouse locations"
         ON public.warehouse_locations FOR SELECT
         USING (public.is_staff())
     $p$;
     EXECUTE $p$
-      CREATE POLICY "Staff can manage warehouse locations"
+      drop policy if exists "Staff can manage warehouse locations" on public.warehouse_locations;
+CREATE POLICY "Staff can manage warehouse locations"
         ON public.warehouse_locations FOR ALL
         USING (public.is_staff())
         WITH CHECK (public.is_staff())
@@ -181,24 +195,28 @@ BEGIN
       WHERE table_schema = 'public' AND table_name = 'admin_notifications' AND column_name = 'user_id'
     ) THEN
       EXECUTE $p$
-        CREATE POLICY "Staff can view notifications"
+        drop policy if exists "Staff can view notifications" on public.admin_notifications;
+CREATE POLICY "Staff can view notifications"
           ON public.admin_notifications FOR SELECT
           USING (public.is_staff() OR user_id = auth.uid())
       $p$;
       EXECUTE $p$
-        CREATE POLICY "Staff can update notifications"
+        drop policy if exists "Staff can update notifications" on public.admin_notifications;
+CREATE POLICY "Staff can update notifications"
           ON public.admin_notifications FOR UPDATE
           USING (public.is_staff() OR user_id = auth.uid())
           WITH CHECK (public.is_staff() OR user_id = auth.uid())
       $p$;
     ELSE
       EXECUTE $p$
-        CREATE POLICY "Staff can view notifications"
+        drop policy if exists "Staff can view notifications" on public.admin_notifications;
+CREATE POLICY "Staff can view notifications"
           ON public.admin_notifications FOR SELECT
           USING (public.is_staff())
       $p$;
       EXECUTE $p$
-        CREATE POLICY "Staff can update notifications"
+        drop policy if exists "Staff can update notifications" on public.admin_notifications;
+CREATE POLICY "Staff can update notifications"
           ON public.admin_notifications FOR UPDATE
           USING (public.is_staff())
           WITH CHECK (public.is_staff())
@@ -206,7 +224,8 @@ BEGIN
     END IF;
 
     EXECUTE $p$
-      CREATE POLICY "Staff can insert notifications"
+      drop policy if exists "Staff can insert notifications" on public.admin_notifications;
+CREATE POLICY "Staff can insert notifications"
         ON public.admin_notifications FOR INSERT
         WITH CHECK (public.is_staff())
     $p$;
