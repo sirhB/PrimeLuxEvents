@@ -35,7 +35,7 @@ export function EventPlansTable({ plans, live }: { plans: EventPlanRow[]; live: 
       {message && <p className="text-sm">{message}</p>}
       <div className="overflow-x-auto border border-[var(--dashboard-border)] bg-white">
         <table className="w-full min-w-[720px] text-left text-sm">
-          <thead className="text-[11px] uppercase tracking-[0.16em] text-[var(--dashboard-text-muted)]">
+          <thead className="text-xs font-medium text-[var(--dashboard-text-muted)]">
             <tr>
               <th className="px-3 py-3 font-medium">Guest</th>
               <th className="px-3 py-3 font-medium">Occasion</th>

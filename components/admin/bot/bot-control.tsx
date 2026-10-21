@@ -70,7 +70,7 @@ export function BotControl({
       )}
 
       <section className="rounded-2xl border border-[var(--dashboard-border)] bg-white p-4 sm:p-6">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--dashboard-text-muted)]">Before you copy</p>
+        <p className="text-xs font-medium text-[var(--dashboard-text-muted)]">Before you copy</p>
         <h2 className="mt-1 font-serif text-2xl">Variables</h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--dashboard-text-muted)]">
           Edit these and the prompts update as you type. The project ref is read from the public Supabase URL. No key is included.
@@ -78,7 +78,7 @@ export function BotControl({
         <div className="mt-5 grid gap-4 sm:grid-cols-3">
           {FIELDS.map((field) => (
             <label key={field.key} className="block">
-              <span className="text-[11px] uppercase tracking-[0.16em] text-[var(--dashboard-text-muted)]">{field.label}</span>
+              <span className="text-xs font-medium text-[var(--dashboard-text-muted)]">{field.label}</span>
               <input
                 className="plan-field mt-2 w-full"
                 value={variables[field.key]}
@@ -113,7 +113,7 @@ export function BotControl({
                 {isCopied ? 'Copied' : 'Copy'}
               </button>
             </div>
-            <pre className="mt-4 max-h-[28rem] overflow-auto whitespace-pre-wrap rounded-xl border border-black/10 bg-[var(--dashboard-background)] p-4 font-sans text-sm leading-relaxed text-[var(--dashboard-text)]">
+            <pre className="mt-4 max-h-[28rem] overflow-auto whitespace-pre-wrap border border-black/10 bg-[var(--dashboard-background)] p-4 font-sans text-sm leading-relaxed text-[var(--dashboard-text)]">
               {text}
             </pre>
           </article>

@@ -60,7 +60,7 @@ export function VenueCrm({
               key={item}
               type="button"
               onClick={() => setTab(item)}
-              className={cn('min-h-10 px-4 text-[11px] uppercase tracking-[0.18em]', tab === item && 'bg-[var(--theme-dark)] text-[var(--theme-on-dark)]')}
+              className={cn('min-h-10 px-4 text-xs font-medium', tab === item && 'bg-[var(--theme-dark)] text-[var(--theme-on-dark)]')}
             >
               {item}
             </button>
@@ -74,7 +74,7 @@ export function VenueCrm({
           <div className="flex gap-3 overflow-x-auto pb-2">
             {LEAD_STAGES.map((stage) => (
               <section key={stage.id} className="w-64 shrink-0 border border-[var(--dashboard-border)] bg-white">
-                <h2 className="border-b border-[var(--dashboard-border)] px-3 py-2 text-[11px] uppercase tracking-[0.18em]">
+                <h2 className="border-b border-[var(--dashboard-border)] px-3 py-2 text-xs font-medium">
                   {stage.label}
                   <span className="ml-2 text-[var(--dashboard-text-muted)]">{leads.filter((lead) => lead.stage === stage.id).length}</span>
                 </h2>
@@ -97,7 +97,7 @@ export function VenueCrm({
           </div>
           <Presence show={Boolean(selected)} id={selected?.id}>{(selected) && (<>
             <aside className="border border-[var(--dashboard-border)] bg-white p-4">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--dashboard-text-muted)]">{selected.source || 'inquiry'}</p>
+              <p className="text-xs font-medium text-[var(--dashboard-text-muted)]">{selected.source || 'inquiry'}</p>
               <h2 className="mt-1 font-serif text-3xl">{selected.contact_name}</h2>
               <p className="mt-1 text-sm">{selected.contact_email}</p>
               <p className="text-sm text-[var(--dashboard-text-muted)]">{selected.contact_phone}</p>
@@ -206,7 +206,7 @@ export function VenueCrm({
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="border border-[var(--dashboard-border)] bg-white p-4">
             <h2 className="font-serif text-3xl">{month.label}</h2>
-            <div className="mt-4 grid grid-cols-7 gap-1 text-center text-[10px] uppercase tracking-[0.14em] text-[var(--dashboard-text-muted)]">
+            <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs font-medium text-[var(--dashboard-text-muted)]">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => <div key={day}>{day}</div>)}
             </div>
             <div className="mt-2 grid grid-cols-7 gap-1">
@@ -216,7 +216,7 @@ export function VenueCrm({
                   <div key={`${cell}-${index}`} className="min-h-16 border border-[var(--dashboard-border)] p-1 text-left text-xs">
                     <span>{cell ? Number(cell.slice(-2)) : ''}</span>
                     {marks.map((mark) => (
-                      <span key={mark.id} className="mt-1 block truncate text-[10px] uppercase tracking-[0.08em]">{mark.status}</span>
+                      <span key={mark.id} className="mt-1 block truncate text-xs font-medium">{mark.status}</span>
                     ))}
                   </div>
                 )

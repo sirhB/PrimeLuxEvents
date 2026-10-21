@@ -933,3 +933,23 @@ html[data-suite="rentals"] .admin-theme {
   outline: 2px solid var(--theme-accent-text);
   outline-offset: 2px;
 }
+
+/* Client event hub */
+.hub-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--dashboard-text);
+}
+.hub-chip {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding-inline: 1rem;
+  border: 1px solid var(--dashboard-border);
+  background: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: background-color var(--dur-hover) var(--ease-out), border-color var(--dur-hover) var(--ease-out), transform var(--dur-press) var(--ease-out);
+}
+.hub-chip:hover { border-color: var(--theme-dark); }
+.hub-chip:active { transform: scale(0.97); }
