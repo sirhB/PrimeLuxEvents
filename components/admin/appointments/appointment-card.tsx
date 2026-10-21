@@ -55,7 +55,7 @@ export function AppointmentCard({ appointment }: AppointmentCardProps) {
             {...attributes}
             {...listeners}
             className={cn(
-                "group relative p-4 rounded-2xl border transition-all duration-300 cursor-grab active:cursor-grabbing",
+                "group relative p-4 rounded-2xl border transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 cursor-grab active:cursor-grabbing",
                 "bg-black/40 border-white/5 hover:border-[var(--dashboard-accent-gold)]/30 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)]",
                 isDragging && "opacity-50 !cursor-grabbing scale-95 shadow-2xl ring-2 ring-[var(--dashboard-accent-gold)]/50"
             )}
@@ -93,7 +93,7 @@ export function AppointmentCard({ appointment }: AppointmentCardProps) {
             </div>
 
             {/* Subtle glow on hover */}
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[var(--dashboard-accent-gold)]/0 to-[var(--dashboard-accent-gold)]/0 group-hover:from-[var(--dashboard-accent-gold)]/[0.02] group-hover:to-transparent transition-all duration-500 pointer-events-none" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[var(--dashboard-accent-gold)]/0 to-[var(--dashboard-accent-gold)]/0 group-hover:from-[var(--dashboard-accent-gold)]/[0.02] group-hover:to-transparent transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 pointer-events-none" />
         </div>
     )
 }

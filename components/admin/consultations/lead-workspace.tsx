@@ -80,7 +80,7 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
                             setViewMode('dossier')
                         }}
                         className={cn(
-                            "rounded-xl h-9 px-4 text-xs font-bold uppercase tracking-wider transition-all",
+                            "rounded-xl h-9 px-4 text-xs font-bold uppercase tracking-wider transition-[color,background-color,border-color,box-shadow,opacity,transform]",
                             viewMode === 'dossier'
                                 ? "bg-[var(--dashboard-accent-gold)] text-black shadow-lg"
                                 : "text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)]"
@@ -97,7 +97,7 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
                             setViewMode('pipeline')
                         }}
                         className={cn(
-                            "rounded-xl h-9 px-4 text-xs font-bold uppercase tracking-wider transition-all",
+                            "rounded-xl h-9 px-4 text-xs font-bold uppercase tracking-wider transition-[color,background-color,border-color,box-shadow,opacity,transform]",
                             viewMode === 'pipeline'
                                 ? "bg-[var(--dashboard-accent-gold)] text-black shadow-lg"
                                 : "text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)]"
@@ -114,7 +114,7 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
                     <>
                         {/* Left Side: Lead Rail */}
                         <Card className={cn(
-                            "flex flex-col border-none glass-card overflow-hidden bg-black/40 transition-all duration-300",
+                            "flex flex-col border-none glass-card overflow-hidden bg-black/40 transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200",
                             "w-full lg:w-80 xl:w-96",
                             selectedLeadId ? "hidden lg:flex" : "flex"
                         )}>
@@ -127,7 +127,7 @@ export function LeadWorkspace({ initialLeads }: LeadWorkspaceProps) {
 
                         {/* Right Side: Immersive Details */}
                         <Card className={cn(
-                            "flex-1 flex flex-col border-none glass-card overflow-hidden relative bg-black/40 transition-all duration-300",
+                            "flex-1 flex flex-col border-none glass-card overflow-hidden relative bg-black/40 transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200",
                             selectedLeadId ? "flex" : "hidden lg:flex"
                         )}>
                             {selectedLead ? (

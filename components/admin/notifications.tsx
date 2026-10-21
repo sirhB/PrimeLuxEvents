@@ -32,7 +32,7 @@ export function AdminNotifications() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-xl hover:bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] border border-transparent hover:border-[var(--dashboard-accent-gold)]/20 transition-all">
+                <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-xl hover:bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] border border-transparent hover:border-[var(--dashboard-accent-gold)]/20 transition-[color,background-color,border-color,box-shadow,opacity,transform]">
                     <Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--dashboard-accent-gold)] text-[10px] font-bold text-black ring-2 ring-[var(--dashboard-background)]">
@@ -81,7 +81,7 @@ export function AdminNotifications() {
                                 >
                                     <div className="flex gap-4">
                                         <div className={cn(
-                                            "h-10 w-10 rounded-2xl flex items-center justify-center border transition-transform group-hover:scale-110",
+                                            "h-10 w-10 rounded-2xl flex items-center justify-center border transition-transform",
                                             notification.type === 'overbooked' ? "bg-red-500/10 border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.1)]" :
                                                 notification.type === 'low_stock' ? "bg-amber-500/10 border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.1)]" :
                                                     "bg-[var(--dashboard-card)] border-[var(--dashboard-border)]"

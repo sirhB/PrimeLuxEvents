@@ -125,7 +125,7 @@ export function TaskItem({ task }: TaskItemProps) {
 
     return (
         <>
-            <div className="p-4 hover:bg-[var(--dashboard-card-hover)] transition-all flex flex-col md:flex-row md:items-center justify-between group gap-4 border-b border-[var(--dashboard-border)] last:border-0">
+            <div className="p-4 hover:bg-[var(--dashboard-card-hover)] transition-[color,background-color,border-color,box-shadow,opacity,transform] flex flex-col md:flex-row md:items-center justify-between group gap-4 border-b border-[var(--dashboard-border)] last:border-0">
                 <div className="flex items-start gap-4 flex-1">
                     <div className={cn(
                         "mt-1 p-2.5 rounded-xl shadow-sm border transition-colors",
@@ -137,7 +137,7 @@ export function TaskItem({ task }: TaskItemProps) {
                     </div>
                     <div className="space-y-1">
                         <h3 className={cn(
-                            "font-medium text-lg tracking-tight transition-all",
+                            "font-medium text-lg tracking-tight transition-[color,background-color,border-color,box-shadow,opacity,transform]",
                             task.status === 'completed'
                                 ? "line-through text-[var(--dashboard-text-muted)] italic"
                                 : "text-[var(--dashboard-text)]"
@@ -193,7 +193,7 @@ export function TaskItem({ task }: TaskItemProps) {
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-card-hover)] rounded-xl transition-all">
+                            <Button variant="ghost" size="icon" className="text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-card-hover)] rounded-xl transition-[color,background-color,border-color,box-shadow,opacity,transform]">
                                 <MoreHorizontal className="h-5 w-5" />
                             </Button>
                         </DropdownMenuTrigger>

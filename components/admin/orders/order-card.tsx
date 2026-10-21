@@ -52,7 +52,7 @@ export function OrderCard({ order, isOverlay }: OrderCardProps) {
             )}
         >
             <Card className={cn(
-                "p-4 border-none glass-card bg-black/40 hover:bg-black/60 transition-all duration-300",
+                "p-4 border-none glass-card bg-black/40 hover:bg-black/60 transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200",
                 "border border-white/5 hover:border-[var(--dashboard-accent-gold)]/30",
                 isOverlay && "border-[var(--dashboard-accent-gold)] shadow-[0_0_30px_rgba(212,175,55,0.2)]"
             )}>

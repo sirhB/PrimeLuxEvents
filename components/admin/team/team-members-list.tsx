@@ -133,7 +133,7 @@ export function TeamMembersList({ members, roles, canManage }: TeamMembersListPr
                 ) : (
                     <div className="space-y-4">
                         {filteredMembers.map((member) => (
-                            <div key={member.id} className="flex items-center justify-between p-5 glass-card border-none hover:bg-white/5 transition-all duration-300">
+                            <div key={member.id} className="flex items-center justify-between p-5 glass-card border-none hover:bg-white/5 transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200">
                                 <div className="flex items-center space-x-4">
                                     <Avatar className="h-12 w-12">
                                         <AvatarImage src={member.avatar_url || undefined} />

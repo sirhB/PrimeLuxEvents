@@ -245,7 +245,7 @@ export default function SettingsClient() {
                                 onChange={(e) =>
                                     setSettings({ ...settings, tax_rate: (parseFloat(e.target.value) / 100).toString() })
                                 }
-                                className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                                 placeholder="8.875"
                             />
                             <p className="text-[10px] text-[var(--dashboard-accent-gold)] font-bold uppercase tracking-wider">
@@ -272,7 +272,7 @@ export default function SettingsClient() {
                                     min="0"
                                     value={settings.delivery_base_fee}
                                     onChange={(e) => setSettings({ ...settings, delivery_base_fee: e.target.value })}
-                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                                     placeholder="50.00"
                                 />
                             </div>
@@ -285,7 +285,7 @@ export default function SettingsClient() {
                                     min="0"
                                     value={settings.delivery_per_mile_rate}
                                     onChange={(e) => setSettings({ ...settings, delivery_per_mile_rate: e.target.value })}
-                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                                     placeholder="1.50"
                                 />
                             </div>
@@ -313,7 +313,7 @@ export default function SettingsClient() {
                                     type="email"
                                     value={settings.company_email}
                                     onChange={(e) => setSettings({ ...settings, company_email: e.target.value })}
-                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                                     placeholder={COMPANY.email}
                                 />
                             </div>
@@ -324,7 +324,7 @@ export default function SettingsClient() {
                                     type="tel"
                                     value={settings.company_phone}
                                     onChange={(e) => setSettings({ ...settings, company_phone: e.target.value })}
-                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                                     placeholder={COMPANY.phone}
                                 />
                             </div>
@@ -335,7 +335,7 @@ export default function SettingsClient() {
                                 id="company_address"
                                 value={settings.company_address}
                                 onChange={(e) => setSettings({ ...settings, company_address: e.target.value })}
-                                className="min-h-[100px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all resize-none"
+                                className="min-h-[100px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform] resize-none"
                                 placeholder={COMPANY.address}
                                 rows={3}
                             />
@@ -360,7 +360,7 @@ export default function SettingsClient() {
                                 <button
                                     type="button"
                                     onClick={() => setSettings({ ...settings, security_deposit_type: 'percent' })}
-                                    className={`h-12 rounded-xl border text-sm font-medium transition-all ${
+                                    className={`h-12 rounded-xl border text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity,transform] ${
                                         settings.security_deposit_type === 'percent'
                                             ? 'border-[var(--dashboard-accent-gold)] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)]'
                                             : 'border-[var(--dashboard-border)] text-[var(--dashboard-text-muted)]'
@@ -371,7 +371,7 @@ export default function SettingsClient() {
                                 <button
                                     type="button"
                                     onClick={() => setSettings({ ...settings, security_deposit_type: 'flat' })}
-                                    className={`h-12 rounded-xl border text-sm font-medium transition-all ${
+                                    className={`h-12 rounded-xl border text-sm font-medium transition-[color,background-color,border-color,box-shadow,opacity,transform] ${
                                         settings.security_deposit_type === 'flat'
                                             ? 'border-[var(--dashboard-accent-gold)] bg-[var(--dashboard-accent-gold)]/10 text-[var(--dashboard-accent-gold)]'
                                             : 'border-[var(--dashboard-border)] text-[var(--dashboard-text-muted)]'
@@ -397,7 +397,7 @@ export default function SettingsClient() {
                                         setSettings({ ...settings, security_deposit_percent: e.target.value })
                                     }
                                     disabled={settings.security_deposit_type !== 'percent'}
-                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                                     placeholder="20"
                                 />
                             </div>
@@ -415,7 +415,7 @@ export default function SettingsClient() {
                                         setSettings({ ...settings, security_deposit_flat_cents: e.target.value })
                                     }
                                     disabled={settings.security_deposit_type !== 'flat'}
-                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                                    className="h-12 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                                     placeholder="100.00"
                                 />
                             </div>
@@ -436,7 +436,7 @@ export default function SettingsClient() {
                                 id="warehouse_address"
                                 value={settings.warehouse_address}
                                 onChange={(e) => setSettings({ ...settings, warehouse_address: e.target.value })}
-                                className="min-h-[100px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all resize-none"
+                                className="min-h-[100px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform] resize-none"
                                 placeholder={COMPANY.warehouseAddress}
                                 rows={3}
                             />
@@ -457,7 +457,7 @@ export default function SettingsClient() {
                                 id="test_address"
                                 value={testAddress}
                                 onChange={(e) => setTestAddress(e.target.value)}
-                                className="min-h-[80px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all resize-none"
+                                className="min-h-[80px] bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform] resize-none"
                                 placeholder="456 Park Ave, Bridgeport, CT 06604"
                                 rows={2}
                             />
@@ -465,7 +465,7 @@ export default function SettingsClient() {
                         <Button
                             onClick={handleTestDistance}
                             disabled={isTesting || !testAddress || !settings.warehouse_address}
-                            className="w-full sm:w-auto rounded-full bg-white/5 hover:bg-white/10 text-[var(--dashboard-text)] border border-[var(--dashboard-border)] font-bold uppercase text-[10px] tracking-widest h-12 px-8 transition-all"
+                            className="w-full sm:w-auto rounded-full bg-white/5 hover:bg-white/10 text-[var(--dashboard-text)] border border-[var(--dashboard-border)] font-bold uppercase text-[10px] tracking-widest h-12 px-8 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                         >
                             {isTesting ? (
                                 <>
@@ -492,7 +492,7 @@ export default function SettingsClient() {
                         onClick={handleSave}
                         disabled={isSaving}
                         size="lg"
-                        className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-bold uppercase text-[11px] tracking-[0.2em] px-10 h-14 shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-all transform active:scale-95"
+                        className="rounded-full bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-bold uppercase text-[11px] tracking-[0.2em] px-10 h-14 shadow-[0_0_20px_rgba(212,175,55,0.2)] transition-[color,background-color,border-color,box-shadow,opacity,transform] transform active:scale-95"
                     >
                         {isSaving ? (
                             <>

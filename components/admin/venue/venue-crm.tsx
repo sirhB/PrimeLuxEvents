@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { Presence } from '@/components/motion/presence'
 import { LEAD_STAGES, type LeadStage, type VenueDay, type VenueLeadRecord } from '@/lib/venues/crm'
 import { VENUE_LISTINGS } from '@/lib/venues/directory'
 import {
@@ -94,7 +95,7 @@ export function VenueCrm({
               </section>
             ))}
           </div>
-          {selected && (
+          <Presence show={Boolean(selected)} id={selected?.id}>{(selected) && (<>
             <aside className="border border-[var(--dashboard-border)] bg-white p-4">
               <p className="text-[11px] uppercase tracking-[0.18em] text-[var(--dashboard-text-muted)]">{selected.source || 'inquiry'}</p>
               <h2 className="mt-1 font-serif text-3xl">{selected.contact_name}</h2>
@@ -199,7 +200,7 @@ export function VenueCrm({
                 <button type="submit" className="lux-cta-ghost !min-h-10">Hold the date</button>
               </form>
             </aside>
-          )}
+          </>)}</Presence>
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">

@@ -146,7 +146,7 @@ export default function BagDetailPage() {
                         </CardContent>
                     </Card>
 
-                    <Button variant="outline" className="w-full rounded-2xl h-14 border-[var(--dashboard-border)] bg-[var(--dashboard-card)] font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-gold hover:text-black transition-all shadow-lg">
+                    <Button variant="outline" className="w-full rounded-2xl h-14 border-[var(--dashboard-border)] bg-[var(--dashboard-card)] font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-gold hover:text-black transition-[color,background-color,border-color,box-shadow,opacity,transform] shadow-lg">
                         Print Bag Label
                     </Button>
                 </div>
@@ -167,7 +167,7 @@ export default function BagDetailPage() {
                                 <div className="divide-y divide-[var(--dashboard-border)]">
                                     {/* Order-specific items */}
                                     {orderAssignments.map((assignment) => (
-                                        <div key={assignment.id} className="p-8 flex items-center justify-between hover:bg-white/5 transition-all group">
+                                        <div key={assignment.id} className="p-8 flex items-center justify-between hover:bg-white/5 transition-[color,background-color,border-color,box-shadow,opacity,transform] group">
                                             <div className="flex items-center gap-6">
                                                 <div className="h-14 w-14 rounded-[1.25rem] bg-blue-500/10 flex items-center justify-center border border-blue-500/20 shadow-inner">
                                                     <ClipboardList className="h-7 w-7 text-blue-400" />
@@ -197,7 +197,7 @@ export default function BagDetailPage() {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => removeOrderAssignment(assignment.id)}
-                                                className="opacity-0 group-hover:opacity-100 transition-all text-[var(--dashboard-text-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-2xl h-12 w-12"
+                                                className="opacity-0 group-hover:opacity-100 transition-[color,background-color,border-color,box-shadow,opacity,transform] text-[var(--dashboard-text-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-2xl h-12 w-12"
                                             >
                                                 <Trash2 className="h-5 w-5" />
                                             </Button>
@@ -206,7 +206,7 @@ export default function BagDetailPage() {
 
                                     {/* General catalog items */}
                                     {catalogItems.map((item) => (
-                                        <div key={item.id} className="p-8 flex items-center justify-between hover:bg-white/5 transition-all group">
+                                        <div key={item.id} className="p-8 flex items-center justify-between hover:bg-white/5 transition-[color,background-color,border-color,box-shadow,opacity,transform] group">
                                             <div className="flex items-center gap-6">
                                                 <div className="h-14 w-14 rounded-[1.25rem] bg-amber-500/10 flex items-center justify-center border border-amber-500/20 shadow-inner">
                                                     <Package className="h-7 w-7 text-amber-400" />
@@ -236,7 +236,7 @@ export default function BagDetailPage() {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => removeCatalogItem(item.id)}
-                                                className="opacity-0 group-hover:opacity-100 transition-all text-[var(--dashboard-text-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-2xl h-12 w-12"
+                                                className="opacity-0 group-hover:opacity-100 transition-[color,background-color,border-color,box-shadow,opacity,transform] text-[var(--dashboard-text-muted)] hover:text-red-400 hover:bg-red-400/10 rounded-2xl h-12 w-12"
                                             >
                                                 <Trash2 className="h-5 w-5" />
                                             </Button>

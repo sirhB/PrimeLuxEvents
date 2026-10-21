@@ -53,7 +53,7 @@ export function PortfolioCategoryForm({ category }: PortfolioCategoryFormProps) 
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <form onSubmit={handleSubmit} className="space-y-8 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-200">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
                     <Card className="glass-card border-none overflow-hidden rounded-[var(--dashboard-radius)]">
@@ -69,7 +69,7 @@ export function PortfolioCategoryForm({ category }: PortfolioCategoryFormProps) 
                                         name="name"
                                         defaultValue={category?.name}
                                         placeholder="e.g. Weddings"
-                                        className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] transition-all rounded-xl h-12"
+                                        className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] transition-[color,background-color,border-color,box-shadow,opacity,transform] rounded-xl h-12"
                                         required
                                     />
                                 </div>
@@ -81,7 +81,7 @@ export function PortfolioCategoryForm({ category }: PortfolioCategoryFormProps) 
                                         name="slug"
                                         defaultValue={category?.slug}
                                         placeholder="weddings"
-                                        className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] transition-all rounded-xl h-12 font-mono text-sm"
+                                        className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] transition-[color,background-color,border-color,box-shadow,opacity,transform] rounded-xl h-12 font-mono text-sm"
                                         required
                                     />
                                 </div>
@@ -94,7 +94,7 @@ export function PortfolioCategoryForm({ category }: PortfolioCategoryFormProps) 
                                     name="description"
                                     defaultValue={category?.description}
                                     placeholder="Brief description of this portfolio category..."
-                                    className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] transition-all rounded-2xl min-h-[120px] resize-none py-4"
+                                    className="bg-[var(--dashboard-card)] border-[var(--dashboard-border)] text-[var(--dashboard-text)] focus:border-[var(--dashboard-accent-gold)] transition-[color,background-color,border-color,box-shadow,opacity,transform] rounded-2xl min-h-[120px] resize-none py-4"
                                 />
                             </div>
                         </CardContent>
@@ -123,7 +123,7 @@ export function PortfolioCategoryForm({ category }: PortfolioCategoryFormProps) 
                     <Button
                         type="submit"
                         disabled={loading}
-                        className="w-full h-14 rounded-2xl bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-bold text-base shadow-lg shadow-[var(--dashboard-accent-gold)]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                        className="w-full h-14 rounded-2xl bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-bold text-base shadow-lg shadow-[var(--dashboard-accent-gold)]/20 transition-[color,background-color,border-color,box-shadow,opacity,transform] active:scale-[0.98]"
                     >
                         {loading ? (
                             <>

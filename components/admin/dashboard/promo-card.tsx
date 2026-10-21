@@ -17,12 +17,12 @@ export function PromoCard() {
             </CardHeader>
             <CardContent className="relative z-10">
                 <div className="mt-4 grid grid-cols-2 gap-4">
-                    <div className="bg-[var(--dashboard-background)] rounded-xl p-4 flex flex-col items-center justify-center gap-2 group cursor-pointer hover:shadow-md transition-all">
+                    <div className="bg-[var(--dashboard-background)] rounded-xl p-4 flex flex-col items-center justify-center gap-2 group cursor-pointer hover:shadow-md transition-[color,background-color,border-color,box-shadow,opacity,transform]">
                         <div className="h-24 w-24 bg-white rounded-lg shadow-sm flex items-center justify-center text-3xl">
                             👕
                         </div>
                     </div>
-                    <div className="bg-[var(--dashboard-background)] rounded-xl p-4 flex flex-col items-center justify-center gap-2 group cursor-pointer hover:shadow-md transition-all">
+                    <div className="bg-[var(--dashboard-background)] rounded-xl p-4 flex flex-col items-center justify-center gap-2 group cursor-pointer hover:shadow-md transition-[color,background-color,border-color,box-shadow,opacity,transform]">
                         <div className="h-24 w-24 bg-white rounded-lg shadow-sm flex items-center justify-center text-3xl">
                             🧢
                         </div>

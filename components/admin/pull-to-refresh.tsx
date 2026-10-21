@@ -79,7 +79,7 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
                 onPan={handlePan}
                 onPanEnd={handlePanEnd}
                 animate={{ y: isRefreshing ? PULL_THRESHOLD : 0 }}
-                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                transition={{ type: 'spring', damping: 30, stiffness: 400 }}
                 className="w-full h-full touch-pan-y"
             >
                 {children}

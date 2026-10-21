@@ -86,7 +86,7 @@ export function TasksCard() {
                         </div>
                     ) : (
                         tasks.map((task) => (
-                            <div key={task.id} className="group relative flex items-center gap-4 p-4 rounded-2xl hover:bg-[var(--dashboard-card-hover)] transition-all duration-300 border border-transparent hover:border-[var(--dashboard-border)] cursor-pointer">
+                            <div key={task.id} className="group relative flex items-center gap-4 p-4 rounded-2xl hover:bg-[var(--dashboard-card-hover)] transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 border border-transparent hover:border-[var(--dashboard-border)] cursor-pointer">
                                 <div className={cn(
                                     "flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
                                     task.priority === 'urgent' ? 'bg-red-500/10 text-red-500' :
@@ -119,7 +119,7 @@ export function TasksCard() {
                     )}
                 </div>
                 <Link href="/admin/tasks">
-                    <Button variant="outline" className="w-full mt-8 rounded-xl border-dashed border-[var(--dashboard-border)] hover:border-[var(--dashboard-accent-orange)]/50 hover:bg-[var(--dashboard-accent-orange)]/5 text-[var(--dashboard-accent-orange)] transition-all duration-300">
+                    <Button variant="outline" className="w-full mt-8 rounded-xl border-dashed border-[var(--dashboard-border)] hover:border-[var(--dashboard-accent-orange)]/50 hover:bg-[var(--dashboard-accent-orange)]/5 text-[var(--dashboard-accent-orange)] transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200">
                         <Plus className="h-4 w-4 mr-2" />
                         Add New Task
                     </Button>

@@ -392,7 +392,7 @@ export function TaskForm({ task, onSuccess, onCancel }: TaskFormProps) {
                 <Button
                     type="submit"
                     disabled={loading}
-                    className="bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium rounded-xl px-8 transition-all"
+                    className="bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium rounded-xl px-8 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                 >
                     {loading ? 'Saving...' : task ? 'Update Task' : 'Create Task'}
                 </Button>

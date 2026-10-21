@@ -69,7 +69,7 @@ export function LeadActionBar({ consultationId, customerName, onActionPerformed 
                 layout
                 ref={containerRef}
                 className={cn(
-                    "bg-black/80 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden transition-colors",
+                    "bg-black/80 border border-white/10 rounded-3xl shadow-2xl overflow-hidden transition-colors",
                     isExpanded ? "p-4 flex flex-col gap-4" : "p-2 flex items-center gap-2"
                 )}
             >
@@ -84,7 +84,7 @@ export function LeadActionBar({ consultationId, customerName, onActionPerformed 
                                     key={action.type}
                                     onClick={() => setActiveAction(action.type)}
                                     className={cn(
-                                        "p-2.5 rounded-xl transition-all duration-300",
+                                        "p-2.5 rounded-xl transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200",
                                         isActive
                                             ? "bg-white/10 text-white shadow-lg"
                                             : "text-[var(--dashboard-text-muted)] hover:text-white"
@@ -105,7 +105,7 @@ export function LeadActionBar({ consultationId, customerName, onActionPerformed 
                                 layout
                                 onClick={() => setIsApptDialogOpen(true)}
                                 className={cn(
-                                    "p-3 rounded-2xl bg-white/5 hover:bg-white/10 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] transition-all flex items-center gap-2",
+                                    "p-3 rounded-2xl bg-white/5 hover:bg-white/10 text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-accent-gold)] transition-[color,background-color,border-color,box-shadow,opacity,transform] flex items-center gap-2",
                                     isExpanded ? "bg-transparent hover:bg-white/5" : ""
                                 )}
                             >
@@ -137,7 +137,7 @@ export function LeadActionBar({ consultationId, customerName, onActionPerformed 
                                 size="icon"
                                 disabled={!content.trim()}
                                 className={cn(
-                                    "absolute right-1 top-1 h-9 w-9 rounded-xl transition-all bg-white/5 text-white/20"
+                                    "absolute right-1 top-1 h-9 w-9 rounded-xl transition-[color,background-color,border-color,box-shadow,opacity,transform] bg-white/5 text-white/20"
                                 )}
                             >
                                 <Send className="h-4 w-4" />
@@ -151,7 +151,7 @@ export function LeadActionBar({ consultationId, customerName, onActionPerformed 
                             exit={{ opacity: 0, height: 0 }}
                             className="w-full relative"
                         >
-                            <div className="relative bg-white/5 rounded-2xl border border-white/5 focus-within:border-white/10 focus-within:bg-white/10 transition-all">
+                            <div className="relative bg-white/5 rounded-2xl border border-white/5 focus-within:border-white/10 focus-within:bg-white/10 transition-[color,background-color,border-color,box-shadow,opacity,transform]">
                                 <textarea
                                     autoFocus
                                     value={content}
@@ -173,7 +173,7 @@ export function LeadActionBar({ consultationId, customerName, onActionPerformed 
                                         onClick={handleQuickAction}
                                         disabled={!content.trim() || isSubmitting}
                                         className={cn(
-                                            "h-9 px-4 rounded-xl transition-all text-xs font-bold uppercase tracking-wider",
+                                            "h-9 px-4 rounded-xl transition-[color,background-color,border-color,box-shadow,opacity,transform] text-xs font-bold uppercase tracking-wider",
                                             content.trim()
                                                 ? "bg-[var(--dashboard-accent-gold)] text-black hover:bg-[var(--dashboard-accent-gold)]/90"
                                                 : "bg-white/5 text-white/20"

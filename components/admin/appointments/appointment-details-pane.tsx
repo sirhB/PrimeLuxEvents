@@ -70,7 +70,7 @@ export function AppointmentDetailsPane({ appointment, onBack }: AppointmentDetai
         <div className="flex flex-col h-full bg-black/40">
             {/* Immersive Header */}
             <div className={cn(
-                "p-6 md:p-8 border-b border-white/10 transition-all duration-500",
+                "p-6 md:p-8 border-b border-white/10 transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200",
                 statusGlows[appointment.status]
             )}>
                 <div className="flex flex-col gap-6">
@@ -169,7 +169,7 @@ export function AppointmentDetailsPane({ appointment, onBack }: AppointmentDetai
                                     </h3>
                                     <Link
                                         href={`/admin/consultations/${appointment.consultation_id}`}
-                                        className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-[var(--dashboard-accent-gold)]/10 border border-[var(--dashboard-accent-gold)]/20 text-[var(--dashboard-accent-gold)] group hover:bg-[var(--dashboard-accent-gold)]/20 transition-all duration-300 w-full"
+                                        className="inline-flex items-center gap-3 px-6 py-4 rounded-2xl bg-[var(--dashboard-accent-gold)]/10 border border-[var(--dashboard-accent-gold)]/20 text-[var(--dashboard-accent-gold)] group hover:bg-[var(--dashboard-accent-gold)]/20 transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 w-full"
                                     >
                                         <CalendarCheck className="h-5 w-5" />
                                         <div className="flex-1 text-left">
@@ -188,7 +188,7 @@ export function AppointmentDetailsPane({ appointment, onBack }: AppointmentDetai
                                         Special Instructions
                                     </h3>
                                     <div className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 relative overflow-hidden group">
-                                        <Info className="absolute -right-4 -top-4 h-24 w-24 text-white/[0.03] rotate-12 transition-transform duration-500 group-hover:scale-110" />
+                                        <Info className="absolute -right-4 -top-4 h-24 w-24 text-white/[0.03] rotate-12 transition-transform duration-200" />
                                         <p className="text-[var(--dashboard-text)] text-sm leading-relaxed relative z-10">
                                             {appointment.notes}
                                         </p>

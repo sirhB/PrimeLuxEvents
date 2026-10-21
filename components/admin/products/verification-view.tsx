@@ -170,7 +170,7 @@ export function VerificationView({ products: initialProducts, categories }: Veri
                                     key={product.id}
                                     onClick={() => setCurrentIndex(actualIndex)}
                                     className={cn(
-                                        "w-full flex items-center gap-3 p-3 rounded-2xl transition-all text-left",
+                                        "w-full flex items-center gap-3 p-3 rounded-2xl transition-[color,background-color,border-color,box-shadow,opacity,transform] text-left",
                                         isActive
                                             ? "bg-[var(--dashboard-accent-gold)] text-black"
                                             : "hover:bg-white/5 text-[var(--dashboard-text-muted)]"
@@ -220,7 +220,7 @@ export function VerificationView({ products: initialProducts, categories }: Veri
                                         <img
                                             src={currentProduct.image_url}
                                             alt={currentProduct.name}
-                                            className="w-full h-full object-contain p-4 transition-transform duration-700 group-hover:scale-105"
+                                            className="w-full h-full object-contain p-4 transition-transform duration-200"
                                         />
                                     ) : (
                                         <div className="w-full h-full bg-black/20 flex flex-col items-center justify-center text-[var(--dashboard-text-muted)] gap-4">
@@ -230,7 +230,7 @@ export function VerificationView({ products: initialProducts, categories }: Veri
                                     )}
 
                                     <div className="absolute top-6 left-6 flex gap-2">
-                                        <Badge className="bg-black/40 backdrop-blur-md text-white border-white/10 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                        <Badge className="bg-black/40 text-white border-white/10 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
                                             {currentProduct.id.slice(0, 8)}
                                         </Badge>
                                     </div>

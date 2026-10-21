@@ -35,7 +35,7 @@ export function LeadCard({ lead, isOverlay }: LeadCardProps) {
             {...attributes}
             {...listeners}
             className={cn(
-                "group p-4 rounded-xl glass-card border border-white/5 bg-black/40 cursor-grab active:cursor-grabbing hover:border-[var(--dashboard-accent-gold)]/30 transition-all",
+                "group p-4 rounded-xl glass-card border border-white/5 bg-black/40 cursor-grab active:cursor-grabbing hover:border-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform]",
                 isDragging && "opacity-0",
                 isOverlay && "cursor-grabbing border-[var(--dashboard-accent-gold)] shadow-2xl"
             )}

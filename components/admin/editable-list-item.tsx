@@ -166,7 +166,7 @@ export function EditableListItem({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="group relative bg-background border border-border/40 rounded-lg overflow-hidden hover:border-gold/30 transition-all"
+                className="group relative bg-background border border-border/40 rounded-lg overflow-hidden hover:border-gold/30 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
             >
                 <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                     <Button

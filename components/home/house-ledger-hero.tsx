@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { MotionConfig, motion, type Transition } from 'framer-motion'
 import { useSuite } from '@/components/suite/use-suite'
@@ -81,11 +82,14 @@ export function HouseLedgerHero({ venues }: { venues: VenueListing[] }) {
               <span className="ledger-corner tr" aria-hidden="true" />
               <span className="ledger-corner bl" aria-hidden="true" />
               <span className="ledger-corner br" aria-hidden="true" />
-              <img
+              <Image
                 src="/images/suites/ceremony.jpg"
                 alt="A ceremony set beneath a floral arch at a Prime Lux venue"
-                fetchPriority="high"
-                decoding="async"
+                width={720}
+                height={1280}
+                quality={90}
+                priority
+                sizes="(min-width: 900px) 416px, 80vw"
               />
               <figcaption>Pl. I — The ceremony</figcaption>
             </motion.figure>

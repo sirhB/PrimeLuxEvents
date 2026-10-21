@@ -62,9 +62,9 @@ function SortableHeaderInner({ column, label, className, sortMapping }: Sortable
                 {label}
                 <div className="flex flex-col">
                     {isAsc ? (
-                        <ChevronUp className="h-3 w-3 text-primary animate-in fade-in zoom-in duration-300" />
+                        <ChevronUp className="h-3 w-3 text-primary animate-in fade-in zoom-in duration-200" />
                     ) : isDesc ? (
-                        <ChevronDown className="h-3 w-3 text-primary animate-in fade-in zoom-in duration-300" />
+                        <ChevronDown className="h-3 w-3 text-primary animate-in fade-in zoom-in duration-200" />
                     ) : (
                         <ChevronsUpDown className="h-3 w-3 opacity-30 group-hover:opacity-100 transition-opacity" />
                     )}

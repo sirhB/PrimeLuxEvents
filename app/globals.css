@@ -117,9 +117,9 @@
   --dashboard-accent-purple: #6d5aa8;
   --dashboard-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 16px 40px -24px rgba(16, 24, 40, 0.28);
   --dashboard-shadow-lg: 0 24px 50px -28px rgba(16, 24, 40, 0.3);
-  --dashboard-glass-bg: rgba(255, 252, 248, 0.92);
+  --dashboard-glass-bg: #fffcf8;
   --dashboard-glass-border: rgba(16, 24, 40, 0.08);
-  --dashboard-radius: 1.25rem;
+  --dashboard-radius: 0.875rem;
   --dashboard-rail: 3px;
   --sidebar-navy: var(--theme-dark);
   --sidebar-navy-text: var(--theme-on-dark);
@@ -167,21 +167,24 @@
 
 .glass-morphism {
   background: var(--dashboard-glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--dashboard-glass-border);
 }
 
 .glass-card {
   background: var(--dashboard-card);
   border: 1px solid var(--dashboard-border);
-  box-shadow: var(--dashboard-shadow);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
 }
 
 .brand-lockup {
   --brand-ink: var(--theme-dark);
   --brand-gold: var(--theme-accent);
   color: var(--brand-gold);
+}
+
+.brand-monogram-strong {
+  /* Header mark: AA-contrast gold on the light canvas. */
+  --brand-gold: var(--theme-accent-text);
 }
 
 .brand-lockup-on-dark {
@@ -777,7 +780,7 @@ html[data-suite="rentals"] .admin-theme {
 .ledger-print {
   position: relative;
   justify-self: center;
-  width: min(88%, 22rem);
+  width: min(80%, 20rem);
   margin: 0;
   background: #fff;
   padding: 0.6rem 0.6rem 0.4rem;
@@ -789,8 +792,11 @@ html[data-suite="rentals"] .admin-theme {
 .ledger-print img {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: auto;
+  /* Square crop on phones keeps the 720px-wide source at >=2x density. */
+  aspect-ratio: 1 / 1;
   object-fit: cover;
+  object-position: 50% 45%;
 }
 @media (min-width: 900px) {
   .ledger-print img { aspect-ratio: 4 / 5; }
@@ -911,4 +917,19 @@ html[data-suite="rentals"] .admin-theme {
 }
 @media (prefers-reduced-motion: reduce) {
   .ledger-arrow { transition: none; }
+}
+
+/* ── Panels (Impeccable: Operate mode — precision over expression) ── */
+.admin-theme table,
+.admin-theme [data-numeric],
+.admin-theme time {
+  font-variant-numeric: tabular-nums;
+}
+::selection {
+  background: color-mix(in srgb, var(--theme-accent) 35%, transparent);
+  color: var(--theme-dark);
+}
+:where(a, button, [role='button'], input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--theme-accent-text);
+  outline-offset: 2px;
 }

@@ -71,7 +71,7 @@ export function ProductsTable({ products, categories }: ProductsTableProps) {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
-                        className="sticky bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-3 rounded-full glass-morphism border border-[var(--dashboard-accent-gold)] shadow-2xl bg-black/80 backdrop-blur-xl"
+                        className="sticky bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-3 rounded-full glass-morphism border border-[var(--dashboard-accent-gold)] shadow-2xl bg-black/80"
                     >
                         <span className="text-sm font-bold text-[var(--dashboard-accent-gold)] uppercase tracking-widest px-2">
                             {selectedIds.length} Selected
@@ -241,7 +241,7 @@ export function ProductsTable({ products, categories }: ProductsTableProps) {
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right pr-6">
-                                        <div className="flex justify-end items-center gap-2 opacity-0 group-hover/row:opacity-100 transition-all duration-300">
+                                        <div className="flex justify-end items-center gap-2 opacity-0 group-hover/row:opacity-100 transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200">
                                             <Button variant="ghost" size="icon-sm" className="h-8 w-8 rounded-lg hover:bg-[var(--dashboard-accent-gold)]/10 hover:text-[var(--dashboard-accent-gold)]" asChild>
                                                 <Link href={`/admin/products/${product.id}`}>
                                                     <Pencil className="h-4 w-4" />

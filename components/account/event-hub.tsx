@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import { Presence } from '@/components/motion/presence'
 import { formatCurrency } from '@/lib/utils'
 import { PIPELINE_STAGES, applyClientChange, deskFromHub, toClientHub, type ClientChange, type ClientHub } from '@/lib/venues/desk'
 import { persistClientChange } from '@/app/account/event/actions'
@@ -71,12 +72,12 @@ export function EventHub({ initial, live = false }: { initial: ClientHub; live?:
         {hub.venue && <p className="mt-1 text-sm text-[var(--dashboard-text-muted)]">{[hub.venue.neighborhood, hub.venue.city].filter(Boolean).join(' · ')}{hub.venue.capacity ? ` · up to ${hub.venue.capacity}` : ''}</p>}
         {hub.venue?.description && <p className="mt-3 text-sm">{hub.venue.description}</p>}
         {hub.venue && hub.venue.amenities.length > 0 && <p className="mt-2 text-sm text-[var(--dashboard-text-muted)]">{hub.venue.amenities.join(' · ')}</p>}
-        {hub.layout && (
+        <Presence show={Boolean(hub.layout)}>{(hub.layout) && (<>
           <div className="mt-4 border-t border-[var(--dashboard-border)] pt-3">
             <p className="text-[10px] uppercase tracking-[0.14em] text-[var(--dashboard-text-muted)]">{hub.layout.floor_plan_label}</p>
             <p className="mt-1 text-sm">{hub.layout.body}</p>
           </div>
-        )}
+        </>)}</Presence>
       </Section>
 
       <Section title="Rentals and services">
@@ -95,7 +96,7 @@ export function EventHub({ initial, live = false }: { initial: ClientHub; live?:
       <Section title="Contract">
         <p className="text-sm">{hub.contract ? `Status · ${hub.contract.status}` : 'Your contract is not ready yet.'}</p>
         {hub.contract?.status === 'signed' && <p className="mt-2 text-sm text-[var(--dashboard-text-muted)]">Signed {hub.contract.signed_at?.slice(0, 10)}.</p>}
-        {hub.contract && hub.contract.status !== 'signed' && (
+        <Presence show={Boolean(hub.contract && hub.contract.status !== 'signed')}>{(hub.contract && hub.contract.status !== 'signed') && (<>
           <form className="mt-3 space-y-3" onSubmit={(event) => { event.preventDefault(); void commit({ type: 'sign', name: signature }) }}>
             <label className="block text-[10px] uppercase tracking-[0.14em]">
               Sign with your name
@@ -103,7 +104,7 @@ export function EventHub({ initial, live = false }: { initial: ClientHub; live?:
             </label>
             <button type="submit" className="lux-cta w-full">Sign the contract</button>
           </form>
-        )}
+        </>)}</Presence>
       </Section>
 
       <Section title="Payments">

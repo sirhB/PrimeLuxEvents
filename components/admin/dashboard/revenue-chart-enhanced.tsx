@@ -125,7 +125,7 @@ export function RevenueChartEnhanced() {
                                 <button
                                     key={range}
                                     onClick={() => setTimeRange(range)}
-                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all duration-300 ${timeRange === range
+                                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 ${timeRange === range
                                             ? 'bg-[var(--dashboard-accent-gold)] text-black shadow-lg'
                                             : 'text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)]'
                                         }`}

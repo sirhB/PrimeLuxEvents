@@ -44,7 +44,7 @@ export function WarehouseTaskCard({ task, selected, onClick, compact }: Warehous
     return (
         <Card
             className={cn(
-                'glass-card border-[var(--dashboard-border)] cursor-pointer transition-all hover:border-[var(--dashboard-accent-gold)]/30',
+                'glass-card border-[var(--dashboard-border)] cursor-pointer transition-[color,background-color,border-color,box-shadow,opacity,transform] hover:border-[var(--dashboard-accent-gold)]/30',
                 selected && 'border-[var(--dashboard-accent-gold)]/50 ring-1 ring-[var(--dashboard-accent-gold)]/20'
             )}
             onClick={onClick}
@@ -98,7 +98,7 @@ export function WarehouseTaskCard({ task, selected, onClick, compact }: Warehous
                 {progress !== null && !compact && (
                     <div className="mt-2 h-1 bg-black/20 rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-[var(--dashboard-accent-gold)] transition-all"
+                            className="h-full bg-[var(--dashboard-accent-gold)] transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                             style={{ width: `${progress}%` }}
                         />
                     </div>

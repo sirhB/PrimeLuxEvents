@@ -184,10 +184,10 @@ export function ActivityFeed() {
                             transition={{ delay: 0.4 + index * 0.05 }}
                         >
                             <Link href={activity.href}>
-                                <div className="group p-6 hover:bg-[var(--dashboard-card-hover)] transition-all duration-300 cursor-pointer">
+                                <div className="group p-6 hover:bg-[var(--dashboard-card-hover)] transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 cursor-pointer">
                                     <div className="flex items-start gap-4">
                                         <div className={cn(
-                                            "flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
+                                            "flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200",
                                             activity.type === 'order' && "bg-[var(--dashboard-accent-green)]/10",
                                             activity.type === 'task' && "bg-[var(--dashboard-accent-orange)]/10",
                                             activity.type === 'event' && "bg-[var(--dashboard-accent-blue)]/10",

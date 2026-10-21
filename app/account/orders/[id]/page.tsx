@@ -260,7 +260,7 @@ function OrderDetailContent() {
                                                 <img
                                                     src={item.products?.image_url || '/placeholder.svg'}
                                                     alt={item.products?.name}
-                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                    className="h-full w-full object-cover transition-transform duration-200"
                                                 />
                                             </div>
                                             <div className="flex-1 min-w-0 flex flex-col justify-center">

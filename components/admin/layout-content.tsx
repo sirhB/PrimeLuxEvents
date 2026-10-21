@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
 import { Command, Menu, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { RouteEnter } from '@/components/motion/route-enter'
 import { useAdminSidebar } from '@/components/admin/sidebar-context'
 import { ModernSidebar } from '@/components/admin/modern-sidebar'
 import { AdminToastProvider } from '@/components/admin/toast-provider'
@@ -62,11 +63,11 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
 
       <div
         className={cn(
-          'flex max-w-full flex-1 flex-col overflow-x-hidden transition-[padding] duration-300',
+          'flex max-w-full flex-1 flex-col overflow-x-hidden transition-[padding] duration-200',
           isCollapsed ? 'md:pl-20' : 'md:pl-60',
         )}
       >
-        <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between gap-3 border-b border-[var(--dashboard-border)] bg-white/85 px-3 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:px-5 md:px-6 print:hidden">
+        <header className="sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between gap-3 border-b border-[var(--dashboard-border)] bg-white px-3 pt-[env(safe-area-inset-top)] sm:px-5 md:px-6 print:hidden">
           <div className="flex min-w-0 items-center gap-2">
             {!isStandalone && (
               <button
@@ -117,7 +118,7 @@ export function AdminLayoutContent({ children }: { children: React.ReactNode }) 
 
         <a href="#admin-main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-[var(--dashboard-accent-gold)] focus:px-3 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#000000]">Skip to main content</a>
         <main id="admin-main" tabIndex={-1} className="max-w-full flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 pb-24 sm:px-5 sm:py-5 md:px-6 md:pb-8">
-          {children}
+          <RouteEnter>{children}</RouteEnter>
         </main>
       </div>
 

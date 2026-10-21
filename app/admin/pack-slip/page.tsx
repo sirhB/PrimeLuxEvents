@@ -357,7 +357,7 @@ function PackSlipPageContent() {
                                 <Card
                                     key={item.date}
                                     className={cn(
-                                        "glass-card border-none cursor-pointer hover:bg-[var(--dashboard-card-hover)] transition-all group",
+                                        "glass-card border-none cursor-pointer hover:bg-[var(--dashboard-card-hover)] transition-[color,background-color,border-color,box-shadow,opacity,transform] group",
                                         `delay-${(idx % 5) * 100}`
                                     )}
                                     onClick={() => generatePackSlip(item.date)}

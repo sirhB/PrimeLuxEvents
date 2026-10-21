@@ -299,7 +299,7 @@ export function OpsIntelligenceDashboard({ metrics }: Props) {
                     </div>
                     <div className="h-2 overflow-hidden rounded-sm bg-black/30">
                       <div
-                        className="h-full rounded-sm transition-all"
+                        className="h-full rounded-sm transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                         style={{
                           width: `${Math.max(step.count > 0 ? 4 : 0, widthPct)}%`,
                           backgroundColor: color,

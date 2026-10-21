@@ -145,11 +145,11 @@ export default function BagsPage() {
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                     {bags.map((bag) => (
-                        <Card key={bag.id} className="rounded-[2rem] border-gray-200 overflow-hidden shadow-sm hover:shadow-xl transition-all group relative">
+                        <Card key={bag.id} className="rounded-[2rem] border-gray-200 overflow-hidden shadow-sm hover:shadow-xl transition-[color,background-color,border-color,box-shadow,opacity,transform] group relative">
                             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm border shadow-sm">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-white/80 border shadow-sm">
                                             <MoreVertical className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>

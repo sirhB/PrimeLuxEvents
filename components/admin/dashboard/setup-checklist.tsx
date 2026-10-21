@@ -203,9 +203,9 @@ export function SetupChecklist() {
                                 className="group block"
                             >
                                 <motion.div
-                                    whileHover={{ x: 5 }}
+                                    
                                     className={`
-                                        relative p-5 rounded-2xl transition-all duration-300
+                                        relative p-5 rounded-2xl transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200
                                         ${isCompleted
                                             ? 'bg-[var(--dashboard-accent-green)]/5 border border-[var(--dashboard-accent-green)]/10'
                                             : 'bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10'

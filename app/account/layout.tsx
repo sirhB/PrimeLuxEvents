@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { RouteEnter } from '@/components/motion/route-enter'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AccountSidebar } from '@/components/account-sidebar'
@@ -72,7 +73,7 @@ export default async function AccountLayout({
                     partnerStatus={partnerStatus}
                 />
                 <main className="flex-1 p-4 pb-24 sm:p-6 md:p-8 md:pb-10">
-                    {children}
+                    <RouteEnter>{children}</RouteEnter>
                 </main>
                 <AccountBottomBar partnerStatus={partnerStatus} />
                 <InstallPrompt surface="account" />

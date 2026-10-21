@@ -582,7 +582,7 @@ export function OrderForm() {
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <label className="flex flex-col items-center justify-center aspect-[3/1] border-2 border-dashed border-[var(--dashboard-border)] rounded-lg cursor-pointer hover:border-[var(--dashboard-accent-gold)]/50 hover:bg-[var(--dashboard-accent-gold)]/5 transition-all">
+                                                    <label className="flex flex-col items-center justify-center aspect-[3/1] border-2 border-dashed border-[var(--dashboard-border)] rounded-lg cursor-pointer hover:border-[var(--dashboard-accent-gold)]/50 hover:bg-[var(--dashboard-accent-gold)]/5 transition-[color,background-color,border-color,box-shadow,opacity,transform]">
                                                         <div className="flex flex-col items-center justify-center py-4">
                                                             <Camera className="h-6 w-6 text-[var(--dashboard-text-muted)] mb-2" />
                                                             <p className="text-xs text-[var(--dashboard-text-muted)]">Take picture or upload check</p>

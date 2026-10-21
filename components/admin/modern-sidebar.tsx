@@ -169,7 +169,7 @@ function SidebarSection({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.18, ease: 'easeInOut' }}
+            transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
             className="space-y-0.5 overflow-hidden"
           >
             {items.map((item) => (
@@ -241,10 +241,10 @@ export function ModernSidebar() {
         {isMobileOpen && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 0.18, ease: [0.23, 1, 0.32, 1] } }}
+            exit={{ opacity: 0, transition: { duration: 0.12, ease: [0.23, 1, 0.32, 1] } }}
             onClick={() => setIsMobileOpen(false)}
-            className="fixed inset-0 z-40 bg-black/55 backdrop-blur-[2px] md:hidden"
+            className="fixed inset-0 z-40 bg-black/55 md:hidden"
           />
         )}
       </AnimatePresence>
@@ -253,7 +253,7 @@ export function ModernSidebar() {
         id="admin-mobile-nav"
         aria-label="Admin navigation"
         className={cn(
-          'fixed inset-y-0 left-0 z-[70] flex flex-col border-r border-white/10 bg-[var(--sidebar-navy)] text-[var(--sidebar-navy-text)] transition-[width,transform] duration-300 ease-out',
+          'fixed inset-y-0 left-0 z-[70] flex flex-col border-r border-white/10 bg-[var(--sidebar-navy)] text-[var(--sidebar-navy-text)] transition-[width,transform] duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]',
           isCollapsed ? 'md:w-20' : 'md:w-60',
           'w-60',
           'md:translate-x-0',
