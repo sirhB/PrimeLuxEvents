@@ -301,7 +301,7 @@ export default function RentalAgreementPage() {
             {/* Final Notice & Warning */}
             <motion.div variants={itemVariants as any} className="mt-12 text-center max-w-3xl mx-auto space-y-12">
               <div className="p-1 border border-gold/20 rounded-full inline-block print:hidden">
-                <div className="px-6 py-2 bg-gold/10 rounded-full text-gold text-[10px] font-bold tracking-[0.3em] uppercase animate-pulse">
+                <div className="px-6 py-2 bg-gold/10 rounded-full text-gold text-[10px] font-bold tracking-[0.3em] uppercase">
                   Legal Acknowledgement
                 </div>
               </div>

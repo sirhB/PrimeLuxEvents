@@ -19,8 +19,7 @@ export function HomeChapters({ venues }: { venues: VenueListing[] }) {
     <section className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24" aria-labelledby="home-venues">
       <div className="mb-10 flex items-end justify-between gap-6">
         <div>
-          <p className="lux-label">Venues</p>
-          <h2 id="home-venues" className="mt-3 font-serif text-4xl font-medium leading-none md:text-6xl">
+                    <h2 id="home-venues" className="font-serif text-4xl font-medium leading-none md:text-6xl">
             Three rooms. One house.
           </h2>
         </div>
@@ -35,7 +34,7 @@ export function HomeChapters({ venues }: { venues: VenueListing[] }) {
               <img
                 src={venue.image}
                 alt=""
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                className="h-full w-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] [@media(hover:hover)]:group-hover:scale-[1.02]"
               />
             </div>
             <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-[var(--theme-muted)]">
@@ -52,13 +51,12 @@ export function HomeChapters({ venues }: { venues: VenueListing[] }) {
   const rentalBlock = (
     <section className="border-y border-[var(--theme-dark)]/10 bg-white/40" aria-labelledby="home-rentals">
       <div className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
-        <p className="lux-label">Rentals</p>
-        <h2 id="home-rentals" className="mt-3 max-w-xl font-serif text-4xl font-medium leading-none md:text-6xl">
+                <h2 id="home-rentals" className="mt-3 max-w-xl font-serif text-4xl font-medium leading-none md:text-6xl">
           Whatever the room still needs.
         </h2>
         <div className="mt-10 grid gap-px bg-[var(--theme-dark)]/10 sm:grid-cols-2 lg:grid-cols-4">
           {RENTALS.map((item) => (
-            <Link key={item.title} href="/catalog" className="bg-[var(--suite-paper)] p-6 transition-colors hover:bg-white">
+            <Link key={item.title} href="/catalog" className="bg-[var(--suite-paper)] p-6 transition-colors duration-200 hover:bg-white">
               <h3 className="font-serif text-3xl font-medium">{item.title}</h3>
               <p className="mt-3 text-sm font-light leading-relaxed text-[var(--theme-muted)]">{item.line}</p>
             </Link>
@@ -71,8 +69,7 @@ export function HomeChapters({ venues }: { venues: VenueListing[] }) {
   return (
     <>
       <section className="mx-auto max-w-3xl px-5 py-20 text-center md:py-28">
-        <p className="lux-label">{venueFirst ? 'Venue suite' : 'Rentals suite'}</p>
-        <h2 className="mt-4 font-serif text-4xl font-medium leading-[1.05] md:text-5xl">
+        <h2 className="font-serif text-4xl font-medium leading-[1.05] md:text-5xl">
           Prime Lux holds the celebration in one place.
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-base font-light leading-relaxed text-[var(--theme-muted)]">
@@ -84,8 +81,7 @@ export function HomeChapters({ venues }: { venues: VenueListing[] }) {
       <section className="bg-[var(--theme-dark)] text-[var(--theme-on-dark)]">
         <div className="mx-auto flex max-w-6xl flex-col items-start gap-8 px-5 py-16 md:flex-row md:items-center md:justify-between md:px-8 md:py-20">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-[var(--theme-accent-on-dark)]">Plan your event</p>
-            <h2 className="mt-3 font-serif text-4xl font-medium md:text-5xl">A few questions. Then we begin.</h2>
+            <h2 className="font-serif text-4xl font-medium md:text-5xl">A few questions. Then we begin.</h2>
           </div>
           <Link href="/plan" className="lux-cta !bg-[var(--theme-accent)] !text-[var(--theme-on-accent)]">
             Start the plan
