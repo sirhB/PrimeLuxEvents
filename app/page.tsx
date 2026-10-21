@@ -1,4 +1,4 @@
-import { SecretDoorHero } from '@/components/home/secret-door-hero'
+import { HouseLedgerHero } from '@/components/home/house-ledger-hero'
 import { HomeChapters } from '@/components/home/home-chapters'
 import { loadPublicVenues } from '@/lib/venues/load'
 
@@ -9,7 +9,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col">
-      <SecretDoorHero />
+      <HouseLedgerHero venues={venues} />
       <HomeChapters venues={venues} />
     </div>
   )

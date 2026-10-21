@@ -205,7 +205,7 @@ export function EditableContent({
             onMouseLeave={() => setIsHovered(false)}
         >
             {editMode ? (
-                <div className="relative z-20 space-y-2 rounded-lg bg-[var(--dashboard-card)]/90 p-2 ring-1 ring-[var(--dashboard-accent-gold,#2f6b57)]/40 backdrop-blur-sm">
+                <div className="relative z-20 space-y-2 rounded-lg bg-[var(--dashboard-card)]/90 p-2 ring-1 ring-[var(--dashboard-accent-gold,#2f6b57)]/40">
                     <div className="flex items-center justify-between gap-2 px-1">
                         <span className="truncate text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--dashboard-accent-gold,#2f6b57)]">
                             {fieldLabel}
@@ -265,7 +265,7 @@ export function EditableContent({
                 <div
                     onClick={() => setEditMode(true)}
                     className={cn(
-                        "relative cursor-pointer rounded-sm transition-all duration-200",
+                        "relative cursor-pointer rounded-sm transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200",
                         isHovered && "outline outline-2 outline-[var(--dashboard-accent-gold,#2f6b57)]/50 bg-[var(--dashboard-accent-gold,#2f6b57)]/5"
                     )}
                 >

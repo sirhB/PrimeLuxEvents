@@ -27,7 +27,7 @@ export function AdminBottomBar() {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[var(--dashboard-border)] bg-[var(--dashboard-surface)]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden print:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[var(--dashboard-border)] bg-[var(--dashboard-surface)]/95 pb-[env(safe-area-inset-bottom)] md:hidden print:hidden">
         <div className="grid grid-cols-5 items-end px-1 pt-1">
           {left.map((item) => {
             const Icon = item.icon

@@ -28,7 +28,7 @@ export function VisualEditorLanding({ onSelectPage }: VisualEditorLandingProps) 
             <motion.div
                 initial={prefersReducedMotion ? false : { opacity: 0, y: -16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
                 className="relative z-10 mb-12 space-y-4 text-center"
             >
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--dashboard-accent-gold)]">
@@ -63,7 +63,7 @@ export function VisualEditorLanding({ onSelectPage }: VisualEditorLandingProps) 
                             onClick={() => onSelectPage(page.id)}
                             initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, delay: prefersReducedMotion ? 0 : index * 0.06 }}
+                            transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1], delay: prefersReducedMotion ? 0 : Math.min(index, 4) * 0.03 }}
                             whileHover={prefersReducedMotion ? undefined : { y: -2 }}
                             className="glass-card group rounded-[var(--dashboard-radius)] p-6 text-left transition-colors hover:border-[var(--dashboard-accent-gold)]/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--dashboard-accent-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--dashboard-background)]"
                         >

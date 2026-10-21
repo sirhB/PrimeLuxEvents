@@ -27,7 +27,7 @@ export function CreateTaskDialog({ trigger, onSuccess }: CreateTaskDialogProps) 
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button className="bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium rounded-full px-6 transition-all shadow-lg hover:shadow-[var(--dashboard-accent-gold)]/20">
+                    <Button className="bg-[var(--dashboard-accent-gold)] hover:bg-[var(--dashboard-accent-gold)]/90 text-black font-medium rounded-full px-6 transition-[color,background-color,border-color,box-shadow,opacity,transform] shadow-lg hover:shadow-[var(--dashboard-accent-gold)]/20">
                         <Plus className="h-4 w-4 mr-2" />
                         Create Task
                     </Button>

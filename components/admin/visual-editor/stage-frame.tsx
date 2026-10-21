@@ -22,7 +22,7 @@ export function StageFrame({ children, device, className }: StageFrameProps) {
       )}
     >
       <div
-        className="relative w-full transition-[max-width] duration-300 ease-out"
+        className="relative w-full transition-[max-width] duration-200 ease-out"
         style={{ maxWidth: width === '100%' ? '1440px' : width }}
       >
         {/* Proscenium top rail */}

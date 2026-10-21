@@ -214,7 +214,7 @@ export function LogisticsContent() {
                     {viewMode === 'map' ? (
                         <Card className="rounded-[2.5rem] border-none glass-card shadow-xl overflow-hidden min-h-[600px] relative">
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-12">
-                                <div className="h-20 w-20 rounded-full bg-[var(--dashboard-card)] shadow-2xl flex items-center justify-center mb-6 text-[var(--dashboard-accent-gold)] animate-bounce border border-[var(--dashboard-border)]">
+                                <div className="h-20 w-20 rounded-full bg-[var(--dashboard-card)] shadow-2xl flex items-center justify-center mb-6 text-[var(--dashboard-accent-gold)] border border-[var(--dashboard-border)]">
                                     <MapPin className="h-10 w-10" />
                                 </div>
                                 <h3 className="text-2xl font-serif mb-2 text-[var(--dashboard-text)]">Interactive Logistics Map</h3>
@@ -224,7 +224,7 @@ export function LogisticsContent() {
 
                                 <div className="mt-12 grid sm:grid-cols-2 gap-4 w-full max-w-xl">
                                     {orders.map((order, index) => (
-                                        <div key={order.id} className="glass-card-bright p-4 rounded-2xl border border-[var(--dashboard-border)] text-left shadow-sm hover:shadow-md transition-all">
+                                        <div key={order.id} className="glass-card-bright p-4 rounded-2xl border border-[var(--dashboard-border)] text-left shadow-sm hover:shadow-md transition-[color,background-color,border-color,box-shadow,opacity,transform]">
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="text-[10px] font-bold text-[var(--dashboard-accent-gold)] uppercase tracking-widest">
                                                     #{index + 1} · {order.delivery_time || 'TBD'}

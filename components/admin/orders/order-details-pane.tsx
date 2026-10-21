@@ -221,7 +221,7 @@ export function OrderDetailsPane({ order, onBack }: OrderDetailsPaneProps) {
 
                     <div className="flex items-center gap-2">
                         <PrintButton />
-                        <Button asChild className="h-12 px-6 rounded-2xl bg-[var(--dashboard-accent-gold)] text-black font-bold hover:bg-[var(--dashboard-accent-gold)]/90 shadow-lg shadow-[var(--dashboard-accent-gold)]/20 transition-all hover:scale-[1.02]">
+                        <Button asChild className="h-12 px-6 rounded-2xl bg-[var(--dashboard-accent-gold)] text-black font-bold hover:bg-[var(--dashboard-accent-gold)]/90 shadow-lg shadow-[var(--dashboard-accent-gold)]/20 transition-[color,background-color,border-color,box-shadow,opacity,transform]">
                             <Link href={`/admin/orders/${order.id}`}>
                                 Full Page View
                             </Link>

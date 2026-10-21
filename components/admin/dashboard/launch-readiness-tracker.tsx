@@ -116,7 +116,7 @@ export function LaunchReadinessTracker() {
                                 role="button"
                                 tabIndex={0}
                                 className={cn(
-                                    "flex flex-col gap-3 p-4 rounded-2xl transition-all duration-300 text-left border relative group/item cursor-pointer",
+                                    "flex flex-col gap-3 p-4 rounded-2xl transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 text-left border relative group/item cursor-pointer",
                                     isDone
                                         ? "bg-[var(--dashboard-accent-green)]/5 border-[var(--dashboard-accent-green)]/20"
                                         : "bg-white/5 border-[var(--dashboard-border)] hover:bg-white/10 hover:border-[var(--dashboard-accent-gold)]/30"
@@ -129,7 +129,7 @@ export function LaunchReadinessTracker() {
                                     )} />
                                     <button
                                         onClick={(e) => handleMarkComplete(item, e)}
-                                        className="transition-all hover:scale-110"
+                                        className="transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                                     >
                                         {isDone ? (
                                             <CheckCircle2 className="h-5 w-5 text-[var(--dashboard-accent-green)]" />

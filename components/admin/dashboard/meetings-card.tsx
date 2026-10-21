@@ -82,7 +82,7 @@ export function MeetingsCard() {
                         </div>
                     ) : (
                         meetings.map((meeting) => (
-                            <div key={meeting.id} className="group relative flex items-start gap-4 p-4 rounded-2xl hover:bg-[var(--dashboard-card-hover)] transition-all duration-300 border border-transparent hover:border-[var(--dashboard-border)]">
+                            <div key={meeting.id} className="group relative flex items-start gap-4 p-4 rounded-2xl hover:bg-[var(--dashboard-card-hover)] transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 border border-transparent hover:border-[var(--dashboard-border)]">
                                 <div className="flex-shrink-0 w-12 h-12 rounded-xl glass-card flex flex-col items-center justify-center border-[var(--dashboard-border)]">
                                     <span className="text-[10px] uppercase font-bold text-[var(--dashboard-accent-blue)] tracking-tighter">
                                         {new Date(meeting.appointment_date).toLocaleDateString('en-US', { month: 'short' })}
@@ -116,7 +116,7 @@ export function MeetingsCard() {
                     )}
                 </div>
                 <Link href="/admin/appointments">
-                    <Button variant="outline" className="w-full mt-8 rounded-xl border-dashed border-[var(--dashboard-border)] hover:border-[var(--dashboard-accent-blue)]/50 hover:bg-[var(--dashboard-accent-blue)]/5 text-[var(--dashboard-accent-blue)] transition-all duration-300">
+                    <Button variant="outline" className="w-full mt-8 rounded-xl border-dashed border-[var(--dashboard-border)] hover:border-[var(--dashboard-accent-blue)]/50 hover:bg-[var(--dashboard-accent-blue)]/5 text-[var(--dashboard-accent-blue)] transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200">
                         <Plus className="h-4 w-4 mr-2" />
                         Schedule Meeting
                     </Button>

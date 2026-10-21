@@ -21,7 +21,7 @@ export function TemplateEditor({ initial, live = false }: { initial: DeskWorkspa
         {api.desk.templates.map((item) => (
           <button key={item.id} type="button" onClick={() => setSelected(item.id)} className={`block w-full border px-3 py-3 text-left ${item.id === template.id ? 'border-[var(--theme-dark)] bg-white' : 'border-[var(--dashboard-border)] bg-white'}`}>
             <span className="block font-medium">{item.name}</span>
-            <span className="text-[11px] uppercase tracking-[0.14em] text-[var(--dashboard-text-muted)]">{item.trigger_stage} · {item.active ? 'active' : 'off'}</span>
+            <span className="text-xs font-medium text-[var(--dashboard-text-muted)]">{item.trigger_stage} · {item.active ? 'active' : 'off'}</span>
           </button>
         ))}
         <button
@@ -37,12 +37,12 @@ export function TemplateEditor({ initial, live = false }: { initial: DeskWorkspa
         </button>
       </aside>
       <section className="border border-[var(--dashboard-border)] bg-white p-4 md:p-6">
-        <label className="block text-[10px] uppercase tracking-[0.14em]">
+        <label className="block text-xs font-medium">
           Name
           <input className="plan-field" value={template.name} onChange={(event) => patch({ ...template, name: event.target.value })} />
         </label>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <label className="text-[10px] uppercase tracking-[0.14em]">
+          <label className="text-xs font-medium">
             When the stage becomes
             <select className="plan-field" value={template.trigger_stage} onChange={(event) => patch({ ...template, trigger_stage: event.target.value as PipelineStage })}>
               {PIPELINE_STAGES.map((stage) => <option key={stage.id} value={stage.id}>{stage.label}</option>)}
@@ -57,21 +57,21 @@ export function TemplateEditor({ initial, live = false }: { initial: DeskWorkspa
           {template.items.map((item, index) => (
             <li key={item.key} className="border-t border-[var(--dashboard-border)] pt-4">
               <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_8rem_8rem]">
-                <label className="text-[10px] uppercase tracking-[0.14em]">
+                <label className="text-xs font-medium">
                   Task
                   <input className="plan-field" value={item.title} onChange={(event) => {
                     const items = template.items.map((row, rowIndex) => rowIndex === index ? { ...row, title: event.target.value } : row)
                     patch({ ...template, items })
                   }} />
                 </label>
-                <label className="text-[10px] uppercase tracking-[0.14em]">
+                <label className="text-xs font-medium">
                   Days from event
                   <input type="number" className="plan-field" value={item.offset_days} onChange={(event) => {
                     const items = template.items.map((row, rowIndex) => rowIndex === index ? { ...row, offset_days: Number(event.target.value) } : row)
                     patch({ ...template, items })
                   }} />
                 </label>
-                <label className="text-[10px] uppercase tracking-[0.14em]">
+                <label className="text-xs font-medium">
                   Priority
                   <select className="plan-field" value={item.priority} onChange={(event) => {
                     const items = template.items.map((row, rowIndex) => rowIndex === index ? { ...row, priority: event.target.value as TaskTemplate['items'][number]['priority'] } : row)
@@ -81,7 +81,7 @@ export function TemplateEditor({ initial, live = false }: { initial: DeskWorkspa
                   </select>
                 </label>
               </div>
-              <label className="mt-3 block text-[10px] uppercase tracking-[0.14em]">
+              <label className="mt-3 block text-xs font-medium">
                 Checklist, one line each
                 <textarea
                   className="plan-field min-h-20"

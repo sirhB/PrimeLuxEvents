@@ -102,7 +102,7 @@ export async function UpcomingOrdersCard() {
                                     href={`/admin/orders/${order.id}`}
                                     className="block group"
                                 >
-                                    <div className="flex items-center justify-between p-4 rounded-2xl hover:bg-[var(--dashboard-card-hover)] transition-all duration-300 border border-transparent hover:border-[var(--dashboard-border)]">
+                                    <div className="flex items-center justify-between p-4 rounded-2xl hover:bg-[var(--dashboard-card-hover)] transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 border border-transparent hover:border-[var(--dashboard-border)]">
                                         <div className="flex-1 min-w-0">
                                             <p className="font-medium text-[var(--dashboard-text)] truncate group-hover:text-[var(--dashboard-accent-green)] transition-colors">
                                                 {order.customer_name}

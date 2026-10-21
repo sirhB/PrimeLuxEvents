@@ -145,7 +145,7 @@ export default async function CalendarPage({
 
                                         return (
                                             <div key={task.id} className={cn(
-                                                "text-xs px-2 py-1.5 rounded-lg flex items-center gap-2 border hover:opacity-100 transition-all",
+                                                "text-xs px-2 py-1.5 rounded-lg flex items-center gap-2 border hover:opacity-100 transition-[color,background-color,border-color,box-shadow,opacity,transform]",
                                                 colorClass
                                             )}>
                                                 {isWarehouse ? (

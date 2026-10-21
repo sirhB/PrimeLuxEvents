@@ -102,7 +102,7 @@ export function CategoryImagesClient({ category, images }: CategoryImagesClientP
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {images.map((image) => (
-                        <Card key={image.id} className="glass-card border-none overflow-hidden rounded-3xl group shadow-xl transition-all hover:translate-y-[-4px]">
+                        <Card key={image.id} className="glass-card border-none overflow-hidden rounded-3xl group shadow-xl transition-[color,background-color,border-color,box-shadow,opacity,transform] hover:translate-y-[-4px]">
                             <CardContent className="p-0 relative">
                                 <div className="relative aspect-square">
                                     <Image
@@ -111,7 +111,7 @@ export function CategoryImagesClient({ category, images }: CategoryImagesClientP
                                         fill
                                         className="object-cover"
                                     />
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-4">
                                         <Button
                                             variant="ghost"
                                             size="icon"

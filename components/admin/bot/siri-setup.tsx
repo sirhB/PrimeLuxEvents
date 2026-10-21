@@ -132,7 +132,7 @@ export function SiriSetup({
             <div className="flex flex-col gap-4 sm:flex-row">
               <Phone lines={step.illustration} />
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] uppercase tracking-[0.16em] text-[var(--dashboard-text-muted)]">Step {index + 1}</p>
+                <p className="text-xs font-medium text-[var(--dashboard-text-muted)]">Step {index + 1}</p>
                 <h3 className="mt-1 font-serif text-2xl">{step.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed">{step.body}</p>
                 <label className="mt-3 flex min-h-11 items-center gap-3 text-sm">

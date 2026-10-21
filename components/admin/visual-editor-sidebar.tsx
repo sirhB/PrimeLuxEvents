@@ -81,7 +81,7 @@ export function VisualEditorSidebar({
 
     const sidebarContent = (
         <>
-            <div className="sticky top-0 z-10 space-y-3 border-b border-[var(--dashboard-border)] bg-[var(--dashboard-glass-bg)] p-4 backdrop-blur-md">
+            <div className="sticky top-0 z-10 space-y-3 border-b border-[var(--dashboard-border)] bg-[var(--dashboard-glass-bg)] p-4">
                 <div className="flex items-center justify-between">
                     <h2 className="text-sm font-semibold text-[var(--dashboard-text)]">Content fields</h2>
                     <Button
@@ -165,7 +165,7 @@ export function VisualEditorSidebar({
                 </div>
             </ScrollArea>
 
-            <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--dashboard-border)] bg-[var(--dashboard-glass-bg)] p-4 backdrop-blur-md">
+            <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--dashboard-border)] bg-[var(--dashboard-glass-bg)] p-4">
                 <p className="mb-2 text-center text-[10px] font-medium uppercase tracking-[0.12em] text-[var(--dashboard-text-muted)]">
                     Preview size
                 </p>
@@ -230,7 +230,7 @@ export function VisualEditorSidebar({
             <aside
                 className={cn(
                     "glass-card relative z-50 flex w-[min(100vw-2rem,340px)] flex-col border-r border-[var(--dashboard-border)] bg-[var(--dashboard-card)]",
-                    "fixed inset-y-0 left-0 transition-transform duration-300 md:relative md:translate-x-0 md:shrink-0",
+                    "fixed inset-y-0 left-0 transition-transform duration-200 md:relative md:translate-x-0 md:shrink-0",
                     isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
                 )}
                 aria-label="Content fields sidebar"

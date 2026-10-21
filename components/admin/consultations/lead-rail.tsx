@@ -97,7 +97,7 @@ export function LeadRail({ leads, selectedId, onSelect }: LeadRailProps) {
                                 key={lead.id}
                                 onClick={() => onSelect(lead.id)}
                                 className={cn(
-                                    "w-full text-left p-3 rounded-2xl transition-all duration-300 border relative group",
+                                    "w-full text-left p-3 rounded-2xl transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 border relative group",
                                     isSelected
                                         ? "bg-[var(--dashboard-accent-gold)]/10 border-[var(--dashboard-accent-gold)]/40 shadow-[0_0_20px_rgba(212,175,55,0.1)]"
                                         : "bg-transparent border-transparent hover:bg-white/5",

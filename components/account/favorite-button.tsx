@@ -50,7 +50,7 @@ export function FavoriteButton({
       disabled={pending}
       onClick={onClick}
       className={cn(
-        'rounded-full bg-[var(--surface-elevated)]/95 text-foreground shadow-sm backdrop-blur border border-border/20 hover:bg-[var(--surface-muted)]',
+        'rounded-full bg-[var(--surface-elevated)]/95 text-foreground shadow-sm border border-border/20 hover:bg-[var(--surface-muted)]',
         className,
       )}
       aria-label={initialFavorited ? 'Remove from favorites' : 'Add to favorites'}

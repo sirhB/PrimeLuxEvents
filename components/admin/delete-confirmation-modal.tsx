@@ -38,7 +38,7 @@ export function DeleteConfirmationModal({
                     <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        transition={{ type: 'spring', duration: 0.5 }}
+                        transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
                         className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10"
                     >
                         <AlertTriangle className="h-6 w-6 text-red-500" />

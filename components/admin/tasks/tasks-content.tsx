@@ -38,7 +38,7 @@ function getPriorityColor(priority: string) {
 
 function TaskBoardItem({ task }: { task: any }) {
     return (
-        <Card className="border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-[var(--dashboard-shadow)] hover:border-[var(--dashboard-accent-gold)]/40 transition-all cursor-pointer group">
+        <Card className="border-[var(--dashboard-border)] bg-[var(--dashboard-card)] shadow-[var(--dashboard-shadow)] hover:border-[var(--dashboard-accent-gold)]/40 transition-[color,background-color,border-color,box-shadow,opacity,transform] cursor-pointer group">
             <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-2">
                     <span className={cn(

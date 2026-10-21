@@ -59,7 +59,7 @@ function SearchInputInner({
             <Input
                 type="search"
                 placeholder={placeholder || 'Search...'}
-                className="pl-9 h-11 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] placeholder:text-[var(--dashboard-text-muted)]/50 focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-all"
+                className="pl-9 h-11 bg-black/20 border-none rounded-xl text-[var(--dashboard-text)] placeholder:text-[var(--dashboard-text-muted)]/50 focus:ring-1 focus:ring-[var(--dashboard-accent-gold)]/30 transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                 onChange={(e) => handleSearch(e.target.value)}
                 defaultValue={searchParams.get('search')?.toString()}
             />

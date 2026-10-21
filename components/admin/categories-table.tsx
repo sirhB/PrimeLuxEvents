@@ -100,7 +100,7 @@ export function CategoriesTable({ categories, onDelete, onBulkDelete }: Categori
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 20 }}
-                        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-3 rounded-full glass-morphism border border-[var(--dashboard-accent-gold)] shadow-2xl bg-black/80 backdrop-blur-xl"
+                        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-6 py-3 rounded-full glass-morphism border border-[var(--dashboard-accent-gold)] shadow-2xl bg-black/80"
                     >
                         <span className="text-sm font-bold text-[var(--dashboard-accent-gold)] uppercase tracking-widest px-2">
                             {selectedIds.length} Selected
@@ -128,7 +128,7 @@ export function CategoriesTable({ categories, onDelete, onBulkDelete }: Categori
                 )}
             </AnimatePresence>
 
-            <Card className="border-[var(--dashboard-border)] bg-[var(--dashboard-card)]/50 overflow-hidden shadow-sm backdrop-blur-md">
+            <Card className="border-[var(--dashboard-border)] bg-[var(--dashboard-card)]/50 overflow-hidden shadow-sm">
                 <Table>
                     <TableHeader className="bg-black/20">
                         <TableRow className="hover:bg-transparent border-b border-[var(--dashboard-border)]">
@@ -221,7 +221,7 @@ export function CategoriesTable({ categories, onDelete, onBulkDelete }: Categori
                                                 <MoreVertical className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-48 bg-[var(--dashboard-card)] border-[var(--dashboard-border)] backdrop-blur-xl">
+                                        <DropdownMenuContent align="end" className="w-48 bg-[var(--dashboard-card)] border-[var(--dashboard-border)]">
                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                             <DropdownMenuSeparator className="bg-[var(--dashboard-border)]" />
                                             <DropdownMenuItem asChild>

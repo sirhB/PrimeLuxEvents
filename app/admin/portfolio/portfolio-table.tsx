@@ -61,7 +61,7 @@ export function PortfolioTable({ categories }: PortfolioTableProps) {
                     {categories.map((category) => (
                         <TableRow key={category.id} className="border-b border-[var(--dashboard-border)]/50 hover:bg-[var(--dashboard-card-hover)] transition-colors group">
                             <TableCell className="py-4 pl-8">
-                                <div className="relative h-16 w-16 rounded-xl overflow-hidden border border-[var(--dashboard-border)] transition-transform duration-300 group-hover:scale-105">
+                                <div className="relative h-16 w-16 rounded-xl overflow-hidden border border-[var(--dashboard-border)] transition-transform duration-200">
                                     <Image
                                         src={category.cover_image || '/images/gallery-hero.png'}
                                         alt={category.name}

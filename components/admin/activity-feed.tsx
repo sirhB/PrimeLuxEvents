@@ -138,7 +138,7 @@ export function ActivityFeed({ tableName, recordId, limit = 10, className }: Act
                 {logs.map((log) => (
                     <div key={log.id} className="relative pl-10 group">
                         {/* Timeline Bullet */}
-                        <div className="absolute left-0 top-0 h-10 w-10 rounded-xl bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] flex items-center justify-center z-10 shadow-lg transition-transform group-hover:scale-110">
+                        <div className="absolute left-0 top-0 h-10 w-10 rounded-xl bg-[var(--dashboard-card)] border border-[var(--dashboard-border)] flex items-center justify-center z-10 shadow-lg transition-transform">
                             {getActionIcon(log.action, log.table_name)}
                         </div>
 

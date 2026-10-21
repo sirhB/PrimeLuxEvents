@@ -109,8 +109,8 @@ export function SiteHeader() {
             </Sheet>
           </div>
 
-          <Link href="/" aria-label="Prime Lux Events" className="brand-lockup inline-flex">
-            <BrandMonogram className="h-10 md:h-12" />
+          <Link href="/" aria-label="Prime Lux Events" className="brand-lockup brand-monogram-strong inline-flex">
+            <BrandMonogram className="h-14 md:h-14" />
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex">

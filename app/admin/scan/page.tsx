@@ -267,7 +267,7 @@ function ScanPageContent() {
                     <div id="reader" className="w-full overflow-hidden min-h-[400px]" />
 
                     {(!isScanning || scannedProduct || (mode === 'picking' && selectedOrder)) && (
-                        <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-300">
+                        <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center p-8 text-center animate-in fade-in zoom-in duration-200">
                             {mode === 'inventory' && scannedProduct ? (
                                 <div className="w-full flex flex-col items-center">
                                     <div className="h-16 w-16 rounded-3xl bg-gold/10 text-gold flex items-center justify-center mb-6 border border-gold/20">
@@ -322,7 +322,7 @@ function ScanPageContent() {
                                             {orderItems.map((item, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className={`flex items-center justify-between p-3 rounded-xl mb-2 border transition-all ${item.picked ? 'bg-green-500/10 border-green-500/20' : 'bg-gray-100 border-transparent'}`}
+                                                    className={`flex items-center justify-between p-3 rounded-xl mb-2 border transition-[color,background-color,border-color,box-shadow,opacity,transform] ${item.picked ? 'bg-green-500/10 border-green-500/20' : 'bg-gray-100 border-transparent'}`}
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         <div
@@ -416,7 +416,7 @@ function ScanPageContent() {
                     )}
 
                     {isLoading && (
-                        <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-50">
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-50">
                             <Loader2 className="h-8 w-8 animate-spin text-white" />
                         </div>
                     )}
@@ -424,11 +424,11 @@ function ScanPageContent() {
             </Card>
 
             <div className="grid grid-cols-2 gap-4">
-                <div className={`p-4 rounded-3xl border flex flex-col items-center gap-2 text-center transition-all ${mode === 'inventory' ? 'bg-gold/10 border-gold shadow-lg' : 'bg-white/50 border-transparent shadow-sm'}`}>
+                <div className={`p-4 rounded-3xl border flex flex-col items-center gap-2 text-center transition-[color,background-color,border-color,box-shadow,opacity,transform] ${mode === 'inventory' ? 'bg-gold/10 border-gold shadow-lg' : 'bg-white/50 border-transparent shadow-sm'}`}>
                     <Package className={`h-5 w-5 ${mode === 'inventory' ? 'text-gold' : 'text-gray-300'}`} />
                     <span className="text-[10px] font-bold uppercase tracking-tight">Stock Control</span>
                 </div>
-                <div className={`p-4 rounded-3xl border flex flex-col items-center gap-2 text-center transition-all ${mode === 'picking' ? 'bg-gold/10 border-gold shadow-lg' : 'bg-white/50 border-transparent shadow-sm'}`}>
+                <div className={`p-4 rounded-3xl border flex flex-col items-center gap-2 text-center transition-[color,background-color,border-color,box-shadow,opacity,transform] ${mode === 'picking' ? 'bg-gold/10 border-gold shadow-lg' : 'bg-white/50 border-transparent shadow-sm'}`}>
                     <ShoppingBag className={`h-5 w-5 ${mode === 'picking' ? 'text-gold' : 'text-gray-300'}`} />
                     <span className="text-[10px] font-bold uppercase tracking-tight">Order Picking</span>
                 </div>

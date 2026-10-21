@@ -63,7 +63,7 @@ export function LeadStageProgress({ currentStatus, consultationId }: LeadStagePr
                             disabled={updating}
                             onClick={() => handleStageClick(stage.status)}
                             className={cn(
-                                "relative group flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300",
+                                "relative group flex items-center gap-2 px-3 py-1.5 rounded-full border transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200",
                                 isActive
                                     ? "bg-[var(--dashboard-accent-gold)] border-[var(--dashboard-accent-gold)] text-black shadow-[0_0_15px_rgba(212,175,55,0.4)]"
                                     : isCompleted

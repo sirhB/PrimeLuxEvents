@@ -66,7 +66,7 @@ export function BotDesk({
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       {hostToast && (
         <Toaster
           position="top-center"
@@ -76,15 +76,17 @@ export function BotDesk({
           }}
         />
       )}
-      <nav className="flex gap-2 overflow-x-auto pb-1" aria-label="Bot control sections">
+      <nav className="-mx-4 flex overflow-x-auto border-b border-[var(--dashboard-border)] px-4 md:mx-0 md:px-0" aria-label="Bot control sections">
         {SECTIONS.map(([id, label]) => (
           <button
             key={id}
             type="button"
             data-section={id}
             aria-pressed={section === id}
-            className={`min-h-11 shrink-0 rounded-full border px-4 text-[11px] uppercase tracking-[0.16em] ${
-              section === id ? 'border-black bg-black text-white' : 'border-black/15 bg-white'
+            className={`relative min-h-11 shrink-0 px-4 text-sm transition-colors ${
+              section === id
+                ? 'font-medium text-[var(--dashboard-text)] after:absolute after:inset-x-3 after:-bottom-px after:h-0.5 after:bg-[var(--theme-dark)]'
+                : 'text-[var(--dashboard-text-muted)] hover:text-[var(--dashboard-text)]'
             }`}
             onClick={() => setSection(id)}
           >
@@ -147,7 +149,7 @@ export function BotDesk({
                     {bot.status === 'active' ? 'Pause' : 'Resume'}
                   </button>
                 </div>
-                <p className="mt-3 text-[11px] uppercase tracking-[0.16em]">{bot.status}</p>
+                <p className="mt-3 inline-block border border-[var(--dashboard-border)] px-2 py-0.5 text-xs font-medium capitalize">{bot.status}</p>
               </article>
             ))}
           </div>
@@ -174,7 +176,7 @@ export function BotDesk({
                 </div>
                 <p className="mt-3 text-sm">Before {JSON.stringify(entry.before)}</p>
                 <p className="text-sm">After {JSON.stringify(entry.after)}</p>
-                {entry.undoneAt && <p className="mt-2 text-[11px] uppercase tracking-[0.16em]">Undone</p>}
+                {entry.undoneAt && <p className="mt-2 inline-block border border-[var(--dashboard-border)] px-2 py-0.5 text-xs font-medium capitalize">Undone</p>}
               </article>
             ))}
           </div>
@@ -187,7 +189,7 @@ export function BotDesk({
               <article key={item.id} className="rounded-xl border border-black/10 p-4">
                 <h3 className="font-serif text-xl">{item.action}</h3>
                 <p className="mt-1 text-sm">{item.summary}</p>
-                <p className="mt-2 text-[11px] uppercase tracking-[0.16em]">{item.status}</p>
+                <p className="mt-2 inline-block border border-[var(--dashboard-border)] px-2 py-0.5 text-xs font-medium capitalize">{item.status}</p>
                 {item.status === 'pending' && (
                   <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                     <button type="button" className="lux-cta min-h-11 w-full sm:w-auto" onClick={() => apply({ type: 'decide', id: item.id, status: 'approved' }, 'Approved')}>Approve</button>
@@ -210,7 +212,7 @@ export function BotDesk({
       )}
       {section === 'digest' && (
         <Section title="Digest preview" lede="Today’s briefing from the venue desk.">
-          <pre className="whitespace-pre-wrap rounded-xl border border-black/10 bg-[var(--dashboard-background)] p-4 font-sans text-sm leading-relaxed">{digest}</pre>
+          <pre className="whitespace-pre-wrap border border-black/10 bg-[var(--dashboard-background)] p-4 font-sans text-sm leading-relaxed">{digest}</pre>
         </Section>
       )}
       {section === 'guardrails' && (
@@ -239,7 +241,7 @@ export function BotDesk({
           <DiffView left={state.versions.find((version) => version.id === leftVersion)?.body || ''} right={state.versions.find((version) => version.id === rightVersion)?.body || ''} />
           <div className="mt-4 space-y-2">
             {state.versions.map((version) => (
-              <div key={version.id} className="flex flex-col gap-2 rounded-xl border border-black/10 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div key={version.id} className="flex flex-col gap-2 border border-black/10 p-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm">{version.promptId} v{version.version} · {version.note}</p>
                 <button type="button" className="lux-cta-ghost min-h-11 w-full sm:w-auto" onClick={() => apply({ type: 'rollback', versionId: version.id, at: new Date().toISOString() }, `Rolled back to v${version.version}`)}>
                   Roll back
@@ -310,10 +312,10 @@ export function BotDesk({
 
 function Section({ title, lede, children }: { title: string; lede: string; children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-[var(--dashboard-border)] bg-white p-4 sm:p-6">
-      <h2 className="font-serif text-3xl">{title}</h2>
-      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[var(--dashboard-text-muted)]">{lede}</p>
-      <div className="mt-5">{children}</div>
+    <section>
+      <h2 className="font-serif text-[1.85rem] leading-tight tracking-[-0.01em]">{title}</h2>
+      <p className="mt-1 max-w-[65ch] text-sm leading-relaxed text-[var(--dashboard-text-muted)]">{lede}</p>
+      <div className="mt-5 border-t border-[var(--dashboard-border)] pt-5">{children}</div>
     </section>
   )
 }
@@ -327,8 +329,8 @@ function KeysSection({ state, onApply }: { state: BotDeskState; onApply: (action
   return (
     <Section title="Access keys" lede="Each bot gets its own token. The full value is shown once. What is stored is a hash. Revoke cuts it off.">
       {state.revealedKey && (
-        <div className="mb-4 rounded-xl border border-black/10 bg-[var(--dashboard-background)] p-4">
-          <p className="text-[11px] uppercase tracking-[0.16em]">Shown once</p>
+        <div className="mb-4 border border-black/10 bg-[var(--dashboard-background)] p-4">
+          <p className="text-xs font-medium">Shown once</p>
           <p className="mt-2 break-all font-mono text-sm">{state.revealedKey.rawKey}</p>
           <button type="button" className="lux-cta mt-3 min-h-11 w-full sm:w-auto" onClick={() => onApply({ type: 'dismiss-key' }, 'Key hidden')}>
             I have copied it
@@ -392,7 +394,7 @@ function KeysSection({ state, onApply }: { state: BotDeskState; onApply: (action
               <p className="mt-1 text-sm text-[var(--dashboard-text-muted)]">{key.scopes.join(' · ')}</p>
               <p className="mt-1 text-sm">Last used {key.lastUsedAt ? key.lastUsedAt.slice(0, 16).replace('T', ' ') : 'never'}</p>
               {key.revokedAt ? (
-                <p className="mt-2 text-[11px] uppercase tracking-[0.16em]">Revoked</p>
+                <p className="mt-2 inline-block border border-[var(--dashboard-border)] px-2 py-0.5 text-xs font-medium capitalize">Revoked</p>
               ) : (
                 <button type="button" className="lux-cta-ghost mt-3 min-h-11 w-full sm:w-auto" onClick={() => onApply({ type: 'revoke-key', id: key.id, at: new Date().toISOString() }, 'Key revoked')}>
                   Revoke
@@ -498,7 +500,7 @@ function GuardrailSection({ guardrails, onSave }: { guardrails: Guardrails; onSa
 function DiffView({ left, right }: { left: string; right: string }) {
   const lines = useMemo(() => diffLines(left, right).slice(0, 40), [left, right])
   return (
-    <pre className="mt-4 max-h-80 overflow-auto whitespace-pre-wrap rounded-xl border border-black/10 bg-[var(--dashboard-background)] p-4 font-sans text-sm leading-relaxed">
+    <pre className="mt-4 max-h-80 overflow-auto whitespace-pre-wrap border border-black/10 bg-[var(--dashboard-background)] p-4 font-sans text-sm leading-relaxed">
       {lines.map((line, index) => (
         <div key={`${line.kind}-${index}`}>{line.kind === 'add' ? '+ ' : line.kind === 'del' ? '− ' : '  '}{line.text}</div>
       ))}

@@ -116,7 +116,7 @@ export function AddCatalogItemToBag({ bagId, onSuccess }: AddCatalogItemToBagPro
                             </div>
                         ) : products.length > 0 ? (
                             products.map((product) => (
-                                <div key={product.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-gold/30 hover:bg-gold/5 transition-all group">
+                                <div key={product.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-gold/30 hover:bg-gold/5 transition-[color,background-color,border-color,box-shadow,opacity,transform] group">
                                     <div className="flex items-center gap-4">
                                         {product.image_url ? (
                                             <img src={product.image_url} alt="" className="w-12 h-12 rounded-xl object-cover shadow-lg" />
@@ -133,7 +133,7 @@ export function AddCatalogItemToBag({ bagId, onSuccess }: AddCatalogItemToBagPro
                                     <Button
                                         size="sm"
                                         variant="ghost"
-                                        className="rounded-xl h-10 w-10 p-0 hover:bg-gold hover:text-black transition-all"
+                                        className="rounded-xl h-10 w-10 p-0 hover:bg-gold hover:text-black transition-[color,background-color,border-color,box-shadow,opacity,transform]"
                                         onClick={() => addToBag(product.id)}
                                         disabled={adding === product.id}
                                     >

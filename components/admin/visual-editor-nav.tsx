@@ -25,7 +25,7 @@ export function VisualEditorNav({ activePage, onPageChange, onNavigateToLanding 
     const currentPage = VISUAL_EDITOR_PAGES.find((p) => p.id === activePage)
 
     return (
-        <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[var(--dashboard-border)] bg-[var(--dashboard-glass-bg)] px-4 backdrop-blur-md md:px-6">
+        <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[var(--dashboard-border)] bg-[var(--dashboard-glass-bg)] px-4 md:px-6">
             <div className="flex min-w-0 items-center gap-3">
                 <Button
                     type="button"

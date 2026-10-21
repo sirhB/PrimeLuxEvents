@@ -37,7 +37,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-full items-center justify-between gap-2 rounded-[var(--radius)] border px-4 py-2 text-sm whitespace-nowrap shadow-sm transition-all duration-300",
+        "flex w-full items-center justify-between gap-2 rounded-[var(--radius)] border px-4 py-2 text-sm whitespace-nowrap shadow-sm transition-[color,background-color,border-color,box-shadow] duration-150",
         "border-border bg-muted/30 text-foreground",
         "data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground",
         "focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none",

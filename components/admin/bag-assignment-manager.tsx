@@ -144,7 +144,7 @@ export function BagAssignmentManager({ orderId, orderItems }: BagAssignmentManag
                                                         key={bag.id}
                                                         disabled={isSaving}
                                                         onClick={() => assignToBag(item.id, bag.id)}
-                                                        className="h-10 rounded-lg border border-gray-200 flex items-center justify-center text-[10px] font-bold hover:bg-black hover:text-white transition-all disabled:opacity-50"
+                                                        className="h-10 rounded-lg border border-gray-200 flex items-center justify-center text-[10px] font-bold hover:bg-black hover:text-white transition-[color,background-color,border-color,box-shadow,opacity,transform] disabled:opacity-50"
                                                         style={{ color: bag.color.toLowerCase() === 'white' ? 'black' : bag.color.toLowerCase() }}
                                                     >
                                                         {bag.number}

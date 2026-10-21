@@ -61,7 +61,7 @@ function StageCell({ label, stage }: { label: string; stage: StageStatus }) {
       <div className="h-1.5 overflow-hidden rounded-full bg-[var(--dashboard-border)]">
         <div
           className={cn(
-            'h-full rounded-full transition-all',
+            'h-full rounded-full transition-[color,background-color,border-color,box-shadow,opacity,transform]',
             stage.status === 'completed'
               ? 'bg-[var(--dashboard-accent-green)]'
               : stage.status === 'in_progress'

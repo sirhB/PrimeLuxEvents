@@ -104,7 +104,7 @@ export function PortfolioImageUpload({
                 {(multiple || value.length === 0) && (
                     <div
                         onClick={() => fileInputRef.current?.click()}
-                        className="w-40 h-40 rounded-xl border-2 border-dashed border-[var(--dashboard-border)] flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-[var(--dashboard-accent-gold)]/50 hover:bg-[var(--dashboard-accent-gold)]/5 transition-all group"
+                        className="w-40 h-40 rounded-xl border-2 border-dashed border-[var(--dashboard-border)] flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-[var(--dashboard-accent-gold)]/50 hover:bg-[var(--dashboard-accent-gold)]/5 transition-[color,background-color,border-color,box-shadow,opacity,transform] group"
                     >
                         {uploading ? (
                             <Loader2 className="h-8 w-8 animate-spin text-[var(--dashboard-accent-gold)]" />

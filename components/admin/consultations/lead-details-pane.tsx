@@ -114,17 +114,17 @@ export function LeadDetailsPane({ lead, onBack }: LeadDetailsPaneProps) {
 
                     <div className="flex items-center gap-2">
                         {lead.customer_phone && (
-                            <Button variant="outline" className="h-12 w-12 rounded-2xl border-white/10 bg-white/5 hover:bg-[var(--dashboard-accent-gold)] hover:text-black transition-all hover:border-[var(--dashboard-accent-gold)]" asChild>
+                            <Button variant="outline" className="h-12 w-12 rounded-2xl border-white/10 bg-white/5 hover:bg-[var(--dashboard-accent-gold)] hover:text-black transition-[color,background-color,border-color,box-shadow,opacity,transform] hover:border-[var(--dashboard-accent-gold)]" asChild>
                                 <a href={`tel:${lead.customer_phone}`}><Phone className="h-5 w-5" /></a>
                             </Button>
                         )}
                         {lead.customer_email && (
-                            <Button variant="outline" className="h-12 w-12 rounded-2xl border-white/10 bg-white/5 hover:bg-[var(--dashboard-accent-gold)] hover:text-black transition-all hover:border-[var(--dashboard-accent-gold)]" asChild>
+                            <Button variant="outline" className="h-12 w-12 rounded-2xl border-white/10 bg-white/5 hover:bg-[var(--dashboard-accent-gold)] hover:text-black transition-[color,background-color,border-color,box-shadow,opacity,transform] hover:border-[var(--dashboard-accent-gold)]" asChild>
                                 <a href={`mailto:${lead.customer_email}`}><Mail className="h-5 w-5" /></a>
                             </Button>
                         )}
                         <div className="flex items-center gap-3">
-                            <Button asChild className="h-12 px-6 rounded-2xl bg-[var(--dashboard-accent-gold)] text-black font-bold hover:bg-[var(--dashboard-accent-gold)]/90 shadow-lg shadow-[var(--dashboard-accent-gold)]/20 transition-all hover:scale-[1.02]">
+                            <Button asChild className="h-12 px-6 rounded-2xl bg-[var(--dashboard-accent-gold)] text-black font-bold hover:bg-[var(--dashboard-accent-gold)]/90 shadow-lg shadow-[var(--dashboard-accent-gold)]/20 transition-[color,background-color,border-color,box-shadow,opacity,transform]">
                                 <Link href={`/admin/orders/new?leadId=${lead.id}`}>
                                     Generate Quote
                                 </Link>
@@ -197,7 +197,7 @@ export function LeadDetailsPane({ lead, onBack }: LeadDetailsPaneProps) {
                                             {/* Timeline dot */}
                                             <div className="absolute -left-[29px] top-1.5 h-3 w-3 rounded-full bg-black border-2 border-[var(--dashboard-accent-gold)] z-10 shadow-[0_0_8px_rgba(212,175,55,0.4)]" />
 
-                                            <div className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 transition-all duration-300 group-hover:translate-x-1">
+                                            <div className="bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-4 transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 group-hover:translate-x-1">
                                                 <div className="flex items-center justify-between mb-2">
                                                     <Badge variant="outline" className="bg-black/20 text-[10px] uppercase font-bold tracking-wider text-[var(--dashboard-accent-gold)] border-[var(--dashboard-accent-gold)]/20 px-2">
                                                         {item.type.replace('_', ' ')}
@@ -279,7 +279,7 @@ export function LeadDetailsPane({ lead, onBack }: LeadDetailsPaneProps) {
                                 value={internalNote}
                                 onChange={(e) => setInternalNote(e.target.value)}
                                 placeholder="Add private staff notes, internal context, or reminders here..."
-                                className="w-full bg-black/20 border border-white/5 rounded-2xl p-4 text-sm text-white/80 placeholder:text-white/10 min-h-[120px] focus:ring-1 focus:ring-amber-500/30 focus:border-amber-500/30 transition-all resize-none font-sans"
+                                className="w-full bg-black/20 border border-white/5 rounded-2xl p-4 text-sm text-white/80 placeholder:text-white/10 min-h-[120px] focus:ring-1 focus:ring-amber-500/30 focus:border-amber-500/30 transition-[color,background-color,border-color,box-shadow,opacity,transform] resize-none font-sans"
                             />
                         </div>
 

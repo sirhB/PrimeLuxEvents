@@ -55,7 +55,7 @@ export function AlertsCard() {
             <CardContent className="pt-6">
                 <div className="space-y-3">
                     {alerts.map((alert) => (
-                        <div key={alert.id} className="group flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 transition-all duration-300 border border-transparent hover:border-gray-100 cursor-pointer">
+                        <div key={alert.id} className="group flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 transition-[color,background-color,border-color,box-shadow,opacity,transform] duration-200 border border-transparent hover:border-gray-100 cursor-pointer">
                             <div className={cn(
                                 "flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center",
                                 alert.bgColor,

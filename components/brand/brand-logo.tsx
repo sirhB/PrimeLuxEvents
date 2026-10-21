@@ -34,7 +34,7 @@ export function BrandMonogram({ className }: { className?: string }) {
       aria-hidden="true"
       className={cn('h-11 w-auto text-[var(--brand-gold,var(--theme-accent))]', className)}
     >
-      <g transform="translate(0 1) scale(0.514)" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <g transform="translate(0 1) scale(0.514)" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
         <path d="M30.2 33.2 C38 46 50 44 56 34 C60 26 63 14 67.2 9.4" />
         <path d="M72.8 9.4 C77 14 80 26 84 34 C90 44 102 46 109.8 33.2" />
         <path d="M38 50 Q70 43.5 102 50" />
@@ -49,7 +49,7 @@ export function BrandMonogram({ className }: { className?: string }) {
         x="18"
         y="82"
         fill="currentColor"
-        fontSize="34"
+        fontSize="36" fontWeight="600"
         className="font-serif"
       >
         P
@@ -58,7 +58,7 @@ export function BrandMonogram({ className }: { className?: string }) {
         x="36"
         y="82"
         fill="currentColor"
-        fontSize="34"
+        fontSize="36" fontWeight="600"
         className="font-serif"
       >
         L

@@ -55,11 +55,6 @@ export function AdminPageHeader({
             ))}
           </nav>
         )}
-        {eyebrow && (
-          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--dashboard-accent-gold)]">
-            {eyebrow}
-          </p>
-        )}
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight text-[var(--dashboard-text)] sm:text-[2rem]">
             {title}
