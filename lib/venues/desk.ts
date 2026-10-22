@@ -1,4 +1,7 @@
 import { VENUE_LISTINGS } from './directory'
+import { DEFAULT_ABANDON_DAYS, parseAbandonDays } from './abandon'
+
+export { DEFAULT_ABANDON_DAYS, parseAbandonDays }
 
 export const PIPELINE_STAGES = [
   { id: 'inquiry', label: 'Inquiry' },
@@ -122,6 +125,8 @@ export type DeskWorkspace = {
   contracts: Contract[]
   payments: Payment[]
   reminders: Reminder[]
+  /** Admin setting `crm_cart_abandon_days` (default 3). */
+  abandon_days?: number
   tasks: StaffTask[]
   templates: TaskTemplate[]
   views: SavedView[]
@@ -699,7 +704,7 @@ export function contactName(desk: DeskWorkspace, contactId: string) {
 
 export type CartFilter = 'all' | 'has_cart' | 'open' | 'abandoned' | 'checked_out' | 'none'
 
-export function leadCartStatus(desk: DeskWorkspace, leadId: string, now = Date.now(), abandonDays = 3): Exclude<CartFilter, 'all' | 'has_cart'> | 'empty' {
+export function leadCartStatus(desk: DeskWorkspace, leadId: string, now = Date.now(), abandonDays = desk.abandon_days ?? DEFAULT_ABANDON_DAYS): Exclude<CartFilter, 'all' | 'has_cart'> | 'empty' {
   const cart = desk.carts?.find((item) => item.lead_id === leadId)
   if (!cart) return 'none'
   if (cart.checked_out_at) return 'checked_out'
@@ -711,7 +716,7 @@ export function filterLeads(desk: DeskWorkspace, view: Pick<SavedView, 'stage' |
   const query = view.query.trim().toLowerCase()
   return desk.leads.filter((lead) => {
     if (view.cart && view.cart !== 'all') {
-      const status = leadCartStatus(desk, lead.id, Date.now(), view.abandonDays ?? 3)
+      const status = leadCartStatus(desk, lead.id, Date.now(), view.abandonDays ?? desk.abandon_days ?? DEFAULT_ABANDON_DAYS)
       if (view.cart === 'has_cart' ? status === 'none' || status === 'empty' : status !== view.cart) return false
     }
     if (view.stage !== 'all' && lead.stage !== view.stage) return false

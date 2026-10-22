@@ -55,6 +55,15 @@ export async function loadVenue(slug: string): Promise<VenueListing | null> {
 
 export type DayStatus = { day: string; status: 'open' | 'held' | 'booked' }
 
+/** Overlay RPC rows on the open grid. Unknown statuses stay open. */
+export function mergeDayStatus(list: DayStatus[], rows: Array<{ day: string; status: string }>): DayStatus[] {
+  const map = new Map(rows.map((row) => [String(row.day).slice(0, 10), String(row.status)]))
+  return list.map((d) => {
+    const s = map.get(d.day)
+    return s === 'booked' ? { ...d, status: 'booked' } : s === 'held' ? { ...d, status: 'held' } : d
+  })
+}
+
 /** Next `days` days for a venue. Missing rows are open; bookings/holds come from the venue CRM. */
 export async function loadVenueAvailability(venueId: string, days = 42): Promise<DayStatus[]> {
   const start = new Date()
@@ -66,17 +75,14 @@ export async function loadVenueAvailability(venueId: string, days = 42): Promise
   })
   try {
     const supabase = await createClient()
-    const { data } = await supabase
-      .from('venue_availability')
-      .select('day, status')
-      .eq('venue_id', venueId)
-      .gte('day', list[0].day)
-      .lte('day', list[list.length - 1].day)
-    const map = new Map((data || []).map((row) => [row.day as string, String(row.status)]))
-    return list.map((d) => {
-      const s = map.get(d.day)
-      return s === 'booked' || s === 'blocked' ? { ...d, status: 'booked' } : s === 'held' || s === 'hold' ? { ...d, status: 'held' } : d
+    // Status-only RPC: combines staff blocks with CRM holds/bookings; never returns lead data.
+    const { data, error } = await supabase.rpc('venue_day_status', {
+      p_venue_id: venueId,
+      p_from: list[0].day,
+      p_to: list[list.length - 1].day,
     })
+    if (error) return list
+    return mergeDayStatus(list, (data || []) as Array<{ day: string; status: string }>)
   } catch {
     return list
   }

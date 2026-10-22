@@ -100,6 +100,13 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         keywords: ['venue', 'crm', 'tours', 'bookings', 'rooms'],
       },
       {
+        icon: Landmark,
+        label: 'Room availability',
+        href: '/admin/venue/availability',
+        permission: 'venues.view',
+        keywords: ['availability', 'block', 'calendar', 'dates', 'hold'],
+      },
+      {
         icon: NotebookPen,
         label: 'Event plans',
         href: '/admin/event-plans',

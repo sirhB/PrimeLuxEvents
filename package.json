@@ -14,7 +14,8 @@
     "test:security": "node --experimental-strip-types scripts/check-safe-path.mjs && node --experimental-strip-types scripts/check-bot-control.mjs",
     "seed:new-db": "node scripts/seed-new-database.mjs",
     "bootstrap:super-admin": "node scripts/bootstrap-super-admin.mjs",
-    "create:admin": "node scripts/create-admin.mjs"
+    "create:admin": "node scripts/create-admin.mjs",
+    "test:admin-gaps": "node --experimental-strip-types scripts/check-admin-gaps.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
