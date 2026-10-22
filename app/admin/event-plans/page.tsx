@@ -10,7 +10,7 @@ const SAMPLE: EventPlanRow[] = [
     event_type: 'Wedding',
     event_date: '2026-11-14',
     guest_count: 140,
-    venue_name: 'The Conservatory',
+    venue_name: 'Prime Lux Pavilion',
     services: ['Planning', 'Florals'],
     rentals: ['Seating', 'Lighting'],
     budget_range: '$15,000–$30,000',

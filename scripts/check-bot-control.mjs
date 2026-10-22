@@ -84,8 +84,8 @@ const digest = renderDigest({
   timezone: 'America/New_York',
   leads: [{ name: 'Jordan Hale', stage: 'inquiry', createdAt: '2026-10-15T15:00:00Z' }],
   stageMoves: [{ name: 'Jordan Hale', from: 'inquiry', to: 'tour', at: '2026-10-15T15:00:00Z' }],
-  tours: [{ name: 'Avery Cole', venue: 'The Conservatory', startsAt: '2026-10-18T18:00:00Z' }],
-  events: [{ name: 'Avery Cole', venue: 'The Conservatory', eventDate: '2026-11-14' }],
+  tours: [{ name: 'Avery Cole', venue: 'Prime Lux Pavilion', startsAt: '2026-10-18T18:00:00Z' }],
+  events: [{ name: 'Avery Cole', venue: 'Prime Lux Pavilion', eventDate: '2026-11-14' }],
   deposits: [{ name: 'Avery Cole', status: 'due', amountCents: 800_000, dueOn: '2026-10-25' }],
   tasks: [{ title: 'Prep the room', assignee: 'Mara Quinn', dueOn: '2026-10-13', status: 'pending' }],
   clientActivity: [{ name: 'Avery Cole', body: 'Updated the guest count to 140.', at: '2026-10-14T16:00:00Z' }],
@@ -128,10 +128,10 @@ const voiceSnapshot = {
     { id: 't2', title: 'Prep the room', assignee: 'Mara Quinn', dueOn: '2026-10-13', status: 'pending' },
   ],
   leads: [
-    { name: 'Jordan Hale', stage: 'inquiry', eventDate: '2026-12-04', venue: 'The Gallery' },
-    { name: 'Avery Cole', stage: 'tour', eventDate: '2026-11-14', venue: 'The Conservatory' },
+    { name: 'Jordan Hale', stage: 'inquiry', eventDate: '2026-12-04', venue: 'Prime Lux Pavilion' },
+    { name: 'Avery Cole', stage: 'tour', eventDate: '2026-11-14', venue: 'Prime Lux Pavilion' },
   ],
-  tours: [{ name: 'Avery Cole', venue: 'The Conservatory', startsAt: '2026-10-18T18:00:00.000Z' }],
+  tours: [{ name: 'Avery Cole', venue: 'Prime Lux Pavilion', startsAt: '2026-10-18T18:00:00.000Z' }],
 }
 const voiceOpen = {
   scopes: ['leads:read', 'tasks:read', 'tasks:write'],
@@ -163,7 +163,7 @@ assert.match(leads, /Jordan Hale/)
 assert.doesNotMatch(leads, /Avery Cole/)
 const status = answerVoice(parseVoiceIntent('status of Avery'), voiceSnapshot, { effect: 'allow' })
 assert.match(status, /tour/)
-assert.match(status, /Conservatory/)
+assert.match(status, /Pavilion/)
 
 const addAction = actionForIntent(parseVoiceIntent('add a task call the florist'))
 assert.equal(addAction, 'tasks.create')

@@ -33,7 +33,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  /** Retired Preferred Partner portal -> planner membership experience. */
+  /** Retired Preferred Partner portal -> planner membership; old rooms -> single Pavilion. */
   async redirects() {
     return [
       { source: "/partners", destination: "/planners/membership", permanent: true },
@@ -44,6 +44,11 @@ const nextConfig = {
       { source: "/account/partner/branding", destination: "/account/planner/invoices", permanent: true },
       { source: "/account/partner/carts", destination: "/account/planner/carts", permanent: true },
       { source: "/account/partner/carts/:id", destination: "/account/planner/carts", permanent: true },
+      ...['the-conservatory', 'the-gallery', 'the-garden-court'].map((slug) => ({
+        source: `/venues/${slug}`,
+        destination: '/venues/prime-lux-pavilion',
+        permanent: true,
+      })),
     ]
   },
   async headers() {

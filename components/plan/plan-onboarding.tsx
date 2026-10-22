@@ -152,7 +152,7 @@ export function PlanOnboarding({ venues = VENUE_LISTINGS, initial, prefill, edit
                       return (
                         <button key={v.id} type="button" aria-pressed={on} className={cn('plan-ob-option', on && 'is-on')}
                           onClick={() => patch({ location_choice: 'primelux', venue_id: v.id })}>
-                          <span>{v.name}</span><small>Up to {v.capacity}</small>
+                          <span>{venues.length === 1 ? `At ${v.name}` : v.name}</span><small>Up to {v.capacity}</small>
                         </button>
                       )
                     })}

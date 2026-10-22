@@ -5,10 +5,10 @@ import { MotionConfig, motion, useReducedMotion, useScroll, useSpring } from 'fr
 import { useCart } from '@/components/providers/cart-provider'
 
 const STEPS = [
-  { n: '01', title: 'Plan your event', line: 'Six quick questions — date, guests, place. A planner sees it the same day.' },
-  { n: '02', title: 'Reserve', line: 'Build the cart, confirm the pieces, and hold them for your date.' },
-  { n: '03', title: 'Delivered & styled', line: 'Our crew brings everything and sets the room the way it was drawn.' },
-  { n: '04', title: 'Picked up', line: 'After the last glass, we pack it out. You go home.' },
+  { n: '01', title: 'Plan your event', line: 'Answer six short questions about your date, your guests, and where it is. Someone on our team reads it the same day.' },
+  { n: '02', title: 'Reserve', line: 'Pick your pieces, look them over, and we hold them for your date.' },
+  { n: '03', title: 'Delivered & styled', line: 'Our crew brings it all out and sets up the room the way you planned it.' },
+  { n: '04', title: 'Picked up', line: 'When the night is over, we come back and pack it up. You just go home.' },
 ]
 
 /**
@@ -27,7 +27,7 @@ export function HowItWorks() {
     <MotionConfig reducedMotion="user">
       <section ref={ref} className="hiw" aria-labelledby="hiw-title">
         <p className="lux-label">How it works</p>
-        <h2 id="hiw-title" className="hiw-title">Four steps. We carry the rest.</h2>
+        <h2 id="hiw-title" className="hiw-title">Four steps, and we do the heavy lifting.</h2>
         <div className="hiw-wrap">
           <div className="hiw-rail" aria-hidden="true">
             <motion.span className="hiw-line" style={reduce ? undefined : { scaleY: draw }} />
