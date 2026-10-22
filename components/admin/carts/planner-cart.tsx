@@ -1,5 +1,6 @@
 'use client'
 
+import { ConvertCartToInvoice } from '@/components/invoices/convert-cart'
 import { useMemo, useState, useTransition } from 'react'
 import { Minus, Plus, Search, StickyNote, Trash2, X } from 'lucide-react'
 import { Presence } from '@/components/motion/presence'
@@ -148,6 +149,8 @@ export function PlannerCart({ cart, ctx, demo = false }: { cart: CartView; ctx: 
         <PaymentStep cartId={cart.id} totalCents={pricing.totalCents} paidCents={cart.paidCents} limits={ctx.limits} links={cart.payments}
           enabled={status === 'approved' && ctx.stripeConfigured} connect={ctx.connect} demo={demo} onFlash={setFlash} />
       )}
+
+      {(status === 'draft' || status === 'shared' || status === 'approved') && cart.paidCents === 0 && <ConvertCartToInvoice cartId={cart.id} demo={demo} />}
 
       <Summary p={pricing} />
 

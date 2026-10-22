@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import { userHasPermission } from '@/lib/auth/permission-catalog'
-import {
+import { ReceiptText,
   LayoutDashboard,
   ClipboardCheck,
   TrendingUp,
@@ -120,6 +120,12 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         label: 'Client carts',
         href: '/admin/carts',
         keywords: ['cart', 'quote', 'client', 'planner', 'markup'],
+      },
+      {
+        icon: ReceiptText,
+        label: 'Invoices',
+        href: '/admin/invoices',
+        keywords: ['invoice', 'bill', 'client', 'planner', 'stripe', 'deposit'],
       },
       {
         icon: ClipboardCheck,

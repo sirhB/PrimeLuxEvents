@@ -22,6 +22,8 @@ const STATE_TONE: Record<string, string> = {
   approved: 'text-[var(--dashboard-accent-green)] border-[color-mix(in_srgb,var(--dashboard-accent-green)_35%,transparent)]',
   ordered: 'text-[var(--dashboard-accent-green)] border-[color-mix(in_srgb,var(--dashboard-accent-green)_35%,transparent)]',
   shared: 'text-[var(--dashboard-accent-blue)] border-[color-mix(in_srgb,var(--dashboard-accent-blue)_35%,transparent)]',
+  overdue: 'text-[var(--dashboard-accent-red)] border-[color-mix(in_srgb,var(--dashboard-accent-red)_35%,transparent)]',
+  open: 'text-[var(--dashboard-accent-blue)] border-[color-mix(in_srgb,var(--dashboard-accent-blue)_35%,transparent)]',
   reversed: 'text-[var(--dashboard-accent-red)] border-[color-mix(in_srgb,var(--dashboard-accent-red)_35%,transparent)]',
 }
 

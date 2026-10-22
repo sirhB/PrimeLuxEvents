@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict'
 import { markupPct, memberCost, planPayments, priceCart, priceLine, splitEven } from '../lib/carts/pricing.ts'
 import { allocateFees, feeRefundCents, paymentSplit, primeLuxFeeCents } from '../lib/carts/split.ts'
+import { displayStatus, invoiceAllowed, priceInvoice } from '../lib/invoices/math.ts'
 import { canSubscribe, isActiveMember, isEligible, nextMembershipState } from '../lib/membership/policy.ts'
 
 let n = 0
@@ -174,6 +175,52 @@ t('split: client paid, Prime Lux fee, planner net after Stripe fee and refunds',
   assert.deepEqual(paymentSplit({ amountCents: 100000, applicationFeeCents: 40000, stripeFeeCents: 2930, refundedCents: 50000, feeRefundedCents: 20000 }),
     { clientPaidCents: 50000, primeLuxFeeCents: 20000, stripeFeeCents: 2930, plannerNetCents: 27070 })
   assert.equal(paymentSplit({ amountCents: 100, applicationFeeCents: 10, stripeFeeCents: null }).plannerNetCents, null)
+})
+
+// --- Invoicing ---
+t('invoice fee: mixed catalog + custom; fee covers catalog only', () => {
+  const cat = [{ listUnitCents: 2000, setupFeeCents: 200, quantity: 10, eligible: true, markupBps: 10000 }]
+  const custom = [{ unitCents: 250000, quantity: 1, taxable: false }, { unitCents: 10000, quantity: 3, taxable: true }]
+  const p = priceInvoice(cat, custom, member, { deliveryFeeCents: 5000, taxRate: 0.1 })
+  // catalog: cost 10000, client 20000, setup 2000, delivery 5000, tax 2200 -> 29200; fee 18200
+  assert.equal(p.primeLuxFeeCents, 18200)
+  assert.equal(p.customSubtotalCents, 280000)
+  assert.equal(p.taxCents, 2200 + 3000)
+  assert.equal(p.totalCents, 29200 + 280000 + 3000)
+  assert.equal(p.plannerGrossCents, p.totalCents - 18200)
+  // Fee is identical to the same catalog lines invoiced alone.
+  assert.equal(priceInvoice(cat, [], member, { deliveryFeeCents: 5000, taxRate: 0.1 }).primeLuxFeeCents, 18200)
+})
+t('invoice fee: custom-only invoice carries no Prime Lux fee or delivery', () => {
+  const p = priceInvoice([], [{ unitCents: 150000, quantity: 1, taxable: true }], member, { deliveryFeeCents: 5000, taxRate: 0.1 })
+  assert.equal(p.primeLuxFeeCents, 0)
+  assert.equal(p.deliveryFeeCents, 0)
+  assert.equal(p.totalCents, 165000)
+})
+t('invoice fee: installments split the catalog fee exactly', () => {
+  const p = priceInvoice([{ listUnitCents: 33333, quantity: 7, eligible: true, markupBps: 3000 }], [{ unitCents: 99999, quantity: 1, taxable: false }], member, { taxRate: 0.08875 })
+  const plan = planPayments({ totalCents: p.totalCents, mode: 'deposit', depositBps: 2500 })
+  const fees = allocateFees(plan.payments.map((x) => x.amountCents), p.primeLuxFeeCents, p.totalCents)
+  assert.equal(fees.reduce((a, b) => a + b, 0), p.primeLuxFeeCents)
+})
+t('invoice gating: only active, unbanned members create/edit/send', () => {
+  for (const a of ['create', 'edit', 'send']) {
+    assert.equal(invoiceAllowed(a, { status: 'active', banned: false }), true)
+    for (const st of ['none', 'incomplete', 'past_due', 'canceled', 'terminated']) assert.equal(invoiceAllowed(a, { status: st, banned: false }), false, `${a}/${st}`)
+    assert.equal(invoiceAllowed(a, { status: 'active', banned: true }), false)
+  }
+})
+t('invoice gating: open invoices stay payable after membership ends', () => {
+  for (const st of ['canceled', 'terminated', 'past_due']) {
+    assert.equal(invoiceAllowed('pay', { status: st, banned: true }), true)
+    assert.equal(invoiceAllowed('view', { status: st, banned: false }), true)
+  }
+})
+t('invoice status: overdue is open past due date', () => {
+  assert.equal(displayStatus('open', '2026-10-01', '2026-10-22'), 'overdue')
+  assert.equal(displayStatus('open', '2026-10-30', '2026-10-22'), 'open')
+  assert.equal(displayStatus('paid', '2026-10-01', '2026-10-22'), 'paid')
+  assert.equal(displayStatus('draft', null, '2026-10-22'), 'draft')
 })
 
 console.log(`check-carts: ${n} checks passed`)

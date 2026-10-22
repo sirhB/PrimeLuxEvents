@@ -14,7 +14,7 @@ export const MEMBERSHIP_POLICIES = [
   { title: 'Nonpayment means termination', body: 'If your monthly payment fails and isn’t resolved, your membership is terminated and you are permanently banned from rejoining.' },
   { title: 'Nonrefundable', body: 'Membership fees are nonrefundable.' },
   { title: 'No combining offers', body: 'The 50% member discount can’t be combined with any other offer, promo code, or discount.' },
-  { title: 'Book through Prime Lux', body: 'Every booking goes through Prime Lux. Your clients pay Prime Lux, and you keep your markup.' },
+  { title: 'Book through Prime Lux', body: 'Every rental booking goes through Prime Lux. Clients pay you through Prime Lux (Stripe), Prime Lux’s share is split out automatically, and you keep your markup.' },
 ] as const
 
 export type SubscribeCheck = { ok: true } | { ok: false; reason: 'banned' | 'already_member' | 'policies' }

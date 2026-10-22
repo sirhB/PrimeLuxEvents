@@ -363,3 +363,152 @@ DROP POLICY IF EXISTS planner_cart_payments_planner_read ON public.planner_cart_
 CREATE POLICY planner_cart_payments_planner_read ON public.planner_cart_payments
   FOR SELECT TO authenticated
   USING (EXISTS (SELECT 1 FROM public.planner_carts c WHERE c.id = cart_id AND c.planner_user_id = auth.uid()));
+
+-- ===========================================================================
+-- Planner invoicing (included with an active membership)
+-- Stripe Invoicing on the planner's connected account (direct). application_fee_amount
+-- covers only Prime Lux catalog lines (lib/invoices/math.ts). Custom-only invoices: no fee.
+-- ===========================================================================
+
+ALTER TABLE public.planner_connect_accounts
+  ADD COLUMN IF NOT EXISTS business_name text,
+  ADD COLUMN IF NOT EXISTS logo_file_id text;     -- Stripe file on the connected account
+
+CREATE TABLE IF NOT EXISTS public.planner_clients (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  planner_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name text NOT NULL CHECK (length(trim(name)) > 0),
+  email text NOT NULL CHECK (position('@' in email) > 1),
+  phone text,
+  company text,
+  lead_id uuid REFERENCES public.venue_leads(id) ON DELETE SET NULL,
+  stripe_customer_id text,                        -- cus_ on the planner's connected account
+  stripe_account_id text,
+  created_at timestamptz NOT NULL DEFAULT timezone('utc'::text, now()),
+  updated_at timestamptz NOT NULL DEFAULT timezone('utc'::text, now()),
+  UNIQUE (planner_user_id, email)
+);
+
+CREATE TABLE IF NOT EXISTS public.planner_invoices (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  planner_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE RESTRICT,
+  client_id uuid NOT NULL REFERENCES public.planner_clients(id) ON DELETE RESTRICT,
+  cart_id uuid REFERENCES public.planner_carts(id) ON DELETE SET NULL,  -- converted from a cart/quote
+  title text NOT NULL DEFAULT 'Invoice',
+  memo text,
+  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'open', 'paid', 'void', 'uncollectible')),
+  plan_mode text NOT NULL DEFAULT 'full' CHECK (plan_mode IN ('full', 'deposit', 'installments')),
+  deposit_bps integer CHECK (deposit_bps BETWEEN 100 AND 9900),
+  installments integer CHECK (installments BETWEEN 2 AND 12),
+  due_date date,
+  delivery_fee_cents bigint NOT NULL DEFAULT 0 CHECK (delivery_fee_cents >= 0),
+  tax_rate numeric(6, 5) NOT NULL DEFAULT 0.08875 CHECK (tax_rate >= 0 AND tax_rate < 1),
+  -- Server-computed snapshot
+  member_active_at_pricing boolean NOT NULL DEFAULT false,
+  total_cents bigint NOT NULL DEFAULT 0,
+  tax_cents bigint NOT NULL DEFAULT 0,
+  prime_lux_fee_cents bigint NOT NULL DEFAULT 0 CHECK (prime_lux_fee_cents >= 0),
+  paid_cents bigint NOT NULL DEFAULT 0,
+  stripe_account_id text,
+  -- Unguessable token for the public client pay page (/pay/invoice/[id]?t=...)
+  access_token text NOT NULL DEFAULT (replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', '')),
+  sent_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT timezone('utc'::text, now()),
+  updated_at timestamptz NOT NULL DEFAULT timezone('utc'::text, now())
+);
+CREATE INDEX IF NOT EXISTS planner_invoices_planner_idx ON public.planner_invoices (planner_user_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS public.planner_invoice_lines (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  invoice_id uuid NOT NULL REFERENCES public.planner_invoices(id) ON DELETE CASCADE,
+  position integer NOT NULL DEFAULT 0,
+  kind text NOT NULL CHECK (kind IN ('catalog', 'custom')),
+  product_id uuid REFERENCES public.products(id) ON DELETE SET NULL,  -- catalog only
+  name text NOT NULL,
+  description text,
+  quantity integer NOT NULL DEFAULT 1 CHECK (quantity BETWEEN 1 AND 100000),
+  list_unit_cents bigint NOT NULL DEFAULT 0,      -- catalog: site price
+  setup_fee_cents bigint NOT NULL DEFAULT 0,      -- catalog: Prime Lux setup
+  eligible boolean NOT NULL DEFAULT false,        -- catalog: member discount applies (server-set)
+  markup_bps integer CHECK (markup_bps BETWEEN 0 AND 100000),
+  unit_cents bigint NOT NULL DEFAULT 0 CHECK (unit_cents >= 0),  -- client unit price (server-computed for catalog)
+  taxable boolean NOT NULL DEFAULT true
+);
+
+-- One Stripe invoice per scheduled payment (full = one; deposit/installments = several, each
+-- with its own due date and its proportional share of the Prime Lux fee).
+CREATE TABLE IF NOT EXISTS public.planner_invoice_payments (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  invoice_id uuid NOT NULL REFERENCES public.planner_invoices(id) ON DELETE CASCADE,
+  position integer NOT NULL DEFAULT 0,
+  label text NOT NULL,
+  amount_cents bigint NOT NULL CHECK (amount_cents > 0),
+  application_fee_cents bigint NOT NULL DEFAULT 0 CHECK (application_fee_cents >= 0 AND application_fee_cents <= amount_cents),
+  due_date date,
+  stripe_invoice_id text UNIQUE,
+  number text,
+  hosted_invoice_url text,
+  invoice_pdf text,
+  status text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'open', 'paid', 'void', 'uncollectible')),
+  stripe_fee_cents bigint,
+  paid_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+ALTER TABLE public.planner_clients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.planner_invoices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.planner_invoice_lines ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.planner_invoice_payments ENABLE ROW LEVEL SECURITY;
+
+-- Admins: everything.
+DO $$
+DECLARE t text;
+BEGIN
+  FOREACH t IN ARRAY ARRAY['planner_clients', 'planner_invoices', 'planner_invoice_lines', 'planner_invoice_payments'] LOOP
+    EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', t || '_admin_all', t);
+    EXECUTE format('CREATE POLICY %I ON public.%I FOR ALL TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin())', t || '_admin_all', t);
+  END LOOP;
+END $$;
+
+-- Planners: read their own clients/invoices. All writes go through server actions
+-- (service role) so membership gating and server-side pricing can't be bypassed.
+DROP POLICY IF EXISTS planner_clients_own_select ON public.planner_clients;
+CREATE POLICY planner_clients_own_select ON public.planner_clients
+  FOR SELECT TO authenticated USING (planner_user_id = auth.uid());
+DROP POLICY IF EXISTS planner_invoices_own_select ON public.planner_invoices;
+CREATE POLICY planner_invoices_own_select ON public.planner_invoices
+  FOR SELECT TO authenticated USING (planner_user_id = auth.uid());
+DROP POLICY IF EXISTS planner_invoice_lines_own_select ON public.planner_invoice_lines;
+CREATE POLICY planner_invoice_lines_own_select ON public.planner_invoice_lines
+  FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.planner_invoices i WHERE i.id = invoice_id AND i.planner_user_id = auth.uid()));
+DROP POLICY IF EXISTS planner_invoice_payments_own_select ON public.planner_invoice_payments;
+CREATE POLICY planner_invoice_payments_own_select ON public.planner_invoice_payments
+  FOR SELECT TO authenticated
+  USING (EXISTS (SELECT 1 FROM public.planner_invoices i WHERE i.id = invoice_id AND i.planner_user_id = auth.uid()));
+
+-- Public client pay page: invoice id + access token. Returns client-safe fields only
+-- (no cost, markup, or Prime Lux fee). Drafts and voids are not shown.
+CREATE OR REPLACE FUNCTION public.public_invoice(p_id uuid, p_token text)
+RETURNS jsonb
+LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
+AS $$
+  SELECT jsonb_build_object(
+    'id', i.id, 'title', i.title, 'memo', i.memo, 'status', i.status, 'due_date', i.due_date,
+    'total_cents', i.total_cents, 'tax_cents', i.tax_cents, 'paid_cents', i.paid_cents,
+    'business_name', coalesce(ca.business_name, 'Your planner'),
+    'client_name', c.name,
+    'lines', coalesce((SELECT jsonb_agg(jsonb_build_object('name', l.name, 'description', l.description, 'quantity', l.quantity, 'unit_cents', l.unit_cents) ORDER BY l.position)
+              FROM public.planner_invoice_lines l WHERE l.invoice_id = i.id), '[]'::jsonb),
+    'delivery_fee_cents', i.delivery_fee_cents,
+    'setup_fee_cents', coalesce((SELECT sum(l.setup_fee_cents * l.quantity) FROM public.planner_invoice_lines l WHERE l.invoice_id = i.id AND l.kind = 'catalog'), 0),
+    'payments', coalesce((SELECT jsonb_agg(jsonb_build_object('label', p.label, 'amount_cents', p.amount_cents, 'due_date', p.due_date, 'status', p.status, 'number', p.number, 'url', p.hosted_invoice_url, 'pdf', p.invoice_pdf) ORDER BY p.position)
+              FROM public.planner_invoice_payments p WHERE p.invoice_id = i.id AND p.status <> 'void'), '[]'::jsonb)
+  )
+  FROM public.planner_invoices i
+  JOIN public.planner_clients c ON c.id = i.client_id
+  LEFT JOIN public.planner_connect_accounts ca ON ca.planner_user_id = i.planner_user_id
+  WHERE i.id = p_id AND i.access_token = p_token AND i.status IN ('open', 'paid', 'uncollectible');
+$$;
+REVOKE ALL ON FUNCTION public.public_invoice(uuid, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.public_invoice(uuid, text) TO anon, authenticated;

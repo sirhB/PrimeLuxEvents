@@ -10,7 +10,7 @@
  *   Line discounts (admin-capped) only apply to lines WITHOUT the member discount (no stacking),
  *   and never take the client price below cost.
  * Cart: tax on client merchandise + setup (not delivery), like the site checkout.
- * Margin = client merchandise - planner cost. That's what Prime Lux owes the planner once paid.
+ * Margin = client merchandise - planner cost: the planner's markup (kept via the Connect split).
  */
 
 export type PricingLineInput = {

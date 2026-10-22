@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { requireStripe } from '@/lib/stripe'
 import { recordCartPayment, refreshCartAfterPayment } from '@/lib/carts/fulfill'
 import { syncConnectAccount } from './server'
+import { syncInvoiceFromStripe } from '@/lib/invoices/sync'
 
 type Db = SupabaseClient
 const idOf = (v: unknown): string | null => (typeof v === 'string' ? v : (v as { id?: string } | null)?.id ?? null)
@@ -75,6 +76,17 @@ function route(event: Stripe.Event, db: Db): null | (() => Promise<void>) {
         await db.from('planner_cart_payments').update({ dispute_status: status }).eq('id', p.id)
       }
     }
+    case 'invoice.finalized':
+    case 'invoice.sent':
+    case 'invoice.paid':
+    case 'invoice.payment_succeeded':
+    case 'invoice.voided':
+    case 'invoice.marked_uncollectible':
+    case 'invoice.overdue': {
+      const inv = event.data.object
+      if (inv.metadata?.kind !== 'planner_invoice' || !account) return null
+      return () => syncInvoiceFromStripe(db, account, inv)
+    }
     default:
       return null
   }
@@ -84,6 +96,15 @@ async function paymentByIntent(db: Db, pi: string | null) {
   if (!pi) return null
   const { data } = await db.from('planner_cart_payments').select('id, cart_id, fee_refunded_cents').eq('stripe_payment_intent_id', pi).maybeSingle()
   return data
+}
+
+/** Stripe processing fee for a PaymentIntent on a connected account, excluding the application fee. */
+export async function stripeFeeForIntent(account: string, pi: string): Promise<{ chargeId: string | null; fee: number | null }> {
+  const intent = await requireStripe().paymentIntents.retrieve(pi, { expand: ['latest_charge.balance_transaction'] }, { stripeAccount: account })
+  const ch = intent.latest_charge as Stripe.Charge | null
+  const bt = ch?.balance_transaction as Stripe.BalanceTransaction | null
+  const appFee = (bt?.fee_details ?? []).filter((f) => f.type === 'application_fee').reduce((a, f) => a + f.amount, 0)
+  return { chargeId: ch?.id ?? null, fee: bt ? bt.fee - appFee : null }
 }
 
 /** Stripe's processing fee on the direct charge (comes out of the planner's balance). */
