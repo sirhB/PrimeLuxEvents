@@ -13,7 +13,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { BRAND_THEME_IDS, DEFAULT_THEME_ID, THEME_STORAGE_KEY } from "@/lib/brand-themes"
 
 const themeBootScript = `(function(){try{var k=${JSON.stringify(THEME_STORAGE_KEY)};var allowed=${JSON.stringify(BRAND_THEME_IDS)};var q=new URLSearchParams(location.search).get('theme');var t=(q&&allowed.indexOf(q)>=0)?q:localStorage.getItem(k);if(!t||allowed.indexOf(t)<0)t=${JSON.stringify(DEFAULT_THEME_ID)};if(q&&allowed.indexOf(q)>=0)localStorage.setItem(k,t);document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`
-const suiteBootScript = `(function(){try{var s=localStorage.getItem(${JSON.stringify(SUITE_STORAGE_KEY)});if(s!=='venue'&&s!=='rentals')s='rentals';document.documentElement.setAttribute('data-suite',s);}catch(e){}})();`
+const suiteBootScript = `(function(){try{var s=localStorage.getItem(${JSON.stringify(SUITE_STORAGE_KEY)});if(s!=='venue'&&s!=='rentals')s='rentals';if(!/^\\/(admin|preview)/.test(location.pathname))s='rentals';document.documentElement.setAttribute('data-suite',s);}catch(e){}})();`
 
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],

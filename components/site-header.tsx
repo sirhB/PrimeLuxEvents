@@ -14,19 +14,12 @@ import { PwaBackButton } from '@/components/pwa/pwa-back-button'
 import { COMPANY } from '@/lib/company'
 import { ThemeSwitcher } from '@/components/theme-switcher'
 import { BrandMonogram } from '@/components/brand/brand-logo'
-import { SuiteToggle } from '@/components/suite/suite-toggle'
-import { useSuite } from '@/components/suite/use-suite'
+import { useCart } from '@/components/providers/cart-provider'
 
-const VENUE_LINKS = [
-  { href: '/venues', label: 'Venues' },
-  { href: '/plan', label: 'Plan' },
-  { href: '/gallery', label: 'Gallery' },
-  { href: '/about', label: 'About' },
-]
-
-const RENTAL_LINKS = [
-  { href: '/catalog', label: 'Collection' },
+const LINKS = [
+  { href: '/catalog', label: 'Rentals' },
   { href: '/packages', label: 'Packages' },
+  { href: '/venues', label: 'Venues' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/about', label: 'About' },
 ]
@@ -36,8 +29,8 @@ export function SiteHeader() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
-  const { suite } = useSuite()
-  const links = suite === 'venue' ? VENUE_LINKS : RENTAL_LINKS
+  const { openPlan, hasLead } = useCart()
+  const links = LINKS
   const onHero = pathname === '/' && !scrolled
 
   useEffect(() => {
@@ -56,7 +49,7 @@ export function SiteHeader() {
     write()
     window.addEventListener('resize', write)
     return () => window.removeEventListener('resize', write)
-  }, [suite, scrolled])
+  }, [scrolled])
 
   if (pathname?.startsWith('/admin')) return null
 
@@ -93,12 +86,9 @@ export function SiteHeader() {
                         {link.label}
                       </Link>
                     ))}
-                    <Link href="/plan" onClick={() => setIsOpen(false)} className="font-serif text-4xl font-medium italic">
-                      Plan your event
-                    </Link>
-                    <Link href={suite === 'venue' ? '/catalog' : '/venues'} onClick={() => setIsOpen(false)} className="text-sm uppercase tracking-[0.18em] text-[var(--theme-muted)]">
-                      {suite === 'venue' ? 'Rentals collection' : 'Venue rooms'}
-                    </Link>
+                    <button type="button" onClick={() => { setIsOpen(false); openPlan() }} className="text-left font-serif text-4xl font-medium italic">
+                      {hasLead ? 'Your event' : 'Plan your event'}
+                    </button>
                     <ThemeSwitcher />
                   </nav>
                   <a href={`tel:${COMPANY.phone.replace(/\D/g, '')}`} className="flex items-center gap-2 border-t border-[var(--theme-dark)]/10 px-6 py-5 text-sm">
@@ -129,19 +119,13 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="hidden lg:block">
-              <SuiteToggle />
-            </div>
             <SearchTrigger onClick={() => setIsSearchOpen(true)} />
             <ThemeSwitcher className="hidden h-9 px-2 lg:inline-flex" />
-            <Link href="/plan" className="hidden text-[11px] uppercase tracking-[0.2em] md:inline">
-              Plan
-            </Link>
+            <button type="button" onClick={() => openPlan()} className="hidden text-[11px] uppercase tracking-[0.2em] md:inline">
+              {hasLead ? 'Your event' : 'Plan'}
+            </button>
             <CartSheet />
           </div>
-        </div>
-        <div className="flex justify-center border-t border-[var(--theme-dark)]/10 px-4 py-2 lg:hidden">
-          <SuiteToggle />
         </div>
       </header>
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />

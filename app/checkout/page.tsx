@@ -1,5 +1,6 @@
 'use client'
 
+import { markLeadCartCheckedOut } from '@/app/plan/lead-actions'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/components/providers/cart-provider'
@@ -504,6 +505,7 @@ export default function CheckoutPage() {
 
             if (result.success) {
                 setIsSuccess(true)
+                markLeadCartCheckedOut((result as { orderId?: string }).orderId ?? null).catch(() => null)
                 clearCart()
                 localStorage.removeItem('checkout_form_data')
                 // Don't set loading to false here, let the redirect happen

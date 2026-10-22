@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { formatCurrency } from '@/lib/utils'
-import { PIPELINE_STAGES, contactName, proposalTotal, type DeskWorkspace, type PipelineStage, type ProposalLine } from '@/lib/venues/desk'
+import { PIPELINE_STAGES, contactName, leadCartStatus, proposalTotal, type DeskWorkspace, type PipelineStage, type ProposalLine } from '@/lib/venues/desk'
 import { useDesk } from '@/components/admin/venue/use-desk'
 
 export function LeadFile({
@@ -46,6 +46,8 @@ export function LeadFile({
   const clientNotes = api.desk.messages.filter((item) => item.lead_id === lead.id)
   const clientFiles = api.desk.documents.filter((item) => item.lead_id === lead.id)
   const layout = api.desk.layouts.find((item) => item.lead_id === lead.id)
+  const cart = api.desk.carts?.find((item) => item.lead_id === lead.id)
+  const cartState = leadCartStatus(api.desk, lead.id)
 
   function addLine() {
     const lines: ProposalLine[] = [...(proposal?.lines || []), { id: `line-${Date.now()}`, kind: 'service', name: 'Service', quantity: 1, unit_cents: 100_000 }]
@@ -86,6 +88,41 @@ export function LeadFile({
                 ))}
               </select>
             </label>
+          </section>
+
+          <section className="border border-[var(--dashboard-border)] bg-white p-4" aria-labelledby="lead-cart">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 id="lead-cart" className="font-serif text-2xl">Cart</h2>
+              <span className={`text-xs font-medium uppercase tracking-[0.12em] ${cartState === 'abandoned' ? 'text-[var(--destructive)]' : 'text-[var(--dashboard-text-muted)]'}`}>
+                {{ none: 'No cart yet', empty: 'Empty', open: 'Open', abandoned: 'Abandoned', checked_out: 'Checked out' }[cartState]}
+              </span>
+            </div>
+            {cart && cart.items.length > 0 ? (
+              <>
+                <ul className="mt-3 space-y-2 text-sm">
+                  {cart.items.map((line) => (
+                    <li key={line.id} className="flex justify-between gap-3 border-t border-[var(--dashboard-border)] pt-2">
+                      <span>{line.name} × {line.quantity}</span>
+                      <span className="tabular-nums">{formatCurrency(line.quantity * line.unit_cents)}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-3 flex flex-wrap items-baseline justify-between gap-2 border-t border-[var(--dashboard-border)] pt-3">
+                  <p className="font-serif text-2xl tabular-nums">{formatCurrency(cart.subtotal_cents)}</p>
+                  <p className="text-xs text-[var(--dashboard-text-muted)]">
+                    {cart.item_count} pieces · last updated {new Date(cart.updated_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                    {cart.checked_out_at ? ` · checked out ${new Date(cart.checked_out_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-[var(--dashboard-text-muted)]">Nothing in the cart yet.</p>
+            )}
+            {(lead.budget_range || lead.consent) && (
+              <p className="mt-3 text-xs text-[var(--dashboard-text-muted)]">
+                {lead.budget_range ? `Budget ${lead.budget_range}` : ''}{lead.budget_range && lead.consent ? ' · ' : ''}{lead.consent ? 'Consented to contact' : ''}
+              </p>
+            )}
           </section>
 
           <section className="border border-[var(--dashboard-border)] bg-white p-4">

@@ -5,8 +5,9 @@ export async function loadVenueDesk(): Promise<{ desk: DeskWorkspace; live: bool
   const sample = buildSampleDesk()
   try {
     const supabase = await createClient()
-    const [leads, contacts, companies, activities, tours, holds, proposals, lines, contracts, payments, reminders, tasks, comments, templates, items, views, notifications, schedule, layouts, documents, messages] = await Promise.all([
+    const [leads, carts, contacts, companies, activities, tours, holds, proposals, lines, contracts, payments, reminders, tasks, comments, templates, items, views, notifications, schedule, layouts, documents, messages] = await Promise.all([
       supabase.from('venue_leads').select('*').order('created_at', { ascending: false }),
+      supabase.from('lead_carts').select('*'),
       supabase.from('crm_contacts').select('*'),
       supabase.from('crm_companies').select('*'),
       supabase.from('crm_activities').select('*').order('created_at', { ascending: false }),
@@ -46,6 +47,16 @@ export async function loadVenueDesk(): Promise<{ desk: DeskWorkspace; live: bool
         owner_name: row.owner_name || 'Unassigned',
         value_cents: row.value_cents || 0,
         event_type: row.event_type || 'Event',
+        budget_range: row.budget_range ?? null,
+        consent: Boolean(row.contact_consent),
+      })),
+      carts: (carts.data || []).map((row) => ({
+        lead_id: row.lead_id,
+        items: Array.isArray(row.items) ? row.items : [],
+        item_count: row.item_count || 0,
+        subtotal_cents: row.subtotal_cents || 0,
+        updated_at: row.updated_at,
+        checked_out_at: row.checked_out_at,
       })),
       activities: (activities.data || []).map((row) => ({
         id: row.id,

@@ -13,6 +13,7 @@ import {
   type DeskWorkspace,
   type PipelineStage,
   type SavedView,
+  type CartFilter,
 } from '@/lib/venues/desk'
 import { useDesk } from '@/components/admin/venue/use-desk'
 import { cn } from '@/lib/utils'
@@ -33,11 +34,13 @@ export function CrmDesk({
   const [tab, setTab] = useState<'board' | 'contacts' | 'calendar' | 'reports'>('board')
   const [view, setView] = useState<Pick<SavedView, 'stage' | 'source' | 'owner' | 'query'>>({ stage: 'all', source: 'all', owner: 'all', query: '' })
   const [viewName, setViewName] = useState('')
-  const leads = useMemo(() => filterLeads(api.desk, view), [api.desk, view])
+  const [cartFilter, setCartFilter] = useState<CartFilter>('all')
+  const [abandonDays, setAbandonDays] = useState(3)
+  const leads = useMemo(() => filterLeads(api.desk, { ...view, cart: cartFilter, abandonDays }), [api.desk, view, cartFilter, abandonDays])
   const owners = [...new Set(api.desk.leads.map((lead) => lead.owner_name))]
 
   const openLeads = api.desk.leads.filter((lead) => lead.stage !== 'lost' && lead.stage !== 'completed')
-  const filtersOn = view.stage !== 'all' || view.source !== 'all' || view.owner !== 'all' || view.query !== ''
+  const filtersOn = cartFilter !== 'all' || view.stage !== 'all' || view.source !== 'all' || view.owner !== 'all' || view.query !== ''
 
   return (
     <div className="space-y-6">
@@ -87,6 +90,23 @@ export function CrmDesk({
                 {owners.map((owner) => <option key={owner} value={owner}>{owner}</option>)}
               </select>
             </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <select aria-label="Cart" className="plan-field !mt-0 !w-auto !text-sm" value={cartFilter} onChange={(event) => setCartFilter(event.target.value as CartFilter)}>
+                <option value="all">Any cart</option>
+                <option value="has_cart">Has a cart</option>
+                <option value="open">Cart open</option>
+                <option value="abandoned">Cart abandoned</option>
+                <option value="checked_out">Checked out</option>
+                <option value="none">No cart</option>
+              </select>
+              {cartFilter === 'abandoned' && (
+                <label className="flex items-center gap-2 text-xs text-[var(--dashboard-text-muted)]">
+                  No checkout after
+                  <input type="number" min={1} max={60} value={abandonDays} onChange={(event) => setAbandonDays(Math.max(1, Number(event.target.value) || 3))} className="plan-field !mt-0 !w-16 !text-sm" />
+                  days
+                </label>
+              )}
+            </div>
             <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:px-0">
               <span className="shrink-0 text-xs text-[var(--dashboard-text-muted)]">Views</span>
               {api.desk.views.map((saved) => (
@@ -95,7 +115,7 @@ export function CrmDesk({
                 </button>
               ))}
               {filtersOn && (
-                <button type="button" className="shrink-0 text-xs underline underline-offset-4" onClick={() => setView({ stage: 'all', source: 'all', owner: 'all', query: '' })}>Clear</button>
+                <button type="button" className="shrink-0 text-xs underline underline-offset-4" onClick={() => { setCartFilter('all'); setView({ stage: 'all', source: 'all', owner: 'all', query: '' }) }}>Clear</button>
               )}
               <form
                 className="ml-auto flex shrink-0 items-center gap-2"
