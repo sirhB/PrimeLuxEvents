@@ -1,7 +1,10 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useCallback, useContext, useRef, useState, useEffect, type ReactNode } from "react"
 import { type EventDetails, EventDetailsDialog } from "@/components/event-details-dialog"
+import { PlanSheet } from "@/components/plan/plan-sheet"
+import { getLeadSnapshot, syncLeadCart, type LeadSnapshot } from "@/app/plan/lead-actions"
+import { LEAD_STORAGE_KEY } from "@/lib/leads/plan-options"
 
 export type CartItem = {
   id: string
@@ -35,6 +38,13 @@ type CartContextType = {
   setEventDetails: (details: EventDetails) => void
   openEventDetails: () => void
   isLoaded: boolean
+  /** True once the visitor has completed (or is linked to) a Plan-your-event lead. */
+  hasLead: boolean
+  leadId: string | null
+  lead: LeadSnapshot | null
+  setLeadDone: (leadId: string) => void
+  /** Open the plan flow. With a lead it opens in edit mode. */
+  openPlan: (opts?: { intent?: "cart" | "plan" }) => void
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -44,6 +54,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [eventDetails, setEventDetailsState] = useState<EventDetails | null>(null)
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [lead, setLead] = useState<LeadSnapshot | null>(null)
+  const [leadId, setLeadId] = useState<string | null>(null)
+  const [planOpen, setPlanOpen] = useState(false)
+  const [planIntent, setPlanIntent] = useState<"cart" | "plan">("plan")
+  const pendingAdd = useRef<null | (() => void)>(null)
+  const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Fast path from local storage, then reconcile with the server (httpOnly token / signed-in account).
+  useEffect(() => {
+    try { setLeadId(localStorage.getItem(LEAD_STORAGE_KEY)) } catch { /* private mode */ }
+    let alive = true
+    getLeadSnapshot().then((snap) => {
+      if (!alive) return
+      setLead(snap)
+      try {
+        if (snap.hasLead && snap.leadId) localStorage.setItem(LEAD_STORAGE_KEY, snap.leadId)
+        else localStorage.removeItem(LEAD_STORAGE_KEY)
+      } catch { /* ignore */ }
+      setLeadId(snap.hasLead ? snap.leadId : null)
+    }).catch(() => null)
+    return () => { alive = false }
+  }, [])
 
   // Load cart from local storage on mount
   useEffect(() => {
@@ -86,7 +118,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [eventDetails, isLoaded])
 
-  const addItem = (productId: string, quantity: number = 1, modifiers: Record<string, any> = {}) => {
+  const rawAddItem = (productId: string, quantity: number = 1, modifiers: Record<string, any> = {}) => {
     setItems((prev) => {
       // Check if item with same product ID AND same modifiers exists
       const existing = prev.find((item) =>
@@ -111,7 +143,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const addPackageItem = (
+  const rawAddPackageItem = (
     packageId: string,
     packageSelections: Record<string, string[]>,
     packageData: any,
@@ -163,6 +195,43 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems([])
   }
 
+  const hasLead = Boolean(leadId)
+
+  // The first add opens the plan flow; the add is replayed once the lead exists.
+  const gate = (run: () => void) => {
+    if (hasLead) return run()
+    pendingAdd.current = run
+    setPlanIntent("cart")
+    setPlanOpen(true)
+  }
+  const addItem: CartContextType["addItem"] = (productId, quantity = 1, modifiers = {}) =>
+    gate(() => rawAddItem(productId, quantity, modifiers))
+  const addPackageItem: CartContextType["addPackageItem"] = (packageId, selections, data, quantity = 1) =>
+    gate(() => rawAddPackageItem(packageId, selections, data, quantity))
+
+  const openPlan = useCallback((opts?: { intent?: "cart" | "plan" }) => {
+    setPlanIntent(opts?.intent ?? "plan")
+    setPlanOpen(true)
+  }, [])
+
+  const onPlanDone = (id: string) => {
+    setLeadId(id)
+    try { localStorage.setItem(LEAD_STORAGE_KEY, id) } catch { /* ignore */ }
+    setPlanOpen(false)
+    const run = pendingAdd.current
+    pendingAdd.current = null
+    run?.()
+    getLeadSnapshot().then(setLead).catch(() => null)
+  }
+
+  // Persist the cart server-side against the lead (debounced).
+  useEffect(() => {
+    if (!isLoaded || !leadId) return
+    if (syncTimer.current) clearTimeout(syncTimer.current)
+    syncTimer.current = setTimeout(() => { syncLeadCart(items).catch(() => null) }, 700)
+    return () => { if (syncTimer.current) clearTimeout(syncTimer.current) }
+  }, [items, isLoaded, leadId])
+
   const cartCount = items.reduce((acc, item) => acc + item.quantity, 0)
 
   return (
@@ -179,6 +248,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setEventDetails: setEventDetailsState,
         openEventDetails: () => setIsEventDialogOpen(true),
         isLoaded,
+        hasLead,
+        leadId,
+        lead,
+        setLeadDone: onPlanDone,
+        openPlan,
       }}
     >
       {children}
@@ -187,6 +261,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         onOpenChange={setIsEventDialogOpen}
         onSubmit={handleEventDetailsSubmit}
         initialData={eventDetails}
+      />
+      <PlanSheet
+        key={planOpen ? `open-${leadId ?? "new"}` : "closed"}
+        open={planOpen}
+        onClose={() => { pendingAdd.current = null; setPlanOpen(false) }}
+        intent={planIntent}
+        editing={hasLead}
+        initial={hasLead ? lead?.details : null}
+        prefill={lead?.prefill}
+        onDone={onPlanDone}
+        onSkip={hasLead ? () => setPlanOpen(false) : undefined}
       />
     </CartContext.Provider>
   )

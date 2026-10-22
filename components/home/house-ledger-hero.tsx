@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { MotionConfig, motion, type Transition } from 'framer-motion'
-import { useSuite } from '@/components/suite/use-suite'
+import { useCart } from '@/components/providers/cart-provider'
 import type { VenueListing } from '@/lib/venues/directory'
 
 /**
@@ -14,26 +14,18 @@ import type { VenueListing } from '@/lib/venues/directory'
  * backdrop. Motion is a single authored moment (rules draw, the print is set
  * down, the ledger lines are entered) and is skipped for reduced motion.
  */
-const TAGLINE = 'The whole celebration, under one roof.'
+const TAGLINE = 'Rentals for the whole celebration.'
 
 // Jakub: soft, exponential ease-out for the entrance; Jhey: one spring for the print.
 const EASE_OUT: Transition['ease'] = [0.23, 1, 0.32, 1]
 const PRINT_SPRING: Transition = { type: 'spring', stiffness: 140, damping: 22, mass: 0.9 }
 
 export function HouseLedgerHero({ venues }: { venues: VenueListing[] }) {
-  const { suite } = useSuite()
+  const { openPlan, hasLead } = useCart()
   const roomCount = venues.length
-  const secondary = suite === 'venue'
-    ? { href: '/venues', label: 'View venues' }
-    : { href: '/catalog', label: 'View the collection' }
 
+  // Rentals-first: the pieces lead, packages follow, the rooms sit last.
   const entries = [
-    {
-      term: 'The room',
-      value: roomCount > 0 ? `${roomCount} ${roomCount === 1 ? 'venue' : 'venues'}` : 'Our venues',
-      note: venues.slice(0, 3).map((v) => v.name).join(' · ') || 'Private rooms for the whole evening',
-      href: '/venues',
-    },
     {
       term: 'The pieces',
       value: 'Rentals',
@@ -41,10 +33,16 @@ export function HouseLedgerHero({ venues }: { venues: VenueListing[] }) {
       href: '/catalog',
     },
     {
-      term: 'The plan',
-      value: 'One planner',
-      note: 'One date, one team, one invoice',
-      href: '/plan',
+      term: 'The sets',
+      value: 'Packages',
+      note: 'Curated collections, priced together',
+      href: '/packages',
+    },
+    {
+      term: 'The room',
+      value: roomCount > 0 ? `${roomCount} ${roomCount === 1 ? 'venue' : 'venues'}` : 'Our venues',
+      note: venues.slice(0, 3).map((v) => v.name).join(' · ') || 'Private rooms for the whole evening',
+      href: '/venues',
     },
   ]
 
@@ -72,6 +70,17 @@ export function HouseLedgerHero({ venues }: { venues: VenueListing[] }) {
               {TAGLINE}
             </h1>
 
+            {/* Primary CTA sits directly under the title so it is above the fold at 390px. */}
+            <div className="ledger-actions">
+              <button type="button" onClick={() => openPlan()} className="lux-cta ledger-primary">
+                {hasLead ? 'Your event details' : 'Plan your event'}
+              </button>
+              <Link href="/catalog" className="lux-cta-ghost">Browse rentals</Link>
+              <p className="ledger-cta-note">
+                {hasLead ? 'Update the date, guests, or place any time.' : 'Six quick questions. Then build your cart.'}
+              </p>
+            </div>
+
             <motion.figure
               className="ledger-print"
               initial={{ opacity: 0, y: 18, rotate: -6, filter: 'blur(6px)' }}
@@ -84,14 +93,14 @@ export function HouseLedgerHero({ venues }: { venues: VenueListing[] }) {
               <span className="ledger-corner br" aria-hidden="true" />
               <Image
                 src="/images/suites/ceremony.jpg"
-                alt="A ceremony set beneath a floral arch at a Prime Lux venue"
+                alt="A ceremony set with Prime Lux rentals beneath a floral arch"
                 width={720}
                 height={1280}
                 quality={90}
                 priority
                 sizes="(min-width: 900px) 416px, 80vw"
               />
-              <figcaption>Pl. I — The ceremony</figcaption>
+              <figcaption>Pl. I — Set for the ceremony</figcaption>
             </motion.figure>
 
             <ul className="ledger-entries">
@@ -119,10 +128,6 @@ export function HouseLedgerHero({ venues }: { venues: VenueListing[] }) {
               ))}
             </ul>
 
-            <div className="ledger-actions">
-              <Link href="/plan" className="lux-cta">Plan your event</Link>
-              <Link href={secondary.href} className="lux-cta-ghost">{secondary.label}</Link>
-            </div>
           </div>
 
           <div className="ledger-foot" aria-hidden="true">

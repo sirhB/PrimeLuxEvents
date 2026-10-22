@@ -904,8 +904,8 @@ html[data-suite="rentals"] .admin-theme {
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     grid-template-areas:
       'title print'
-      'entries print'
-      'actions print';
+      'actions print'
+      'entries print';
     column-gap: 4rem;
     row-gap: 2rem;
     padding-top: 2.5rem;
@@ -917,6 +917,71 @@ html[data-suite="rentals"] .admin-theme {
 }
 @media (prefers-reduced-motion: reduce) {
   .ledger-arrow { transition: none; }
+}
+.ledger-primary { width: 100%; }
+.ledger-cta-note {
+  font-size: 0.8rem;
+  color: var(--theme-muted);
+  font-weight: 300;
+}
+@media (min-width: 640px) {
+  .ledger-primary { width: auto; }
+  .ledger-actions { flex-wrap: wrap; align-items: center; }
+  .ledger-cta-note { flex-basis: 100%; }
+}
+
+/* ── Plan your event onboarding (Emil: quick, quiet, responsive) ── */
+.plan-ob { display: grid; gap: 1.25rem; }
+.plan-ob-progress { height: 2px; background: color-mix(in srgb, var(--theme-dark) 12%, transparent); overflow: hidden; }
+.plan-ob-progress span {
+  display: block; height: 100%; background: var(--theme-accent); transform-origin: left;
+  transition: transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.plan-ob-count { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--theme-muted); }
+.plan-ob-stage { min-height: 300px; }
+.plan-ob-title { font-family: var(--font-cormorant), "Times New Roman", serif; font-weight: 500; font-size: clamp(2rem, 8vw, 2.75rem); line-height: 1; outline: none; text-wrap: balance; }
+.plan-ob-note { margin-top: 0.6rem; font-size: 0.9rem; font-weight: 300; color: var(--theme-muted); }
+.plan-ob-list { display: grid; gap: 0.5rem; }
+@media (min-width: 640px) { .plan-ob-list { grid-template-columns: 1fr 1fr; } }
+.plan-ob-option {
+  display: flex; min-height: 3.25rem; align-items: center; justify-content: space-between; gap: 1rem;
+  border: 1px solid color-mix(in srgb, var(--theme-dark) 16%, transparent);
+  background: var(--theme-canvas); padding: 0.75rem 1rem; text-align: left; font-size: 0.95rem;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+.plan-ob-option small { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--theme-muted); }
+.plan-ob-option.is-on { border-color: var(--theme-dark); background: color-mix(in srgb, var(--theme-accent) 14%, var(--theme-canvas)); }
+.plan-ob-option:active, .plan-ob-chip:active, .plan-ob-next:active { transform: scale(0.98); }
+.plan-ob-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.plan-ob-chip {
+  min-height: 2.75rem; min-width: 4.25rem; padding: 0 1rem; border: 1px solid color-mix(in srgb, var(--theme-dark) 16%, transparent);
+  font-size: 0.9rem; transition: border-color 160ms ease, background-color 160ms ease;
+}
+.plan-ob-chip.is-on { border-color: var(--theme-dark); background: var(--theme-dark); color: var(--theme-on-dark); }
+.plan-ob-label { display: block; font-size: 0.8rem; font-weight: 500; }
+.plan-ob-check { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.9rem; font-weight: 300; line-height: 1.4; }
+.plan-ob-check input { margin-top: 0.2rem; width: 1.1rem; height: 1.1rem; accent-color: var(--theme-dark); flex-shrink: 0; }
+.plan-ob-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.plan-ob-error { font-size: 0.875rem; color: var(--destructive); }
+.plan-ob-actions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-top: 0.25rem; }
+.plan-ob-back { min-height: 2.75rem; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--theme-muted); }
+.plan-ob-next { min-width: 9rem; transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1), opacity 160ms ease; }
+.plan-ob-next:disabled { opacity: 0.4; }
+.plan-sheet-root { position: fixed; inset: 0; z-index: 80; display: flex; align-items: flex-end; justify-content: center; }
+.plan-sheet-scrim { position: absolute; inset: 0; background: rgba(10, 16, 28, 0.5); }
+.plan-sheet-panel {
+  position: relative; width: 100%; max-height: 92svh; overflow-y: auto; background: var(--theme-canvas); color: var(--theme-dark);
+  padding: 1rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .plan-sheet-root { align-items: center; }
+  .plan-sheet-panel { max-width: 36rem; padding: 1.5rem 2rem 2rem; box-shadow: 0 30px 60px -30px rgba(15, 27, 45, 0.6); }
+}
+.plan-sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.plan-sheet-close { display: inline-flex; height: 2.75rem; width: 2.75rem; align-items: center; justify-content: center; margin-right: -0.75rem; }
+@media (prefers-reduced-motion: reduce) {
+  .plan-ob-progress span, .plan-ob-option, .plan-ob-chip, .plan-ob-next { transition: none; }
+  .plan-ob-option:active, .plan-ob-chip:active, .plan-ob-next:active { transform: none; }
 }
 
 /* ── Panels (Impeccable: Operate mode — precision over expression) ── */
