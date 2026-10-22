@@ -3,7 +3,7 @@ import type { MembersDeskData } from './admin-types'
 /** Mock data for /preview routes only. */
 export function sampleMembersDesk(): MembersDeskData {
   return {
-    limits: { memberDiscountBps: 5000, maxLineDiscountBps: 1500, defaultDepositBps: 3000 },
+    limits: { memberDiscountBps: 5000, maxLineDiscountBps: 1500, defaultDepositBps: 3000, platformFee: { bps: 0, flatCents: 0, minCents: null, capCents: null }, marketplaceFacilitator: false },
     members: [
       { id: 'p-ava', name: 'Ava Laurent', email: 'ava@example.com', status: 'active', periodEnd: '2026-11-18T00:00:00Z', terminatedReason: null, banned: false, eventCount: 4 },
       { id: 'p-marco', name: 'Marco Reyes', email: 'marco@example.com', status: 'past_due', periodEnd: '2026-10-20T00:00:00Z', terminatedReason: null, banned: false, eventCount: 2 },

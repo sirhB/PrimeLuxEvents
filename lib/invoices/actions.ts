@@ -8,7 +8,7 @@ import { requireStripe, stripe } from '@/lib/stripe'
 import { isEligible } from '@/lib/membership/policy'
 import { loadCartLimits, loadEligibility, memberActiveFor, productCategories } from '@/lib/carts/load'
 import { planPayments, priceLine, type PlanMode } from '@/lib/carts/pricing'
-import { allocateFees } from '@/lib/carts/split'
+import { allocateFees, applicationFeeForPayment, isBlockedFeeLabel } from '@/lib/carts/split'
 import { canTakePayments, getConnectStatus } from '@/lib/connect/server'
 import { invoiceAllowed, priceInvoice, type InvoiceAction } from './math'
 import { rollUpInvoice } from './sync'
@@ -99,6 +99,9 @@ export async function saveInvoice(id: string, input: SaveInvoiceInput): Promise<
   const g = await gate(inv.planner_user_id, 'edit'); if (g) return { ok: false, error: g }
   if (input.lines.length > 200) return { ok: false, error: 'Too many lines' }
   if (input.dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(input.dueDate)) return { ok: false, error: 'Bad due date' }
+  // CT surcharge law: no card/processing/transaction/convenience fees or non-cash adjustments.
+  const labels = [input.title, input.memo, ...input.lines.flatMap((l) => (l.kind === 'custom' ? [l.name, l.description] : [l.description]))]
+  if (labels.some(isBlockedFeeLabel)) return { ok: false, error: 'Card, processing, transaction, or convenience fees can’t be added. Prices must be the same however the client pays.' }
 
   const productIds = [...new Set(input.lines.flatMap((l) => (l.kind === 'catalog' && l.productId && UUID.test(l.productId) ? [l.productId] : [])))]
   const [products, limits, elig, member, cats, { data: oldLines }] = await Promise.all([
@@ -129,7 +132,7 @@ export async function saveInvoice(id: string, input: SaveInvoiceInput): Promise<
     }
   }
   const pricingLines = catalog.map((l) => ({ listUnitCents: l.list, setupFeeCents: l.setup, quantity: l.quantity, eligible: l.eligible, markupBps: l.markupBps }))
-  const priced = priceInvoice(pricingLines, custom, ctx, { deliveryFeeCents: input.deliveryFeeCents, taxRate: Number(inv.tax_rate) })
+  const priced = priceInvoice(pricingLines, custom, ctx, { deliveryFeeCents: input.deliveryFeeCents, taxRate: Number(inv.tax_rate), marketplaceFacilitator: limits.marketplaceFacilitator })
 
   let ci = 0, ui = 0
   const rows = order.map((k, position) => {
@@ -199,7 +202,11 @@ export async function sendInvoice(id: string): Promise<Result<{ count: number }>
 
   const plan = planPayments({ totalCents: Number(inv.total_cents), mode: inv.plan_mode, depositBps: inv.deposit_bps ?? 3000, installments: inv.installments ?? 3 })
   if (!plan.payments.length) return { ok: false, error: plan.warnings[0] ?? 'Nothing to collect' }
-  const fees = allocateFees(plan.payments.map((p) => p.amountCents), Number(inv.prime_lux_fee_cents), Number(inv.total_cents))
+  const limits = await loadCartLimits()
+  const shares = allocateFees(plan.payments.map((p) => p.amountCents), Number(inv.prime_lux_fee_cents), Number(inv.total_cents))
+  // Rental share + Prime Lux platform fee (on every payment, incl. custom-only invoices),
+  // deducted from the planner's proceeds. The client's amounts never change.
+  const fees = plan.payments.map((p, i) => applicationFeeForPayment(p.amountCents, shares[i], limits.platformFee))
   const first = inv.due_date ?? addDays(new Date().toISOString().slice(0, 10), 14)
 
   // Itemize on Stripe when there's a single payment; otherwise one line per scheduled payment.
@@ -215,14 +222,14 @@ export async function sendInvoice(id: string): Promise<Result<{ count: number }>
   for (const [i, p] of plan.payments.entries()) {
     const due = i === 0 ? first : addDays(first, 30 * i)
     const { data: row } = await c.svc.from('planner_invoice_payments').insert({
-      invoice_id: id, position: i, label: p.label, amount_cents: p.amountCents, application_fee_cents: fees[i], due_date: due,
+      invoice_id: id, position: i, label: p.label, amount_cents: p.amountCents, application_fee_cents: fees[i].applicationFeeCents, platform_fee_cents: fees[i].platformFeeCents, due_date: due,
     }).select('id').single()
     if (!row) return { ok: false, error: 'Could not record payment' }
     try {
       const meta = { kind: 'planner_invoice', planner_invoice_id: id, planner_invoice_payment_id: row.id }
       const draft = await s.invoices.create({
         customer, collection_method: 'send_invoice', due_date: unix(due), auto_advance: false, currency: 'usd',
-        application_fee_amount: fees[i] || undefined,
+        application_fee_amount: fees[i].applicationFeeCents || undefined,
         description: [inv.title, plan.payments.length > 1 ? `${p.label} (${i + 1} of ${plan.payments.length})` : null].filter(Boolean).join(' · '),
         footer: [inv.memo, POWERED_BY].filter(Boolean).join('\n\n'),
         metadata: meta,

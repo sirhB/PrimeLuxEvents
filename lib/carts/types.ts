@@ -1,4 +1,5 @@
 import type { MembershipStatus } from '@/lib/membership/policy'
+import type { PlatformFeeConfig } from './split'
 
 export type CartStatus = 'draft' | 'shared' | 'approved' | 'paid' | 'ordered' | 'void'
 export type CartItemType = 'product' | 'package' | 'venue'
@@ -31,7 +32,13 @@ export type CatalogPick = {
   eligible: boolean
 }
 
-export type CartLimits = { memberDiscountBps: number; maxLineDiscountBps: number; defaultDepositBps: number }
+export type CartLimits = {
+  memberDiscountBps: number; maxLineDiscountBps: number; defaultDepositBps: number
+  /** Prime Lux platform/service fee (admin-defined, default 0). Deducted from planner proceeds. */
+  platformFee: PlatformFeeConfig
+  /** Prime Lux collects sales tax as a marketplace facilitator (off by default; CPA review pending). */
+  marketplaceFacilitator: boolean
+}
 
 export type CartPaymentView = {
   id: string
@@ -43,6 +50,7 @@ export type CartPaymentView = {
   /** Planner/admin only (never loaded for clients): the read-only Connect split. */
   split?: {
     applicationFeeCents: number
+    platformFeeCents: number
     stripeFeeCents: number | null
     refundedCents: number
     feeRefundedCents: number

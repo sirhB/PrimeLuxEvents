@@ -141,7 +141,7 @@ export function LinkItem({ k, demo = false, onFlash }: { k: CartPaymentView; dem
 function SplitRows({ k, demo, onFlash }: { k: CartPaymentView; demo: boolean; onFlash?: (m: string) => void }) {
   const [pending, start] = useTransition()
   const s = k.split!
-  const v = paymentSplit({ amountCents: k.amountCents, applicationFeeCents: s.applicationFeeCents, stripeFeeCents: s.stripeFeeCents, refundedCents: s.refundedCents, feeRefundedCents: s.feeRefundedCents })
+  const v = paymentSplit({ amountCents: k.amountCents, applicationFeeCents: s.applicationFeeCents, platformFeeCents: s.platformFeeCents, stripeFeeCents: s.stripeFeeCents, refundedCents: s.refundedCents, feeRefundedCents: s.feeRefundedCents })
   const row = (label: string, val: string, strong = false) => (
     <div className="flex justify-between gap-3"><dt className="text-[var(--dashboard-text-muted)]">{label}</dt><dd className={`tabular-nums ${strong ? 'text-[var(--dashboard-text)]' : ''}`}>{val}</dd></div>
   )
@@ -156,7 +156,8 @@ function SplitRows({ k, demo, onFlash }: { k: CartPaymentView; demo: boolean; on
   return (
     <dl className="mt-2 grid gap-1 border-l border-[var(--dashboard-border)] pl-3 text-xs">
       {row(k.status === 'paid' ? 'Client paid' : 'Client pays', money(v.clientPaidCents))}
-      {row('Prime Lux fee', `−${money(v.primeLuxFeeCents)}`)}
+      {row('Prime Lux rental share', `−${money(v.rentalShareCents)}`)}
+      {v.platformFeeCents > 0 && row('Prime Lux platform fee', `−${money(v.platformFeeCents)}`)}
       {row('Stripe fee', v.stripeFeeCents == null ? (k.status === 'paid' ? 'pending' : 'after payment') : `−${money(v.stripeFeeCents)}`)}
       {row('Your net', v.plannerNetCents == null ? `≈ ${money(v.clientPaidCents - v.primeLuxFeeCents)} before Stripe fee` : money(v.plannerNetCents), true)}
       {s.refundedCents > 0 && <p className="text-[var(--dashboard-text-muted)]">Refunded {money(s.refundedCents)} (Prime Lux fee back {money(s.feeRefundedCents)})</p>}

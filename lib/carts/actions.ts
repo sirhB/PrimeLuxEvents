@@ -7,7 +7,7 @@ import { resolvePriceCents } from '@/lib/catalog/adapters'
 import { calculateDeliveryFee } from '@/app/actions/checkout'
 import { isEligible } from '@/lib/membership/policy'
 import { cancelClientPayment, clientPaymentsEnabled, createClientPayment, refundClientPayment } from './payment-provider'
-import { allocateFees, primeLuxFeeCents } from './split'
+import { allocateFees, applicationFeeForPayment, isBlockedFeeLabel, primeLuxFeeCents } from './split'
 import { canTakePayments, getConnectStatus } from '@/lib/connect/server'
 import { planPayments, priceCart, type PlanMode } from './pricing'
 import { loadCartLimits, loadEligibility, memberActiveFor, productCategories } from './load'
@@ -76,6 +76,10 @@ export async function savePlannerCart(cartId: string, input: { title: string; no
   if (cart.planner_user_id !== c.user.id && !c.isAdmin) return { ok: false, error: 'Not your cart' }
   if (!['draft', 'shared'].includes(cart.status)) return { ok: false, error: 'This cart is approved and locked' }
   if (input.lines.length > 300) return { ok: false, error: 'Too many lines' }
+  // CT surcharge law: no card/processing/convenience fees or non-cash adjustments as lines or notes.
+  if ([input.title, input.noteToClient, ...input.lines.map((l) => l.note)].some(isBlockedFeeLabel)) {
+    return { ok: false, error: 'Card, processing, transaction, or convenience fees can’t be added. Prices must be the same however the client pays.' }
+  }
 
   const ids = (t: CartItemType) => [...new Set(input.lines.filter((l) => l.itemType === t && UUID.test(l.refId)).map((l) => l.refId))]
   const [products, packages, venues, limits, elig, member, cats] = await Promise.all([
@@ -204,21 +208,25 @@ export async function createCartPayments(cartId: string, plan: { mode: PlanMode;
   const cartFee = primeLuxFeeCents({
     rentalCostCents: Number(cart.cost_cents), setupFeeCents: Number(cart.setup_fee_cents),
     deliveryFeeCents: Number(cart.delivery_fee_cents), taxRate: Number(cart.tax_rate), totalCents: Number(cart.total_cents),
+    marketplaceFacilitator: limits.marketplaceFacilitator,
   })
-  const { data: paidRows } = await svc.from('planner_cart_payments').select('amount_cents, application_fee_cents').eq('cart_id', cartId).eq('status', 'paid')
-  const paidFee = ((paidRows ?? []) as Row[]).reduce((a, r) => a + Number(r.application_fee_cents), 0)
+  const { data: paidRows } = await svc.from('planner_cart_payments').select('amount_cents, application_fee_cents, platform_fee_cents').eq('cart_id', cartId).eq('status', 'paid')
+  // Rental share already collected (application fee minus platform fee).
+  const paidFee = ((paidRows ?? []) as Row[]).reduce((a, r) => a + Number(r.application_fee_cents) - Number(r.platform_fee_cents ?? 0), 0)
   const paidAmt = ((paidRows ?? []) as Row[]).reduce((a, r) => a + Number(r.amount_cents), 0)
-  const fees = allocateFees(result.payments.map((p) => p.amountCents), cartFee, Number(cart.total_cents), paidFee, paidAmt)
+  const shares = allocateFees(result.payments.map((p) => p.amountCents), cartFee, Number(cart.total_cents), paidFee, paidAmt)
+  // + Prime Lux platform fee per payment (deducted from the planner's proceeds; client total unchanged).
+  const fees = result.payments.map((p, i) => applicationFeeForPayment(p.amountCents, shares[i], limits.platformFee))
 
   let made = 0
   for (const [i, p] of result.payments.entries()) {
     const { data: row } = await svc.from('planner_cart_payments').insert({
       cart_id: cartId, kind: p.kind, label: p.label, amount_cents: p.amountCents, created_by: c.user.id,
-      application_fee_cents: fees[i], stripe_account_id: connect.accountId,
+      application_fee_cents: fees[i].applicationFeeCents, platform_fee_cents: fees[i].platformFeeCents, stripe_account_id: connect.accountId,
     }).select('id').single()
     if (!row) continue
     try {
-      const handle = await createClientPayment({ paymentId: row.id, cartId, connectedAccountId: connect.accountId!, amountCents: p.amountCents, applicationFeeCents: fees[i], label: p.label })
+      const handle = await createClientPayment({ paymentId: row.id, cartId, connectedAccountId: connect.accountId!, amountCents: p.amountCents, applicationFeeCents: fees[i].applicationFeeCents, label: p.label })
       await svc.from('planner_cart_payments').update({ stripe_payment_link_id: handle.providerRef, url: handle.url }).eq('id', row.id)
       made++
     } catch (e) {
@@ -256,16 +264,29 @@ export async function refundCartPayment(paymentId: string, amountCents: number):
   return { ok: true }
 }
 
-/** Admin: cart limits. */
-export async function updateCartLimits(input: { maxDiscountPct: number; defaultDepositPct: number }): Promise<Result> {
+/** Admin: cart limits, Prime Lux platform/service fee, and marketplace-facilitator tax flag (audited by trigger). */
+export async function updateCartLimits(input: {
+  maxDiscountPct: number; defaultDepositPct: number
+  platformFeePct?: number; platformFeeFlat?: number; platformFeeMin?: number | null; platformFeeCap?: number | null
+  marketplaceFacilitator?: boolean
+}): Promise<Result> {
   const c = await caller()
   if (!c?.isAdmin) return { ok: false, error: 'Admins only' }
+  const dollars = (v: number | null | undefined) => (v == null || !Number.isFinite(v) || v < 0 ? null : Math.round(v * 100))
+  const pct = Math.min(50, Math.max(0, Number(input.platformFeePct ?? 0) || 0))
+  const min = dollars(input.platformFeeMin), cap = dollars(input.platformFeeCap)
+  if (min != null && cap != null && min > cap) return { ok: false, error: 'Minimum can’t be above the cap' }
   const { error } = await c.db.from('planner_cart_settings').update({
     max_line_discount_bps: Math.round(Math.min(100, Math.max(0, input.maxDiscountPct)) * 100),
     default_deposit_bps: Math.round(Math.min(100, Math.max(1, input.defaultDepositPct)) * 100),
+    platform_fee_bps: Math.round(pct * 100),
+    platform_fee_flat_cents: Math.min(100000, dollars(input.platformFeeFlat) ?? 0),
+    platform_fee_min_cents: min, platform_fee_cap_cents: cap,
+    marketplace_facilitator_tax: Boolean(input.marketplaceFacilitator),
     updated_by: c.user.id, updated_at: new Date().toISOString(),
   }).eq('id', 1)
   if (error) return { ok: false, error: error.message }
   touch()
+  revalidatePath('/planners/membership')
   return { ok: true }
 }

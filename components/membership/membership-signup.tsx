@@ -9,7 +9,7 @@ import { openPayoutsDashboard, refreshConnectStatus, startConnectOnboarding } fr
 import { MEMBERSHIP_POLICIES, type MembershipStatus } from '@/lib/membership/policy'
 
 export type ConnectState = { started: boolean; chargesEnabled: boolean; payoutsEnabled: boolean }
-export type SignupState = { signedIn: boolean; status: MembershipStatus; banned: boolean; periodEnd: string | null; joined?: boolean; connect?: ConnectState; connectReturn?: boolean }
+export type SignupState = { signedIn: boolean; status: MembershipStatus; banned: boolean; periodEnd: string | null; joined?: boolean; connect?: ConnectState; connectReturn?: boolean; balanceDueCents?: number; balanceDueUrl?: string | null; platformFee?: string }
 
 const EASE = [0.23, 1, 0.32, 1] as const
 const PERKS = [
@@ -70,7 +70,7 @@ export function MembershipSignup({ state, demo = false }: { state: SignupState; 
             <div>
               <h2 className="font-serif text-3xl">Membership policies</h2>
               <ol className="mt-4 divide-y divide-[var(--dashboard-border)] border-y border-[var(--dashboard-border)]">
-                {MEMBERSHIP_POLICIES.map((p, i) => (
+                {[...MEMBERSHIP_POLICIES, { title: 'Prime Lux platform/service fee', body: `Prime Lux charges a platform/service fee for the tools and payment platform on every payment you collect through Prime Lux, including invoices for your own services: ${state.platformFee ?? 'currently 0%'}. It’s deducted from your proceeds along with Prime Lux’s rental share, shown on every payment, and refunded in proportion with any refund. It’s never added to your client’s total, and your client pays the same price however they pay. Don’t add card, processing, transaction, or convenience fees to client invoices or carts.` }].map((p, i) => (
                   <li key={p.title} className="grid grid-cols-[2rem_1fr] gap-2 py-4">
                     <span className="font-serif text-lg tabular-nums text-[var(--dashboard-accent-gold)]">{i + 1}</span>
                     <div>
@@ -83,7 +83,16 @@ export function MembershipSignup({ state, demo = false }: { state: SignupState; 
             </div>
 
             <div className="border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] p-5">
-              {blocked ? (
+              {state.status === 'balance_due' ? (
+                <div role="status" className="flex flex-col gap-3">
+                  <p className="text-[11px] uppercase tracking-[0.14em] text-[var(--dashboard-accent-red)]">Balance due</p>
+                  <p className="font-serif text-4xl tabular-nums">{`$${((state.balanceDueCents ?? 0) / 100).toFixed(2)}`}</p>
+                  <p className="text-sm leading-relaxed text-[var(--dashboard-text-muted)]">You canceled while a membership payment was past due. That balance is still owed and Stripe keeps trying your card on file. Member pricing, client carts, and invoicing are off. Once it’s settled, or collection ends unpaid, the membership is closed permanently.</p>
+                  {state.balanceDueUrl && (
+                    <a href={state.balanceDueUrl} className="inline-flex min-h-12 items-center justify-center bg-[var(--theme-dark)] text-sm font-medium text-white transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97]">Pay balance</a>
+                  )}
+                </div>
+              ) : blocked ? (
                 <p className="text-sm">This account can’t join the planner membership. Questions? <Link className="underline" href="/contact">Contact us</Link>.</p>
               ) : member ? (
                 <div className="flex flex-col gap-3">

@@ -5,6 +5,7 @@ import type { ClientView, InvoiceContext, InvoiceSummary, InvoiceView, PublicInv
 export function sampleInvoiceContext(): InvoiceContext {
   return {
     memberStatus: 'active', canInvoice: true, connectReady: true, memberActive: true, memberDiscountBps: 5000, maxLineDiscountBps: 1500,
+    platformFee: { bps: 200, flatCents: 0, minCents: null, capCents: null }, marketplaceFacilitator: false,
     catalog: [
       { productId: 'pr-chiavari', name: 'Gold Chiavari chair', category: 'Seating', listUnitCents: 1250, setupFeeCents: 150, eligible: true },
       { productId: 'pr-farm', name: 'Farmhouse table, 8 ft', category: 'Tables', listUnitCents: 9500, setupFeeCents: 1500, eligible: true },

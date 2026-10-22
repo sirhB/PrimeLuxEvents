@@ -25,7 +25,7 @@ export function MembersDesk({ data, demo = false, initialTab = 'members' }: { da
     <div className="flex flex-col gap-6">
       <Figures items={[
         { label: 'Active members', value: String(active), note: `${money(active * 9900)}/mo` },
-        { label: 'Past due', value: String(data.members.filter((m) => m.status === 'past_due').length), note: 'Stripe is retrying' },
+        { label: 'Past due', value: String(data.members.filter((m) => m.status === 'past_due' || m.status === 'balance_due').length), note: 'Incl. canceled with balance due' },
         { label: 'Banned', value: String(data.members.filter((m) => m.banned).length), note: 'Permanent' },
         { label: 'Assigned events', value: String(data.leads.filter((l) => l.plannerId).length) },
       ]} />
@@ -56,7 +56,7 @@ export function MembersDesk({ data, demo = false, initialTab = 'members' }: { da
         </div>
       )}
 
-      {tab === 'rules' && <Rules data={data} busy={pending} onSave={(d, dep) => run('Cart rules saved', () => updateCartLimits({ maxDiscountPct: d, defaultDepositPct: dep }))} />}
+      {tab === 'rules' && <Rules data={data} busy={pending} onSave={(v) => run('Rules saved', () => updateCartLimits(v))} />}
     </div>
   )
 }
@@ -140,19 +140,54 @@ function ProductRules({ data, run }: { data: MembersDeskData; run: (l: string, f
   )
 }
 
-function Rules({ data, busy, onSave }: { data: MembersDeskData; busy: boolean; onSave: (maxDiscount: number, deposit: number) => void }) {
-  const [d, setD] = useState(String(data.limits.maxLineDiscountBps / 100))
-  const [dep, setDep] = useState(String(data.limits.defaultDepositBps / 100))
+type RulesInput = Parameters<typeof updateCartLimits>[0]
+
+function Rules({ data, busy, onSave }: { data: MembersDeskData; busy: boolean; onSave: (v: RulesInput) => void }) {
+  const L = data.limits
+  const opt = (c: number | null) => (c == null ? '' : String(c / 100))
+  const [d, setD] = useState(String(L.maxLineDiscountBps / 100))
+  const [dep, setDep] = useState(String(L.defaultDepositBps / 100))
+  const [pct, setPct] = useState(String(L.platformFee.bps / 100))
+  const [flat, setFlat] = useState(String(L.platformFee.flatCents / 100))
+  const [min, setMin] = useState(opt(L.platformFee.minCents))
+  const [cap, setCap] = useState(opt(L.platformFee.capCents))
+  const [mf, setMf] = useState(L.marketplaceFacilitator)
+  const num = (v: string) => Number(v.replace(/[^0-9.]/g, '') || 0)
+  const optNum = (v: string) => (v.trim() === '' ? null : num(v))
+  const field = (label: string, v: string, set: (s: string) => void, placeholder?: string) => (
+    <label className="text-xs font-medium text-[var(--dashboard-text-muted)]">{label}
+      <input className="plan-field tabular-nums" inputMode="decimal" placeholder={placeholder} value={v} onChange={(e) => set(e.target.value)} />
+    </label>
+  )
   return (
     <div className="grid max-w-xl gap-5 border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] p-4">
-      <p className="text-sm">Member discount: <strong>50%</strong> on eligible rentals, only while the membership is active. It never stacks with other discounts.</p>
-      <label className="text-xs font-medium text-[var(--dashboard-text-muted)]">Max client discount on non-member lines (%)
-        <input className="plan-field tabular-nums" inputMode="decimal" value={d} onChange={(e) => setD(e.target.value)} />
-      </label>
-      <label className="text-xs font-medium text-[var(--dashboard-text-muted)]">Default deposit (%)
-        <input className="plan-field tabular-nums" inputMode="decimal" value={dep} onChange={(e) => setDep(e.target.value)} />
-      </label>
-      <PressButton disabled={busy} onClick={() => onSave(Number(d), Number(dep))}>Save rules</PressButton>
+      <p className="text-sm">Member discount: <strong>50%</strong> on eligible rentals, only while the membership is active. It never stacks with other discounts. This is the only planner discount.</p>
+      {field('Max client discount on non-member lines (%)', d, setD)}
+      {field('Default deposit (%)', dep, setDep)}
+
+      <fieldset className="grid gap-3 border-t border-[var(--dashboard-border)] pt-4">
+        <legend className="font-serif text-xl">Prime Lux platform fee</legend>
+        <p className="text-xs leading-relaxed text-[var(--dashboard-text-muted)]">Charged on every payment a planner collects (carts and invoices, including their own services), added to Prime Lux’s rental share in the application fee. It comes out of the planner’s proceeds only: clients never see it and pay the same however they pay (CT surcharge rule). Default 0.</p>
+        <div className="grid grid-cols-2 gap-3">
+          {field('Percentage (%)', pct, setPct)}
+          {field('Flat per payment ($)', flat, setFlat)}
+          {field('Minimum ($, optional)', min, setMin, 'None')}
+          {field('Cap ($, optional)', cap, setCap, 'None')}
+        </div>
+      </fieldset>
+
+      <fieldset className="grid gap-2 border-t border-[var(--dashboard-border)] pt-4">
+        <legend className="font-serif text-xl">Sales tax</legend>
+        <label className="flex min-h-11 items-start gap-3 text-sm">
+          <input type="checkbox" className="mt-0.5 size-5 shrink-0 accent-[var(--theme-dark)]" checked={mf} onChange={(e) => setMf(e.target.checked)} />
+          <span>Prime Lux collects sales tax as a marketplace facilitator<span className="mt-1 block text-xs text-[var(--dashboard-text-muted)]">Off by default. When on, Prime Lux’s share includes tax on its rentals. Needs CPA review first: CT marketplace facilitator rule (CGS 12-408e, $250k threshold). Changes are logged.</span></span>
+        </label>
+      </fieldset>
+
+      <PressButton disabled={busy} onClick={() => onSave({
+        maxDiscountPct: num(d), defaultDepositPct: num(dep), platformFeePct: num(pct), platformFeeFlat: num(flat),
+        platformFeeMin: optNum(min), platformFeeCap: optNum(cap), marketplaceFacilitator: mf,
+      })}>Save rules</PressButton>
     </div>
   )
 }

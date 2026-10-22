@@ -24,6 +24,7 @@ export type InvoicePaymentView = {
   label: string
   amountCents: number
   applicationFeeCents: number
+  platformFeeCents: number
   stripeFeeCents: number | null
   dueDate: string | null
   status: InvoiceStatus
@@ -66,6 +67,9 @@ export type InvoiceContext = {
   memberActive: boolean
   memberDiscountBps: number
   maxLineDiscountBps: number
+  /** Prime Lux platform/service fee config (deducted from the planner's proceeds). */
+  platformFee: import('@/lib/carts/split').PlatformFeeConfig
+  marketplaceFacilitator: boolean
   catalog: { productId: string; name: string; category: string; listUnitCents: number; setupFeeCents: number; eligible: boolean }[]
   clients: { id: string; name: string; email: string }[]
 }

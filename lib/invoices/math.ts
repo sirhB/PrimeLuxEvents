@@ -21,9 +21,9 @@ export type InvoicePricing = {
   deliveryFeeCents: number
   taxCents: number
   totalCents: number
-  /** Prime Lux application fee for the whole invoice (catalog lines only). */
+  /** Prime Lux rental share for the whole invoice (catalog lines only). The platform fee is added per payment. */
   primeLuxFeeCents: number
-  /** What the planner keeps before Stripe fees: markup + custom lines + tax not owed to Prime Lux. */
+  /** What the planner keeps before the platform fee and Stripe fees. */
   plannerGrossCents: number
 }
 
@@ -33,7 +33,7 @@ export function priceInvoice(
   catalog: PricingLineInput[],
   custom: CustomLineInput[],
   ctx: PricingContext,
-  fees: { deliveryFeeCents?: number; taxRate?: number } = {},
+  fees: { deliveryFeeCents?: number; taxRate?: number; marketplaceFacilitator?: boolean } = {},
 ): InvoicePricing {
   const rate = fees.taxRate != null && fees.taxRate >= 0 && fees.taxRate < 1 ? fees.taxRate : 0
   // Delivery is a Prime Lux fee; it only applies when there are catalog lines.
@@ -44,7 +44,7 @@ export function priceInvoice(
   const tax = c.taxCents + Math.round(customTaxable * rate)
   const total = c.totalCents + customSub + Math.round(customTaxable * rate)
   const fee = catalog.length
-    ? primeLuxFeeCents({ rentalCostCents: c.costCents, setupFeeCents: c.setupFeeCents, deliveryFeeCents: c.deliveryFeeCents, taxRate: rate, totalCents: c.totalCents })
+    ? primeLuxFeeCents({ rentalCostCents: c.costCents, setupFeeCents: c.setupFeeCents, deliveryFeeCents: c.deliveryFeeCents, taxRate: rate, totalCents: c.totalCents, marketplaceFacilitator: fees.marketplaceFacilitator })
     : 0
   return {
     catalogSubtotalCents: c.subtotalCents, catalogSetupCents: c.setupFeeCents, catalogCostCents: c.costCents,

@@ -19,8 +19,11 @@ CREATE TABLE IF NOT EXISTS public.planner_memberships (
   stripe_customer_id text UNIQUE,
   stripe_subscription_id text UNIQUE,
   status text NOT NULL DEFAULT 'none'
-    CHECK (status IN ('none', 'incomplete', 'active', 'past_due', 'canceled', 'terminated')),
+    CHECK (status IN ('none', 'incomplete', 'active', 'past_due', 'balance_due', 'canceled', 'terminated')),
   current_period_end timestamptz,
+  -- balance_due: unpaid membership invoices still owed after canceling while past due
+  balance_due_cents bigint NOT NULL DEFAULT 0 CHECK (balance_due_cents >= 0),
+  balance_due_url text,                          -- Stripe hosted invoice page for the oldest open invoice
   terminated_at timestamptz,
   terminated_reason text CHECK (terminated_reason IN ('nonpayment', 'sharing')),
   terminated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -94,10 +97,40 @@ CREATE TABLE IF NOT EXISTS public.planner_cart_settings (
   member_discount_bps integer NOT NULL DEFAULT 5000 CHECK (member_discount_bps BETWEEN 0 AND 10000),
   max_line_discount_bps integer NOT NULL DEFAULT 1500 CHECK (max_line_discount_bps BETWEEN 0 AND 10000),
   default_deposit_bps integer NOT NULL DEFAULT 3000 CHECK (default_deposit_bps BETWEEN 100 AND 10000),
+  -- Prime Lux platform/service fee on every planner-collected payment (default 0 = off).
+  -- Deducted from the planner's proceeds inside the application fee; never added to the
+  -- client's total and never varies by payment method (CT surcharge law).
+  platform_fee_bps integer NOT NULL DEFAULT 0 CHECK (platform_fee_bps BETWEEN 0 AND 5000),
+  platform_fee_flat_cents integer NOT NULL DEFAULT 0 CHECK (platform_fee_flat_cents BETWEEN 0 AND 100000),
+  platform_fee_min_cents integer CHECK (platform_fee_min_cents >= 0),
+  platform_fee_cap_cents integer CHECK (platform_fee_cap_cents >= 0),
+  -- Prime Lux collects sales tax as a marketplace facilitator (off by default).
+  -- TODO(CPA): CT marketplace facilitator rule (CGS 12-408e, $250k threshold) needs CPA review.
+  marketplace_facilitator_tax boolean NOT NULL DEFAULT false,
   updated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
   updated_at timestamptz NOT NULL DEFAULT timezone('utc'::text, now())
 );
 INSERT INTO public.planner_cart_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+
+-- Audit trail for admin changes to fees and tax settings (who, when, before/after).
+CREATE TABLE IF NOT EXISTS public.planner_settings_audit (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  changed_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  changed_at timestamptz NOT NULL DEFAULT timezone('utc'::text, now()),
+  before jsonb NOT NULL,
+  after jsonb NOT NULL
+);
+CREATE OR REPLACE FUNCTION public.planner_settings_audit_trg()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF to_jsonb(OLD) - 'updated_at' IS DISTINCT FROM to_jsonb(NEW) - 'updated_at' THEN
+    INSERT INTO public.planner_settings_audit (changed_by, before, after) VALUES (NEW.updated_by, to_jsonb(OLD), to_jsonb(NEW));
+  END IF;
+  RETURN NEW;
+END $$;
+DROP TRIGGER IF EXISTS planner_settings_audit ON public.planner_cart_settings;
+CREATE TRIGGER planner_settings_audit AFTER UPDATE ON public.planner_cart_settings
+  FOR EACH ROW EXECUTE FUNCTION public.planner_settings_audit_trg();
 
 -- ---------------------------------------------------------------------------
 -- Carts and lines
@@ -178,6 +211,7 @@ CREATE TABLE IF NOT EXISTS public.planner_cart_payments (
   label text NOT NULL,
   amount_cents bigint NOT NULL CHECK (amount_cents > 0),
   application_fee_cents bigint NOT NULL DEFAULT 0 CHECK (application_fee_cents >= 0 AND application_fee_cents <= amount_cents),
+  platform_fee_cents bigint NOT NULL DEFAULT 0 CHECK (platform_fee_cents >= 0 AND platform_fee_cents <= application_fee_cents),
   stripe_account_id text,                      -- planner's acct_ the charge lives on
   stripe_payment_link_id text UNIQUE,
   url text,
@@ -293,6 +327,7 @@ ALTER TABLE public.planner_stripe_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.member_discount_eligibility ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.planner_event_assignments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.planner_cart_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.planner_settings_audit ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.planner_carts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.planner_cart_lines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.planner_cart_payments ENABLE ROW LEVEL SECURITY;
@@ -309,7 +344,7 @@ BEGIN
     EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', t || '_admin_all', t);
     EXECUTE format('CREATE POLICY %I ON public.%I FOR ALL TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin())', t || '_admin_all', t);
   END LOOP;
-  FOREACH t IN ARRAY ARRAY['planner_bans', 'planner_stripe_events'] LOOP
+  FOREACH t IN ARRAY ARRAY['planner_bans', 'planner_stripe_events', 'planner_settings_audit'] LOOP
     EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', t || '_admin_select', t);
     EXECUTE format('CREATE POLICY %I ON public.%I FOR SELECT TO authenticated USING (public.is_admin())', t || '_admin_select', t);
   END LOOP;
@@ -444,6 +479,9 @@ CREATE TABLE IF NOT EXISTS public.planner_invoice_payments (
   label text NOT NULL,
   amount_cents bigint NOT NULL CHECK (amount_cents > 0),
   application_fee_cents bigint NOT NULL DEFAULT 0 CHECK (application_fee_cents >= 0 AND application_fee_cents <= amount_cents),
+  platform_fee_cents bigint NOT NULL DEFAULT 0 CHECK (platform_fee_cents >= 0 AND platform_fee_cents <= application_fee_cents),
+  refunded_cents bigint NOT NULL DEFAULT 0,
+  fee_refunded_cents bigint NOT NULL DEFAULT 0,
   due_date date,
   stripe_invoice_id text UNIQUE,
   number text,

@@ -10,7 +10,7 @@ import { Notice, PressButton, StateChip, money, shortDate } from '@/components/a
 import { saveInvoice, sendInvoice, voidInvoice, type SaveInvoiceLine } from '@/lib/invoices/actions'
 import { priceInvoice } from '@/lib/invoices/math'
 import { planPayments, type PlanMode } from '@/lib/carts/pricing'
-import { allocateFees } from '@/lib/carts/split'
+import { allocateFees, applicationFeeForPayment, isBlockedFeeLabel } from '@/lib/carts/split'
 import type { InvoiceContext, InvoiceView } from '@/lib/invoices/types'
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -44,11 +44,14 @@ export function InvoiceEditor({ invoice, ctx, demo = false }: { invoice: Invoice
   const cus = lines.filter((l): l is CusLine => l.kind === 'custom')
   const p = useMemo(() => priceInvoice(
     cat.map((l) => ({ listUnitCents: l.list, setupFeeCents: l.setup, quantity: l.quantity, eligible: l.eligible, markupBps: l.markupBps })),
-    cus, pricingCtx, { deliveryFeeCents: cents(delivery), taxRate: invoice.taxRate },
+    cus, pricingCtx, { deliveryFeeCents: cents(delivery), taxRate: invoice.taxRate, marketplaceFacilitator: ctx.marketplaceFacilitator },
   // eslint-disable-next-line react-hooks/exhaustive-deps
   ), [lines, delivery, invoice.taxRate, ctx.memberActive])
   const plan = useMemo(() => planPayments({ totalCents: p.totalCents, mode, depositBps: Math.round(Number(depositPct || 0) * 100), installments: count }), [p.totalCents, mode, depositPct, count])
-  const planFees = allocateFees(plan.payments.map((x) => x.amountCents), p.primeLuxFeeCents, p.totalCents)
+  const planShares = allocateFees(plan.payments.map((x) => x.amountCents), p.primeLuxFeeCents, p.totalCents)
+  const planFees = plan.payments.map((x, i) => applicationFeeForPayment(x.amountCents, planShares[i], ctx.platformFee))
+  const platformTotal = invoice.status === 'draft' ? planFees.reduce((a, f) => a + f.platformFeeCents, 0) : invoice.payments.reduce((a, x) => a + x.platformFeeCents, 0)
+  const blocked = lines.some((l) => l.kind === 'custom' && (isBlockedFeeLabel(l.name) || isBlockedFeeLabel(l.description))) || isBlockedFeeLabel(title) || isBlockedFeeLabel(memo)
 
   const set = (key: string, patch: Partial<Line>) => setLines((ls) => ls.map((l) => (l.key === key ? ({ ...l, ...patch } as Line) : l)))
   const addCatalog = () => {
@@ -154,7 +157,7 @@ export function InvoiceEditor({ invoice, ctx, demo = false }: { invoice: Invoice
             </div>
           )}
           <ol className="divide-y divide-[var(--dashboard-border)] border-y border-[var(--dashboard-border)] text-sm">
-            {(invoice.status === 'draft' ? plan.payments.map((x, i) => ({ id: String(i), label: x.label, amountCents: x.amountCents, fee: planFees[i], status: null as null | string, hostedUrl: null as string | null, pdfUrl: null as string | null, dueDate: null as string | null, number: null as string | null }))
+            {(invoice.status === 'draft' ? plan.payments.map((x, i) => ({ id: String(i), label: x.label, amountCents: x.amountCents, fee: planFees[i].applicationFeeCents, status: null as null | string, hostedUrl: null as string | null, pdfUrl: null as string | null, dueDate: null as string | null, number: null as string | null }))
               : invoice.payments.map((x) => ({ id: x.id, label: x.label, amountCents: x.amountCents, fee: x.applicationFeeCents, status: x.status as string, hostedUrl: x.hostedUrl, pdfUrl: x.pdfUrl, dueDate: x.dueDate, number: x.number }))).map((x) => (
               <li key={x.id} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 py-3">
                 <span className="min-w-0 truncate">{x.label}{x.number ? <span className="ml-2 text-xs text-[var(--dashboard-text-muted)]">{x.number}</span> : null}</span>
@@ -178,14 +181,18 @@ export function InvoiceEditor({ invoice, ctx, demo = false }: { invoice: Invoice
 
         {invoice.payUrl && <PayLink url={invoice.payUrl} />}
 
+        {blocked && <Notice>Card, processing, transaction, or convenience fees can’t be added to invoices. Prices must be the same however the client pays.</Notice>}
+
         <dl className="grid gap-2 border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] p-4 text-sm">
           {p.catalogSubtotalCents + p.catalogSetupCents > 0 && <Row k="Prime Lux rentals + setup" v={money(p.catalogSubtotalCents + p.catalogSetupCents)} />}
           {p.customSubtotalCents > 0 && <Row k="Your services" v={money(p.customSubtotalCents)} />}
           {p.deliveryFeeCents > 0 && <Row k="Delivery" v={money(p.deliveryFeeCents)} />}
           <Row k="Tax" v={money(p.taxCents)} />
           <div className="flex items-baseline justify-between border-t border-[var(--dashboard-border)] pt-2"><dt>Client pays</dt><dd className="font-serif text-2xl tabular-nums">{money(p.totalCents)}</dd></div>
-          <Row k="Prime Lux fee (rentals only)" v={`−${money(p.primeLuxFeeCents)}`} muted />
-          <Row k="You keep, before Stripe fees" v={money(p.plannerGrossCents)} strong />
+          <Row k="Prime Lux rental share" v={`−${money(p.primeLuxFeeCents)}`} muted />
+          {platformTotal > 0 && <Row k="Prime Lux platform fee" v={`−${money(platformTotal)}`} muted />}
+          <Row k="You keep, before Stripe fees" v={money(p.plannerGrossCents - platformTotal)} strong />
+          <p className="text-[11px] text-[var(--dashboard-text-muted)]">Prime Lux’s share comes out of your proceeds. Your client pays the same total however they pay.</p>
         </dl>
 
         <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[var(--dashboard-border)] bg-[var(--dashboard-surface)]/95 px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 backdrop-blur md:static md:border-0 md:bg-transparent md:p-0">
@@ -198,8 +205,8 @@ export function InvoiceEditor({ invoice, ctx, demo = false }: { invoice: Invoice
               </div>
             ) : (
               <div className="grid grid-cols-[auto_1fr] gap-2">
-                <button type="button" className="hub-chip min-h-12 px-5" disabled={locked || pending} onClick={save}>Save</button>
-                <PressButton disabled={locked || pending || !ctx.connectReady || p.totalCents <= 0} onClick={() => setConfirmSend(true)}>Send {money(p.totalCents)} invoice</PressButton>
+                <button type="button" className="hub-chip min-h-12 px-5" disabled={locked || pending || blocked} onClick={save}>Save</button>
+                <PressButton disabled={locked || pending || blocked || !ctx.connectReady || p.totalCents <= 0} onClick={() => setConfirmSend(true)}>Send {money(p.totalCents)} invoice</PressButton>
               </div>
             )
           ) : (invoice.status === 'open' || invoice.status === 'uncollectible') && (

@@ -4,12 +4,13 @@ import { loadPublicCatalog } from '@/lib/catalog/public-catalog'
 import { isEligible } from '@/lib/membership/policy'
 import { getMembership, isBanned } from '@/lib/membership/server'
 import { clientPaymentsEnabled } from './payment-provider'
+import { ZERO_PLATFORM_FEE } from './split'
 import { canTakePayments, getConnectStatus } from '@/lib/connect/server'
 import type { CartLimits, CartSummary, CartView, CatalogPick, PlannerCartContext, QuoteView } from './types'
 
 type Row = Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 
-export const DEFAULT_LIMITS: CartLimits = { memberDiscountBps: 5000, maxLineDiscountBps: 1500, defaultDepositBps: 3000 }
+export const DEFAULT_LIMITS: CartLimits = { memberDiscountBps: 5000, maxLineDiscountBps: 1500, defaultDepositBps: 3000, platformFee: ZERO_PLATFORM_FEE, marketplaceFacilitator: false }
 
 const leadTitle = (l: Row | null | undefined) =>
   [l?.contact_name, l?.event_type && l.event_type !== 'Event' ? l.event_type : null, l?.venue_name].filter(Boolean).join(' · ') || 'Event'
@@ -25,7 +26,15 @@ export async function loadCartLimits(): Promise<CartLimits> {
   const db = await createClient()
   const { data } = await db.from('planner_cart_settings').select('*').eq('id', 1).maybeSingle()
   return data
-    ? { memberDiscountBps: data.member_discount_bps, maxLineDiscountBps: data.max_line_discount_bps, defaultDepositBps: data.default_deposit_bps }
+    ? {
+        memberDiscountBps: data.member_discount_bps, maxLineDiscountBps: data.max_line_discount_bps, defaultDepositBps: data.default_deposit_bps,
+        platformFee: {
+          bps: Number(data.platform_fee_bps ?? 0), flatCents: Number(data.platform_fee_flat_cents ?? 0),
+          minCents: data.platform_fee_min_cents == null ? null : Number(data.platform_fee_min_cents),
+          capCents: data.platform_fee_cap_cents == null ? null : Number(data.platform_fee_cap_cents),
+        },
+        marketplaceFacilitator: Boolean(data.marketplace_facilitator_tax),
+      }
     : DEFAULT_LIMITS
 }
 
@@ -71,7 +80,7 @@ export async function loadCart(cartId: string): Promise<CartView | null> {
   const [{ data: cart }, { data: lines }, { data: payments }] = await Promise.all([
     db.from('planner_carts').select('*, venue_leads(contact_name, venue_name, event_date, event_type)').eq('id', cartId).maybeSingle(),
     db.from('planner_cart_lines').select('*').eq('cart_id', cartId).order('position'),
-    db.from('planner_cart_payments').select('id, kind, label, amount_cents, url, status, application_fee_cents, stripe_fee_cents, refunded_cents, fee_refunded_cents, dispute_status').eq('cart_id', cartId).order('created_at'),
+    db.from('planner_cart_payments').select('id, kind, label, amount_cents, url, status, application_fee_cents, platform_fee_cents, stripe_fee_cents, refunded_cents, fee_refunded_cents, dispute_status').eq('cart_id', cartId).order('created_at'),
   ])
   if (!cart) return null
   const names = await displayNames([cart.planner_user_id])
@@ -104,7 +113,7 @@ export async function loadCart(cartId: string): Promise<CartView | null> {
     payments: ((payments ?? []) as Row[]).map((p) => ({
       id: p.id, kind: p.kind, label: p.label, amountCents: Number(p.amount_cents), url: p.url, status: p.status,
       split: {
-        applicationFeeCents: Number(p.application_fee_cents), stripeFeeCents: p.stripe_fee_cents == null ? null : Number(p.stripe_fee_cents),
+        applicationFeeCents: Number(p.application_fee_cents), platformFeeCents: Number(p.platform_fee_cents ?? 0), stripeFeeCents: p.stripe_fee_cents == null ? null : Number(p.stripe_fee_cents),
         refundedCents: Number(p.refunded_cents), feeRefundedCents: Number(p.fee_refunded_cents), disputeStatus: p.dispute_status,
       },
     })),

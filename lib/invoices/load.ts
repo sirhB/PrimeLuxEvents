@@ -68,7 +68,7 @@ export async function loadInvoice(id: string): Promise<InvoiceView | null> {
       unitCents: Number(l.unit_cents), taxable: l.taxable,
     })),
     payments: ((pays ?? []) as Row[]).map((p) => ({
-      id: p.id, label: p.label, amountCents: Number(p.amount_cents), applicationFeeCents: Number(p.application_fee_cents),
+      id: p.id, label: p.label, amountCents: Number(p.amount_cents), applicationFeeCents: Number(p.application_fee_cents), platformFeeCents: Number(p.platform_fee_cents ?? 0),
       stripeFeeCents: p.stripe_fee_cents == null ? null : Number(p.stripe_fee_cents), dueDate: p.due_date, status: p.status,
       number: p.number, hostedUrl: p.hosted_invoice_url, pdfUrl: p.invoice_pdf,
     })),
@@ -88,6 +88,7 @@ export async function loadInvoiceContext(plannerId: string): Promise<InvoiceCont
     canInvoice: member.active, // = invoiceAllowed('create', ...): active and not banned
     connectReady: canTakePayments(connect),
     memberDiscountBps: limits.memberDiscountBps, maxLineDiscountBps: limits.maxLineDiscountBps,
+    platformFee: limits.platformFee, marketplaceFacilitator: limits.marketplaceFacilitator,
     catalog: catalog.filter((c) => c.itemType === 'product').map((c) => ({ productId: c.refId, name: c.name, category: c.category, listUnitCents: c.priceCents, setupFeeCents: c.setupFeeCents, eligible: c.eligible })),
     clients: ((clients ?? []) as Row[]).map((c) => ({ id: c.id, name: c.name, email: c.email })),
   }

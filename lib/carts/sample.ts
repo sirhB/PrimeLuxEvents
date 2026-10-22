@@ -4,7 +4,7 @@ import { priceCart } from './pricing'
 /** Mock data for /preview routes only. No real people or money. */
 export function samplePlannerContext(): PlannerCartContext {
   return {
-    limits: { memberDiscountBps: 5000, maxLineDiscountBps: 1500, defaultDepositBps: 3000 },
+    limits: { memberDiscountBps: 5000, maxLineDiscountBps: 1500, defaultDepositBps: 3000, platformFee: { bps: 0, flatCents: 0, minCents: null, capCents: null }, marketplaceFacilitator: false },
     memberStatus: 'active',
     memberActive: true,
     stripeConfigured: true,
@@ -29,9 +29,9 @@ export function sampleCart(status: CartView['status'] = 'draft'): CartView {
     approvedAt: status === 'approved' ? '2026-10-21T18:00:00Z' : null, updatedAt: '2026-10-21T16:00:00Z',
     payments: status === 'approved' ? [
       { id: 'p1', kind: 'deposit', label: 'Deposit (30%)', amountCents: 284484, url: null, status: 'paid',
-        split: { applicationFeeCents: 160000, stripeFeeCents: 8280, refundedCents: 0, feeRefundedCents: 0, disputeStatus: 'none' } },
+        split: { applicationFeeCents: 165690, platformFeeCents: 5690, stripeFeeCents: 8280, refundedCents: 0, feeRefundedCents: 0, disputeStatus: 'none' } },
       { id: 'p2', kind: 'final', label: 'Balance', amountCents: 663797, url: 'https://buy.stripe.com/test_demo', status: 'open',
-        split: { applicationFeeCents: 373300, stripeFeeCents: null, refundedCents: 0, feeRefundedCents: 0, disputeStatus: 'none' } },
+        split: { applicationFeeCents: 386576, platformFeeCents: 13276, stripeFeeCents: null, refundedCents: 0, feeRefundedCents: 0, disputeStatus: 'none' } },
     ] : [],
     lines: [
       { id: 'l1', itemType: 'product', refId: 'pr-chiavari', name: 'Gold Chiavari chair', imageUrl: null, listUnitCents: 1250, eligible: true, clientUnitCents: null, markupBps: null, setupFeeCents: 150, quantity: 140, discountBps: 0, note: 'Ivory cushions' },
