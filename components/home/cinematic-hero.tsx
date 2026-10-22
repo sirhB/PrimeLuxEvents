@@ -16,7 +16,7 @@ import { PLAN_EVENT_TYPES } from '@/lib/leads/plan-options'
 const FRAMES = [
   { src: '/images/suites/ceremony.jpg', alt: 'Ceremony aisle set with Prime Lux seating and florals' },
   { src: '/images/luxury_event_setup_celebration_1767781442112.png', alt: 'Reception tables dressed under chandeliers' },
-  { src: '/images/suites/venue-conservatory.jpg', alt: 'Long tables set in The Conservatory' },
+  { src: '/images/suites/venue-conservatory.jpg', alt: 'Long tables set for a party' },
 ]
 const LINES = ['Rentals for', 'the whole', 'celebration.']
 const EASE = [0.22, 1, 0.36, 1] as const

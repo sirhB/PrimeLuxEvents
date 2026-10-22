@@ -30,8 +30,8 @@ export default async function VenueAvailabilityPage() {
     <AdminPage>
       <AdminPageHeader
         eyebrow="Venue suite"
-        title="Room availability"
-        description="Block or open dates for each room. Holds and confirmed bookings from the venue desk appear here and on the public venue pages."
+        title="Pavilion availability"
+        description="Block or open dates for the Pavilion. Holds and confirmed bookings from the venue desk appear here and on the public venue pages."
       />
       <VenueCrm leads={[]} days={days} bookings={bookings} live={live} mode="availability" />
     </AdminPage>

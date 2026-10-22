@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { Presence } from '@/components/motion/presence'
 import { LEAD_STAGES, type LeadStage, type VenueDay, type VenueLeadRecord } from '@/lib/venues/crm'
-import { VENUE_LISTINGS } from '@/lib/venues/directory'
+import { VENUE_LISTINGS, resolveVenueId } from '@/lib/venues/directory'
 import {
   addVenueNote,
   createVenueBooking,
@@ -225,19 +225,21 @@ export function VenueCrm({
                 <button type="button" aria-label="Next month" className="min-h-10 min-w-10 border border-[var(--dashboard-border)] text-sm" onClick={() => setMonthOffset((value) => value + 1)}>›</button>
               </div>
             </div>
-            <label className="mt-3 block text-xs uppercase tracking-[0.16em]">
-              Show room
-              <select className="plan-field" value={roomFilter} onChange={(event) => setRoomFilter(event.target.value)}>
-                {VENUE_LISTINGS.map((venue) => <option key={venue.id} value={venue.id}>{venue.name}</option>)}
-              </select>
-            </label>
+            {VENUE_LISTINGS.length > 1 && (
+              <label className="mt-3 block text-xs uppercase tracking-[0.16em]">
+                Show room
+                <select className="plan-field" value={roomFilter} onChange={(event) => setRoomFilter(event.target.value)}>
+                  {VENUE_LISTINGS.map((venue) => <option key={venue.id} value={venue.id}>{venue.name}</option>)}
+                </select>
+              </label>
+            )}
             <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs font-medium text-[var(--dashboard-text-muted)]">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => <div key={day}>{day}</div>)}
             </div>
             <div className="mt-2 grid grid-cols-7 gap-1">
               {month.cells.map((cell, index) => {
-                const marks = days.filter((day) => day.day === cell && day.venue_id === roomFilter)
-                const leadMarks = cell ? bookings.filter((booking) => booking.venue_id === roomFilter && booking.status !== 'released' && booking.status !== 'cancelled' && booking.starts_on <= cell && cell <= booking.ends_on) : []
+                const marks = days.filter((day) => day.day === cell && resolveVenueId(day.venue_id) === roomFilter)
+                const leadMarks = cell ? bookings.filter((booking) => resolveVenueId(booking.venue_id) === roomFilter && booking.status !== 'released' && booking.status !== 'cancelled' && booking.starts_on <= cell && cell <= booking.ends_on) : []
                 return (
                   <div key={`${cell}-${index}`} className="min-h-16 border border-[var(--dashboard-border)] p-1 text-left text-xs">
                     <span>{cell ? Number(cell.slice(-2)) : ''}</span>
@@ -271,12 +273,16 @@ export function VenueCrm({
             }}
           >
             <h2 className="font-serif text-2xl">Availability</h2>
-            <label className="mt-3 block text-xs uppercase tracking-[0.16em]">
-              Room
-              <select name="venue_id" className="plan-field" value={roomFilter} onChange={(event) => setRoomFilter(event.target.value)}>
-                {VENUE_LISTINGS.map((venue) => <option key={venue.id} value={venue.id}>{venue.name}</option>)}
-              </select>
-            </label>
+            {VENUE_LISTINGS.length > 1 ? (
+              <label className="mt-3 block text-xs uppercase tracking-[0.16em]">
+                Room
+                <select name="venue_id" className="plan-field" value={roomFilter} onChange={(event) => setRoomFilter(event.target.value)}>
+                  {VENUE_LISTINGS.map((venue) => <option key={venue.id} value={venue.id}>{venue.name}</option>)}
+                </select>
+              </label>
+            ) : (
+              <input type="hidden" name="venue_id" value={roomFilter} />
+            )}
             <label className="mt-3 block text-xs uppercase tracking-[0.16em]">
               Day
               <input name="day" type="date" className="plan-field" />

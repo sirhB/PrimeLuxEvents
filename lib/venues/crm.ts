@@ -33,8 +33,8 @@ export type VenueLeadRecord = {
 export const SAMPLE_LEADS: VenueLeadRecord[] = [
   {
     id: 'sample-avery',
-    venue_id: '11111111-1111-4111-8111-111111111111',
-    venue_name: 'The Conservatory',
+    venue_id: '44444444-4444-4444-8444-444444444444',
+    venue_name: 'Prime Lux Pavilion',
     contact_name: 'Avery Cole',
     contact_email: 'avery.cole@example.com',
     contact_phone: '(203) 555-0148',
@@ -43,13 +43,13 @@ export const SAMPLE_LEADS: VenueLeadRecord[] = [
     stage: 'tour',
     source: 'sample',
     notes: [{ id: 'n1', body: 'Asked for a late-afternoon ceremony and a seated dinner.', author_name: 'Desk', created_at: '2026-10-12T15:00:00Z' }],
-    tours: [{ id: 't1', starts_at: '2026-10-18T18:00:00Z', status: 'scheduled', venue_id: '11111111-1111-4111-8111-111111111111' }],
+    tours: [{ id: 't1', starts_at: '2026-10-18T18:00:00Z', status: 'scheduled', venue_id: '44444444-4444-4444-8444-444444444444' }],
     bookings: [],
   },
   {
     id: 'sample-jordan',
-    venue_id: '22222222-2222-4222-8222-222222222222',
-    venue_name: 'The Gallery',
+    venue_id: '44444444-4444-4444-8444-444444444444',
+    venue_name: 'Prime Lux Pavilion',
     contact_name: 'Jordan Hale',
     contact_email: 'jordan.hale@example.com',
     contact_phone: '(203) 555-0194',
@@ -63,8 +63,8 @@ export const SAMPLE_LEADS: VenueLeadRecord[] = [
   },
   {
     id: 'sample-rene',
-    venue_id: '33333333-3333-4333-8333-333333333333',
-    venue_name: 'The Garden Court',
+    venue_id: '44444444-4444-4444-8444-444444444444',
+    venue_name: 'Prime Lux Pavilion',
     contact_name: 'René Patel',
     contact_email: 'rene.patel@example.com',
     contact_phone: '(475) 555-0112',
@@ -72,14 +72,14 @@ export const SAMPLE_LEADS: VenueLeadRecord[] = [
     guest_count: 110,
     stage: 'proposal',
     source: 'sample',
-    notes: [{ id: 'n2', body: 'Wants the terrace for cocktails and the loggia for dinner.', author_name: 'Desk', created_at: '2026-10-10T12:00:00Z' }],
+    notes: [{ id: 'n2', body: 'Wants cocktails near the entrance and dinner at long tables.', author_name: 'Desk', created_at: '2026-10-10T12:00:00Z' }],
     tours: [],
     bookings: [],
   },
 ]
 
 export const SAMPLE_DAYS: VenueDay[] = [
-  { id: 'd1', venue_id: '11111111-1111-4111-8111-111111111111', day: '2026-11-14', status: 'hold' },
-  { id: 'd2', venue_id: '22222222-2222-4222-8222-222222222222', day: '2026-12-04', status: 'open' },
-  { id: 'd3', venue_id: '33333333-3333-4333-8333-333333333333', day: '2026-10-18', status: 'booked' },
+  { id: 'd1', venue_id: '44444444-4444-4444-8444-444444444444', day: '2026-11-14', status: 'hold' },
+  { id: 'd2', venue_id: '44444444-4444-4444-8444-444444444444', day: '2026-12-04', status: 'open' },
+  { id: 'd3', venue_id: '44444444-4444-4444-8444-444444444444', day: '2026-10-18', status: 'booked' },
 ]

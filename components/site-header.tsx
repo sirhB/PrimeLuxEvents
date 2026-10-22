@@ -19,7 +19,7 @@ import { useCart } from '@/components/providers/cart-provider'
 const LINKS = [
   { href: '/catalog', label: 'Rentals' },
   { href: '/packages', label: 'Packages' },
-  { href: '/venues', label: 'Venues' },
+  { href: '/venues/prime-lux-pavilion', label: 'The Pavilion' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/about', label: 'About' },
 ]

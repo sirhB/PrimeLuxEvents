@@ -13,71 +13,43 @@ export type VenueListing = {
   tagline?: string
   details?: Array<{ label: string; value: string }>
   bestFor?: string[]
+  address?: string
 }
+
+/** Prime Lux has one hall. Address confirmed by the owner (Devyn, Oct 2026). */
+export const PAVILION_ADDRESS = '2 Research Dr, Shelton, CT 06484'
+export const PAVILION_MAPS_URL =
+  'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Prime Lux Pavilion, 2 Research Dr, Shelton, CT 06484')
+
+export const PAVILION_ID = '44444444-4444-4444-8444-444444444444'
+export const PAVILION_SLUG = 'prime-lux-pavilion'
+/** Old placeholder rooms; their slugs redirect and their ids map to the Pavilion. */
+export const RETIRED_VENUE_IDS = [
+  '11111111-1111-4111-8111-111111111111',
+  '22222222-2222-4222-8222-222222222222',
+  '33333333-3333-4333-8333-333333333333',
+]
 
 export const VENUE_LISTINGS: VenueListing[] = [
   {
-    id: '11111111-1111-4111-8111-111111111111',
-    slug: 'the-conservatory',
-    name: 'The Conservatory',
+    id: PAVILION_ID,
+    slug: PAVILION_SLUG,
+    name: 'Prime Lux Pavilion',
     neighborhood: 'Shelton',
     city: 'Connecticut',
-    capacity: 180,
+    capacity: 344, // from public listing, pending owner confirmation
     description:
-      'A glass-roofed room with pale stone underfoot. Daylight does most of the decorating. It holds a ceremony, a long table, or both.',
-    image: '/images/suites/venue-conservatory.jpg',
-    amenities: ['Ceremony lawn approach', 'In-house power', 'Bridal room', 'Street parking'],
-    tagline: 'Glass overhead, stone underfoot.',
-    gallery: ['/images/suites/venue-conservatory.jpg', '/images/suites/ceremony.jpg', '/images/luxury_event_setup_celebration_1767781442112.png'],
+      'One big, open hall that we set up fresh for every party. You bring the theme and the guest list. We dress the room with our own rentals, down to the backdrop and the balloons. Birthdays, showers, christenings and weddings have all happened here, and the room looks different every time.',
+    image: '/images/venue/pavilion-hall.jpg',
+    amenities: [],
+    tagline: 'One open hall, set up your way.',
+    gallery: ['/images/venue/pavilion-hall.jpg'],
     details: [
-      { label: 'Seated dinner', value: '140' },
-      { label: 'Ceremony', value: '180' },
-      { label: 'Cocktail', value: '180' },
-      { label: 'Light', value: 'Daylight, glass roof' },
+      { label: 'Hall', value: '5,000 sq ft' }, // from public listing, pending owner confirmation
+      { label: 'Renovated', value: '2024' }, // from public listing, pending owner confirmation
     ],
-    bestFor: ['Ceremonies', 'Long-table dinners', 'Daytime receptions'],
-  },
-  {
-    id: '22222222-2222-4222-8222-222222222222',
-    slug: 'the-gallery',
-    name: 'The Gallery',
-    neighborhood: 'Shelton',
-    city: 'Connecticut',
-    capacity: 90,
-    description:
-      'Tall white walls and one chandelier. Built for dinners, launches, and evenings that should feel edited rather than filled.',
-    image: '/images/suites/venue-gallery.jpg',
-    amenities: ['Dimmer lighting', 'Gallery walls', 'Service entrance', 'Coat room'],
-    tagline: 'White walls, one chandelier.',
-    gallery: ['/images/suites/venue-gallery.jpg', '/images/luxury_furniture_collection_1767781427931.png', '/images/gallery-hero.png'],
-    details: [
-      { label: 'Seated dinner', value: '70' },
-      { label: 'Cocktail', value: '90' },
-      { label: 'Ceiling', value: 'Double height' },
-      { label: 'Light', value: 'Fully dimmable' },
-    ],
-    bestFor: ['Private dinners', 'Launches', 'Showers'],
-  },
-  {
-    id: '33333333-3333-4333-8333-333333333333',
-    slug: 'the-garden-court',
-    name: 'The Garden Court',
-    neighborhood: 'Shelton',
-    city: 'Connecticut',
-    capacity: 140,
-    description:
-      'A clipped courtyard and a stone terrace. Evenings stay outside as long as the weather agrees, then move under the covered loggia.',
-    image: '/images/suites/venue-garden.jpg',
-    amenities: ['Terrace', 'Loggia', 'Twilight lighting', 'Guest parking'],
-    tagline: 'A courtyard with a loggia for later.',
-    gallery: ['/images/suites/venue-garden.jpg', '/images/luxury-event-hero.png', '/images/suites/ceremony.jpg'],
-    details: [
-      { label: 'Seated dinner', value: '110' },
-      { label: 'Ceremony', value: '140' },
-      { label: 'Cocktail', value: '140' },
-      { label: 'Weather plan', value: 'Covered loggia' },
-    ],
-    bestFor: ['Garden ceremonies', 'Summer evenings', 'Rehearsal dinners'],
+    bestFor: ['Birthdays', 'Showers', 'Weddings'],
+    address: PAVILION_ADDRESS,
   },
 ]
 
@@ -87,4 +59,10 @@ export function venueBySlug(slug: string) {
 
 export function venueDefaults(slug: string) {
   return venueBySlug(slug)
+}
+
+/** Old room ids resolve to the Pavilion. */
+export function resolveVenueId(id: string | null | undefined) {
+  if (!id) return id ?? null
+  return RETIRED_VENUE_IDS.includes(id) ? PAVILION_ID : id
 }

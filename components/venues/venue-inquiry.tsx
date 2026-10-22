@@ -38,7 +38,7 @@ export function VenueInquiry({ venue }: { venue: VenueListing }) {
 
   return (
     <form action={onSubmit} className="grid gap-4">
-      <h2 className="font-serif text-3xl font-medium">Ask about this room</h2>
+      <h2 className="font-serif text-3xl font-medium">Ask about the Pavilion</h2>
       <input name="contact_name" required placeholder="Name" className="plan-field" autoComplete="name" />
       <input name="contact_email" type="email" required placeholder="Email" className="plan-field" autoComplete="email" />
       <input name="contact_phone" required placeholder="Phone" className="plan-field" autoComplete="tel" />

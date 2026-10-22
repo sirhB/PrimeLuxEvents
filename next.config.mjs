@@ -33,6 +33,13 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  async redirects() {
+    return ['the-conservatory', 'the-gallery', 'the-garden-court'].map((slug) => ({
+      source: `/venues/${slug}`,
+      destination: '/venues/prime-lux-pavilion',
+      permanent: true,
+    }))
+  },
   async headers() {
     return [
       {

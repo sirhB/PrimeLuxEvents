@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { VenueInquiry } from '@/components/venues/venue-inquiry'
 import { VenueAvailability } from '@/components/venues/venue-availability'
-import { VENUE_LISTINGS } from '@/lib/venues/directory'
-import { loadPublicVenues, loadVenue, loadVenueAvailability } from '@/lib/venues/load'
+import { VENUE_LISTINGS, PAVILION_MAPS_URL } from '@/lib/venues/directory'
+import { loadVenue, loadVenueAvailability } from '@/lib/venues/load'
 
 export const revalidate = 60
 
@@ -20,23 +20,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function VenuePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const [venue, venues] = await Promise.all([loadVenue(slug), loadPublicVenues()])
+  const venue = await loadVenue(slug)
   if (!venue) notFound()
   const availability = await loadVenueAvailability(venue.id)
   const gallery = venue.gallery?.length ? venue.gallery : [venue.image]
 
   return (
     <article className="pb-24">
-      <nav aria-label="Venues" className="mx-auto flex max-w-6xl gap-6 overflow-x-auto px-5 py-3 text-[11px] uppercase tracking-[0.2em] md:px-8">
-        <Link href="/venues" className="shrink-0 text-[var(--theme-muted)] hover:text-[var(--theme-dark)]">All venues</Link>
-        {venues.map((v) => (
-          <Link key={v.id} href={`/venues/${v.slug}`} aria-current={v.slug === venue.slug ? 'page' : undefined}
-            className={v.slug === venue.slug ? 'shrink-0 text-[var(--theme-dark)]' : 'shrink-0 text-[var(--theme-muted)] hover:text-[var(--theme-dark)]'}>
-            {v.name}
-          </Link>
-        ))}
-      </nav>
-
       <div className="relative h-[56svh] min-h-[340px] md:h-[68svh]">
         <img src={gallery[0]} alt={`${venue.name}`} className="h-full w-full object-cover" />
       </div>
@@ -47,6 +37,12 @@ export default async function VenuePage({ params }: { params: Promise<{ slug: st
           <h1 className="mt-3 font-serif text-5xl font-medium md:text-6xl">{venue.name}</h1>
           {venue.tagline && <p className="mt-2 font-serif text-2xl italic text-[var(--theme-muted)]">{venue.tagline}</p>}
           <p className="mt-5 max-w-xl font-light leading-relaxed text-[var(--theme-muted)]">{venue.description}</p>
+          {venue.address && (
+            <p className="mt-4 text-sm">
+              {venue.address} ·{' '}
+              <a href={PAVILION_MAPS_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">Get directions</a>
+            </p>
+          )}
 
           <section aria-labelledby="venue-capacity" className="mt-10">
             <h2 id="venue-capacity" className="lux-label">Capacity &amp; details</h2>
@@ -62,11 +58,11 @@ export default async function VenuePage({ params }: { params: Promise<{ slug: st
                 </div>
               ))}
             </dl>
-            <ul className="mt-6 flex flex-wrap gap-2">
+            {venue.amenities.length > 0 && <ul className="mt-6 flex flex-wrap gap-2">
               {venue.amenities.map((item) => (
                 <li key={item} className="border border-[var(--theme-dark)]/15 px-3 py-2 text-[11px] uppercase tracking-[0.16em]">{item}</li>
               ))}
-            </ul>
+            </ul>}
             {venue.bestFor?.length ? (
               <p className="mt-6 text-sm font-light text-[var(--theme-muted)]">Best for {venue.bestFor.join(', ').toLowerCase()}.</p>
             ) : null}
@@ -93,7 +89,7 @@ export default async function VenuePage({ params }: { params: Promise<{ slug: st
           <div className="md:sticky md:top-24">
             <VenueInquiry venue={venue} />
             <Link href="/catalog" className="mt-8 inline-block text-[11px] uppercase tracking-[0.2em] underline underline-offset-4">
-              Browse rentals for this room
+              Browse rentals for your party
             </Link>
           </div>
         </div>

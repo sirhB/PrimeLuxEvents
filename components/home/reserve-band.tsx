@@ -12,7 +12,7 @@ export function ReserveBand() {
       <div className="reserve-inner">
         <span className="reserve-hairline" aria-hidden="true" />
         <h2 id="reserve-title" className="reserve-title">Reserve your rentals.</h2>
-        <p className="reserve-line">Tell us the date. We hold the pieces, deliver, style, and collect.</p>
+        <p className="reserve-line">Tell us your date and what you have in mind. We'll hold your pieces and bring them out, then come back for them when it's over.</p>
         <div className="reserve-actions">
           <button type="button" className="lux-cta !bg-[var(--theme-accent)] !text-[var(--theme-on-accent)]" onClick={() => openPlan()}>
             {hasLead ? 'Your event details' : 'Plan your event'}

@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { COMPANY } from "@/lib/company"
 import { BrandLockup } from "@/components/brand/brand-logo"
+import { PAVILION_MAPS_URL } from "@/lib/venues/directory"
 
 export function SiteFooter() {
   const [settings, setSettings] = useState({
@@ -46,7 +47,7 @@ export function SiteFooter() {
               <BrandLockup className="text-[1.45rem]" />
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs font-light">
-              Venues, rentals, and the rest of the celebration. Shelton, Connecticut — serving Connecticut, Rhode Island, and Massachusetts.
+              Party rentals and our event hall, Prime Lux Pavilion. Shelton, Connecticut — serving Connecticut, Rhode Island, and Massachusetts.
             </p>
             <div className="flex gap-6">
               <a
@@ -81,12 +82,7 @@ export function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/venues" className="hover:text-foreground transition-colors">Venues</Link>
-                <ul className="mt-3 space-y-2 border-l border-[var(--theme-dark)]/10 pl-4 text-[13px]">
-                  <li><Link href="/venues/the-conservatory" className="hover:text-foreground transition-colors">The Conservatory</Link></li>
-                  <li><Link href="/venues/the-gallery" className="hover:text-foreground transition-colors">The Gallery</Link></li>
-                  <li><Link href="/venues/the-garden-court" className="hover:text-foreground transition-colors">The Garden Court</Link></li>
-                </ul>
+                <Link href="/venues/prime-lux-pavilion" className="hover:text-foreground transition-colors">The Pavilion</Link>
               </li>
               <li>
                 <Link href="/gallery" className="hover:text-foreground transition-colors flex items-center group">
@@ -137,7 +133,7 @@ export function SiteFooter() {
             <ul className="space-y-6 text-sm text-muted-foreground font-light">
               <li className="flex items-start gap-4">
                 <MapPin className="h-5 w-5 text-[var(--theme-muted)] shrink-0" />
-                <span className="whitespace-pre-line">{settings.company_address}</span>
+                <a href={PAVILION_MAPS_URL} target="_blank" rel="noopener noreferrer" className="whitespace-pre-line hover:text-foreground transition-colors">{settings.company_address}</a>
               </li>
               <li className="flex items-center gap-4">
                 <Phone className="h-5 w-5 text-[var(--theme-muted)] shrink-0" />
