@@ -35,3 +35,36 @@ export function stripeReason(code: string): 'requested_by_customer' | 'duplicate
 export function validIdempotencyKey(key: string): boolean {
   return /^[A-Za-z0-9_-]{16,80}$/.test(key)
 }
+
+/** A planner-collected payment: a direct charge on the planner's Stripe Connect account. */
+export type ConnectPayment = { id: string; amountCents: number; refundedCents: number; applicationFeeCents: number; paidAt?: string | null }
+
+export type ConnectRefundPlan =
+  | { ok: true; amount: number; full: boolean; parts: { id: string; amount: number; feeReturnedCents: number }[] }
+  | { ok: false; error: string }
+
+/**
+ * Planner-collected orders can be paid in several charges (deposit + installments) on the
+ * connected account. Spread a refund across them, newest first. Each part is refunded with
+ * refund_application_fee, so Stripe returns Prime Lux's application fee in proportion to the
+ * amount refunded on that charge; `feeReturnedCents` is that expected share (floor, matching Stripe).
+ */
+export function planConnectRefund(payments: ConnectPayment[], requestedCents?: number | null): ConnectRefundPlan {
+  const live = payments
+    .map((p) => ({ ...p, left: Math.max(0, Math.round(p.amountCents) - Math.round(p.refundedCents)) }))
+    .filter((p) => p.left > 0)
+    .sort((a, b) => String(b.paidAt ?? '').localeCompare(String(a.paidAt ?? '')))
+  const remaining = live.reduce((s, p) => s + p.left, 0)
+  const plan = planRefund(remaining, 0, requestedCents)
+  if (!plan.ok) return plan
+  let need = plan.amount
+  const parts: { id: string; amount: number; feeReturnedCents: number }[] = []
+  for (const p of live) {
+    if (need <= 0) break
+    const amount = Math.min(need, p.left)
+    const feeReturnedCents = p.amountCents > 0 ? Math.floor((p.applicationFeeCents * amount) / p.amountCents) : 0
+    parts.push({ id: p.id, amount, feeReturnedCents })
+    need -= amount
+  }
+  return { ok: true, amount: plan.amount, full: plan.full, parts }
+}

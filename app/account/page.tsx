@@ -5,7 +5,8 @@ import { Calendar, Package, Clock, ArrowRight, CheckCircle2, PenLine, Truck } fr
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { OrderStatusChip } from '@/components/account/order-status-chip'
-import { getPartnerProfileForUser } from '@/lib/auth/partners'
+import { getMembership } from '@/lib/membership/server'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 
 export default async function AccountPage() {
     const supabase = await createClient()
@@ -13,7 +14,7 @@ export default async function AccountPage() {
 
     if (!user) return null
 
-    const partner = await getPartnerProfileForUser(user.id)
+    const membership = await getMembership(createServiceRoleClient(), user.id).catch(() => null)
 
     const { data: orders } = await supabase
         .from('orders')
@@ -85,16 +86,16 @@ export default async function AccountPage() {
                 </p>
             </div>
 
-            {!partner && (
+            {(!membership || membership.status === 'none') && (
                 <div className="flex flex-col gap-3 rounded-2xl border border-[var(--champagne,#2f6b57)]/30 bg-white/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p className="text-sm font-medium">Event planner or decorator?</p>
                         <p className="text-xs text-muted-foreground">
-                            Join the Preferred Vendor program for trade rates and client share links.
+                            Planner membership: $99/month for 50% off eligible rentals, client carts, and invoicing.
                         </p>
                     </div>
                     <Button asChild variant="outline" className="rounded-full shrink-0">
-                        <Link href="/account/partner/apply">Learn more</Link>
+                        <Link href="/planners/membership">Learn more</Link>
                     </Button>
                 </div>
             )}

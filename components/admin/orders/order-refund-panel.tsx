@@ -68,7 +68,7 @@ export function OrderRefundPanel({
         startTransition(async () => {
             const result = await refundOrderPayment({ orderId, amountCents: requested, reasonCode, reasonNote: note, idempotencyKey: key })
             if (result.success) {
-                toast.success(`${result.duplicate ? 'Already refunded' : 'Refunded'} ${formatCents(result.amount)}${result.status === 'pending' ? ' (pending at Stripe)' : ''}`)
+                toast.success(`${result.duplicate ? 'Already refunded' : 'Refunded'} ${formatCents(result.amount)}${result.status === 'pending' ? ' (pending at Stripe)' : result.status === 'partial' ? ' (partly; see the refund log)' : ''}`)
                 setNote('')
                 setDollars('')
                 setKey(newKey())

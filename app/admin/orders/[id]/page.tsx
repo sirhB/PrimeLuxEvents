@@ -173,7 +173,9 @@ export default async function OrderDetailsPage({
                                 Rental payment refund
                             </CardTitle>
                             <CardDescription className="text-[var(--dashboard-text-muted)]">
-                                Refund all or part of the rental charge through Stripe. Every refund is recorded with its reason.
+                                {order.payment_method === 'stripe_connect_direct'
+                                    ? "Planner-collected order: refunds run on the planner's Stripe account, and Prime Lux's fee is returned in proportion. Every refund is recorded with its reason."
+                                    : 'Refund all or part of the rental charge through Stripe. Every refund is recorded with its reason.'}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -181,7 +183,7 @@ export default async function OrderDetailsPage({
                                 orderId={order.id}
                                 paidCents={order.total_amount || 0}
                                 refundedCents={order.refunded_amount || 0}
-                                hasStripePayment={Boolean(order.payment_intent_id && !String(order.payment_intent_id).startsWith('pi_mock_'))}
+                                hasStripePayment={order.payment_method === 'stripe_connect_direct' || Boolean(order.payment_intent_id && !String(order.payment_intent_id).startsWith('pi_mock_'))}
                                 refunds={refundRows || []}
                             />
                         </CardContent>

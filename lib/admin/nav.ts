@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import { userHasPermission } from '@/lib/auth/permission-catalog'
-import {
+import { ReceiptText,
   LayoutDashboard,
   ClipboardCheck,
   TrendingUp,
@@ -35,6 +35,8 @@ import {
   Landmark,
   NotebookPen,
   Bot,
+  ShoppingBag,
+  BadgeCheck,
 } from 'lucide-react'
 
 export type AdminNavItem = {
@@ -119,6 +121,18 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         href: '/admin/my-tasks',
         permission: 'tasks.view',
         keywords: ['today', 'overdue', 'assigned', 'checklist'],
+      },
+      {
+        icon: ShoppingBag,
+        label: 'Client carts',
+        href: '/admin/carts',
+        keywords: ['cart', 'quote', 'client', 'planner', 'markup'],
+      },
+      {
+        icon: ReceiptText,
+        label: 'Invoices',
+        href: '/admin/invoices',
+        keywords: ['invoice', 'bill', 'client', 'planner', 'stripe', 'deposit'],
       },
       {
         icon: ClipboardCheck,
@@ -243,7 +257,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [
       {
         icon: Handshake,
-        label: 'Preferred partners',
+        label: 'Legacy partners',
         href: '/admin/partners',
         permission: 'customers.view',
         keywords: ['planners', 'decorators', 'preferred', 'trade', 'partner', 'vendor'],
@@ -268,6 +282,13 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         href: '/admin/team/shifts',
         permission: 'shifts.view',
         keywords: ['schedule', 'shifts', 'roster'],
+      },
+      {
+        icon: BadgeCheck,
+        label: 'Planner members',
+        href: '/admin/members',
+        permission: 'users.view',
+        keywords: ['membership', 'planner', 'stripe', 'earnings', 'eligible', 'ban'],
       },
       {
         icon: Bot,
@@ -314,10 +335,10 @@ export const ADMIN_QUICK_ACTIONS: AdminNavItem[] = [
   { icon: Plus, label: 'New package', href: '/admin/packages/new', permission: 'catalog.create', keywords: ['add', 'create'] },
   {
     icon: Handshake,
-    label: 'Review partners',
-    href: '/admin/partners',
-    permission: 'customers.view',
-    keywords: ['approve', 'planner', 'preferred'],
+    label: 'Planner members',
+    href: '/admin/members',
+    permission: 'users.view',
+    keywords: ['planner', 'membership', 'preferred', 'partner'],
   },
 ]
 

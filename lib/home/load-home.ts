@@ -1,5 +1,4 @@
-import { readdirSync } from 'node:fs'
-import path from 'node:path'
+import publicImages from '@/lib/generated/public-images.json'
 import { createClient } from '@/lib/supabase/server'
 import { resolvePriceCents } from '@/lib/catalog/adapters'
 
@@ -40,8 +39,9 @@ function titleFromFile(file: string) {
 /** Offline fallback: the real product photos that ship in /public, named from their files. */
 function localProducts(): HomeProduct[] {
   try {
-    const dir = path.join(process.cwd(), 'public/images/products')
-    return readdirSync(dir)
+    return (publicImages as string[])
+      .filter((p) => p.startsWith('/images/products/') && !p.slice('/images/products/'.length).includes('/'))
+      .map((p) => p.slice('/images/products/'.length))
       .filter((f) => /\.(jpe?g|png|webp)$/i.test(f) && !/regular\./i.test(f))
       .map((file) => {
         const name = titleFromFile(file)

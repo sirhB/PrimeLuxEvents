@@ -27,6 +27,7 @@ export const ADMIN_ROUTE_RULES: AdminRouteRule[] = [
   { prefix: '/admin/customers', permission: 'customers.view' },
   { prefix: '/admin/messages', permission: 'customers.view' },
   { prefix: '/admin/partners', permission: 'customers.view' },
+  { prefix: '/admin/members', permission: 'users.view' },
   { prefix: '/admin/team/shifts', permission: 'shifts.view' },
   { prefix: '/admin/team', permission: 'users.view' },
   { prefix: '/admin/settings', permission: 'settings.view' },

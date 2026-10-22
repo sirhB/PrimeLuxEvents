@@ -30,15 +30,30 @@ const contentSecurityPolicy = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /** Photos are served from the CDN; never bundle public/ into serverless functions (Hobby 12-function limit). */
+  outputFileTracingExcludes: {
+    '/*': ['public/**/*'],
+  },
   typescript: {
     ignoreBuildErrors: false,
   },
+  /** Retired Preferred Partner portal -> planner membership; old rooms -> single Pavilion. */
   async redirects() {
-    return ['the-conservatory', 'the-gallery', 'the-garden-court'].map((slug) => ({
-      source: `/venues/${slug}`,
-      destination: '/venues/prime-lux-pavilion',
-      permanent: true,
-    }))
+    return [
+      { source: "/partners", destination: "/planners/membership", permanent: true },
+      { source: "/account/partner", destination: "/planners/membership", permanent: true },
+      { source: "/account/partner/apply", destination: "/planners/membership", permanent: true },
+      { source: "/account/partner/rates", destination: "/planners/membership", permanent: true },
+      { source: "/account/partner/payments", destination: "/planners/membership#payouts", permanent: true },
+      { source: "/account/partner/branding", destination: "/account/planner/invoices", permanent: true },
+      { source: "/account/partner/carts", destination: "/account/planner/carts", permanent: true },
+      { source: "/account/partner/carts/:id", destination: "/account/planner/carts", permanent: true },
+      ...['the-conservatory', 'the-gallery', 'the-garden-court'].map((slug) => ({
+        source: `/venues/${slug}`,
+        destination: '/venues/prime-lux-pavilion',
+        permanent: true,
+      })),
+    ]
   },
   async headers() {
     return [

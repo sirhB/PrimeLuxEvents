@@ -1,11 +1,14 @@
 import fs from 'fs'
 import path from 'path'
+import publicImages from '@/lib/generated/public-images.json'
 import type { AppProduct } from '@/lib/catalog/adapters'
 import {
   pickShowroomPieces,
   type PublicCategory,
   type PublicProduct,
 } from '@/lib/catalog/catalog-view'
+
+const PUBLIC_IMAGES = new Set(publicImages as string[])
 
 const SQL_PATH = path.join(
   process.cwd(),
@@ -93,7 +96,7 @@ function parseValueTuples(block: string): string[][] {
 
 function imageExists(url: string | null) {
   if (!url || !url.startsWith('/images/')) return false
-  return fs.existsSync(path.join(process.cwd(), 'public', url))
+  return PUBLIC_IMAGES.has(url)
 }
 
 function parseSeedCatalog(sql: string): SeedCatalog {
