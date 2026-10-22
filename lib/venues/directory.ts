@@ -22,17 +22,17 @@ export const VENUE_LISTINGS: VenueListing[] = [
     name: 'The Conservatory',
     neighborhood: 'Shelton',
     city: 'Connecticut',
-    capacity: 180,
+    capacity: /* pending owner confirmation */ 180,
     description:
-      'A glass-roofed room with pale stone underfoot. Daylight does most of the decorating. It holds a ceremony, a long table, or both.',
+      'The roof is glass, so the room changes with the sky. Morning light comes in soft and even, and by late afternoon it turns gold across the stone floor. You can say your vows at one end and sit down to dinner at a long table at the other, and nobody has to move rooms.',
     image: '/images/suites/venue-conservatory.jpg',
     amenities: ['Ceremony lawn approach', 'In-house power', 'Bridal room', 'Street parking'],
-    tagline: 'Glass overhead, stone underfoot.',
+    tagline: 'A glass roof, a stone floor, and plenty of daylight.',
     gallery: ['/images/suites/venue-conservatory.jpg', '/images/suites/ceremony.jpg', '/images/luxury_event_setup_celebration_1767781442112.png'],
     details: [
-      { label: 'Seated dinner', value: '140' },
-      { label: 'Ceremony', value: '180' },
-      { label: 'Cocktail', value: '180' },
+      { label: 'Seated dinner', value: '140' }, // pending owner confirmation
+      { label: 'Ceremony', value: '180' }, // pending owner confirmation
+      { label: 'Cocktail', value: '180' }, // pending owner confirmation
       { label: 'Light', value: 'Daylight, glass roof' },
     ],
     bestFor: ['Ceremonies', 'Long-table dinners', 'Daytime receptions'],
@@ -43,16 +43,16 @@ export const VENUE_LISTINGS: VenueListing[] = [
     name: 'The Gallery',
     neighborhood: 'Shelton',
     city: 'Connecticut',
-    capacity: 90,
+    capacity: /* pending owner confirmation */ 90,
     description:
-      'Tall white walls and one chandelier. Built for dinners, launches, and evenings that should feel edited rather than filled.',
+      'Tall white walls, a double-height ceiling, and a single chandelier in the middle. The lights dim all the way down, so a dinner can start bright and end by candlelight. It suits a smaller crowd that wants room to talk.',
     image: '/images/suites/venue-gallery.jpg',
     amenities: ['Dimmer lighting', 'Gallery walls', 'Service entrance', 'Coat room'],
-    tagline: 'White walls, one chandelier.',
+    tagline: 'A quiet white room for smaller nights.',
     gallery: ['/images/suites/venue-gallery.jpg', '/images/luxury_furniture_collection_1767781427931.png', '/images/gallery-hero.png'],
     details: [
-      { label: 'Seated dinner', value: '70' },
-      { label: 'Cocktail', value: '90' },
+      { label: 'Seated dinner', value: '70' }, // pending owner confirmation
+      { label: 'Cocktail', value: '90' }, // pending owner confirmation
       { label: 'Ceiling', value: 'Double height' },
       { label: 'Light', value: 'Fully dimmable' },
     ],
@@ -64,17 +64,17 @@ export const VENUE_LISTINGS: VenueListing[] = [
     name: 'The Garden Court',
     neighborhood: 'Shelton',
     city: 'Connecticut',
-    capacity: 140,
+    capacity: /* pending owner confirmation */ 140,
     description:
-      'A clipped courtyard and a stone terrace. Evenings stay outside as long as the weather agrees, then move under the covered loggia.',
+      'An open courtyard with a stone terrace off to one side. On a warm night people tend to stay out until the light goes. If it rains, or the air turns cool, everyone steps under the covered loggia and the party keeps going.',
     image: '/images/suites/venue-garden.jpg',
     amenities: ['Terrace', 'Loggia', 'Twilight lighting', 'Guest parking'],
-    tagline: 'A courtyard with a loggia for later.',
+    tagline: 'Outside for as long as the weather lets you.',
     gallery: ['/images/suites/venue-garden.jpg', '/images/luxury-event-hero.png', '/images/suites/ceremony.jpg'],
     details: [
-      { label: 'Seated dinner', value: '110' },
-      { label: 'Ceremony', value: '140' },
-      { label: 'Cocktail', value: '140' },
+      { label: 'Seated dinner', value: '110' }, // pending owner confirmation
+      { label: 'Ceremony', value: '140' }, // pending owner confirmation
+      { label: 'Cocktail', value: '140' }, // pending owner confirmation
       { label: 'Weather plan', value: 'Covered loggia' },
     ],
     bestFor: ['Garden ceremonies', 'Summer evenings', 'Rehearsal dinners'],

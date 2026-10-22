@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useInView, useReducedMotion } from 'framer-motion'
+import { REVIEWS, GOOGLE_PROFILE_URL } from '@/lib/reviews/data'
 
 type Stat = { label: string; value: number | null; suffix?: string }
 
@@ -28,12 +29,11 @@ function CountUp({ value }: { value: number }) {
 
 /**
  * Proof. Stats are real counts only (catalog, categories, venues) — anything we
- * don't know shows as a labeled placeholder. Reviews are placeholders until a
- * real review source (e.g. Google Business Profile) is connected.
+ * don't know shows as a labeled placeholder. Reviews are real public Google
+ * reviews from lib/reviews/data.ts; the strip hides itself if that list is empty.
  */
 export function Proof({ stats }: { stats: Stat[] }) {
   const [paused, setPaused] = useState(false)
-  const placeholders = Array.from({ length: 5 }, (_, i) => i + 1)
   return (
     <section className="proof" aria-labelledby="proof-title">
       <h2 id="proof-title" className="sr-only">Proof</h2>
@@ -45,23 +45,33 @@ export function Proof({ stats }: { stats: Stat[] }) {
           </div>
         ))}
       </dl>
-      <div className="proof-marquee" data-paused={paused || undefined}>
-        <button type="button" className="proof-pause" onClick={() => setPaused((p) => !p)} aria-pressed={paused}>
-          {paused ? 'Play reviews' : 'Pause reviews'}
-        </button>
-        <div className="proof-track">
-          {[0, 1].map((dup) => (
-            <ul key={dup} className="proof-row" aria-hidden={dup === 1 || undefined}>
-              {placeholders.map((i) => (
-                <li key={i} className="proof-card">
-                  <p className="proof-ph-label">Review placeholder {i}</p>
-                  <p className="proof-quote">Connect Google reviews to show real client quotes here.</p>
-                </li>
+      {REVIEWS.length > 0 && (
+        <>
+          <div className="proof-marquee" data-paused={paused || undefined}>
+            <button type="button" className="proof-pause" onClick={() => setPaused((p) => !p)} aria-pressed={paused}>
+              {paused ? 'Play reviews' : 'Pause reviews'}
+            </button>
+            <div className="proof-track">
+              {[0, 1].map((dup) => (
+                <ul key={dup} className="proof-row" aria-hidden={dup === 1 || undefined}>
+                  {REVIEWS.map((r) => (
+                    <li key={r.name} className="proof-card">
+                      <p className="proof-ph-label" aria-label={`${r.rating} out of 5 stars`}>{'★'.repeat(r.rating)}</p>
+                      <p className="proof-quote">“{r.quote}”</p>
+                      <p className="proof-ph-label">{r.name} · {r.source}</p>
+                    </li>
+                  ))}
+                </ul>
               ))}
-            </ul>
-          ))}
-        </div>
-      </div>
+            </div>
+          </div>
+          <p className="mt-4 text-center text-sm">
+            <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+              Read more on Google
+            </a>
+          </p>
+        </>
+      )}
     </section>
   )
 }
