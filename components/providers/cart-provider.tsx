@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useRef, useState, useEffect, ty
 import { type EventDetails, EventDetailsDialog } from "@/components/event-details-dialog"
 import { PlanSheet } from "@/components/plan/plan-sheet"
 import { getLeadSnapshot, syncLeadCart, type LeadSnapshot } from "@/app/plan/lead-actions"
-import { LEAD_STORAGE_KEY } from "@/lib/leads/plan-options"
+import { LEAD_STORAGE_KEY, type PlanLeadDraft } from "@/lib/leads/plan-options"
 
 export type CartItem = {
   id: string
@@ -44,7 +44,7 @@ type CartContextType = {
   lead: LeadSnapshot | null
   setLeadDone: (leadId: string) => void
   /** Open the plan flow. With a lead it opens in edit mode. */
-  openPlan: (opts?: { intent?: "cart" | "plan" }) => void
+  openPlan: (opts?: { intent?: "cart" | "plan"; draft?: Partial<PlanLeadDraft>; step?: number }) => void
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -58,6 +58,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [leadId, setLeadId] = useState<string | null>(null)
   const [planOpen, setPlanOpen] = useState(false)
   const [planIntent, setPlanIntent] = useState<"cart" | "plan">("plan")
+  const [planDraft, setPlanDraft] = useState<Partial<PlanLeadDraft> | null>(null)
+  const [planStep, setPlanStep] = useState(0)
   const pendingAdd = useRef<null | (() => void)>(null)
   const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -209,8 +211,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addPackageItem: CartContextType["addPackageItem"] = (packageId, selections, data, quantity = 1) =>
     gate(() => rawAddPackageItem(packageId, selections, data, quantity))
 
-  const openPlan = useCallback((opts?: { intent?: "cart" | "plan" }) => {
+  const openPlan = useCallback((opts?: { intent?: "cart" | "plan"; draft?: Partial<PlanLeadDraft>; step?: number }) => {
     setPlanIntent(opts?.intent ?? "plan")
+    setPlanDraft(opts?.draft ?? null)
+    setPlanStep(opts?.step ?? 0)
     setPlanOpen(true)
   }, [])
 
@@ -268,7 +272,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         onClose={() => { pendingAdd.current = null; setPlanOpen(false) }}
         intent={planIntent}
         editing={hasLead}
-        initial={hasLead ? lead?.details : null}
+        initial={{ ...(hasLead ? lead?.details : {}), ...(planDraft || {}) }}
+        initialStep={planStep}
         prefill={lead?.prefill}
         onDone={onPlanDone}
         onSkip={hasLead ? () => setPlanOpen(false) : undefined}
