@@ -7,7 +7,8 @@ import { AccountBottomBar } from '@/components/account-bottom-bar'
 import { AccountPortalHeader } from '@/components/account-portal-header'
 import { InstallPrompt } from '@/components/pwa/install-prompt'
 import { claimOrdersForCurrentUser } from '@/app/account/actions'
-import { getPartnerProfileForUser } from '@/lib/auth/partners'
+import { getMembership } from '@/lib/membership/server'
+import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import type { PartnerNavStatus } from '@/components/account-sidebar'
 
 export const metadata: Metadata = {
@@ -49,8 +50,11 @@ export default async function AccountLayout({
         .eq('user_id', user.id)
         .order('delivery_date', { ascending: true })
 
-    const partner = await getPartnerProfileForUser(user.id)
-    const partnerStatus: PartnerNavStatus = partner?.status ?? 'none'
+    // Planner nav: members get carts + invoices; former members keep read access to their own
+    // invoices (open ones stay payable). Replaces the old Preferred Partner portal.
+    const membership = await getMembership(createServiceRoleClient(), user.id).catch(() => null)
+    const partnerStatus: PartnerNavStatus =
+        !membership || membership.status === 'none' ? 'none' : membership.status === 'active' ? 'member' : 'former'
 
     const now = new Date()
     const upcomingOrder = orders?.find(

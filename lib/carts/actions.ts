@@ -28,7 +28,8 @@ async function caller() {
 
 function touch(cartId?: string) {
   revalidatePath('/admin/carts')
-  if (cartId) revalidatePath(`/admin/carts/${cartId}`)
+  revalidatePath('/account/planner/carts')
+  if (cartId) { revalidatePath(`/admin/carts/${cartId}`); revalidatePath(`/account/planner/carts/${cartId}`) }
   revalidatePath('/account/event')
   revalidatePath('/admin/members')
 }

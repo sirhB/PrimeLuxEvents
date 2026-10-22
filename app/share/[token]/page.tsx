@@ -3,22 +3,6 @@ import { formatCentsWithCommas } from '@/lib/format-money'
 import { resolvePriceCents } from '@/lib/catalog/adapters'
 import type { Metadata } from 'next'
 
-function partnerPaymentRows(partner: any) {
-  if (!partner) return []
-  const rows: { label: string; value: string }[] = []
-  if (partner.payment_zelle) rows.push({ label: 'Zelle', value: partner.payment_zelle })
-  if (partner.payment_venmo) rows.push({ label: 'Venmo', value: partner.payment_venmo })
-  if (partner.payment_apple_cash) rows.push({ label: 'Apple Cash', value: partner.payment_apple_cash })
-  if (partner.payment_cash_app) rows.push({ label: 'Cash App', value: partner.payment_cash_app })
-  if (partner.payment_other_value) {
-    rows.push({
-      label: partner.payment_other_label?.trim() || 'Other',
-      value: partner.payment_other_value,
-    })
-  }
-  return rows
-}
-
 function brandName(partner: any) {
   return partner?.brand_display_name?.trim() || partner?.company_name || 'Your planner'
 }
@@ -66,7 +50,6 @@ export default async function SharedCartPublicPage({
 
   const { cart, partner, products } = result
   const productMap = new Map((products || []).map((p: any) => [p.id, p]))
-  const paymentRows = partnerPaymentRows(partner)
   const name = brandName(partner)
   const color = accent(partner)
   const invoiceRef = `INV-${String(cart.id).slice(0, 8).toUpperCase()}`
@@ -278,50 +261,18 @@ export default async function SharedCartPublicPage({
               </p>
             </div>
 
-            {/* Payment methods */}
+            {/* Legacy Preferred Partner link: off-platform payment instructions are retired. */}
             <section
               className="rounded-sm border px-5 py-5"
               style={{ borderColor: `${color}33`, backgroundColor: `${color}08` }}
             >
               <h2 className="text-sm font-semibold" style={{ color }}>
-                How to pay
+                Ready to book?
               </h2>
               <p className="mt-1 text-sm text-neutral-600">
-                Please send {formatCentsWithCommas(cart.retail_total)} to {name} using one of the
-                methods below. This invoice does not accept card payments online.
+                This is a read-only copy of an earlier selection. Ask {name} for a current Prime Lux
+                invoice to book and pay securely online.
               </p>
-              {paymentRows.length === 0 ? (
-                <p className="mt-4 text-sm text-neutral-500">
-                  Contact {name}
-                  {partner?.phone ? ` at ${partner.phone}` : ''}
-                  {partner?.business_email ? ` or ${partner.business_email}` : ''} for payment
-                  instructions.
-                </p>
-              ) : (
-                <ul className="mt-4 divide-y divide-neutral-200/80">
-                  {paymentRows.map((row) => (
-                    <li
-                      key={row.label}
-                      className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between"
-                    >
-                      <span
-                        className="text-[10px] font-semibold uppercase tracking-[0.18em]"
-                        style={{ color }}
-                      >
-                        {row.label}
-                      </span>
-                      <span className="break-all text-sm font-medium text-neutral-900">
-                        {row.value}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {partner?.payment_instructions && (
-                <p className="mt-4 border-t border-neutral-200/80 pt-4 text-sm text-neutral-600">
-                  {partner.payment_instructions}
-                </p>
-              )}
             </section>
 
             <footer className="space-y-2 border-t border-neutral-100 pt-6 text-center text-xs text-neutral-500">

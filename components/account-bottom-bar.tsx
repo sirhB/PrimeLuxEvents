@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ShoppingCart, Heart, CalendarCheck, Handshake, CalendarRange } from 'lucide-react'
+import { LayoutDashboard, ShoppingCart, Heart, CalendarCheck, ReceiptText, CalendarRange } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { usePwaContext } from '@/components/providers/pwa-provider'
 import type { PartnerNavStatus } from '@/components/account-sidebar'
@@ -15,12 +15,12 @@ export function AccountBottomBar({ partnerStatus = 'none' }: { partnerStatus?: P
     { title: 'Home', href: '/account', icon: LayoutDashboard },
     { title: 'Event', href: '/account/event', icon: CalendarRange },
     { title: 'Orders', href: '/account/orders', icon: ShoppingCart },
-    partnerStatus === 'active'
-      ? { title: 'Partner', href: '/account/partner', icon: Handshake }
+    partnerStatus !== 'none'
+      ? { title: 'Invoices', href: '/account/planner/invoices', icon: ReceiptText }
       : { title: 'Saved', href: '/account/favorites', icon: Heart },
     { title: 'Visits', href: '/account/appointments', icon: CalendarCheck },
-    partnerStatus === 'active'
-      ? { title: 'Carts', href: '/account/partner/carts', icon: ShoppingCart }
+    partnerStatus !== 'none'
+      ? { title: 'Carts', href: '/account/planner/carts', icon: ShoppingCart }
       : { title: 'Saved', href: '/account/favorites', icon: Heart },
   ]
 
@@ -35,7 +35,7 @@ export function AccountBottomBar({ partnerStatus = 'none' }: { partnerStatus?: P
   // Ensure non-partners still get Chat-like fifth slot: favorites already covered;
   // keep 4–5 items max
   const finalItems =
-    partnerStatus === 'active'
+    partnerStatus !== 'none'
       ? items
       : [
           { title: 'Home', href: '/account', icon: LayoutDashboard },

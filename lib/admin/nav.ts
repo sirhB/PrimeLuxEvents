@@ -250,7 +250,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [
       {
         icon: Handshake,
-        label: 'Preferred partners',
+        label: 'Legacy partners',
         href: '/admin/partners',
         permission: 'customers.view',
         keywords: ['planners', 'decorators', 'preferred', 'trade', 'partner', 'vendor'],
@@ -328,10 +328,10 @@ export const ADMIN_QUICK_ACTIONS: AdminNavItem[] = [
   { icon: Plus, label: 'New package', href: '/admin/packages/new', permission: 'catalog.create', keywords: ['add', 'create'] },
   {
     icon: Handshake,
-    label: 'Review partners',
-    href: '/admin/partners',
-    permission: 'customers.view',
-    keywords: ['approve', 'planner', 'preferred'],
+    label: 'Planner members',
+    href: '/admin/members',
+    permission: 'users.view',
+    keywords: ['planner', 'membership', 'preferred', 'partner'],
   },
 ]
 

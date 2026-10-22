@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import { PanelTabs } from '@/components/admin/panel-tabs'
+import { usePlannerBase } from './paths'
 import { Figures, Notice, PressButton, StateChip, money, shortDate } from '@/components/admin/carts/parts'
 import { createInvoice, upsertClient } from '@/lib/invoices/actions'
 import type { DisplayStatus } from '@/lib/invoices/math'
@@ -18,6 +19,7 @@ const EASE = [0.23, 1, 0.32, 1] as const
 export function InvoicesDashboard({ invoices, clients, canInvoice, showPlanner = false, demo = false }: {
   invoices: InvoiceSummary[]; clients: ClientView[]; canInvoice: boolean; showPlanner?: boolean; demo?: boolean
 }) {
+  const base = usePlannerBase()
   const [tab, setTab] = useState<(typeof TABS)[number]>('invoices')
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>('all')
   const shown = useMemo(() => invoices.filter((i) => filter === 'all' || i.display === filter), [invoices, filter])
@@ -52,7 +54,7 @@ export function InvoicesDashboard({ invoices, clients, canInvoice, showPlanner =
                 <ul className="divide-y divide-[var(--dashboard-border)] border-y border-[var(--dashboard-border)] bg-[var(--dashboard-card)]">
                   {shown.map((i) => (
                     <li key={i.id}>
-                      <Link href={`/admin/invoices/${i.id}`} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 px-4 py-4 transition-colors hover:bg-[var(--dashboard-card-hover)] active:bg-[var(--dashboard-surface)]">
+                      <Link href={demo ? base.invoices : `${base.invoices}/${i.id}`} className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-1 px-4 py-4 transition-colors hover:bg-[var(--dashboard-card-hover)] active:bg-[var(--dashboard-surface)]">
                         <span className="min-w-0 truncate font-medium">{i.clientName}</span>
                         <span className="text-right text-sm tabular-nums">{money(i.totalCents)}</span>
                         <span className="min-w-0 truncate text-xs text-[var(--dashboard-text-muted)]">
@@ -80,9 +82,10 @@ function NewInvoice({ clients, disabled, demo }: { clients: ClientView[]; disabl
   const [err, setErr] = useState<string | null>(null)
   const [pending, start] = useTransition()
   const router = useRouter()
+  const base = usePlannerBase()
   const go = () => {
     if (demo) { router.push('/preview/invoice-editor'); return }
-    start(async () => { const r = await createInvoice(client); if (r.ok) router.push(`/admin/invoices/${r.id}`); else setErr(r.error) })
+    start(async () => { const r = await createInvoice(client); if (r.ok) router.push(`${base.invoices}/${r.id}`); else setErr(r.error) })
   }
   return (
     <div className="grid gap-2 border border-[var(--dashboard-border)] bg-[var(--dashboard-card)] p-4 sm:grid-cols-[1fr_auto] sm:items-end">

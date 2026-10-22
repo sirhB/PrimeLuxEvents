@@ -10,7 +10,6 @@ import { createClient } from "@/lib/supabase/client"
 import { formatCurrency } from "@/lib/utils"
 import { resolvePriceCents } from "@/lib/catalog/adapters"
 import { motion, AnimatePresence } from "framer-motion"
-import { PartnerShareCartButton } from "@/components/partner/partner-share-cart-button"
 
 export function CartSheet() {
   const { items, removeItem, updateQuantity, cartCount, clearCart } = useCart()
@@ -329,21 +328,6 @@ export function CartSheet() {
               })()}
             </div>
             <div className="space-y-3">
-            <PartnerShareCartButton
-              disabled={items.reduce((acc, item) => {
-                if (item.packageId && item.packageData) {
-                  return acc + (resolvePriceCents({ price: item.packageData.price }) * item.quantity)
-                }
-                if (item.productId) {
-                  const product = products.find(p => p.id === item.productId)
-                  if (!product) return acc
-                  const price = resolvePriceCents(product)
-                  const modifiersPrice = Object.values(item.modifiers || {}).reduce((mAcc: number, curr: any) => mAcc + (curr.priceAdjustment || 0), 0)
-                  return acc + (price + modifiersPrice) * item.quantity
-                }
-                return acc
-              }, 0) < 15000}
-            />
             <Button
               className="lux-cta w-full !h-14 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => {

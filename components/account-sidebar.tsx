@@ -13,10 +13,8 @@ import {
     CalendarRange,
     MessageSquare,
     Handshake,
-    Percent,
-    Share2,
     ClipboardList,
-    Palette,
+    ReceiptText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { BrandLockup } from '@/components/brand/brand-logo'
@@ -24,7 +22,8 @@ import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
-export type PartnerNavStatus = 'none' | 'pending' | 'active' | 'suspended' | 'revoked'
+/** Planner membership state for account nav (replaces the old Preferred Partner status). */
+export type PartnerNavStatus = 'none' | 'member' | 'former'
 
 export const accountNavItems = [
     {
@@ -69,18 +68,13 @@ export const accountNavItems = [
     },
 ]
 
-const partnerActiveNav = [
-    { title: 'Partner home', href: '/account/partner', icon: Handshake },
-    { title: 'Shared carts', href: '/account/partner/carts', icon: Share2 },
-    { title: 'Trade rates', href: '/account/partner/rates', icon: Percent },
-    { title: 'Branding', href: '/account/partner/branding', icon: Palette },
-    { title: 'Client payments', href: '/account/partner/payments', icon: ClipboardList },
+const plannerNav = [
+    { title: 'Membership', href: '/planners/membership', icon: Handshake },
+    { title: 'Client carts', href: '/account/planner/carts', icon: ShoppingCart },
+    { title: 'Invoices', href: '/account/planner/invoices', icon: ReceiptText },
 ]
 
 function isNavItemActive(pathname: string, href: string) {
-    if (href === '/account/partner') {
-        return pathname === '/account/partner'
-    }
     return pathname === href || (href !== '/account' && pathname.startsWith(href))
 }
 
@@ -139,10 +133,10 @@ export function AccountNav({
 
                     <div className="mt-4 space-y-2 border-t border-white/10 pt-4">
                         <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--sidebar-navy-muted)]">
-                            Preferred vendor
+                            Planners
                         </p>
-                        {partnerStatus === 'active' ? (
-                            partnerActiveNav.map((item) => {
+                        {partnerStatus !== 'none' ? (
+                            plannerNav.map((item) => {
                                 const isActive = isNavItemActive(pathname, item.href)
                                 return (
                                     <Link
@@ -168,21 +162,17 @@ export function AccountNav({
                             })
                         ) : (
                             <Link
-                                href="/account/partner/apply"
+                                href="/planners/membership"
                                 onClick={onNavigate}
                                 className={cn(
                                     'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors',
-                                    pathname.startsWith('/account/partner')
+                                    pathname.startsWith('/planners')
                                         ? 'bg-white/10 font-semibold text-white'
                                         : 'text-[var(--sidebar-navy-muted)] hover:bg-white/5 hover:text-white'
                                 )}
                             >
                                 <ClipboardList className="h-4 w-4" />
-                                {partnerStatus === 'pending'
-                                    ? 'Application status'
-                                    : partnerStatus === 'suspended' || partnerStatus === 'revoked'
-                                      ? 'Partner access'
-                                      : 'Become a partner'}
+                                Planner membership
                             </Link>
                         )}
                     </div>

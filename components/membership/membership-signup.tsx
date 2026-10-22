@@ -99,7 +99,7 @@ export function MembershipSignup({ state, demo = false }: { state: SignupState; 
                   <p className="text-sm">{state.status === 'past_due' ? 'Your last payment failed. Update your card to keep your membership. If it stays unpaid, the membership is terminated permanently.' : `You’re a member${state.periodEnd ? `. Renews ${new Date(state.periodEnd).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}.`}</p>
                   <ConnectPayouts c={state.connect ?? { started: false, chargesEnabled: false, payoutsEnabled: false }} demo={demo} returned={Boolean(state.connectReturn)} />
                   <div className="grid gap-2 sm:grid-cols-2">
-                    <Link href="/admin/carts" className="inline-flex min-h-12 items-center justify-center bg-[var(--theme-dark)] text-sm font-medium text-white transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97]">Open client carts</Link>
+                    <Link href="/account/planner/carts" className="inline-flex min-h-12 items-center justify-center bg-[var(--theme-dark)] text-sm font-medium text-white transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97]">Open client carts</Link>
                     <button type="button" onClick={portal} disabled={pending} className="hub-chip min-h-12">Manage billing</button>
                   </div>
                 </div>

@@ -33,6 +33,19 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  /** Retired Preferred Partner portal -> planner membership experience. */
+  async redirects() {
+    return [
+      { source: "/partners", destination: "/planners/membership", permanent: true },
+      { source: "/account/partner", destination: "/planners/membership", permanent: true },
+      { source: "/account/partner/apply", destination: "/planners/membership", permanent: true },
+      { source: "/account/partner/rates", destination: "/planners/membership", permanent: true },
+      { source: "/account/partner/payments", destination: "/planners/membership#payouts", permanent: true },
+      { source: "/account/partner/branding", destination: "/account/planner/invoices", permanent: true },
+      { source: "/account/partner/carts", destination: "/account/planner/carts", permanent: true },
+      { source: "/account/partner/carts/:id", destination: "/account/planner/carts", permanent: true },
+    ]
+  },
   async headers() {
     return [
       {

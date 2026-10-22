@@ -22,8 +22,8 @@ export default async function AdminPartnersPage() {
     return (
       <AdminPage>
         <AdminPageHeader
-          title="Preferred partners"
-          description="Approve planners and decorators for trade rates and client share carts."
+          title="Legacy partners"
+          description="Read-only records from the retired Preferred Partner program."
           eyebrow="CRM"
           breadcrumbs={[
             { label: 'Admin', href: '/admin' },

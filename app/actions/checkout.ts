@@ -4,10 +4,6 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { getDistanceBetweenAddresses } from '@/lib/geocoding'
 import { stripe, createMockPaymentIntent, allowMockPayments } from '@/lib/stripe'
 import { resolvePriceCents } from '@/lib/catalog/adapters'
-import {
-    getPartnerBaseDiscountPercent,
-    getPartnerProfileForUser,
-} from '@/lib/auth/partners'
 import { clampCheckoutAmount } from '@/lib/security/checkout-amounts'
 import { checkRateLimit, clientIpFromHeaders } from '@/lib/security/rate-limit'
 import { COMPANY } from '@/lib/company'
@@ -235,49 +231,11 @@ export async function calculateOrderTotal(
     const taxableAmount = subtotal + setupFee
     const taxAmount = Math.round(taxableAmount * taxRate)
 
-    // --- PARTNER / TRADE DISCOUNTS ---
-    // Active Preferred Vendor partners get a base trade % off merchandise,
-    // plus volume tiers from tiered_discounts (best of base vs volume).
-    let discountAmount = 0
-    let discountName = ''
-
-    const { data: { user } } = await supabase.auth.getUser()
-    const partner = user ? await getPartnerProfileForUser(user.id) : null
-
-    if (partner?.status === 'active') {
-        const basePercent = await getPartnerBaseDiscountPercent(partner)
-        const baseDiscount = Math.round(subtotal * (basePercent / 100))
-        const discountParts: string[] = []
-
-        if (baseDiscount > 0) {
-            discountParts.push(`${partner.tier} ${basePercent}% trade`)
-        }
-
-        const { data: discounts } = await supabase
-            .from('tiered_discounts')
-            .select('*')
-            .eq('is_active', true)
-            .order('min_cart_total', { ascending: false })
-
-        let volumeDiscount = 0
-        if (discounts && discounts.length > 0) {
-            for (const discount of discounts) {
-                if (subtotal >= discount.min_cart_total) {
-                    if (discount.discount_type === 'percentage') {
-                        volumeDiscount = Math.round(subtotal * (discount.discount_value / 100))
-                    } else {
-                        volumeDiscount = discount.discount_value
-                    }
-                    discountParts.push(discount.name)
-                    break
-                }
-            }
-        }
-
-        discountAmount = Math.max(baseDiscount, volumeDiscount)
-        if (discountAmount > subtotal) discountAmount = subtotal
-        discountName = discountParts.join(' + ') || 'Partner trade rate'
-    }
+    // No planner/trade discount at site checkout. The only planner discount is the 50%
+    // member price on eligible rentals, applied in planner carts and invoices
+    // (lib/carts/pricing.ts). The old Preferred/Elite/House partner tiers are retired.
+    const discountAmount = 0
+    const discountName = ''
 
     // Adjusted Taxable Amount
     const discountedSubtotal = Math.max(0, subtotal - discountAmount)

@@ -34,7 +34,8 @@ async function gate(plannerId: string, action: InvoiceAction): Promise<string | 
 
 function touch(id?: string) {
   revalidatePath('/admin/invoices')
-  if (id) revalidatePath(`/admin/invoices/${id}`)
+  revalidatePath('/account/planner/invoices')
+  if (id) { revalidatePath(`/admin/invoices/${id}`); revalidatePath(`/account/planner/invoices/${id}`) }
 }
 
 async function ownInvoice(c: NonNullable<Awaited<ReturnType<typeof caller>>>, id: string) {
