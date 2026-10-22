@@ -35,6 +35,8 @@ import {
   Landmark,
   NotebookPen,
   Bot,
+  ShoppingBag,
+  BadgeCheck,
 } from 'lucide-react'
 
 export type AdminNavItem = {
@@ -112,6 +114,12 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         href: '/admin/my-tasks',
         permission: 'tasks.view',
         keywords: ['today', 'overdue', 'assigned', 'checklist'],
+      },
+      {
+        icon: ShoppingBag,
+        label: 'Client carts',
+        href: '/admin/carts',
+        keywords: ['cart', 'quote', 'client', 'planner', 'markup'],
       },
       {
         icon: ClipboardCheck,
@@ -261,6 +269,13 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         href: '/admin/team/shifts',
         permission: 'shifts.view',
         keywords: ['schedule', 'shifts', 'roster'],
+      },
+      {
+        icon: BadgeCheck,
+        label: 'Planner members',
+        href: '/admin/members',
+        permission: 'users.view',
+        keywords: ['membership', 'planner', 'stripe', 'earnings', 'eligible', 'ban'],
       },
       {
         icon: Bot,

@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test:security": "node --experimental-strip-types scripts/check-safe-path.mjs && node --experimental-strip-types scripts/check-bot-control.mjs",
+    "test:security": "node --experimental-strip-types scripts/check-safe-path.mjs && node --experimental-strip-types scripts/check-bot-control.mjs && node --experimental-strip-types scripts/check-carts.mjs",
+    "test:carts": "node --experimental-strip-types scripts/check-carts.mjs",
     "seed:new-db": "node scripts/seed-new-database.mjs",
     "bootstrap:super-admin": "node scripts/bootstrap-super-admin.mjs"
   },

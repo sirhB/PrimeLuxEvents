@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
 import { headers } from 'next/headers'
+import { handlePlannerStripeEvent } from '@/lib/membership/stripe-events'
 
 export async function POST(req: Request) {
     const body = await req.text()
@@ -28,6 +29,16 @@ export async function POST(req: Request) {
 
     // Service role: webhook has no user session and must update orders/payments despite RLS
     const supabase = createServiceRoleClient()
+
+    // Planner membership + planner cart events are handled separately; existing order flow is unchanged.
+    try {
+        if (await handlePlannerStripeEvent(event, supabase)) {
+            return NextResponse.json({ received: true })
+        }
+    } catch (err: any) {
+        console.error('Planner webhook error:', err?.message)
+        return NextResponse.json({ error: 'Planner event failed' }, { status: 500 })
+    }
 
     switch (event.type) {
         case 'payment_intent.succeeded': {

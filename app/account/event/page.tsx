@@ -1,10 +1,12 @@
 import { EventHub } from '@/components/account/event-hub'
 import { loadClientHub } from '@/lib/venues/load-client-hub'
+import { QuoteList } from '@/components/account/client-quote'
+import { loadClientQuotes } from '@/lib/carts/load'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AccountEventPage() {
-  const { hub, live } = await loadClientHub()
+  const [{ hub, live }, quotes] = await Promise.all([loadClientHub(), loadClientQuotes().catch(() => [])])
   if (!hub) {
     return (
       <div className="mx-auto max-w-lg">
@@ -16,5 +18,10 @@ export default async function AccountEventPage() {
       </div>
     )
   }
-  return <EventHub initial={hub} live={live} />
+  return (
+    <>
+      <QuoteList quotes={quotes} />
+      <EventHub initial={hub} live={live} />
+    </>
+  )
 }
