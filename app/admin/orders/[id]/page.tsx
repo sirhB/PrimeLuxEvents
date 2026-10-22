@@ -38,6 +38,8 @@ import { AdminQRCode } from '@/components/admin/qr-code'
 import { Truck, Search, ShoppingBag } from 'lucide-react'
 import { BagAssignmentManager } from '@/components/admin/bag-assignment-manager'
 import { OrderPickupDepositPanel } from '@/components/admin/orders/order-pickup-deposit-panel'
+import { OrderRefundPanel } from '@/components/admin/orders/order-refund-panel'
+import { hasPermission } from '@/lib/auth/authorization'
 
 export default async function OrderDetailsPage({
     params,
@@ -58,6 +60,15 @@ export default async function OrderDetailsPage({
     if (error || !order) {
         notFound()
     }
+
+    const canRefund = await hasPermission('orders.update')
+    const { data: refundRows } = canRefund
+        ? await supabase
+            .from('order_refunds')
+            .select('id, amount_cents, reason, status, created_at, created_by_email')
+            .eq('order_id', id)
+            .order('created_at', { ascending: false })
+        : { data: [] }
 
     async function updateStatus(formData: FormData) {
         'use server'
@@ -154,6 +165,28 @@ export default async function OrderDetailsPage({
                         </CardContent>
                     </Card>
                 </div>
+
+                {canRefund && (
+                    <Card className="glass-card border-none">
+                        <CardHeader>
+                            <CardTitle className="text-[var(--dashboard-text)] text-base font-semibold">
+                                Rental payment refund
+                            </CardTitle>
+                            <CardDescription className="text-[var(--dashboard-text-muted)]">
+                                Refund all or part of the rental charge through Stripe. Every refund is recorded with its reason.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <OrderRefundPanel
+                                orderId={order.id}
+                                paidCents={order.total_amount || 0}
+                                refundedCents={order.refunded_amount || 0}
+                                hasStripePayment={Boolean(order.payment_intent_id && !String(order.payment_intent_id).startsWith('pi_mock_'))}
+                                refunds={refundRows || []}
+                            />
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Pickup schedule + security deposit */}
                 <Card className="glass-card border-none">

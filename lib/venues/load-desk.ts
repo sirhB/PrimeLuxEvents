@@ -1,11 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
-import { buildSampleDesk, normalizeStage, type DeskWorkspace, type PipelineStage, type StaffTask } from '@/lib/venues/desk'
+import { buildSampleDesk, parseAbandonDays, normalizeStage, type DeskWorkspace, type PipelineStage, type StaffTask } from '@/lib/venues/desk'
 
 export async function loadVenueDesk(): Promise<{ desk: DeskWorkspace; live: boolean }> {
   const sample = buildSampleDesk()
   try {
     const supabase = await createClient()
-    const [leads, carts, contacts, companies, activities, tours, holds, proposals, lines, contracts, payments, reminders, tasks, comments, templates, items, views, notifications, schedule, layouts, documents, messages] = await Promise.all([
+    const [leads, carts, contacts, companies, activities, tours, holds, proposals, lines, contracts, payments, reminders, tasks, comments, templates, items, views, notifications, schedule, layouts, documents, messages, abandonSetting] = await Promise.all([
       supabase.from('venue_leads').select('*').order('created_at', { ascending: false }),
       supabase.from('lead_carts').select('*'),
       supabase.from('crm_contacts').select('*'),
@@ -28,10 +28,12 @@ export async function loadVenueDesk(): Promise<{ desk: DeskWorkspace; live: bool
       supabase.from('crm_layouts').select('*'),
       supabase.from('crm_documents').select('*').order('created_at', { ascending: false }),
       supabase.from('crm_messages').select('*').order('created_at', { ascending: true }),
+      supabase.from('settings').select('value').eq('key', 'crm_cart_abandon_days').maybeSingle(),
     ])
     if (leads.error || !leads.data) return { desk: sample, live: false }
     const contactRows = contacts.data || []
     const desk: DeskWorkspace = {
+      abandon_days: parseAbandonDays(abandonSetting.data?.value),
       companies: (companies.data || []).map((row) => ({ id: row.id, name: row.name, phone: row.phone, website: row.website })),
       contacts: contactRows.map((row) => ({ id: row.id, company_id: row.company_id, name: row.name, email: row.email, phone: row.phone, title: row.title })),
       leads: leads.data.map((row) => ({
@@ -78,7 +80,7 @@ export async function loadVenueDesk(): Promise<{ desk: DeskWorkspace; live: bool
       })),
       contracts: (contracts.data || []).map((row) => ({ id: row.id, lead_id: row.lead_id, proposal_id: row.proposal_id, status: row.status, signed_at: row.signed_at })),
       payments: (payments.data || []).map((row) => ({ id: row.id, lead_id: row.lead_id, kind: row.kind, status: row.status, amount_cents: row.amount_cents, due_on: row.due_on })),
-      reminders: (reminders.data || []).map((row) => ({ id: row.id, lead_id: row.lead_id, due_on: row.due_on, body: row.body, done: row.done, owner_name: row.owner_name || 'Staff' })),
+      reminders: (reminders.data || []).sort((a, b) => String(a.due_on).localeCompare(String(b.due_on))).map((row) => ({ id: row.id, lead_id: row.lead_id, due_on: row.due_on, body: row.body, done: row.done, owner_name: row.owner_name || 'Staff' })),
       tasks: (tasks.data || []).map((row) => ({
         id: row.id,
         lead_id: row.lead_id,

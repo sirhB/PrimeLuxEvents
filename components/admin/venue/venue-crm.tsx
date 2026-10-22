@@ -17,19 +17,32 @@ export function VenueCrm({
   leads: initialLeads,
   days: initialDays,
   live,
+  mode = 'full',
+  bookings = [],
 }: {
   leads: VenueLeadRecord[]
   days: VenueDay[]
   live: boolean
+  /** `availability` shows only the room calendar (Venue desk → Availability). */
+  mode?: 'full' | 'availability'
+  /** Lead holds and confirmed bookings, shown read-only on the calendar. */
+  bookings?: Array<{ id: string; venue_id: string | null; starts_on: string; ends_on: string; status: string }>
 }) {
   const [leads, setLeads] = useState(initialLeads)
   const [days, setDays] = useState(initialDays)
   const [selectedId, setSelectedId] = useState(initialLeads[0]?.id ?? '')
-  const [tab, setTab] = useState<'pipeline' | 'calendar'>('pipeline')
+  const [tab, setTab] = useState<'pipeline' | 'calendar'>(mode === 'availability' ? 'calendar' : 'pipeline')
+  const [monthOffset, setMonthOffset] = useState(0)
+  const [roomFilter, setRoomFilter] = useState<string>(VENUE_LISTINGS[0]?.id ?? '')
   const [message, setMessage] = useState('')
   const selected = leads.find((lead) => lead.id === selectedId) ?? null
 
-  const month = useMemo(() => buildMonth(new Date()), [])
+  const month = useMemo(() => {
+    const anchor = new Date()
+    anchor.setDate(1)
+    anchor.setMonth(anchor.getMonth() + monthOffset)
+    return buildMonth(anchor)
+  }, [monthOffset])
 
   async function run(task: () => Promise<void>, local: () => void) {
     setMessage('')
@@ -48,13 +61,13 @@ export function VenueCrm({
 
   return (
     <div className="space-y-5">
-      {!live && (
+      {!live && mode === 'full' && (
         <p className="border border-[var(--dashboard-border)] bg-white px-4 py-3 text-sm text-[var(--dashboard-text-muted)]">
           Sample pipeline. Inquiries from the venue pages and Plan your event replace these once the migration is applied.
         </p>
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="inline-flex border border-[var(--dashboard-border)] bg-white p-0.5">
+        <div className={cn('inline-flex border border-[var(--dashboard-border)] bg-white p-0.5', mode === 'availability' && 'hidden')}>
           {(['pipeline', 'calendar'] as const).map((item) => (
             <button
               key={item}
@@ -205,18 +218,34 @@ export function VenueCrm({
       ) : (
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="border border-[var(--dashboard-border)] bg-white p-4">
-            <h2 className="font-serif text-3xl">{month.label}</h2>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="font-serif text-3xl">{month.label}</h2>
+              <div className="flex items-center gap-1">
+                <button type="button" aria-label="Previous month" className="min-h-10 min-w-10 border border-[var(--dashboard-border)] text-sm" onClick={() => setMonthOffset((value) => value - 1)}>‹</button>
+                <button type="button" aria-label="Next month" className="min-h-10 min-w-10 border border-[var(--dashboard-border)] text-sm" onClick={() => setMonthOffset((value) => value + 1)}>›</button>
+              </div>
+            </div>
+            <label className="mt-3 block text-xs uppercase tracking-[0.16em]">
+              Show room
+              <select className="plan-field" value={roomFilter} onChange={(event) => setRoomFilter(event.target.value)}>
+                {VENUE_LISTINGS.map((venue) => <option key={venue.id} value={venue.id}>{venue.name}</option>)}
+              </select>
+            </label>
             <div className="mt-4 grid grid-cols-7 gap-1 text-center text-xs font-medium text-[var(--dashboard-text-muted)]">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => <div key={day}>{day}</div>)}
             </div>
             <div className="mt-2 grid grid-cols-7 gap-1">
               {month.cells.map((cell, index) => {
-                const marks = days.filter((day) => day.day === cell)
+                const marks = days.filter((day) => day.day === cell && day.venue_id === roomFilter)
+                const leadMarks = cell ? bookings.filter((booking) => booking.venue_id === roomFilter && booking.status !== 'released' && booking.status !== 'cancelled' && booking.starts_on <= cell && cell <= booking.ends_on) : []
                 return (
                   <div key={`${cell}-${index}`} className="min-h-16 border border-[var(--dashboard-border)] p-1 text-left text-xs">
                     <span>{cell ? Number(cell.slice(-2)) : ''}</span>
                     {marks.map((mark) => (
-                      <span key={mark.id} className="mt-1 block truncate text-xs font-medium">{mark.status}</span>
+                      <span key={mark.id} className="mt-1 block truncate text-xs font-medium">{mark.status === 'closed' ? 'blocked' : mark.status}</span>
+                    ))}
+                    {leadMarks.map((mark) => (
+                      <span key={mark.id} className="mt-1 block truncate text-xs text-[var(--dashboard-accent-gold)]">{mark.status === 'hold' ? 'lead hold' : 'booked'}</span>
                     ))}
                   </div>
                 )
@@ -244,7 +273,7 @@ export function VenueCrm({
             <h2 className="font-serif text-2xl">Availability</h2>
             <label className="mt-3 block text-xs uppercase tracking-[0.16em]">
               Room
-              <select name="venue_id" className="plan-field">
+              <select name="venue_id" className="plan-field" value={roomFilter} onChange={(event) => setRoomFilter(event.target.value)}>
                 {VENUE_LISTINGS.map((venue) => <option key={venue.id} value={venue.id}>{venue.name}</option>)}
               </select>
             </label>
@@ -255,13 +284,14 @@ export function VenueCrm({
             <label className="mt-3 block text-xs uppercase tracking-[0.16em]">
               Status
               <select name="status" className="plan-field">
-                <option value="open">Open</option>
+                <option value="open">Open (clear a block)</option>
                 <option value="hold">Hold</option>
                 <option value="booked">Booked</option>
-                <option value="closed">Closed</option>
+                <option value="closed">Blocked</option>
               </select>
             </label>
             <button type="submit" className="lux-cta mt-4 !min-h-10">Save day</button>
+            <p className="mt-3 text-xs text-[var(--dashboard-text-muted)]">The public venue page shows only Open, On hold, or Booked for each date. Lead holds and confirmed bookings show there automatically; setting Open never hides them.</p>
           </form>
         </div>
       )}

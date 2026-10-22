@@ -59,14 +59,20 @@ export async function createVenueBooking(leadId: string, venueId: string | null,
   revalidatePath('/admin/venue')
 }
 
+const DAY_STATUSES = new Set(['open', 'hold', 'booked', 'closed'])
+
 export async function setVenueAvailability(venueId: string, day: string, status: string) {
   const supabase = await requireUser()
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !DAY_STATUSES.has(status)) throw new Error('Pick a day and a status')
+  const { data: { user } } = await supabase.auth.getUser()
   const { error } = await supabase.from('venue_availability').upsert(
-    { venue_id: venueId, day, status },
+    { venue_id: venueId, day, status, updated_by: user?.id ?? null, updated_at: new Date().toISOString() },
     { onConflict: 'venue_id,day' },
   )
   if (error) throw new Error('Could not update availability')
   revalidatePath('/admin/venue')
+  revalidatePath('/admin/venue/availability')
+  revalidatePath('/venues/[slug]', 'page')
 }
 
 export async function updateEventPlanStatus(planId: string, status: string) {
