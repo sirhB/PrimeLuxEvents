@@ -30,6 +30,10 @@ const contentSecurityPolicy = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /** Photos are served from the CDN; never bundle public/ into serverless functions (Hobby 12-function limit). */
+  outputFileTracingExcludes: {
+    '/*': ['public/**/*'],
+  },
   typescript: {
     ignoreBuildErrors: false,
   },

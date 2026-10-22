@@ -16,7 +16,9 @@
     "seed:new-db": "node scripts/seed-new-database.mjs",
     "bootstrap:super-admin": "node scripts/bootstrap-super-admin.mjs",
     "create:admin": "node scripts/create-admin.mjs",
-    "test:admin-gaps": "node --experimental-strip-types scripts/check-admin-gaps.mjs"
+    "test:admin-gaps": "node --experimental-strip-types scripts/check-admin-gaps.mjs",
+    "images:manifest": "node scripts/gen-image-manifest.mjs",
+    "prebuild": "node scripts/gen-image-manifest.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
