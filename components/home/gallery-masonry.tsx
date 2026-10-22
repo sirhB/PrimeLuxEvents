@@ -7,10 +7,10 @@ import { MotionConfig, motion, useReducedMotion } from 'framer-motion'
 const SHOTS = [
   { src: '/images/suites/ceremony.jpg', alt: 'Ceremony aisle with white seating and florals', h: 'tall' },
   { src: '/images/luxury_event_setup_celebration_1767781442112.png', alt: 'Reception under chandeliers', h: 'wide' },
-  { src: '/images/suites/venue-gallery.jpg', alt: 'Dinner in The Gallery', h: 'sq' },
+  { src: '/images/suites/venue-gallery.jpg', alt: 'A dinner table set with rentals', h: 'sq' },
   { src: '/images/luxury_furniture_collection_1767781427931.png', alt: 'Lounge furniture collection', h: 'tall' },
-  { src: '/images/suites/venue-garden.jpg', alt: 'Evening in The Garden Court', h: 'sq' },
-  { src: '/images/suites/venue-conservatory.jpg', alt: 'Long tables in The Conservatory', h: 'wide' },
+  { src: '/images/suites/venue-garden.jpg', alt: 'An evening party setup', h: 'sq' },
+  { src: '/images/suites/venue-conservatory.jpg', alt: 'Long tables set for dinner', h: 'wide' },
 ]
 
 /** Scroll-driven clip-path reveal, once per image. Reduced motion: images simply appear. */

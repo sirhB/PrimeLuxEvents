@@ -1,3 +1,5 @@
+import { PAVILION_MAPS_URL } from '@/lib/venues/directory'
+
 /**
  * Real public Google reviews of PrimeLux Party Rentals (2 Research Dr, Shelton, CT).
  * Quotes are verbatim (trimmed with an ellipsis only). Do not reword.
@@ -12,8 +14,8 @@ export type Review = {
   url: string
 }
 
-export const GOOGLE_PROFILE_URL =
-  'https://www.google.com/maps/search/?api=1&query=PrimeLux+Party+Rentals+2+Research+Dr+Shelton+CT'
+/** Google Maps search for 2 Research Dr, Shelton, CT (owner-confirmed address). */
+export const GOOGLE_PROFILE_URL = PAVILION_MAPS_URL
 
 export const REVIEWS: Review[] = [
   {

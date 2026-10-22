@@ -19,7 +19,7 @@ export default function DashboardPreview() {
         todayTasks={[
           { id: 't1', title: 'Pick: Gold chiavari chairs ×120', category: 'pick', status: 'in_progress', customerName: 'Avery Cole', href: '#' },
           { id: 't2', title: 'Pack: Crystal chandelier set', category: 'pack', status: 'pending', customerName: 'Nina Voss', href: '#' },
-          { id: 't3', title: 'Load: Conservatory van', category: 'vehicle_load', status: 'pending', customerName: null, href: '#' },
+          { id: 't3', title: 'Load: Pavilion van', category: 'vehicle_load', status: 'pending', customerName: null, href: '#' },
         ]}
       />
     </div>

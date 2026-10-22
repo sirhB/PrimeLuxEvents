@@ -17,6 +17,7 @@ type VenueRow = {
 function fromRow(row: VenueRow): VenueListing {
   const base = venueBySlug(row.slug)
   return {
+    address: base?.address,
     gallery: base?.gallery,
     tagline: base?.tagline,
     details: base?.details,
@@ -28,7 +29,7 @@ function fromRow(row: VenueRow): VenueListing {
     city: row.city || 'Connecticut',
     capacity: row.capacity || 100,
     description: row.description || '',
-    image: row.image_url || '/images/suites/venue-gallery.jpg',
+    image: row.image_url || base?.image || '/images/venue/pavilion-hall.jpg',
     amenities: row.amenities || [],
   }
 }
@@ -41,8 +42,10 @@ export async function loadPublicVenues(): Promise<VenueListing[]> {
       .select('id, slug, name, neighborhood, city, capacity, description, image_url, amenities, published')
       .eq('published', true)
       .order('name')
-    if (error || !data?.length) return VENUE_LISTINGS
-    return (data as VenueRow[]).map(fromRow)
+    // Only venues that exist in the directory (the Pavilion). Retired placeholder rooms are ignored.
+    const rows = ((data || []) as VenueRow[]).filter((row) => venueBySlug(row.slug))
+    if (error || !rows.length) return VENUE_LISTINGS
+    return rows.map(fromRow)
   } catch {
     return VENUE_LISTINGS
   }

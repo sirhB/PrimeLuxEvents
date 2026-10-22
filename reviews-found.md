@@ -1,7 +1,7 @@
 # Public reviews found — Prime Lux Events (PrimeLux Party Rentals, 2 Research Dr, Shelton CT)
 
 Google Business Profile ratings (as reported by mirrors, Oct 2026): PrimeLux Party Rentals 4.5/5 (~50–53 Google reviews); Prime Lux Pavilion 5.0/5 (5 reviews).
-Google Maps link used on site: https://www.google.com/maps/search/?api=1&query=PrimeLux+Party+Rentals+2+Research+Dr+Shelton+CT
+Google Maps link used on site (owner-confirmed address): https://www.google.com/maps/search/?api=1&query=Prime%20Lux%20Pavilion%2C%202%20Research%20Dr%2C%20Shelton%2C%20CT%2006484
 
 Review text was read from public mirrors of the Google profile (Google/Yelp not directly fetchable from here):
 - https://localitybiz.com/27670440/primelux-party-rentals-%26-venue-shelton

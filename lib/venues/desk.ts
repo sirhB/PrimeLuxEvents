@@ -1,4 +1,4 @@
-import { VENUE_LISTINGS } from './directory'
+import { VENUE_LISTINGS, resolveVenueId } from './directory'
 import { DEFAULT_ABANDON_DAYS, parseAbandonDays } from './abandon'
 
 export { DEFAULT_ABANDON_DAYS, parseAbandonDays }
@@ -303,13 +303,13 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
     { id: 'ct-sam', company_id: null, name: 'Sam Idris', email: 'sam.idris@example.com', phone: '(203) 555-0120', title: null },
   ]
   const leads: Lead[] = [
-    { id: 'lead-avery', contact_id: 'ct-avery', company_id: 'co-cole', venue_id: '11111111-1111-4111-8111-111111111111', venue_name: 'The Conservatory', event_date: '2026-11-14', guest_count: 140, stage: 'tour', source: 'website', owner_name: 'Mara Quinn', value_cents: 2_800_000, event_type: 'Wedding' },
-    { id: 'lead-jordan', contact_id: 'ct-jordan', company_id: 'co-hale', venue_id: '22222222-2222-4222-8222-222222222222', venue_name: 'The Gallery', event_date: '2026-12-04', guest_count: 60, stage: 'inquiry', source: 'phone', owner_name: 'Chris Adeyemi', value_cents: 950_000, event_type: 'Private dinner' },
-    { id: 'lead-rene', contact_id: 'ct-rene', company_id: null, venue_id: '33333333-3333-4333-8333-333333333333', venue_name: 'The Garden Court', event_date: '2027-05-22', guest_count: 110, stage: 'proposal', source: 'planner', owner_name: 'Mara Quinn', value_cents: 2_200_000, event_type: 'Wedding' },
-    { id: 'lead-nina', contact_id: 'ct-nina', company_id: null, venue_id: '11111111-1111-4111-8111-111111111111', venue_name: 'The Conservatory', event_date: '2026-11-21', guest_count: 160, stage: 'contract', source: 'referral', owner_name: 'Chris Adeyemi', value_cents: 4_100_000, event_type: 'Wedding' },
-    { id: 'lead-luis', contact_id: 'ct-luis', company_id: null, venue_id: '22222222-2222-4222-8222-222222222222', venue_name: 'The Gallery', event_date: '2027-01-16', guest_count: 70, stage: 'deposit', source: 'website', owner_name: 'Mara Quinn', value_cents: 1_800_000, event_type: 'Corporate' },
-    { id: 'lead-priya', contact_id: 'ct-priya', company_id: null, venue_id: '11111111-1111-4111-8111-111111111111', venue_name: 'The Conservatory', event_date: '2026-11-14', guest_count: 120, stage: 'booked', source: 'planner', owner_name: 'Chris Adeyemi', value_cents: 3_600_000, event_type: 'Wedding' },
-    { id: 'lead-ellen', contact_id: 'ct-ellen', company_id: null, venue_id: '33333333-3333-4333-8333-333333333333', venue_name: 'The Garden Court', event_date: '2026-09-12', guest_count: 80, stage: 'completed', source: 'website', owner_name: 'Mara Quinn', value_cents: 1_500_000, event_type: 'Birthday' },
+    { id: 'lead-avery', contact_id: 'ct-avery', company_id: 'co-cole', venue_id: '44444444-4444-4444-8444-444444444444', venue_name: 'Prime Lux Pavilion', event_date: '2026-11-14', guest_count: 140, stage: 'tour', source: 'website', owner_name: 'Mara Quinn', value_cents: 2_800_000, event_type: 'Wedding' },
+    { id: 'lead-jordan', contact_id: 'ct-jordan', company_id: 'co-hale', venue_id: '44444444-4444-4444-8444-444444444444', venue_name: 'Prime Lux Pavilion', event_date: '2026-12-04', guest_count: 60, stage: 'inquiry', source: 'phone', owner_name: 'Chris Adeyemi', value_cents: 950_000, event_type: 'Private dinner' },
+    { id: 'lead-rene', contact_id: 'ct-rene', company_id: null, venue_id: '44444444-4444-4444-8444-444444444444', venue_name: 'Prime Lux Pavilion', event_date: '2027-05-22', guest_count: 110, stage: 'proposal', source: 'planner', owner_name: 'Mara Quinn', value_cents: 2_200_000, event_type: 'Wedding' },
+    { id: 'lead-nina', contact_id: 'ct-nina', company_id: null, venue_id: '44444444-4444-4444-8444-444444444444', venue_name: 'Prime Lux Pavilion', event_date: '2026-11-21', guest_count: 160, stage: 'contract', source: 'referral', owner_name: 'Chris Adeyemi', value_cents: 4_100_000, event_type: 'Wedding' },
+    { id: 'lead-luis', contact_id: 'ct-luis', company_id: null, venue_id: '44444444-4444-4444-8444-444444444444', venue_name: 'Prime Lux Pavilion', event_date: '2027-01-16', guest_count: 70, stage: 'deposit', source: 'website', owner_name: 'Mara Quinn', value_cents: 1_800_000, event_type: 'Corporate' },
+    { id: 'lead-priya', contact_id: 'ct-priya', company_id: null, venue_id: '44444444-4444-4444-8444-444444444444', venue_name: 'Prime Lux Pavilion', event_date: '2026-11-14', guest_count: 120, stage: 'booked', source: 'planner', owner_name: 'Chris Adeyemi', value_cents: 3_600_000, event_type: 'Wedding' },
+    { id: 'lead-ellen', contact_id: 'ct-ellen', company_id: null, venue_id: '44444444-4444-4444-8444-444444444444', venue_name: 'Prime Lux Pavilion', event_date: '2026-09-12', guest_count: 80, stage: 'completed', source: 'website', owner_name: 'Mara Quinn', value_cents: 1_500_000, event_type: 'Birthday' },
     { id: 'lead-maya', contact_id: 'ct-maya', company_id: null, venue_id: null, venue_name: 'Own venue · Westport', event_date: '2027-06-12', guest_count: 150, stage: 'inquiry', source: 'plan_flow', owner_name: 'Unassigned', value_cents: 0, event_type: 'Wedding', budget_range: '$7,500–$15,000', consent: true },
     { id: 'lead-sam', contact_id: 'ct-sam', company_id: null, venue_id: null, venue_name: null, event_date: '2026-10-30', guest_count: 40, stage: 'lost', source: 'phone', owner_name: 'Unassigned', value_cents: 1_200_000, event_type: 'Other' },
   ]
@@ -337,7 +337,7 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
       lead_id: 'lead-avery',
       booking_id: null,
       title: 'Prep the room',
-      description: 'Walk-through setup for The Conservatory.',
+      description: 'Walk-through setup for Prime Lux Pavilion.',
       status: 'in_progress',
       priority: 'medium',
       assignee_name: 'Mara Quinn',
@@ -443,25 +443,25 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
       },
     ],
     activities: [
-      { id: 'act1', lead_id: 'lead-avery', kind: 'email', body: 'Sent the Conservatory lookbook and November dates.', author_name: 'Mara Quinn', created_at: `${isoOffset(-3, now)}T15:00:00Z`, visibility: 'client' },
+      { id: 'act1', lead_id: 'lead-avery', kind: 'email', body: 'Sent the Pavilion lookbook and November dates.', author_name: 'Mara Quinn', created_at: `${isoOffset(-3, now)}T15:00:00Z`, visibility: 'client' },
       { id: 'act2', lead_id: 'lead-avery', kind: 'call', body: 'Spoke for twelve minutes. They want a ceremony and a seated dinner.', author_name: 'Mara Quinn', created_at: `${isoOffset(-1, now)}T18:10:00Z`, visibility: 'internal' },
       { id: 'act3', lead_id: 'lead-avery', kind: 'note', body: 'Asked for a late-afternoon ceremony.', author_name: 'Mara Quinn', created_at: `${today}T14:00:00Z`, visibility: 'internal' },
       { id: 'act4', lead_id: 'lead-avery', kind: 'client', body: 'Updated the guest count to 140.', author_name: 'Avery Cole', created_at: `${isoOffset(-2, now)}T16:20:00Z`, visibility: 'client' },
     ],
     tours: [
-      { id: 'tour-avery', lead_id: 'lead-avery', venue_id: '11111111-1111-4111-8111-111111111111', venue_name: 'The Conservatory', starts_at: `${isoOffset(4, now)}T18:00:00Z`, status: 'scheduled' },
+      { id: 'tour-avery', lead_id: 'lead-avery', venue_id: '44444444-4444-4444-8444-444444444444', venue_name: 'Prime Lux Pavilion', starts_at: `${isoOffset(4, now)}T18:00:00Z`, status: 'scheduled' },
     ],
     holds: [
-      { id: 'hold-priya', lead_id: 'lead-priya', venue_id: '11111111-1111-4111-8111-111111111111', venue_name: 'The Conservatory', starts_on: '2026-11-14', ends_on: '2026-11-15', status: 'booked' },
+      { id: 'hold-priya', lead_id: 'lead-priya', venue_id: '44444444-4444-4444-8444-444444444444', venue_name: 'Prime Lux Pavilion', starts_on: '2026-11-14', ends_on: '2026-11-15', status: 'booked' },
     ],
     proposals: [
       {
         id: 'prop-avery',
         lead_id: 'lead-avery',
-        title: 'Conservatory wedding',
+        title: 'Pavilion wedding',
         status: 'sent',
         lines: [
-          { id: 'ln1', kind: 'rental', name: 'Conservatory room', quantity: 1, unit_cents: 1_800_000 },
+          { id: 'ln1', kind: 'rental', name: 'Pavilion room', quantity: 1, unit_cents: 1_800_000 },
           { id: 'ln2', kind: 'service', name: 'Planning', quantity: 1, unit_cents: 600_000 },
           { id: 'ln3', kind: 'rental', name: 'Lighting package', quantity: 1, unit_cents: 400_000 },
         ],
@@ -498,14 +498,14 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
       { id: 'cue-5', lead_id: 'lead-avery', starts_at: '20:00', title: 'Dancing', notes: 'Floor clears to the stone.' },
     ],
     layouts: [
-      { lead_id: 'lead-avery', floor_plan_label: 'Conservatory, ceremony and dinner', body: 'Ceremony faces the glass. Dinner is a single long table. The dance floor takes the west end after the cake is cut. Keep the bridal room closed during cocktails.' },
+      { lead_id: 'lead-avery', floor_plan_label: 'Pavilion, ceremony and dinner', body: 'Ceremony faces the glass. Dinner is a single long table. The dance floor takes the west end after the cake is cut. Keep the bridal room closed during cocktails.' },
     ],
     documents: [
       { id: 'doc-1', lead_id: 'lead-avery', name: 'Florist agreement.pdf', kind: 'vendor', uploaded_by: 'Avery Cole', created_at: `${isoOffset(-1, now)}T12:00:00Z` },
       { id: 'doc-2', lead_id: 'lead-avery', name: 'Evening light references', kind: 'inspiration', uploaded_by: 'Avery Cole', created_at: `${today}T09:10:00Z` },
     ],
     messages: [
-      { id: 'msg-1', lead_id: 'lead-avery', author_name: 'Mara Quinn', role: 'staff', body: 'The Conservatory is held for the afternoon of the 14th. I will walk you through the room on the tour.', created_at: `${isoOffset(-2, now)}T15:00:00Z` },
+      { id: 'msg-1', lead_id: 'lead-avery', author_name: 'Mara Quinn', role: 'staff', body: 'Prime Lux Pavilion is held for the afternoon of the 14th. I will walk you through the room on the tour.', created_at: `${isoOffset(-2, now)}T15:00:00Z` },
       { id: 'msg-2', lead_id: 'lead-avery', author_name: 'Avery Cole', role: 'client', body: 'Can we add a small lounge for the cocktail hour, away from the ceremony chairs?', created_at: `${isoOffset(-1, now)}T19:40:00Z` },
     ],
   }
@@ -571,7 +571,7 @@ export function deskFromHub(hub: ClientHub): DeskWorkspace {
 export function toClientHub(desk: DeskWorkspace, leadId: string): ClientHub | null {
   const lead = desk.leads.find((item) => item.id === leadId)
   if (!lead) return null
-  const listing = VENUE_LISTINGS.find((item) => item.id === lead.venue_id) || null
+  const listing = VENUE_LISTINGS.find((item) => item.id === resolveVenueId(lead.venue_id)) || null
   const proposal = desk.proposals.find((item) => item.lead_id === lead.id && item.status !== 'draft')
   return {
     lead,

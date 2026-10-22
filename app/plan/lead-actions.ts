@@ -5,7 +5,7 @@ import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { checkRateLimit, clientIpFromHeaders } from '@/lib/security/rate-limit'
-import { VENUE_LISTINGS } from '@/lib/venues/directory'
+import { VENUE_LISTINGS, resolveVenueId } from '@/lib/venues/directory'
 import { resolvePriceCents } from '@/lib/catalog/adapters'
 import { LEAD_COOKIE, PLAN_BUDGETS, PLAN_EVENT_TYPES, type PlanLeadDraft } from '@/lib/leads/plan-options'
 
@@ -154,7 +154,7 @@ export async function submitPlanLead(input: Omit<PlanLeadDraft, 'guest_count' | 
       return { ok: false, error: field === 'consent' ? 'Please agree to be contacted.' : 'Please check your details and try again.' }
     }
     const d = parsed.data
-    const venue = d.location_choice === 'primelux' && d.venue_id ? VENUE_LISTINGS.find((v) => v.id === d.venue_id) ?? null : null
+    const venue = d.location_choice === 'primelux' && d.venue_id ? VENUE_LISTINGS.find((v) => v.id === resolveVenueId(d.venue_id)) ?? null : null
     const user = await currentUser()
     const admin = createServiceClient()
     const now = new Date().toISOString()
