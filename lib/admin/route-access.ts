@@ -34,6 +34,7 @@ export const ADMIN_ROUTE_RULES: AdminRouteRule[] = [
   { prefix: '/admin/bot-inbox', permission: 'bot_inbox.view' },
   { prefix: '/admin/api-keys', permission: 'settings.view' },
   { prefix: '/admin/activity', permission: 'settings.view' },
+  { prefix: '/admin/commissions', permission: 'reports.view' },
   { prefix: '/admin/analytics', permission: 'reports.view' },
   { prefix: '/admin/week-prep', permission: 'orders.view' },
   { prefix: '/admin/calendar', permission: 'orders.view' },
