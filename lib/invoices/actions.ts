@@ -89,7 +89,7 @@ export type SaveInvoiceInput = {
 /**
  * Save a draft. Catalog prices come from the database and the member discount applies only
  * if the planner's membership is active now (same rules as carts). Custom lines are the
- * planner's own services at the planner's price. The Prime Lux fee is recomputed here.
+ * planner's own services at the planner's price. The Prime Lux rental share and platform fee are recomputed here.
  */
 export async function saveInvoice(id: string, input: SaveInvoiceInput): Promise<Result<{ totalCents: number; feeCents: number }>> {
   const c = await caller()

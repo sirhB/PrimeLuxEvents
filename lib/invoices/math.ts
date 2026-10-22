@@ -4,8 +4,9 @@
  * An invoice mixes:
  *   catalog lines: Prime Lux rentals, priced exactly like carts (member cost + planner markup)
  *   custom lines:  the planner's own services (planning fee, coordination, third-party vendors)
- * Prime Lux's application fee covers ONLY the catalog lines (primeLuxFeeCents, same as carts).
- * A custom-only invoice carries no Prime Lux fee.
+ * The Prime Lux rental share covers ONLY the catalog lines (primeLuxFeeCents, same as carts).
+ * The Prime Lux platform fee (applicationFeeForPayment) applies to every payment, custom lines
+ * included, so a custom-only invoice still carries the platform fee (0% by default).
  */
 import { priceCart, type PricingContext, type PricingLineInput } from '../carts/pricing.ts'
 import { primeLuxFeeCents } from '../carts/split.ts'

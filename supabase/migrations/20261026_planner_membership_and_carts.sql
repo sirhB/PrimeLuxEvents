@@ -402,7 +402,7 @@ CREATE POLICY planner_cart_payments_planner_read ON public.planner_cart_payments
 -- ===========================================================================
 -- Planner invoicing (included with an active membership)
 -- Stripe Invoicing on the planner's connected account (direct). application_fee_amount
--- covers only Prime Lux catalog lines (lib/invoices/math.ts). Custom-only invoices: no fee.
+-- = rental share on Prime Lux catalog lines + platform fee on every payment (custom lines too).
 -- ===========================================================================
 
 ALTER TABLE public.planner_connect_accounts

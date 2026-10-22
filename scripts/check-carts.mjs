@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict'
 import { markupPct, memberCost, planPayments, priceCart, priceLine, splitEven } from '../lib/carts/pricing.ts'
 import { allocateFees, applicationFeeForPayment, feeRefundCents, isBlockedFeeLabel, paymentSplit, platformFeeCents, primeLuxFeeCents, splitFeeRefund, ZERO_PLATFORM_FEE, describePlatformFee } from '../lib/carts/split.ts'
+import { planConnectRefund } from '../lib/orders/refund.ts'
 import { displayStatus, invoiceAllowed, priceInvoice } from '../lib/invoices/math.ts'
 import { canSubscribe, isActiveMember, isEligible, nextMembershipState } from '../lib/membership/policy.ts'
 
@@ -212,7 +213,7 @@ t('invoice fee: mixed catalog + custom; fee covers catalog only', () => {
   // Fee is identical to the same catalog lines invoiced alone.
   assert.equal(priceInvoice(cat, [], member, { deliveryFeeCents: 5000, taxRate: 0.1, marketplaceFacilitator: true }).primeLuxFeeCents, 18200)
 })
-t('invoice fee: custom-only invoice carries no Prime Lux fee or delivery', () => {
+t('invoice fee: custom-only invoice carries no rental share or delivery (platform fee still applies per payment)', () => {
   const p = priceInvoice([], [{ unitCents: 150000, quantity: 1, taxable: true }], member, { deliveryFeeCents: 5000, taxRate: 0.1 })
   assert.equal(p.primeLuxFeeCents, 0)
   assert.equal(p.deliveryFeeCents, 0)
@@ -304,4 +305,25 @@ t('platform fee disclosure copy', () => {
   assert.equal(describePlatformFee({ bps: 250, flatCents: 30, minCents: null, capCents: 5000 }), '2.5% + $0.30 per payment, maximum $50')
 })
 
+t('connect order refund: full refund spans every paid charge, newest first, fee back proportionally', () => {
+  const pays = [
+    { id: 'dep', amountCents: 30000, refundedCents: 0, applicationFeeCents: 12000, paidAt: '2026-10-01' },
+    { id: 'bal', amountCents: 70000, refundedCents: 0, applicationFeeCents: 28000, paidAt: '2026-10-20' },
+  ]
+  const full = planConnectRefund(pays, null)
+  assert.ok(full.ok)
+  assert.equal(full.amount, 100000)
+  assert.deepEqual(full.parts, [{ id: 'bal', amount: 70000, feeReturnedCents: 28000 }, { id: 'dep', amount: 30000, feeReturnedCents: 12000 }])
+  const part = planConnectRefund(pays, 80000)
+  assert.ok(part.ok)
+  assert.deepEqual(part.parts, [{ id: 'bal', amount: 70000, feeReturnedCents: 28000 }, { id: 'dep', amount: 10000, feeReturnedCents: 4000 }])
+})
+t('connect order refund: honors prior refunds and rejects over-refunds', () => {
+  const pays = [{ id: 'a', amountCents: 10000, refundedCents: 10000, applicationFeeCents: 3333 }, { id: 'b', amountCents: 10000, refundedCents: 2500, applicationFeeCents: 3333 }]
+  const r = planConnectRefund(pays, 5000)
+  assert.ok(r.ok)
+  assert.deepEqual(r.parts, [{ id: 'b', amount: 5000, feeReturnedCents: 1666 }])
+  assert.equal(planConnectRefund(pays, 7501).ok, false)
+  assert.equal(planConnectRefund([{ id: 'x', amountCents: 500, refundedCents: 500, applicationFeeCents: 0 }], null).ok, false)
+})
 console.log(`check-carts: ${n} checks passed`)

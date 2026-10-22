@@ -10,7 +10,7 @@ import { Notice, PressButton, StateChip, money, shortDate } from '@/components/a
 import { saveInvoice, sendInvoice, voidInvoice, type SaveInvoiceLine } from '@/lib/invoices/actions'
 import { priceInvoice } from '@/lib/invoices/math'
 import { planPayments, type PlanMode } from '@/lib/carts/pricing'
-import { allocateFees, applicationFeeForPayment, isBlockedFeeLabel } from '@/lib/carts/split'
+import { allocateFees, applicationFeeForPayment, isBlockedFeeLabel, describePlatformFee } from '@/lib/carts/split'
 import type { InvoiceContext, InvoiceView } from '@/lib/invoices/types'
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -132,7 +132,7 @@ export function InvoiceEditor({ invoice, ctx, demo = false }: { invoice: Invoice
                 <button type="button" onClick={addCatalog} className="hub-chip min-h-11"><Plus className="mr-1 inline size-4" />Rental</button>
                 <button type="button" onClick={addCustom} className="hub-chip min-h-11"><Plus className="mr-1 inline size-4" />Your service</button>
               </div>
-              <p className="text-[11px] text-[var(--dashboard-text-muted)]">Your services (planning, coordination, other vendors) are yours in full; Prime Lux takes no fee on them.</p>
+              <p className="text-[11px] text-[var(--dashboard-text-muted)]">No Prime Lux rental share on your services (planning, coordination, other vendors). The Prime Lux platform fee ({describePlatformFee(ctx.platformFee)}) still applies to every payment, including these lines. It comes out of what you keep, never the client’s total.</p>
             </div>
           )}
         </section>
@@ -270,7 +270,7 @@ function CustomRow({ l, locked, onChange, onRemove }: { l: CusLine; locked: bool
       </div>
       <label className="flex min-h-11 items-center gap-2 text-xs text-[var(--dashboard-text-muted)]">
         <input type="checkbox" className="size-5 accent-[var(--theme-dark)]" disabled={locked} checked={l.taxable} onChange={(e) => onChange({ taxable: e.target.checked })} /> Taxable
-        <span className="ml-auto text-[10px] uppercase tracking-[0.1em]">Your service · no Prime Lux fee</span>
+        <span className="ml-auto text-[10px] uppercase tracking-[0.1em]">Your service · platform fee applies</span>
       </label>
     </div>
   )
