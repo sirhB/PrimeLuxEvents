@@ -13,6 +13,7 @@ import { fetchIsStaffClient } from '@/lib/auth/roles-shared'
 import { safeInternalPath } from '@/lib/security/safe-path'
 import { assertAuthAttemptAllowed } from '@/app/actions/auth-rate-limit'
 import { BrandLockup } from '@/components/brand/brand-logo'
+import { signInWithUsername } from '@/app/actions/username-login'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
@@ -28,6 +29,29 @@ function LoginForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    const identifier = email.trim()
+    if (identifier && !identifier.includes('@')) {
+      // Staff username sign-in, resolved and rate-limited on the server.
+      try {
+        const result = await signInWithUsername(identifier, password)
+        if (!result.ok) {
+          toast.error(result.error)
+          return
+        }
+        toast.success('Signed in')
+        if (result.mustChangePassword) {
+          router.push('/login/change-password')
+        } else {
+          router.push(nextParam && nextParam.startsWith('/admin') ? nextParam : '/admin')
+        }
+        router.refresh()
+      } catch {
+        toast.error('An unexpected error occurred')
+      } finally {
+        setLoading(false)
+      }
+      return
+    }
     const gate = await assertAuthAttemptAllowed('login')
     if (!gate.ok) {
       toast.error(gate.error)
@@ -38,7 +62,7 @@ function LoginForm() {
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: identifier,
         password,
       })
 
@@ -101,11 +125,15 @@ function LoginForm() {
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email or staff username</Label>
               <Input
                 id="email"
-                type="email"
-                placeholder="you@example.com"
+                type="text"
+                autoComplete="username"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder="you@example.com or username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
