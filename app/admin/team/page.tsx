@@ -10,6 +10,8 @@ import { RolesManagement } from '@/components/admin/team/roles-management'
 import { InvitationsList } from '@/components/admin/team/invitations-list'
 import { InviteUserDialog } from '@/components/admin/team/invite-user-dialog'
 import { AdminPage } from '@/components/admin/page-shell'
+import { CreateAdminDialog } from '@/components/admin/team/create-admin-dialog'
+import { isCurrentUserSuperAdmin } from '@/app/admin/team/admin-username-actions'
 import { AdminPageHeader } from '@/components/admin/page-shell'
 
 export const dynamic = 'force-dynamic'
@@ -73,6 +75,7 @@ export default async function TeamManagementPage() {
 
     const canInviteUsers = await hasPermission('users.create')
     const canManageRoles = await hasPermission('users.manage')
+    const canCreateAdmins = await isCurrentUserSuperAdmin()
 
     return (
         <AdminPage>
@@ -80,7 +83,12 @@ export default async function TeamManagementPage() {
                 eyebrow="Administration"
                 title="Team Management"
                 description="Manage members, roles, and access permissions."
-                actions={canInviteUsers ? <InviteUserDialog /> : undefined}
+                actions={(canInviteUsers || canCreateAdmins) ? (
+                    <div className="flex flex-wrap gap-2">
+                        {canCreateAdmins && <CreateAdminDialog roles={roles} />}
+                        {canInviteUsers && <InviteUserDialog />}
+                    </div>
+                ) : undefined}
             />
 
             {serviceRoleError && (

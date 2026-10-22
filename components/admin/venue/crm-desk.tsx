@@ -13,6 +13,7 @@ import {
   type DeskWorkspace,
   type PipelineStage,
   type SavedView,
+  type CartFilter,
 } from '@/lib/venues/desk'
 import { useDesk } from '@/components/admin/venue/use-desk'
 import { cn } from '@/lib/utils'
@@ -33,11 +34,17 @@ export function CrmDesk({
   const [tab, setTab] = useState<'board' | 'contacts' | 'calendar' | 'reports'>('board')
   const [view, setView] = useState<Pick<SavedView, 'stage' | 'source' | 'owner' | 'query'>>({ stage: 'all', source: 'all', owner: 'all', query: '' })
   const [viewName, setViewName] = useState('')
-  const leads = useMemo(() => filterLeads(api.desk, view), [api.desk, view])
+  const [cartFilter, setCartFilter] = useState<CartFilter>('all')
+  const [abandonDays, setAbandonDays] = useState(initial.abandon_days ?? 3)
+  const leads = useMemo(() => filterLeads(api.desk, { ...view, cart: cartFilter, abandonDays }), [api.desk, view, cartFilter, abandonDays])
   const owners = [...new Set(api.desk.leads.map((lead) => lead.owner_name))]
 
+  const savedAbandonDays = api.desk.abandon_days ?? 3
+  const today = new Date().toISOString().slice(0, 10)
+  const openReminders = api.desk.reminders.filter((item) => !item.done)
+  const dueReminders = openReminders.filter((item) => item.due_on <= today)
   const openLeads = api.desk.leads.filter((lead) => lead.stage !== 'lost' && lead.stage !== 'completed')
-  const filtersOn = view.stage !== 'all' || view.source !== 'all' || view.owner !== 'all' || view.query !== ''
+  const filtersOn = cartFilter !== 'all' || view.stage !== 'all' || view.source !== 'all' || view.owner !== 'all' || view.query !== ''
 
   return (
     <div className="space-y-6">
@@ -46,6 +53,23 @@ export function CrmDesk({
         <span className="font-medium tabular-nums text-[var(--dashboard-text)]">{formatCurrency(pipelineValue(api.desk.leads))}</span> in pipeline ·{' '}
         <span className="font-medium tabular-nums text-[var(--dashboard-text)]">{Math.round(conversionRate(api.desk.leads) * 100)}%</span> converted
       </p>
+
+      {dueReminders.length > 0 && (
+        <section aria-label="Follow-ups due" className="border-l-2 border-[var(--dashboard-accent-gold)] bg-white px-4 py-3">
+          <p className="text-xs font-medium uppercase tracking-[0.12em] text-[var(--dashboard-text-muted)]">Follow-ups due · {dueReminders.length}</p>
+          <ul className="mt-2 space-y-1 text-sm">
+            {dueReminders.slice(0, 5).map((item) => {
+              const lead = api.desk.leads.find((row) => row.id === item.lead_id)
+              return (
+                <li key={item.id} className="truncate">
+                  <Link href={`${leadBase}/${item.lead_id}`} className="underline-offset-4 hover:underline">{lead ? contactName(api.desk, lead.contact_id) : 'Lead'}</Link>
+                  <span className="text-[var(--dashboard-text-muted)]"> · <span className="tabular-nums">{item.due_on}</span> · {item.body}</span>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      )}
 
       <div role="tablist" aria-label="Venue desk" className="-mx-4 flex overflow-x-auto border-b border-[var(--dashboard-border)] px-4 md:mx-0 md:px-0">
         {(['board', 'contacts', 'calendar', 'reports'] as const).map((item) => (
@@ -87,6 +111,28 @@ export function CrmDesk({
                 {owners.map((owner) => <option key={owner} value={owner}>{owner}</option>)}
               </select>
             </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <select aria-label="Cart" className="plan-field !mt-0 !w-auto !text-sm" value={cartFilter} onChange={(event) => setCartFilter(event.target.value as CartFilter)}>
+                <option value="all">Any cart</option>
+                <option value="has_cart">Has a cart</option>
+                <option value="open">Cart open</option>
+                <option value="abandoned">Cart abandoned</option>
+                <option value="checked_out">Checked out</option>
+                <option value="none">No cart</option>
+              </select>
+              {cartFilter === 'abandoned' && (
+                <label className="flex items-center gap-2 text-xs text-[var(--dashboard-text-muted)]">
+                  No checkout after
+                  <input type="number" min={1} max={60} value={abandonDays} onChange={(event) => setAbandonDays(Math.max(1, Number(event.target.value) || 3))} className="plan-field !mt-0 !w-16 !text-sm" />
+                  days
+                  {abandonDays !== savedAbandonDays ? (
+                    <button type="button" className="text-xs font-medium text-[var(--dashboard-text)] underline underline-offset-4" onClick={() => api.setAbandonDays(abandonDays)}>Save as default</button>
+                  ) : (
+                    <span>(default)</span>
+                  )}
+                </label>
+              )}
+            </div>
             <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:px-0">
               <span className="shrink-0 text-xs text-[var(--dashboard-text-muted)]">Views</span>
               {api.desk.views.map((saved) => (
@@ -95,7 +141,7 @@ export function CrmDesk({
                 </button>
               ))}
               {filtersOn && (
-                <button type="button" className="shrink-0 text-xs underline underline-offset-4" onClick={() => setView({ stage: 'all', source: 'all', owner: 'all', query: '' })}>Clear</button>
+                <button type="button" className="shrink-0 text-xs underline underline-offset-4" onClick={() => { setCartFilter('all'); setView({ stage: 'all', source: 'all', owner: 'all', query: '' }) }}>Clear</button>
               )}
               <form
                 className="ml-auto flex shrink-0 items-center gap-2"
@@ -133,6 +179,16 @@ export function CrmDesk({
                             <span className="shrink-0 text-sm tabular-nums">{formatCurrency(lead.value_cents)}</span>
                           </div>
                           <p className="mt-1 text-xs text-[var(--dashboard-text-muted)]">{company?.name || 'Private client'} · {lead.source}</p>
+                          {(() => {
+                            const next = openReminders.find((item) => item.lead_id === lead.id)
+                            if (!next) return null
+                            const due = next.due_on <= today
+                            return (
+                              <p className={cn('mt-1 truncate text-xs', due ? 'font-medium text-[var(--destructive)]' : 'text-[var(--dashboard-text-muted)]')}>
+                                Follow up {due ? 'due ' : ''}<span className="tabular-nums">{next.due_on}</span> · {next.body}
+                              </p>
+                            )
+                          })()}
                           <p className="mt-0.5 text-xs">{lead.venue_name || 'Venue open'} · <span className="tabular-nums">{lead.event_date || 'Date open'}</span></p>
                           <div className="mt-3 flex items-center justify-between gap-2">
                             <span className="truncate text-xs text-[var(--dashboard-text-muted)]">{lead.owner_name}</span>

@@ -69,9 +69,6 @@ export function SiteFooter() {
                 <Link href="/plan" className="hover:text-foreground transition-colors">Plan your event</Link>
               </li>
               <li>
-                <Link href="/venues" className="hover:text-foreground transition-colors">Venues</Link>
-              </li>
-              <li>
                 <Link href="/catalog" className="hover:text-foreground transition-colors flex items-center group">
                   <ArrowRight className="h-3 w-3 mr-2 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
                   Rental catalog
@@ -82,6 +79,14 @@ export function SiteFooter() {
                   <ArrowRight className="h-3 w-3 mr-2 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all" />
                   Event Packages
                 </Link>
+              </li>
+              <li>
+                <Link href="/venues" className="hover:text-foreground transition-colors">Venues</Link>
+                <ul className="mt-3 space-y-2 border-l border-[var(--theme-dark)]/10 pl-4 text-[13px]">
+                  <li><Link href="/venues/the-conservatory" className="hover:text-foreground transition-colors">The Conservatory</Link></li>
+                  <li><Link href="/venues/the-gallery" className="hover:text-foreground transition-colors">The Gallery</Link></li>
+                  <li><Link href="/venues/the-garden-court" className="hover:text-foreground transition-colors">The Garden Court</Link></li>
+                </ul>
               </li>
               <li>
                 <Link href="/gallery" className="hover:text-foreground transition-colors flex items-center group">

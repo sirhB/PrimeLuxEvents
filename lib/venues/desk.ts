@@ -1,4 +1,7 @@
 import { VENUE_LISTINGS } from './directory'
+import { DEFAULT_ABANDON_DAYS, parseAbandonDays } from './abandon'
+
+export { DEFAULT_ABANDON_DAYS, parseAbandonDays }
 
 export const PIPELINE_STAGES = [
   { id: 'inquiry', label: 'Inquiry' },
@@ -13,7 +16,7 @@ export const PIPELINE_STAGES = [
 
 export type PipelineStage = (typeof PIPELINE_STAGES)[number]['id']
 
-export const LEAD_SOURCES = ['website', 'phone', 'planner', 'referral', 'event_plan', 'venue_page'] as const
+export const LEAD_SOURCES = ['website', 'phone', 'planner', 'referral', 'event_plan', 'venue_page', 'plan_flow'] as const
 export type LeadSource = (typeof LEAD_SOURCES)[number]
 
 export const OPEN_STAGES: PipelineStage[] = ['inquiry', 'tour', 'proposal', 'contract', 'deposit', 'booked']
@@ -104,7 +107,12 @@ export type Lead = {
   owner_name: string
   value_cents: number
   event_type: string
+  budget_range?: string | null
+  consent?: boolean
 }
+
+export type LeadCartLine = { id: string; name: string; quantity: number; unit_cents: number; product_id?: string | null; package_id?: string | null }
+export type LeadCart = { lead_id: string; items: LeadCartLine[]; item_count: number; subtotal_cents: number; updated_at: string; checked_out_at: string | null }
 
 export type DeskWorkspace = {
   companies: Company[]
@@ -117,6 +125,8 @@ export type DeskWorkspace = {
   contracts: Contract[]
   payments: Payment[]
   reminders: Reminder[]
+  /** Admin setting `crm_cart_abandon_days` (default 3). */
+  abandon_days?: number
   tasks: StaffTask[]
   templates: TaskTemplate[]
   views: SavedView[]
@@ -125,6 +135,8 @@ export type DeskWorkspace = {
   layouts: LayoutNote[]
   documents: ClientDocument[]
   messages: ClientMessage[]
+  /** Server-side carts from the Plan-your-event flow (optional for older callers). */
+  carts?: LeadCart[]
 }
 
 export function normalizeStage(stage: string | null | undefined): PipelineStage {
@@ -287,6 +299,7 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
     { id: 'ct-luis', company_id: null, name: 'Luis Ortega', email: 'luis.ortega@example.com', phone: '(860) 555-0177', title: null },
     { id: 'ct-priya', company_id: null, name: 'Priya Shah', email: 'priya.shah@example.com', phone: '(203) 555-0188', title: null },
     { id: 'ct-ellen', company_id: null, name: 'Ellen Cho', email: 'ellen.cho@example.com', phone: '(203) 555-0133', title: null },
+    { id: 'ct-maya', company_id: null, name: 'Maya Brooks', email: 'maya.brooks@example.com', phone: '(203) 555-0157', title: null },
     { id: 'ct-sam', company_id: null, name: 'Sam Idris', email: 'sam.idris@example.com', phone: '(203) 555-0120', title: null },
   ]
   const leads: Lead[] = [
@@ -297,6 +310,7 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
     { id: 'lead-luis', contact_id: 'ct-luis', company_id: null, venue_id: '22222222-2222-4222-8222-222222222222', venue_name: 'The Gallery', event_date: '2027-01-16', guest_count: 70, stage: 'deposit', source: 'website', owner_name: 'Mara Quinn', value_cents: 1_800_000, event_type: 'Corporate' },
     { id: 'lead-priya', contact_id: 'ct-priya', company_id: null, venue_id: '11111111-1111-4111-8111-111111111111', venue_name: 'The Conservatory', event_date: '2026-11-14', guest_count: 120, stage: 'booked', source: 'planner', owner_name: 'Chris Adeyemi', value_cents: 3_600_000, event_type: 'Wedding' },
     { id: 'lead-ellen', contact_id: 'ct-ellen', company_id: null, venue_id: '33333333-3333-4333-8333-333333333333', venue_name: 'The Garden Court', event_date: '2026-09-12', guest_count: 80, stage: 'completed', source: 'website', owner_name: 'Mara Quinn', value_cents: 1_500_000, event_type: 'Birthday' },
+    { id: 'lead-maya', contact_id: 'ct-maya', company_id: null, venue_id: null, venue_name: 'Own venue · Westport', event_date: '2027-06-12', guest_count: 150, stage: 'inquiry', source: 'plan_flow', owner_name: 'Unassigned', value_cents: 0, event_type: 'Wedding', budget_range: '$7,500–$15,000', consent: true },
     { id: 'lead-sam', contact_id: 'ct-sam', company_id: null, venue_id: null, venue_name: null, event_date: '2026-10-30', guest_count: 40, stage: 'lost', source: 'phone', owner_name: 'Unassigned', value_cents: 1_200_000, event_type: 'Other' },
   ]
   const tasks: StaffTask[] = [
@@ -405,6 +419,29 @@ export function buildSampleDesk(now = new Date()): DeskWorkspace {
     companies,
     contacts,
     leads,
+    carts: [
+      {
+        lead_id: 'lead-maya',
+        items: [
+          { id: 'c1', name: 'Gold Chiavari chair', quantity: 150, unit_cents: 900 },
+          { id: 'c2', name: '8 ft farm table', quantity: 15, unit_cents: 6500 },
+          { id: 'c3', name: 'Crystal chandelier', quantity: 3, unit_cents: 22500 },
+          { id: 'c4', name: 'Ivory linen, 90 × 156', quantity: 15, unit_cents: 2800 },
+        ],
+        item_count: 183,
+        subtotal_cents: 150 * 900 + 15 * 6500 + 3 * 22500 + 15 * 2800,
+        updated_at: `${isoOffset(-5, now)}T21:40:00Z`,
+        checked_out_at: null,
+      },
+      {
+        lead_id: 'lead-avery',
+        items: [{ id: 'c5', name: 'Velvet lounge set', quantity: 2, unit_cents: 45000 }],
+        item_count: 2,
+        subtotal_cents: 90000,
+        updated_at: `${isoOffset(-1, now)}T14:00:00Z`,
+        checked_out_at: null,
+      },
+    ],
     activities: [
       { id: 'act1', lead_id: 'lead-avery', kind: 'email', body: 'Sent the Conservatory lookbook and November dates.', author_name: 'Mara Quinn', created_at: `${isoOffset(-3, now)}T15:00:00Z`, visibility: 'client' },
       { id: 'act2', lead_id: 'lead-avery', kind: 'call', body: 'Spoke for twelve minutes. They want a ceremony and a seated dinner.', author_name: 'Mara Quinn', created_at: `${isoOffset(-1, now)}T18:10:00Z`, visibility: 'internal' },
@@ -665,9 +702,23 @@ export function contactName(desk: DeskWorkspace, contactId: string) {
   return desk.contacts.find((contact) => contact.id === contactId)?.name || 'Contact'
 }
 
-export function filterLeads(desk: DeskWorkspace, view: Pick<SavedView, 'stage' | 'source' | 'owner' | 'query'>) {
+export type CartFilter = 'all' | 'has_cart' | 'open' | 'abandoned' | 'checked_out' | 'none'
+
+export function leadCartStatus(desk: DeskWorkspace, leadId: string, now = Date.now(), abandonDays = desk.abandon_days ?? DEFAULT_ABANDON_DAYS): Exclude<CartFilter, 'all' | 'has_cart'> | 'empty' {
+  const cart = desk.carts?.find((item) => item.lead_id === leadId)
+  if (!cart) return 'none'
+  if (cart.checked_out_at) return 'checked_out'
+  if (cart.item_count === 0) return 'empty'
+  return now - new Date(cart.updated_at).getTime() > abandonDays * 86_400_000 ? 'abandoned' : 'open'
+}
+
+export function filterLeads(desk: DeskWorkspace, view: Pick<SavedView, 'stage' | 'source' | 'owner' | 'query'> & { cart?: CartFilter; abandonDays?: number }) {
   const query = view.query.trim().toLowerCase()
   return desk.leads.filter((lead) => {
+    if (view.cart && view.cart !== 'all') {
+      const status = leadCartStatus(desk, lead.id, Date.now(), view.abandonDays ?? desk.abandon_days ?? DEFAULT_ABANDON_DAYS)
+      if (view.cart === 'has_cart' ? status === 'none' || status === 'empty' : status !== view.cart) return false
+    }
     if (view.stage !== 'all' && lead.stage !== view.stage) return false
     if (view.source !== 'all' && lead.source !== view.source) return false
     if (view.owner !== 'all' && lead.owner_name !== view.owner) return false

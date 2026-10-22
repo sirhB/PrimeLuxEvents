@@ -1,5 +1,6 @@
 'use client'
 
+import { markLeadCartCheckedOut } from '@/app/plan/lead-actions'
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createOrder, type CartItem, type CheckoutFormData } from '@/app/actions/checkout'
@@ -110,6 +111,7 @@ function CheckoutReturnContent() {
 
                     if (result.success) {
                         setStatus('success')
+                        markLeadCartCheckedOut((result as { orderId?: string }).orderId ?? null).catch(() => null)
                         clearCart()
                         localStorage.removeItem('checkout_form_data')
                         router.push(`/order-confirmation?orderId=${result.orderId}`)
